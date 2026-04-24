@@ -34,7 +34,10 @@ public abstract class SharedBlobCarrierSystem : EntitySystem
                 continue;
 
             var remainingTime = Math.Round(comp.TransformationDelay - comp.TransformationTimer, 0);
-            _popup.PopupClient(Loc.GetString("carrier-blob-alert", ("second", remainingTime)), ent, ent, PopupType.LargeCaution);
+            _popup.PopupClient(Loc.GetString("carrier-blob-alert", ("second", remainingTime)),
+                ent,
+                ent,
+                PopupType.LargeCaution);
 
             comp.NextAlert = _gameTiming.CurTime + TimeSpan.FromSeconds(comp.AlertInterval);
 

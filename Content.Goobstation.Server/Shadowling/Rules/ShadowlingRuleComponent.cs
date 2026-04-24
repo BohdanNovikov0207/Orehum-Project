@@ -6,7 +6,7 @@
 
 namespace Content.Goobstation.Server.Shadowling.Rules;
 
-[RegisterComponent, Access(typeof(ShadowlingRuleSystem))]
+[RegisterComponent] [Access(typeof(ShadowlingRuleSystem))]
 public sealed partial class ShadowlingRuleComponent : Component
 {
     [DataField]
@@ -23,5 +23,5 @@ public enum ShadowlingWinCondition : byte
 {
     Draw,
     Win,
-    Failure
+    Failure,
 }

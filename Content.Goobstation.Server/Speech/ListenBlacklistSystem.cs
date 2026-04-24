@@ -1,12 +1,11 @@
 using Content.Goobstation.Shared.Speech;
-using Content.Server.Speech;
 using Content.Shared.Speech;
 using Content.Shared.Whitelist;
 
 namespace Content.Goobstation.Server.Speech;
 
 /// <summary>
-/// Handles <see cref="ListenAttemptEvent"/> for <see cref="ListenBlacklistComponent"/>.
+/// Handles <see cref="ListenAttemptEvent" /> for <see cref="ListenBlacklistComponent" />.
 /// </summary>
 public sealed class ListenBlacklistSystem : EntitySystem
 {

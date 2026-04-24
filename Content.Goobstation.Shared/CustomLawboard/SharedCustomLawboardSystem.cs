@@ -1,19 +1,23 @@
+using System.Linq;
 using Content.Shared.Administration.Logs;
 using Content.Shared.Database;
 using Content.Shared.Popups;
 using Content.Shared.Silicons.Laws;
 using Content.Shared.Silicons.Laws.Components;
-using System.Linq;
 
 namespace Content.Goobstation.Shared.CustomLawboard;
 
 public abstract class SharedCustomLawboardSystem : EntitySystem
 {
+    public static readonly int MaxLaws = 15;
+
+    public static readonly int
+        MaxLawLength =
+            512; // These 2 are random arbitrary numbers (These don't seem like they're worth making cvars for)
+
     [Dependency] private readonly ISharedAdminLogManager _adminLogger = default!;
     [Dependency] private readonly SharedPopupSystem _popup = default!;
 
-    public static readonly int MaxLaws = 15;
-    public static readonly int MaxLawLength = 512; // These 2 are random arbitrary numbers (These don't seem like they're worth making cvars for)
     public override void Initialize()
     {
         base.Initialize();
@@ -24,21 +28,23 @@ public abstract class SharedCustomLawboardSystem : EntitySystem
     public static List<SiliconLaw> SanitizeLaws(List<SiliconLaw> listToSanitize)
     {
         var sanitizedLaws = new List<SiliconLaw>();
-        foreach (SiliconLaw law in listToSanitize.Take(MaxLaws)) // clamp to maxlaws  
+        foreach (var law in listToSanitize.Take(MaxLaws)) // clamp to maxlaws  
         {
-            var sanitizedLaw = law.LawString.Replace("\n", " "); // Remove newlines cause they mess chat up when the law is stated  
+            var sanitizedLaw =
+                law.LawString.Replace("\n", " "); // Remove newlines cause they mess chat up when the law is stated  
 
             // clamp max law length
             if (sanitizedLaw.Length > MaxLawLength)
                 sanitizedLaw = sanitizedLaw[..MaxLawLength];
 
-            sanitizedLaws.Add(new SiliconLaw()
+            sanitizedLaws.Add(new SiliconLaw
             {
                 LawString = sanitizedLaw,
                 Order = law.Order,
-                LawIdentifierOverride = law.LawIdentifierOverride
+                LawIdentifierOverride = law.LawIdentifierOverride,
             });
         }
+
         return sanitizedLaws;
     }
 
@@ -50,7 +56,9 @@ public abstract class SharedCustomLawboardSystem : EntitySystem
         return lawset;
     }
 
-    private void OnChangeLaws(EntityUid uid, CustomLawboardComponent customLawboard, CustomLawboardChangeLawsMessage args)
+    private void OnChangeLaws(EntityUid uid,
+        CustomLawboardComponent customLawboard,
+        CustomLawboardChangeLawsMessage args)
     {
         var provider = EnsureComp<SiliconLawProviderComponent>(uid);
         var sanitizedLaws = SanitizeLaws(args.Laws);
@@ -62,10 +70,14 @@ public abstract class SharedCustomLawboardSystem : EntitySystem
         Dirty(uid, customLawboard);
 
         if (args.Popup)
-        {
-            _popup.PopupClient(Loc.GetString("custom-lawboard-updated"), args.Actor, args.Actor); // This is entirely to make the UI feel responsive
-        }
+            _popup.PopupClient(Loc.GetString("custom-lawboard-updated"),
+                args.Actor,
+                args.Actor); // This is entirely to make the UI feel responsive
     }
 
-    protected virtual void DirtyUI(EntityUid uid, CustomLawboardComponent? customLawboard, UserInterfaceComponent? ui = null) { }
+    protected virtual void DirtyUI(EntityUid uid,
+        CustomLawboardComponent? customLawboard,
+        UserInterfaceComponent? ui = null)
+    {
+    }
 }

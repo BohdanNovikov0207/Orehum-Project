@@ -12,7 +12,6 @@ using System.Linq;
 using Content.Goobstation.Common.Blob;
 using Content.Server.Abilities.Felinid;
 using Content.Server.Ghost.Roles.Events;
-using Content.Server.Nutrition.Components;
 using Content.Server.Station.Components;
 using Content.Server.StationEvents.Components;
 using Content.Server.StationEvents.Events;
@@ -27,8 +26,8 @@ namespace Content.Goobstation.Server.Blob.StationEvents;
 
 public sealed class BlobSpawnRule : StationEventSystem<BlobSpawnRuleComponent>
 {
-    [Dependency] private readonly IRobustRandom _random = default!;
     [Dependency] private readonly IPlayerManager _playerSystem = default!;
+    [Dependency] private readonly IRobustRandom _random = default!;
 
     public override void Initialize()
     {
@@ -44,9 +43,7 @@ public sealed class BlobSpawnRule : StationEventSystem<BlobSpawnRuleComponent>
         base.Started(uid, component, gameRule, args);
 
         if (!TryGetRandomStation(out var station))
-        {
             return;
-        }
 
         var locations = EntityQueryEnumerator<VentCritterSpawnLocationComponent, TransformComponent>();
         var validLocations = new List<EntityCoordinates>();
@@ -56,9 +53,7 @@ public sealed class BlobSpawnRule : StationEventSystem<BlobSpawnRuleComponent>
                 continue;
 
             if (CompOrNull<StationMemberComponent>(transform.GridUid)?.Station == station)
-            {
                 validLocations.Add(transform.Coordinates);
-            }
         }
 
         if (validLocations.Count == 0)
@@ -68,7 +63,8 @@ public sealed class BlobSpawnRule : StationEventSystem<BlobSpawnRuleComponent>
         }
 
         var playerPool = _playerSystem.Sessions.ToList();
-        var numBlobs = MathHelper.Clamp(playerPool.Count / component.PlayersPerCarrierBlob, 1, component.MaxCarrierBlob);
+        var numBlobs =
+            MathHelper.Clamp(playerPool.Count / component.PlayersPerCarrierBlob, 1, component.MaxCarrierBlob);
 
         for (var i = 0; i < numBlobs; i++)
         {
@@ -92,7 +88,5 @@ public sealed class BlobSpawnRule : StationEventSystem<BlobSpawnRuleComponent>
         // Blob doesn't spawn when blob carrier was eaten.
         RemComp<FoodComponent>(carrier);
         RemComp<FelinidFoodComponent>(carrier);
-
-
     }
 }

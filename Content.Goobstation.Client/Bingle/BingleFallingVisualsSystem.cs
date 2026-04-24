@@ -15,13 +15,11 @@ using Content.Goobstation.Shared.Bingle;
 using Robust.Client.Animations;
 using Robust.Client.GameObjects;
 using Robust.Shared.Animations;
-using Robust.Shared.GameObjects;
-using Robust.Shared.IoC;
 
 namespace Content.Goobstation.Client.Bingle;
 
 /// <summary>
-///     Handles the falling animation for entities that fall into a Binglepit. shamlesly copied from chasm
+/// Handles the falling animation for entities that fall into a Binglepit. shamlesly copied from chasm
 /// </summary>
 public sealed class BingleFallingVisualsSystem : EntitySystem
 {
@@ -41,9 +39,7 @@ public sealed class BingleFallingVisualsSystem : EntitySystem
     {
         if (!TryComp<SpriteComponent>(uid, out var sprite) ||
             TerminatingOrDeleted(uid))
-        {
             return;
-        }
 
         component.OriginalScale = sprite.Scale;
 
@@ -73,12 +69,12 @@ public sealed class BingleFallingVisualsSystem : EntitySystem
     {
         var length = component.AnimationTime;
 
-        return new Animation()
+        return new Animation
         {
             Length = length,
             AnimationTracks =
             {
-                new AnimationTrackComponentProperty()
+                new AnimationTrackComponentProperty
                 {
                     ComponentType = typeof(SpriteComponent),
                     Property = nameof(SpriteComponent.Scale),
@@ -87,9 +83,9 @@ public sealed class BingleFallingVisualsSystem : EntitySystem
                         new AnimationTrackProperty.KeyFrame(component.OriginalScale, 0.0f),
                         new AnimationTrackProperty.KeyFrame(component.AnimationScale, length.Seconds),
                     },
-                    InterpolationMode = AnimationInterpolationMode.Cubic
-                }
-            }
+                    InterpolationMode = AnimationInterpolationMode.Cubic,
+                },
+            },
         };
     }
 }

@@ -6,29 +6,29 @@ namespace Content.Goobstation.Shared.Shadowling;
 /// <summary>
 /// This handles Sling's DoAfter Events
 /// </summary>
-[Serializable, NetSerializable]
+[Serializable] [NetSerializable]
 public sealed partial class EnthrallDoAfterEvent : SimpleDoAfterEvent;
 
-[Serializable, NetSerializable]
+[Serializable] [NetSerializable]
 public sealed partial class RapidRehatchDoAfterEvent : SimpleDoAfterEvent;
 
-[Serializable, NetSerializable]
+[Serializable] [NetSerializable]
 public sealed partial class NullChargeDoAfterEvent : SimpleDoAfterEvent;
 
-[Serializable, NetSerializable]
+[Serializable] [NetSerializable]
 public sealed partial class BlackRecuperationDoAfterEvent : SimpleDoAfterEvent;
 
-[Serializable, NetSerializable]
+[Serializable] [NetSerializable]
 public sealed partial class LightningStormEventDoAfterEvent : SimpleDoAfterEvent;
 
-[Serializable, NetSerializable]
+[Serializable] [NetSerializable]
 public sealed partial class EmpoweredEnthrallDoAfterEvent : SimpleDoAfterEvent;
 
-[Serializable, NetSerializable]
+[Serializable] [NetSerializable]
 public sealed partial class NoxImperiiDoAfterEvent : SimpleDoAfterEvent;
 
-[Serializable, NetSerializable]
+[Serializable] [NetSerializable]
 public sealed partial class AscendanceDoAfterEvent : SimpleDoAfterEvent;
 
-[Serializable, NetSerializable]
+[Serializable] [NetSerializable]
 public sealed partial class AntiMindControlItemDoAfterEvent : SimpleDoAfterEvent;

@@ -20,9 +20,9 @@ namespace Content.Goobstation.Server.Actions;
 public sealed class TimeTransferPanelEui : BaseEui
 {
     [Dependency] private readonly IAdminManager _adminMan = default!;
+    [Dependency] private readonly IServerDbManager _databaseMan = default!;
     [Dependency] private readonly ILogManager _log = default!;
     [Dependency] private readonly IPlayerLocator _playerLocator = default!;
-    [Dependency] private readonly IServerDbManager _databaseMan = default!;
 
     private readonly ISawmill _sawmill;
 
@@ -61,8 +61,11 @@ public sealed class TimeTransferPanelEui : BaseEui
         var playerData = await _playerLocator.LookupIdByNameAsync(playerId);
         if (playerData == null)
         {
-            _sawmill.Warning($"{Player.Name} ({Player.UserId} tried to add roles time to not existing player {playerId})");
-            SendMessage(new TimeTransferWarningEuiMessage(Loc.GetString("time-transfer-panel-no-player-database-message"), Color.Red));
+            _sawmill.Warning(
+                $"{Player.Name} ({Player.UserId} tried to add roles time to not existing player {playerId})");
+            SendMessage(
+                new TimeTransferWarningEuiMessage(Loc.GetString("time-transfer-panel-no-player-database-message"),
+                    Color.Red));
             return;
         }
 
@@ -86,7 +89,8 @@ public sealed class TimeTransferPanelEui : BaseEui
 
         _sawmill.Info($"{Player.Name} ({Player.UserId} saved {updateList.Count} trackers for {userId})");
 
-        SendMessage(new TimeTransferWarningEuiMessage(Loc.GetString("time-transfer-panel-warning-set-success"), Color.LightGreen));
+        SendMessage(new TimeTransferWarningEuiMessage(Loc.GetString("time-transfer-panel-warning-set-success"),
+            Color.LightGreen));
     }
 
     public async void AddTime(NetUserId userId, List<TimeTransferData> timeData)
@@ -115,7 +119,8 @@ public sealed class TimeTransferPanelEui : BaseEui
 
         _sawmill.Info($"{Player.Name} ({Player.UserId} saved {updateList.Count} trackers for {userId})");
 
-        SendMessage(new TimeTransferWarningEuiMessage(Loc.GetString("time-transfer-panel-warning-add-success"), Color.LightGreen));
+        SendMessage(new TimeTransferWarningEuiMessage(Loc.GetString("time-transfer-panel-warning-add-success"),
+            Color.LightGreen));
     }
 
     public override async void Opened()
@@ -133,9 +138,7 @@ public sealed class TimeTransferPanelEui : BaseEui
     private void OnPermsChanged(AdminPermsChangedEventArgs args)
     {
         if (args.Player != Player)
-        {
             return;
-        }
 
         StateDirty();
     }

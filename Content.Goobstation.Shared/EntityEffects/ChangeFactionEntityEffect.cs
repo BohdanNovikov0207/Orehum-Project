@@ -4,11 +4,11 @@ using Content.Shared.NPC.Prototypes;
 using Robust.Shared.Prototypes;
 
 namespace Content.Goobstation.Shared.EntityEffects;
+
 public sealed partial class ChangeFactionEntityEffect : EntityEffect
 {
-    [DataField(required: true)] public ProtoId<NpcFactionPrototype> NewFaction;
-
     [DataField] public float Duration = 0f;
+    [DataField(required: true)] public ProtoId<NpcFactionPrototype> NewFaction;
 
     public override void Effect(EntityEffectBaseArgs args)
     {

@@ -4,7 +4,6 @@
 // SPDX-License-Identifier: AGPL-3.0-or-later
 
 using System.Linq;
-using System.Threading;
 using Content.Goobstation.Shared.MisandryBox.JumpScare;
 using Content.Shared.Electrocution;
 using Content.Shared.Popups;
@@ -18,17 +17,16 @@ namespace Content.Goobstation.Shared.MisandryBox.Smites;
 
 public sealed class ThunderstrikeSystem : EntitySystem
 {
-    [Dependency] private readonly IFullScreenImageJumpscare _jumpscare = default!;
-    [Dependency] private readonly ISharedPlayerManager _player = default!;
-    [Dependency] private readonly SharedAudioSystem _audio = default!;
-    [Dependency] private readonly SharedPointLightSystem _light = default!;
-    [Dependency] private readonly SharedElectrocutionSystem _elect = default!;
-    [Dependency] private readonly SharedPopupSystem _popup = default!;
-
     private const string Sound = "/Audio/_Goobstation/Effects/Smites/Thunderstrike/thunderstrike.ogg";
     private const string God = "/Textures/_Goobstation/MisandryBox/For he does not need no fucking rsi.png";
+    [Dependency] private readonly SharedAudioSystem _audio = default!;
+    [Dependency] private readonly SharedElectrocutionSystem _elect = default!;
+    [Dependency] private readonly IFullScreenImageJumpscare _jumpscare = default!;
+    [Dependency] private readonly SharedPointLightSystem _light = default!;
 
     private readonly Dictionary<EntityUid, TimeSpan> _pending = new();
+    [Dependency] private readonly ISharedPlayerManager _player = default!;
+    [Dependency] private readonly SharedPopupSystem _popup = default!;
     private float _accumulator;
 
     public override void Update(float frameTime)

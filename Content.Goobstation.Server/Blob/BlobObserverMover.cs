@@ -20,28 +20,40 @@ namespace Content.Goobstation.Server.Blob;
 
 public sealed class BlobObserverMover : Job<object>
 {
-    public BlobObserverMover(EntityManager entityManager, ActionBlockerSystem blockerSystem, SharedTransformSystem transform, BlobObserverSystem observerSystem, double maxTime, CancellationToken cancellation = default) : base(maxTime, cancellation)
-    {
-        _observerSystem = observerSystem;
-        _transform = transform;
-        //_blocker = blockerSystem;
-        _entityManager = entityManager;
-    }
+    //private ActionBlockerSystem _blocker;
+    private readonly EntityManager _entityManager;
 
-    public BlobObserverMover(EntityManager entityManager, ActionBlockerSystem blockerSystem, SharedTransformSystem transform, BlobObserverSystem observerSystem, double maxTime, IStopwatch stopwatch, CancellationToken cancellation = default) : base(maxTime, stopwatch, cancellation)
-    {
-        _observerSystem = observerSystem;
-        _transform = transform;
-        //_blocker = blockerSystem;
-        _entityManager = entityManager;
-    }
+    private readonly BlobObserverSystem _observerSystem;
+    private readonly SharedTransformSystem _transform;
     public EntityCoordinates NewPosition;
     public Entity<BlobObserverComponent> Observer;
 
-    private BlobObserverSystem _observerSystem;
-    private SharedTransformSystem _transform;
-    //private ActionBlockerSystem _blocker;
-    private EntityManager _entityManager;
+    public BlobObserverMover(EntityManager entityManager,
+        ActionBlockerSystem blockerSystem,
+        SharedTransformSystem transform,
+        BlobObserverSystem observerSystem,
+        double maxTime,
+        CancellationToken cancellation = default) : base(maxTime, cancellation)
+    {
+        _observerSystem = observerSystem;
+        _transform = transform;
+        //_blocker = blockerSystem;
+        _entityManager = entityManager;
+    }
+
+    public BlobObserverMover(EntityManager entityManager,
+        ActionBlockerSystem blockerSystem,
+        SharedTransformSystem transform,
+        BlobObserverSystem observerSystem,
+        double maxTime,
+        IStopwatch stopwatch,
+        CancellationToken cancellation = default) : base(maxTime, stopwatch, cancellation)
+    {
+        _observerSystem = observerSystem;
+        _transform = transform;
+        //_blocker = blockerSystem;
+        _entityManager = entityManager;
+    }
 
 
     protected override async Task<object?> Process()
@@ -49,9 +61,7 @@ public sealed class BlobObserverMover : Job<object>
         try
         {
             if (Observer.Comp.Core == null)
-            {
                 return default;
-            }
 
             var newPos = _transform.ToMapCoordinates(NewPosition);
 
@@ -80,7 +90,7 @@ public sealed class BlobObserverMover : Job<object>
 
                 var nearestEntityPos = _transform.GetMapCoordinates(nearestEntityUid.Value);
 
-                var direction = (nearestEntityPos.Position - newPos.Position);
+                var direction = nearestEntityPos.Position - newPos.Position;
                 var newPosition = newPos.Offset(direction * 0.1f);
 
                 _transform.SetMapCoordinates(Observer, newPosition);

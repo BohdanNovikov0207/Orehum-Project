@@ -12,7 +12,7 @@ namespace Content.Goobstation.Shared.Enchanting.Components;
 /// <summary>
 /// Scales <c>SlipperyComponent</c> values by the enchant level.
 /// </summary>
-[RegisterComponent, NetworkedComponent, Access(typeof(SlipperyEnchantSystem))]
+[RegisterComponent] [NetworkedComponent] [Access(typeof(SlipperyEnchantSystem))]
 [EntityCategory("Enchants")]
 public sealed partial class SlipperyEnchantComponent : Component
 {

@@ -23,18 +23,6 @@ namespace Content.Goobstation.Shared.MartialArts;
 [Prototype("martialArt")]
 public sealed class MartialArtPrototype : IPrototype
 {
-    [IdDataField]
-    public string ID { get; private init; } = default!;
-
-    [DataField]
-    public MartialArtsForms MartialArtsForm = MartialArtsForms.CloseQuartersCombat;
-
-    [DataField]
-    public int MinRandomDamageModifier;
-
-    [DataField]
-    public int MaxRandomDamageModifier = 5;
-
     [DataField]
     public FixedPoint2 BaseDamageModifier;
 
@@ -42,10 +30,16 @@ public sealed class MartialArtPrototype : IPrototype
     public ProtoId<DamageTypePrototype> DamageModifierType = "Blunt";
 
     [DataField]
-    public bool RandomDamageModifier;
+    public MartialArtsForms MartialArtsForm = MartialArtsForms.CloseQuartersCombat;
 
     [DataField]
-    public ProtoId<ComboListPrototype> RoundstartCombos = "CQCMoves";
+    public int MaxRandomDamageModifier = 5;
+
+    [DataField]
+    public int MinRandomDamageModifier;
+
+    [DataField]
+    public bool RandomDamageModifier;
 
     [DataField]
     public List<LocId> RandomSayings = [];
@@ -54,5 +48,11 @@ public sealed class MartialArtPrototype : IPrototype
     public List<LocId> RandomSayingsDowned = [];
 
     [DataField]
+    public ProtoId<ComboListPrototype> RoundstartCombos = "CQCMoves";
+
+    [DataField]
     public GrabStage StartingStage = GrabStage.Soft;
+
+    [IdDataField]
+    public string ID { get; } = default!;
 }

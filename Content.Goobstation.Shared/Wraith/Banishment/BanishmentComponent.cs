@@ -3,27 +3,27 @@ using Robust.Shared.GameStates;
 
 namespace Content.Goobstation.Shared.Wraith.Banishment;
 
-[RegisterComponent, NetworkedComponent]
+[RegisterComponent] [NetworkedComponent]
 [AutoGenerateComponentState]
 public sealed partial class BanishmentComponent : Component
 {
     /// <summary>
-    ///  Amount of lives the user has left. Doesn't count the starting life.
+    /// Amount of lives the user has left. Doesn't count the starting life.
     /// </summary>
-    [DataField, AutoNetworkedField]
+    [DataField] [AutoNetworkedField]
     public int Lives;
 
     /// <summary>
-    ///  When to trigger the banishment
-    /// </summary>
-    [DataField]
-    public MobState MobStateTrigger = MobState.Dead;
-
-    /// <summary>
-    ///  The max lives the user can have
+    /// The max lives the user can have
     /// </summary>
     [ViewVariables]
     public int MaxLives;
+
+    /// <summary>
+    /// When to trigger the banishment
+    /// </summary>
+    [DataField]
+    public MobState MobStateTrigger = MobState.Dead;
 
     [DataField]
     public LocId? Popup;

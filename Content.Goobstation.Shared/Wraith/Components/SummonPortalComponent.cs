@@ -3,14 +3,14 @@ using Robust.Shared.Prototypes;
 
 namespace Content.Goobstation.Shared.Wraith.Components;
 
-[RegisterComponent, NetworkedComponent]
+[RegisterComponent] [NetworkedComponent]
 [AutoGenerateComponentState]
 public sealed partial class SummonPortalComponent : Component
 {
     /// <summary>
     /// How many portals are currently active.
     /// </summary>
-    [DataField, AutoNetworkedField]
+    [DataField] [AutoNetworkedField]
     public int CurrentActivePortals;
 
     /// <summary>
@@ -30,5 +30,4 @@ public sealed partial class SummonPortalComponent : Component
     /// </summary>
     [DataField]
     public EntProtoId RitualCircle = "RitualCircle4";
-
 }

@@ -7,17 +7,14 @@ namespace Content.Goobstation.Shared.Shadowling.Components.Abilities.PreAscensio
 /// <summary>
 /// This is used for the Rapid Re-Hatch ability
 /// </summary>
-[RegisterComponent, NetworkedComponent]
+[RegisterComponent] [NetworkedComponent]
 public sealed partial class ShadowlingRapidRehatchComponent : Component
 {
     [DataField]
-    public EntProtoId ActionId = "ActionRapidRehatch";
-
-    [DataField]
     public EntityUid? ActionEnt;
 
-    [ViewVariables]
-    public EntityUid? ActionRapidRehatchEntity { get; set; }
+    [DataField]
+    public EntProtoId ActionId = "ActionRapidRehatch";
 
     /// <summary>
     /// The default DoAfter time for the ability
@@ -35,5 +32,9 @@ public sealed partial class ShadowlingRapidRehatchComponent : Component
     /// The sound that plays during the ability.
     /// </summary>
     [DataField]
-    public SoundSpecifier? RapidRehatchSound = new SoundPathSpecifier("/Audio/_EinsteinEngines/Shadowling/rapid_rehatch.ogg");
+    public SoundSpecifier? RapidRehatchSound =
+        new SoundPathSpecifier("/Audio/_EinsteinEngines/Shadowling/rapid_rehatch.ogg");
+
+    [ViewVariables]
+    public EntityUid? ActionRapidRehatchEntity { get; set; }
 }

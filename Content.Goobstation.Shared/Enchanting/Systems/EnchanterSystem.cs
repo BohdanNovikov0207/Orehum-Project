@@ -24,15 +24,15 @@ namespace Content.Goobstation.Shared.Enchanting.Systems;
 /// </summary>
 public sealed class EnchanterSystem : EntitySystem
 {
-    [Dependency] private readonly EnchantingSystem _enchanting = default!;
-    [Dependency] private readonly INetManager _net = default!;
-    [Dependency] private readonly IRobustRandom _random = default!;
     [Dependency] private readonly ISharedAdminLogManager _adminLogger = default!;
     [Dependency] private readonly SharedAudioSystem _audio = default!;
-    [Dependency] private readonly SharedPopupSystem _popup = default!;
-    [Dependency] private readonly SharedStackSystem _stack = default!;
+    [Dependency] private readonly EnchantingSystem _enchanting = default!;
+    [Dependency] private readonly INetManager _net = default!;
 
-    private List<EntProtoId<EnchantComponent>> _pool = new();
+    private readonly List<EntProtoId<EnchantComponent>> _pool = new();
+    [Dependency] private readonly SharedPopupSystem _popup = default!;
+    [Dependency] private readonly IRobustRandom _random = default!;
+    [Dependency] private readonly SharedStackSystem _stack = default!;
     private EntityQuery<CanEnchantComponent> _userQuery;
 
     public override void Initialize()
@@ -65,7 +65,7 @@ public sealed class EnchanterSystem : EntitySystem
 
     private void OnBeforeInteract(Entity<EnchantingToolComponent> ent, ref BeforeRangedInteractEvent args)
     {
-        if (!args.CanReach || args.Target is not {} item)
+        if (!args.CanReach || args.Target is not { } item)
             return;
 
         // do nothing if used without an altar
@@ -76,13 +76,13 @@ public sealed class EnchanterSystem : EntitySystem
 
         // need an enchanter on the altar as well as the target
         var user = args.User;
-        if (_enchanting.FindEnchanter(item) is not {} enchanter)
+        if (_enchanting.FindEnchanter(item) is not { } enchanter)
         {
             _popup.PopupClient(Loc.GetString("enchanting-tool-no-enchanter"), user, user);
             return;
         }
 
-        if (_userQuery.HasComp(user) == false)
+        if (!_userQuery.HasComp(user))
         {
             _popup.PopupClient(Loc.GetString("enchanter-disallowed-enchant"), user, user);
             return;
@@ -120,7 +120,7 @@ public sealed class EnchanterSystem : EntitySystem
         // pick a random enchant then do it
         var picking = _random.NextFloat(ent.Comp.MinCount, ent.Comp.MaxCount);
         var total = 0f;
-        for (int i = 0; i < 20 && total < picking; i++)
+        for (var i = 0; i < 20 && total < picking; i++)
         {
             var id = _random.Pick(_pool);
             var level = (int) _random.NextFloat(ent.Comp.MinLevel, ent.Comp.MaxLevel);
@@ -131,14 +131,16 @@ public sealed class EnchanterSystem : EntitySystem
         _audio.PlayPvs(ent.Comp.Sound, item);
         _popup.PopupEntity(Loc.GetString("enchanter-enchanted", ("item", item)), item, PopupType.Large);
 
-        _adminLogger.Add(LogType.EntityDelete, LogImpact.Low,
+        _adminLogger.Add(LogType.EntityDelete,
+            LogImpact.Low,
             $"{ToPrettyString(user):player} enchanted {ToPrettyString(item):item} using {ToPrettyString(ent):enchanter}");
 
         if (!TryComp<StackComponent>(ent, out var stack) || !_stack.Use(ent, 1, stack))
         {
-            ent.Comp.Enchants = new(); // prevent double enchanting by malf client
+            ent.Comp.Enchants = new List<EntProtoId<EnchantComponent>>(); // prevent double enchanting by malf client
             QueueDel(ent);
         }
+
         return true;
     }
 }

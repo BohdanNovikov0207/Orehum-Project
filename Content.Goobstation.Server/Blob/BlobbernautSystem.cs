@@ -26,18 +26,23 @@ namespace Content.Goobstation.Server.Blob;
 
 public sealed class BlobbernautSystem : SharedBlobbernautSystem
 {
-    [Dependency] private readonly EntityLookupSystem _entityLookupSystem = default!;
     [Dependency] private readonly DamageableSystem _damageableSystem = default!;
+    [Dependency] private readonly EmpSystem _empSystem = default!;
+    [Dependency] private readonly EntityLookupSystem _entityLookupSystem = default!;
+
+
+    private readonly HashSet<Entity<BlobTileComponent>> _entitySet = new();
 
     [Dependency] private readonly ExplosionSystem _explosionSystem = default!;
-    [Dependency] private readonly IRobustRandom _random = default!;
-    [Dependency] private readonly EmpSystem _empSystem = default!;
     [Dependency] private readonly MobStateSystem _mobStateSystem = default!;
     [Dependency] private readonly SharedPopupSystem _popup = default!;
+    [Dependency] private readonly IRobustRandom _random = default!;
     [Dependency] private readonly TransformSystem _transform = default!;
+
+    private EntityQuery<BlobCoreComponent> _coreQuery;
+
     //private EntityQuery<MapGridComponent> _mapGridQuery;
     private EntityQuery<BlobTileComponent> _tileQuery;
-    private EntityQuery<BlobCoreComponent> _coreQuery;
 
     public override void Initialize()
     {
@@ -50,9 +55,6 @@ public sealed class BlobbernautSystem : SharedBlobbernautSystem
     }
 
 
-    private readonly HashSet<Entity<BlobTileComponent>> _entitySet = new();
-
-
     public override void Update(float frameTime)
     {
         base.Update(frameTime);
@@ -60,7 +62,7 @@ public sealed class BlobbernautSystem : SharedBlobbernautSystem
         var blobFactoryQuery = EntityQueryEnumerator<BlobbernautComponent, MobStateComponent>();
         while (blobFactoryQuery.MoveNext(out var ent, out var comp, out var mobStateComponent))
         {
-            if (_mobStateSystem.IsDead(ent,mobStateComponent))
+            if (_mobStateSystem.IsDead(ent, mobStateComponent))
                 continue;
 
             comp.NextDamage += frameTime;
@@ -86,7 +88,7 @@ public sealed class BlobbernautSystem : SharedBlobbernautSystem
             _entitySet.Clear();
             _entityLookupSystem.GetEntitiesInRange(mapPos.MapId, mapPos.Position, 1f, _entitySet);
 
-            if(_entitySet.Count != 0)
+            if (_entitySet.Count != 0)
                 continue;
 
             TryChangeDamage("blobberaut-not-on-blob-tile", ent, comp.Damage);
@@ -105,7 +107,12 @@ public sealed class BlobbernautSystem : SharedBlobbernautSystem
         switch (blobCoreComponent.CurrentChem)
         {
             case BlobChemType.ExplosiveLattice:
-                _explosionSystem.QueueExplosion(args.HitEntities.FirstOrDefault(), blobCoreComponent.BlobExplosive, 4, 1, 2, maxTileBreak: 0);
+                _explosionSystem.QueueExplosion(args.HitEntities.FirstOrDefault(),
+                    blobCoreComponent.BlobExplosive,
+                    4,
+                    1,
+                    2,
+                    maxTileBreak: 0);
                 break;
             case BlobChemType.ElectromagneticWeb:
             {

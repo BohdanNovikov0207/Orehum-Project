@@ -12,25 +12,24 @@ namespace Content.Goobstation.Shared.Enchanting.Components;
 
 /// <summary>
 /// Component required for all enchants.
-/// Events are relayed by <see cref="EnchantRelaySystem"/> to be used for behaviour.
+/// Events are relayed by <see cref="EnchantRelaySystem" /> to be used for behaviour.
 /// </summary>
-[RegisterComponent, NetworkedComponent, Access(typeof(EnchantingSystem))]
+[RegisterComponent] [NetworkedComponent] [Access(typeof(EnchantingSystem))]
 [AutoGenerateComponentState]
 [EntityCategory("Enchants")]
 public sealed partial class EnchantComponent : Component
 {
     /// <summary>
-    /// Whitelist for items that this enchant can be applied to.
-    /// Used to prevent picking invalid enchants on items.
-    /// </summary>
-    [DataField]
-    public EntityWhitelist? Whitelist;
-
-    /// <summary>
     /// Blacklist for items that cannot be enchanted, even if they match the whitelist.
     /// </summary>
     [DataField]
     public EntityWhitelist? Blacklist;
+
+    /// <summary>
+    /// The entity this enchant belongs to.
+    /// </summary>
+    [DataField] [AutoNetworkedField]
+    public EntityUid? Enchanted;
 
     /// <summary>
     /// Enchants this cannot be combined with.
@@ -42,7 +41,7 @@ public sealed partial class EnchantComponent : Component
     /// <summary>
     /// The rolled level of this enchant.
     /// </summary>
-    [DataField, AutoNetworkedField]
+    [DataField] [AutoNetworkedField]
     public int Level = 1;
 
     /// <summary>
@@ -50,6 +49,13 @@ public sealed partial class EnchantComponent : Component
     /// </summary>
     [DataField]
     public int MaxLevel = 1;
+
+    /// <summary>
+    /// Whitelist for items that this enchant can be applied to.
+    /// Used to prevent picking invalid enchants on items.
+    /// </summary>
+    [DataField]
+    public EntityWhitelist? Whitelist;
 
     /// <summary>
     /// Whether to show the level when examining.
@@ -61,12 +67,6 @@ public sealed partial class EnchantComponent : Component
     /// </summary>
     [ViewVariables]
     public bool IsMaxed => Level == MaxLevel;
-
-    /// <summary>
-    /// The entity this enchant belongs to.
-    /// </summary>
-    [DataField, AutoNetworkedField]
-    public EntityUid? Enchanted;
 }
 
 /// <summary>

@@ -3,15 +3,15 @@ using Robust.Shared.Prototypes;
 
 namespace Content.Goobstation.Shared.Wraith.Components;
 
-[RegisterComponent, NetworkedComponent]
+[RegisterComponent] [NetworkedComponent]
 public sealed partial class WraithComponent : Component
 {
     [DataField(required: true)]
     public EntProtoId Abilities;
 
     [DataField]
-    public EntProtoId WraithWeakenedEffect = "StatusEffectWeakenedWraith";
+    public EntProtoId WraithDeathEffect = "WraithDeathEffect";
 
     [DataField]
-    public EntProtoId WraithDeathEffect = "WraithDeathEffect";
+    public EntProtoId WraithWeakenedEffect = "StatusEffectWeakenedWraith";
 }

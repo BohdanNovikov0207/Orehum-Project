@@ -7,33 +7,33 @@ using Robust.Shared.Utility;
 
 namespace Content.Goobstation.Shared.SecondSkin;
 
-[RegisterComponent, NetworkedComponent, AutoGenerateComponentState]
+[RegisterComponent] [NetworkedComponent] [AutoGenerateComponentState]
 public sealed partial class SecondSkinHolderComponent : Component
 {
     [ViewVariables]
     public ContainerSlot Container = default!;
 
+    [DataField]
+    public string ContainerId = "skin_slot";
+
+    [DataField]
+    public SlotFlags Flags = SlotFlags.OUTERCLOTHING;
+
     [DataField(required: true)]
     public ItemSlot ItemSlot;
 
+    [DataField] [AutoNetworkedField]
+    public EntityUid? SecondSkinAction;
+
     [DataField]
-    public string ContainerId = "skin_slot";
+    public EntProtoId SecondSkinActionId = "ActionActivateSecondSkin";
 
     [DataField]
     public string Slot = "outerClothing";
 
     [DataField]
-    public SlotFlags Flags = SlotFlags.OUTERCLOTHING;
+    public SpriteSpecifier.Rsi Sprite = new(new ResPath("_Goobstation/Clothing/OuterClothing/second_skin.rsi"), "icon");
 
     [DataField]
     public string State = "equipped-OUTERCLOTHING";
-
-    [DataField]
-    public EntProtoId SecondSkinActionId = "ActionActivateSecondSkin";
-
-    [DataField, AutoNetworkedField]
-    public EntityUid? SecondSkinAction;
-
-    [DataField]
-    public SpriteSpecifier.Rsi Sprite = new(new ResPath("_Goobstation/Clothing/OuterClothing/second_skin.rsi"), "icon");
 }

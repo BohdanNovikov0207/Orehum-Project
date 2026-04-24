@@ -9,7 +9,6 @@
 //
 // SPDX-License-Identifier: AGPL-3.0-or-later
 
-using System.Linq;
 using System.Numerics;
 using Content.Client.Research;
 using Content.Client.UserInterface.Controls;
@@ -33,37 +32,17 @@ namespace Content.Goobstation.Client.Research.UI;
 [GenerateTypedNameReferences]
 public sealed partial class FancyResearchConsoleMenu : FancyWindow
 {
-    public Action<string>? OnTechnologyCardPressed;
-    public Action? OnServerButtonPressed;
+    private const float MinZoom = 0.5f;
+    private const float MaxZoom = 2f;
+    private const float ZoomSpeed = 0.125f;
+    private readonly AccessReaderSystem _accessReader;
 
     [Dependency] private readonly IEntityManager _entity = default!;
-    [Dependency] private readonly IPrototypeManager _prototype = default!;
     [Dependency] private readonly IPlayerManager _player = default!;
+    [Dependency] private readonly IPrototypeManager _prototype = default!;
 
     private readonly ResearchSystem _research;
     private readonly SpriteSystem _sprite;
-    private readonly AccessReaderSystem _accessReader;
-
-    /// <summary>
-    /// Console entity
-    /// </summary>
-    public EntityUid Entity;
-
-    /// <summary>
-    /// Currently selected tech
-    /// Exsists for better UI refreshing
-    /// </summary>
-    public ProtoId<TechnologyPrototype>? CurrentTech;
-
-    /// <summary>
-    /// All technologies and their availablity
-    /// </summary>
-    public Dictionary<string, ResearchAvailability> List = new();
-
-    /// <summary>
-    /// Cached research points
-    /// </summary>
-    public int Points = 0;
 
     /// <summary>
     /// Is tech currently being dragged
@@ -74,11 +53,33 @@ public sealed partial class FancyResearchConsoleMenu : FancyWindow
     /// Global position that all tech relates to.
     /// For dragging mostly
     /// </summary>
-    private Vector2 _position = new Vector2(45, 250);
+    private Vector2 _position = new(45, 250);
+
     private float _zoom = 1f;
-    private const float MinZoom = 0.5f;
-    private const float MaxZoom = 2f;
-    private const float ZoomSpeed = 0.125f;
+
+    /// <summary>
+    /// Currently selected tech
+    /// Exsists for better UI refreshing
+    /// </summary>
+    public ProtoId<TechnologyPrototype>? CurrentTech;
+
+    /// <summary>
+    /// Console entity
+    /// </summary>
+    public EntityUid Entity;
+
+    /// <summary>
+    /// All technologies and their availablity
+    /// </summary>
+    public Dictionary<string, ResearchAvailability> List = new();
+
+    public Action? OnServerButtonPressed;
+    public Action<string>? OnTechnologyCardPressed;
+
+    /// <summary>
+    /// Cached research points
+    /// </summary>
+    public int Points;
 
     public FancyResearchConsoleMenu()
     {
@@ -87,7 +88,8 @@ public sealed partial class FancyResearchConsoleMenu : FancyWindow
         _research = _entity.System<ResearchSystem>();
         _sprite = _entity.System<SpriteSystem>();
         _accessReader = _entity.System<AccessReaderSystem>();
-        StaticSprite.SetFromSpriteSpecifier(new SpriteSpecifier.Rsi(new("_Goobstation/Interface/rnd-static.rsi"), "static"));
+        StaticSprite.SetFromSpriteSpecifier(
+            new SpriteSpecifier.Rsi(new ResPath("_Goobstation/Interface/rnd-static.rsi"), "static"));
         StaticSprite.DisplayRect.CanShrink = true;
         StaticSprite.DisplayRect.Stretch = TextureRect.StretchMode.Scale;
 
@@ -139,14 +141,14 @@ public sealed partial class FancyResearchConsoleMenu : FancyWindow
         TierDisplayContainer.RemoveAllChildren();
         foreach (var disciplineId in database.SupportedDisciplines)
         {
-            var discipline = _prototype.Index<TechDisciplinePrototype>(disciplineId);
+            var discipline = _prototype.Index(disciplineId);
             var tier = _research.GetTierCompletionPercentage(database, discipline, _prototype);
 
             // i'm building the small-ass control here to spare me some mild annoyance in making a new file
             var texture = new TextureRect
             {
                 TextureScale = new Vector2(2, 2),
-                VerticalAlignment = VAlignment.Center
+                VerticalAlignment = VAlignment.Center,
             };
             var label = new RichTextLabel();
             texture.Texture = _sprite.Frame0(discipline.Icon);
@@ -160,15 +162,64 @@ public sealed partial class FancyResearchConsoleMenu : FancyWindow
                     label,
                     new Control
                     {
-                        MinWidth = 10
-                    }
-                }
+                        MinWidth = 10,
+                    },
+                },
             };
             TierDisplayContainer.AddChild(control);
         }
     }
 
+    /// <summary>
+    /// Selects a tech prototype and opens info panel
+    /// </summary>
+    /// <param name="proto">Tech proto</param>
+    /// <param name="availability">Tech availablity</param>
+    public void SelectTech(TechnologyPrototype proto, ResearchAvailability availability)
+    {
+        InfoContainer.RemoveAllChildren();
+        if (!_player.LocalEntity.HasValue)
+            return;
+
+        CurrentTech = proto.ID;
+        var control = new FancyTechnologyInfoPanel(proto,
+            _accessReader.IsAllowed(_player.LocalEntity.Value, Entity),
+            availability,
+            _sprite);
+        control.BuyAction += args => OnTechnologyCardPressed?.Invoke(args.ID);
+        InfoContainer.AddChild(control);
+    }
+
+    /// <summary>
+    /// Sets <see cref="_position" /> to its default value
+    /// </summary>
+    public void Recenter()
+    {
+        _position = new Vector2(45, 250);
+        foreach (var item in DragContainer.Children)
+        {
+            if (item is not FancyResearchConsoleItem research)
+                continue;
+
+            LayoutContainer.SetPosition(item, _position + research.Prototype.Position * 150 * _zoom);
+        }
+    }
+
+    public override void Close()
+    {
+        base.Close();
+
+        DragContainer.RemoveAllChildren();
+        InfoContainer.RemoveAllChildren();
+    }
+
+    private sealed class DisciplineButton(TechDisciplinePrototype proto) : Button
+    {
+        public TechDisciplinePrototype Proto = proto;
+    }
+
     #region Drag handle
+
     protected override void MouseMove(GUIMouseMoveEventArgs args)
     {
         base.MouseMove(args);
@@ -210,11 +261,12 @@ public sealed partial class FancyResearchConsoleMenu : FancyWindow
             LayoutContainer.SetPosition(child, _position + pos * _zoom);
             research.SetScale(_zoom);
         }
+
         args.Handle();
     }
 
     /// <summary>
-    /// Raised when LMB is pressed at <see cref="DragContainer"/>
+    /// Raised when LMB is pressed at <see cref="DragContainer" />
     /// </summary>
     private void OnKeybindDown(GUIBoundKeyEventArgs args)
     {
@@ -223,7 +275,7 @@ public sealed partial class FancyResearchConsoleMenu : FancyWindow
     }
 
     /// <summary>
-    /// Raised when LMB is unpressed at <see cref="DragContainer"/>
+    /// Raised when LMB is unpressed at <see cref="DragContainer" />
     /// </summary>
     private void OnKeybindUp(GUIBoundKeyEventArgs args)
     {
@@ -233,50 +285,6 @@ public sealed partial class FancyResearchConsoleMenu : FancyWindow
 
     protected override DragMode GetDragModeFor(Vector2 relativeMousePos)
         => _draggin ? DragMode.None : base.GetDragModeFor(relativeMousePos);
+
     #endregion
-
-    /// <summary>
-    /// Selects a tech prototype and opens info panel
-    /// </summary>
-    /// <param name="proto">Tech proto</param>
-    /// <param name="availability">Tech availablity</param>
-    public void SelectTech(TechnologyPrototype proto, ResearchAvailability availability)
-    {
-        InfoContainer.RemoveAllChildren();
-        if (!_player.LocalEntity.HasValue)
-            return;
-
-        CurrentTech = proto.ID;
-        var control = new FancyTechnologyInfoPanel(proto, _accessReader.IsAllowed(_player.LocalEntity.Value, Entity), availability, _sprite);
-        control.BuyAction += args => OnTechnologyCardPressed?.Invoke(args.ID);
-        InfoContainer.AddChild(control);
-    }
-
-    /// <summary>
-    /// Sets <see cref="_position"/> to its default value
-    /// </summary>
-    public void Recenter()
-    {
-        _position = new(45, 250);
-        foreach (var item in DragContainer.Children)
-        {
-            if (item is not FancyResearchConsoleItem research)
-                continue;
-
-            LayoutContainer.SetPosition(item, _position + research.Prototype.Position * 150 * _zoom);
-        }
-    }
-
-    public override void Close()
-    {
-        base.Close();
-
-        DragContainer.RemoveAllChildren();
-        InfoContainer.RemoveAllChildren();
-    }
-
-    private sealed partial class DisciplineButton(TechDisciplinePrototype proto) : Button
-    {
-        public TechDisciplinePrototype Proto = proto;
-    }
 }

@@ -1,6 +1,7 @@
 using Robust.Shared.Map;
 
-namespace Content.Goobstation.Server.SpaceWhale; // predictions? how bout you predict my ass, but seriously this is THE problem with ts cuz i have no fucking idea how to predict it
+namespace Content.Goobstation.Server.SpaceWhale;
+// predictions? how bout you predict my ass, but seriously this is THE problem with ts cuz i have no fucking idea how to predict it
 // edit ok nvm it looks sorta fine with mobs but please do not put this on something that is predicted otherwise it will look like shit
 
 public sealed class TailedEntitySystem : EntitySystem
@@ -19,7 +20,9 @@ public sealed class TailedEntitySystem : EntitySystem
     private void OnComponentShutdown(EntityUid uid, TailedEntityComponent component, ComponentShutdown args)
     {
         foreach (var segment in component.TailSegments)
+        {
             QueueDel(segment);
+        }
 
         component.TailSegments.Clear();
     }
@@ -29,7 +32,6 @@ public sealed class TailedEntitySystem : EntitySystem
         var eqe = EntityQueryEnumerator<TailedEntityComponent, TransformComponent>();
         while (eqe.MoveNext(out var uid, out var comp, out var xform))
         {
-
             if (comp.TailSegments.Count == 0)
             {
                 InitializeTailSegments(uid, comp, xform);
@@ -66,7 +68,9 @@ public sealed class TailedEntitySystem : EntitySystem
         var headPos = _transformSystem.GetWorldPosition(xform);
         var headRot = _transformSystem.GetWorldRotation(xform);
 
-        for (var i = 0; i < comp.TailSegments.Count; i++) // This is total goida, foreach is cleaner but i is needed in the loop
+        for (var i = 0;
+             i < comp.TailSegments.Count;
+             i++) // This is total goida, foreach is cleaner but i is needed in the loop
         {
             var segment = comp.TailSegments[i];
             if (!Exists(segment)
@@ -105,13 +109,15 @@ public sealed class TailedEntitySystem : EntitySystem
             var targetAngle = new Angle();
 
             if (i == 0)
-            {// first segment should look at the head because there isnt a segment to look for
+            {
+                // first segment should look at the head because there isnt a segment to look for
                 var segmentPos = _transformSystem.GetWorldPosition(segmentXform);
                 var direction = headPos - segmentPos;
                 targetAngle = direction.ToWorldAngle();
             }
             else
-            {// while other segments should look towards other segments
+            {
+                // while other segments should look towards other segments
                 var prevSegment = comp.TailSegments[i - 1];
                 if (TryComp(prevSegment, out TransformComponent? prevXform))
                 {
@@ -121,9 +127,7 @@ public sealed class TailedEntitySystem : EntitySystem
                     targetAngle = direction.ToWorldAngle();
                 }
                 else
-                {
                     targetAngle = _transformSystem.GetWorldRotation(segmentXform);
-                }
             }
 
             var curRot = _transformSystem.GetWorldRotation(segmentXform);

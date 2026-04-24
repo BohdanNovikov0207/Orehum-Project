@@ -5,5 +5,5 @@ namespace Content.Goobstation.Shared.Wraith.Components;
 /// <summary>
 /// Marks entity as plaguebringer
 /// </summary>
-[RegisterComponent, NetworkedComponent]
+[RegisterComponent] [NetworkedComponent]
 public sealed partial class PlaguebringerComponent : Component;

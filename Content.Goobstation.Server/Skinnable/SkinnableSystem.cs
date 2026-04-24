@@ -16,12 +16,13 @@ using Robust.Shared.Utility;
 
 namespace Content.Goobstation.Server.Skinnable;
 
-public sealed partial class SkinnableSystem : SharedSkinnableSystem
+public sealed class SkinnableSystem : SharedSkinnableSystem
 {
-    [Dependency] private readonly DoAfterSystem _doAfter = null!;
-    [Dependency] private readonly DamageableSystem _damageable = null!;
-    [Dependency] private readonly PopupSystem _popups = null!;
     [Dependency] private readonly AudioSystem _audio = null!;
+    [Dependency] private readonly DamageableSystem _damageable = null!;
+    [Dependency] private readonly DoAfterSystem _doAfter = null!;
+    [Dependency] private readonly PopupSystem _popups = null!;
+
     public override void Initialize()
     {
         base.Initialize();
@@ -33,10 +34,10 @@ public sealed partial class SkinnableSystem : SharedSkinnableSystem
     private void OnGetVerbs(Entity<SkinnableComponent> ent, ref GetVerbsEvent<InteractionVerb> args)
     {
         if (!args.CanAccess
-        || !args.CanInteract
-        || !args.CanComplexInteract
-        || !TryComp<SharpComponent>(args.Using, out _)
-        || ent.Comp.Skinned)
+            || !args.CanInteract
+            || !args.CanComplexInteract
+            || !TryComp<SharpComponent>(args.Using, out _)
+            || ent.Comp.Skinned)
             return;
 
         var target = ent;
@@ -46,15 +47,16 @@ public sealed partial class SkinnableSystem : SharedSkinnableSystem
         {
             Act = () => { StartSkinning(performer, target, arguments); },
             Text = Loc.GetString("skin-verb"),
-            Icon = new SpriteSpecifier.Rsi(new("/Textures/Mobs/Animals/monkey.rsi"), "monkey_skinned"),
+            Icon = new SpriteSpecifier.Rsi(new ResPath("/Textures/Mobs/Animals/monkey.rsi"), "monkey_skinned"),
             Priority = 1,
         };
 
         args.Verbs.Add(verb);
-
     }
 
-    private void StartSkinning(EntityUid performer, Entity<SkinnableComponent> target, GetVerbsEvent<InteractionVerb> args)
+    private void StartSkinning(EntityUid performer,
+        Entity<SkinnableComponent> target,
+        GetVerbsEvent<InteractionVerb> args)
     {
         var doAfterArgs = new DoAfterArgs(
             EntityManager,
@@ -64,7 +66,7 @@ public sealed partial class SkinnableSystem : SharedSkinnableSystem
             target,
             target,
             args.Using
-            )
+        )
         {
             BreakOnMove = true,
             NeedHand = true,
@@ -77,7 +79,6 @@ public sealed partial class SkinnableSystem : SharedSkinnableSystem
         _audio.PlayPvs(target.Comp.SkinSound, target);
         var popup = Loc.GetString("skinning-start", ("target", target), ("performer", performer));
         _popups.PopupEntity(popup, target, PopupType.LargeCaution);
-
     }
 
     private void OnSkinningDoAfter(Entity<SkinnableComponent> target, ref SkinningDoAfterEvent args)
@@ -90,5 +91,4 @@ public sealed partial class SkinnableSystem : SharedSkinnableSystem
 
         _damageable.TryChangeDamage(target, target.Comp.DamageOnSkinned);
     }
-
 }

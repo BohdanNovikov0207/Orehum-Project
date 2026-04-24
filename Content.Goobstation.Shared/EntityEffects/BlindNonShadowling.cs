@@ -19,16 +19,15 @@ namespace Content.Goobstation.Shared.EntityEffects;
 [UsedImplicitly]
 public sealed partial class BlindNonShadowling : EntityEffect
 {
-    /// <inheritdoc/>
+    /// <inheritdoc />
     protected override string ReagentEffectGuidebookText(IPrototypeManager prototype, IEntitySystemManager entSys) =>
         Loc.GetString("reagent-effect-guidebook-blind-non-sling", ("chance", Probability));
+
     public override void Effect(EntityEffectBaseArgs args)
     {
         if (args.EntityManager.HasComponent<ShadowlingComponent>(args.TargetEntity) ||
             args.EntityManager.HasComponent<ThrallComponent>(args.TargetEntity))
-        {
             return;
-        }
 
         if (!args.EntityManager.TryGetComponent<StatusEffectsComponent>(args.TargetEntity, out var statusEffects))
             return;

@@ -36,10 +36,8 @@ public sealed partial class StaminaDamageThreshold : EntityEffectCondition
         return false;
     }
 
-    public override string GuidebookExplanation(IPrototypeManager prototype)
-    {
-        return Loc.GetString("reagent-effect-condition-guidebook-stamina-damage-threshold",
-            ("max", float.IsPositiveInfinity(Max) ? (float) int.MaxValue : Max),
+    public override string GuidebookExplanation(IPrototypeManager prototype) =>
+        Loc.GetString("reagent-effect-condition-guidebook-stamina-damage-threshold",
+            ("max", float.IsPositiveInfinity(Max) ? int.MaxValue : Max),
             ("min", Min));
-    }
 }

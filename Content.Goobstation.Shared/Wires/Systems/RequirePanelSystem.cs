@@ -14,7 +14,7 @@ using Content.Shared.Wires;
 
 namespace Content.Goobstation.Shared.Wires.Systems;
 
-public sealed partial class RequirePanelSystem : EntitySystem
+public sealed class RequirePanelSystem : EntitySystem
 {
     [Dependency] private readonly ItemSlotsSystem _itemSlots = default!;
 
@@ -26,14 +26,12 @@ public sealed partial class RequirePanelSystem : EntitySystem
         SubscribeLocalEvent<ItemSlotsRequirePanelComponent, ItemSlotEjectAttemptEvent>(ItemSlotEjectAttempt);
     }
 
-    private void ItemSlotInsertAttempt(Entity<ItemSlotsRequirePanelComponent> entity, ref ItemSlotInsertAttemptEvent args)
-    {
+    private void ItemSlotInsertAttempt(Entity<ItemSlotsRequirePanelComponent> entity,
+        ref ItemSlotInsertAttemptEvent args) => args.Cancelled = !CheckPanelStateForItemSlot(entity, args.Slot.ID);
+
+    private void
+        ItemSlotEjectAttempt(Entity<ItemSlotsRequirePanelComponent> entity, ref ItemSlotEjectAttemptEvent args) =>
         args.Cancelled = !CheckPanelStateForItemSlot(entity, args.Slot.ID);
-    }
-    private void ItemSlotEjectAttempt(Entity<ItemSlotsRequirePanelComponent> entity, ref ItemSlotEjectAttemptEvent args)
-    {
-        args.Cancelled = !CheckPanelStateForItemSlot(entity, args.Slot.ID);
-    }
 
     public bool CheckPanelStateForItemSlot(Entity<ItemSlotsRequirePanelComponent> entity, string? slot)
     {

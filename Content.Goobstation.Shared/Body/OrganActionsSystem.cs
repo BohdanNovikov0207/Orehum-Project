@@ -10,8 +10,8 @@ namespace Content.Goobstation.Shared.Body;
 public sealed class OrganActionsSystem : EntitySystem
 {
     [Dependency] private readonly ActionContainerSystem _actionContainer = default!;
-    [Dependency] private readonly INetManager _net = default!;
     [Dependency] private readonly SharedActionsSystem _actions = default!;
+    [Dependency] private readonly INetManager _net = default!;
 
     private EntityQuery<OrganComponent> _organQuery;
 
@@ -58,13 +58,13 @@ public sealed class OrganActionsSystem : EntitySystem
 
     private void OnDisabled(Entity<OrganActionsComponent> ent, ref OrganDisabledEvent args)
     {
-        if (args.Organ.Comp.Body is {} body)
+        if (args.Organ.Comp.Body is { } body)
             _actions.RemoveProvidedActions(body, ent.Owner);
     }
 
     private void OnRemoved(Entity<OrganActionsComponent> ent, ref OrganRemovedEvent args)
     {
-        if (args.OldBody is {} body)
+        if (args.OldBody is { } body)
             _actions.RemoveProvidedActions(body, ent.Owner);
     }
 }

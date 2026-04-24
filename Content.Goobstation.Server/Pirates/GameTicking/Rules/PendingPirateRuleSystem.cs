@@ -8,7 +8,6 @@
 //
 // SPDX-License-Identifier: AGPL-3.0-or-later
 
-using Content.Server.Cargo.Components;
 using Content.Server.Cargo.Systems;
 using Content.Server.Chat.Systems;
 using Content.Server.GameTicking;
@@ -25,16 +24,21 @@ using Robust.Shared.Random;
 
 namespace Content.Goobstation.Server.Pirates.GameTicking.Rules;
 
-public sealed partial class PendingPirateRuleSystem : GameRuleSystem<PendingPirateRuleComponent>
+public sealed class PendingPirateRuleSystem : GameRuleSystem<PendingPirateRuleComponent>
 {
-    [Dependency] private readonly ChatSystem _chat = default!;
-    [Dependency] private readonly IRobustRandom _rand = default!;
-    [Dependency] private readonly IPrototypeManager _prot = default!;
-    [Dependency] private readonly GameTicker _gt = default!;
-    [Dependency] private readonly StationSystem _station = default!;
-    [Dependency] private readonly CargoSystem _cargo = default!;
+    public enum AnnouncementType
+    {
+        // should match with the localization strings
+        Threat, Arrival, Paid, Cancelled, NotEnough,
+    }
 
     private static readonly EntProtoId PirateSpawnRule = "PiratesSpawn";
+    [Dependency] private readonly CargoSystem _cargo = default!;
+    [Dependency] private readonly ChatSystem _chat = default!;
+    [Dependency] private readonly GameTicker _gt = default!;
+    [Dependency] private readonly IPrototypeManager _prot = default!;
+    [Dependency] private readonly IRobustRandom _rand = default!;
+    [Dependency] private readonly StationSystem _station = default!;
 
     public override void Update(float frameTime)
     {
@@ -47,7 +51,8 @@ public sealed partial class PendingPirateRuleSystem : GameRuleSystem<PendingPira
             if (pending.PirateSpawnTimer >= pending.PirateSpawnTime)
             {
                 // remove spawned order.
-                if (!AllEntityQuery<BecomesStationComponent, StationMemberComponent>().MoveNext(out var eqData, out _, out _))
+                if (!AllEntityQuery<BecomesStationComponent, StationMemberComponent>()
+                        .MoveNext(out var eqData, out _, out _))
                 {
                     // No station found, end the rule
                     _gt.EndGameRule(uid, gamerule);
@@ -63,9 +68,7 @@ public sealed partial class PendingPirateRuleSystem : GameRuleSystem<PendingPira
                 }
 
                 if (_cargo.TryGetOrderDatabase(station, out var cargoDb) && pending.Order != null)
-                {
                     _cargo.RemoveOrder(station.Value, bank.PrimaryAccount, pending.Order.OrderId, cargoDb);
-                }
 
                 SendAnnouncement((uid, pending), AnnouncementType.Arrival);
                 _gt.StartGameRule(PirateSpawnRule);
@@ -75,7 +78,10 @@ public sealed partial class PendingPirateRuleSystem : GameRuleSystem<PendingPira
         }
     }
 
-    protected override void Started(EntityUid uid, PendingPirateRuleComponent component, GameRuleComponent gameRule, GameRuleStartedEvent args)
+    protected override void Started(EntityUid uid,
+        PendingPirateRuleComponent component,
+        GameRuleComponent gameRule,
+        GameRuleStartedEvent args)
     {
         base.Started(uid, component, gameRule, args);
 
@@ -104,7 +110,16 @@ public sealed partial class PendingPirateRuleSystem : GameRuleSystem<PendingPira
             var reason = Loc.GetString($"pirates-ransom-{announcer}-desc", ("num", price));
             var requester = Loc.GetString($"pirates-announcer-{announcer}");
 
-            var ransom = new CargoOrderData(orderId, component.RansomPrototype, name, price, 1, requester, null, reason, bank.PrimaryAccount, 30); // CorvaxGoob-CargoFeatures : добавлен нул
+            var ransom = new CargoOrderData(orderId,
+                component.RansomPrototype,
+                name,
+                price,
+                1,
+                requester,
+                null,
+                reason,
+                bank.PrimaryAccount,
+                30); // CorvaxGoob-CargoFeatures : добавлен нул
 
             component.Order = ransom;
 
@@ -130,12 +145,7 @@ public sealed partial class PendingPirateRuleSystem : GameRuleSystem<PendingPira
         _chat.DispatchGlobalAnnouncement(announcement, announcer, colorOverride: Color.Orange);
     }
 
-    public EntityQueryEnumerator<ActiveGameRuleComponent, PendingPirateRuleComponent, GameRuleComponent> GetPendingRules()
+    public EntityQueryEnumerator<ActiveGameRuleComponent, PendingPirateRuleComponent, GameRuleComponent>
+        GetPendingRules()
         => QueryActiveRules();
-
-    public enum AnnouncementType
-    {
-        // should match with the localization strings
-        Threat, Arrival, Paid, Cancelled, NotEnough
-    }
 }

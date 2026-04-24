@@ -12,8 +12,8 @@ using Robust.Shared.Serialization;
 
 namespace Content.Goobstation.Shared.Clothing;
 
-[Serializable, NetSerializable]
+[Serializable] [NetSerializable]
 public enum SealableClothingVisuals : byte
 {
-    Sealed
+    Sealed,
 }

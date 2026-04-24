@@ -3,17 +3,20 @@ using Robust.Shared.GameStates;
 
 namespace Content.Goobstation.Shared.Shadowling.Components;
 
-[RegisterComponent, NetworkedComponent]
+[RegisterComponent] [NetworkedComponent]
 public sealed partial class HatchingEggComponent : Component
 {
     [DataField]
-    public TimeSpan NextUpdate = TimeSpan.Zero;
-
-    [DataField]
     public TimeSpan CooldownTimer = TimeSpan.FromSeconds(15);
 
-    [DataField]
-    public EntityUid? ShadowlingInside;
+    [DataField] public SoundSpecifier? CrackFirst =
+        new SoundPathSpecifier("/Audio/_EinsteinEngines/Shadowling/egg/crack01.ogg");
+
+    [DataField] public SoundSpecifier? CrackSecond =
+        new SoundPathSpecifier("/Audio/_EinsteinEngines/Shadowling/egg/crack02.ogg");
+
+    [DataField] public SoundSpecifier? CrackThird =
+        new SoundPathSpecifier("/Audio/_EinsteinEngines/Shadowling/egg/crack03.ogg");
 
     [DataField]
     public bool HasBeenHatched;
@@ -25,10 +28,9 @@ public sealed partial class HatchingEggComponent : Component
     [ViewVariables] public bool HasSecondMessageAppeared;
     [ViewVariables] public bool HasThirdMessageAppeared;
 
-    [DataField] public SoundSpecifier? CrackFirst =
-        new SoundPathSpecifier("/Audio/_EinsteinEngines/Shadowling/egg/crack01.ogg");
-    [DataField] public SoundSpecifier? CrackSecond =
-        new SoundPathSpecifier("/Audio/_EinsteinEngines/Shadowling/egg/crack02.ogg");
-    [DataField] public SoundSpecifier? CrackThird =
-        new SoundPathSpecifier("/Audio/_EinsteinEngines/Shadowling/egg/crack03.ogg");
+    [DataField]
+    public TimeSpan NextUpdate = TimeSpan.Zero;
+
+    [DataField]
+    public EntityUid? ShadowlingInside;
 }

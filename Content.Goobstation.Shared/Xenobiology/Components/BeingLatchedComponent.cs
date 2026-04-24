@@ -12,5 +12,5 @@ namespace Content.Goobstation.Shared.Xenobiology.Components;
 /// Marks an entity as being consumed so it is not targeted by other entities.
 /// Freaky.
 /// </summary>
-[RegisterComponent, NetworkedComponent]
+[RegisterComponent] [NetworkedComponent]
 public sealed partial class BeingLatchedComponent : Component;

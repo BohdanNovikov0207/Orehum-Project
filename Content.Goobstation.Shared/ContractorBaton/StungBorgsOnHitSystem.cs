@@ -18,9 +18,9 @@ namespace Content.Goobstation.Shared.ContractorBaton;
 
 public sealed class StungBorgsOnHitSystem : EntitySystem
 {
-    [Dependency] private readonly ItemToggleSystem _toggle = default!;
-    [Dependency] private readonly SharedStunSystem _stun = default!;
     [Dependency] private readonly SharedJitteringSystem _jitter = default!;
+    [Dependency] private readonly SharedStunSystem _stun = default!;
+    [Dependency] private readonly ItemToggleSystem _toggle = default!;
 
     public override void Initialize()
     {

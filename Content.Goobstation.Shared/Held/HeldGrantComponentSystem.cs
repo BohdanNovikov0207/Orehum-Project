@@ -39,7 +39,7 @@ public sealed class HeldGrantComponentSystem : EntitySystem
 
             object? temp = newComp;
             _serializationManager.CopyTo(data.Component, ref temp);
-            EntityManager.AddComponent(args.User, (Component)temp!);
+            EntityManager.AddComponent(args.User, (Component) temp!);
 
             ent.Comp.Active[name] = true; // Goobstation
         }

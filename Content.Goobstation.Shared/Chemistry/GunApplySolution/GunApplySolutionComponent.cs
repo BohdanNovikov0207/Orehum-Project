@@ -8,11 +8,11 @@ namespace Content.Goobstation.Shared.Chemistry.GunApplySolution;
 public sealed partial class GunApplySolutionComponent : Component
 {
     [DataField]
+    public float Amount = 5f;
+
+    [DataField]
     public string SourceSolution = "solution";
 
     [DataField]
     public string TargetSolution = "ammo";
-
-    [DataField]
-    public float Amount = 5f;
 }

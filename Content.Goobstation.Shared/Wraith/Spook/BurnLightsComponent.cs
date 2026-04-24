@@ -6,13 +6,13 @@ namespace Content.Goobstation.Shared.Wraith.Spook;
 public sealed partial class BurnLightsComponent : Component
 {
     /// <summary>
-    /// Search radius of lights
+    /// Amount of fire stacks to apply
     /// </summary>
     [DataField]
-    public float SearchRadius = 15f;
+    public MinMax FireStack = new(1, 3);
 
     /// <summary>
-    ///  How many lights to burn
+    /// How many lights to burn
     /// </summary>
     [DataField]
     public int MaxBurnLights = 4;
@@ -24,8 +24,8 @@ public sealed partial class BurnLightsComponent : Component
     public float Range = 4f;
 
     /// <summary>
-    /// Amount of fire stacks to apply
+    /// Search radius of lights
     /// </summary>
     [DataField]
-    public MinMax FireStack = new(1, 3);
+    public float SearchRadius = 15f;
 }

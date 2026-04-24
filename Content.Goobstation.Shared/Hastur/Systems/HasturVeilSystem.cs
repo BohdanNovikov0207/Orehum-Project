@@ -5,10 +5,11 @@ using Content.Shared.Stealth;
 using Content.Shared.Stealth.Components;
 
 namespace Content.Goobstation.Shared.Hastur.Systems;
+
 public sealed class HasturVeilSystem : EntitySystem
 {
-    [Dependency] private readonly SharedStealthSystem _stealth = default!;
     [Dependency] private readonly SharedPopupSystem _popup = default!;
+    [Dependency] private readonly SharedStealthSystem _stealth = default!;
 
     public override void Initialize()
     {
@@ -30,7 +31,9 @@ public sealed class HasturVeilSystem : EntitySystem
 
             _popup.PopupPredicted(
                 Loc.GetString("hastur-hide1", ("user", ent.Owner)),
-                ent.Owner, ent.Owner, PopupType.Medium);
+                ent.Owner,
+                ent.Owner,
+                PopupType.Medium);
             ent.Comp.IsActive = true;
             Dirty(ent);
         }
@@ -40,21 +43,27 @@ public sealed class HasturVeilSystem : EntitySystem
 
             _popup.PopupPredicted(
                 Loc.GetString("hastur-reveal1", ("user", ent.Owner)),
-                ent.Owner, ent.Owner, PopupType.Medium);
+                ent.Owner,
+                ent.Owner,
+                PopupType.Medium);
             ent.Comp.IsActive = false;
             Dirty(ent);
 
-            args.Handled = true; // Only set the event as handled if he deactivates the stealth. Then the cooldown kicks in.
+            args.Handled =
+                true; // Only set the event as handled if he deactivates the stealth. Then the cooldown kicks in.
         }
     }
 
-    private void OnDevour(Entity<HasturVeilComponent> ent, ref HasturDevourEvent args) // Stealth gets broken on devour as well.
+    private void
+        OnDevour(Entity<HasturVeilComponent> ent, ref HasturDevourEvent args) // Stealth gets broken on devour as well.
     {
         RemComp<StealthComponent>(ent.Owner);
 
         _popup.PopupPredicted(
             Loc.GetString("hastur-reveal1", ("user", ent.Owner)),
-            ent.Owner, ent.Owner, PopupType.Medium);
+            ent.Owner,
+            ent.Owner,
+            PopupType.Medium);
         ent.Comp.IsActive = false;
         Dirty(ent);
     }

@@ -4,7 +4,6 @@
 //
 // SPDX-License-Identifier: AGPL-3.0-or-later
 
-using Content.Goobstation.Shared.Enchanting.Components;
 using Content.Shared.Atmos;
 using Content.Shared.Damage;
 using Content.Shared.Electrocution;
@@ -35,7 +34,7 @@ public sealed class EnchantRelaySystem : EntitySystem
         SubInventory<ElectrocutionAttemptEvent>();
     }
 
-    private void SubInventory<T>(bool relayInventory = false) where T: IInventoryRelayEvent
+    private void SubInventory<T>(bool relayInventory = false) where T : IInventoryRelayEvent
     {
         SubscribeLocalEvent<EnchantedComponent, T>(RelayEvent);
         SubscribeLocalEvent<EnchantedComponent, InventoryRelayedEvent<T>>(RelayInventoryEvent);
@@ -52,8 +51,6 @@ public sealed class EnchantRelaySystem : EntitySystem
         }
     }
 
-    private void RelayInventoryEvent<T>(Entity<EnchantedComponent> ent, ref InventoryRelayedEvent<T> args) where T: IInventoryRelayEvent
-    {
-        RelayEvent(ent, ref args.Args);
-    }
+    private void RelayInventoryEvent<T>(Entity<EnchantedComponent> ent, ref InventoryRelayedEvent<T> args)
+        where T : IInventoryRelayEvent => RelayEvent(ent, ref args.Args);
 }

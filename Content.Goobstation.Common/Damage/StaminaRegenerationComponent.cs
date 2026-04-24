@@ -7,18 +7,18 @@ using Robust.Shared.GameStates;
 
 namespace Content.Goobstation.Common.Damage;
 
-[RegisterComponent, NetworkedComponent, AutoGenerateComponentState]
+[RegisterComponent] [NetworkedComponent] [AutoGenerateComponentState]
 public sealed partial class StaminaRegenerationComponent : Component
 {
     /// <summary>
-    ///     How much stamina is regenerated per second.
+    /// String key to identify the stamina regeneration within the drains dictionary.
     /// </summary>
-    [DataField, AutoNetworkedField]
-    public float RegenerationRate = -1.0f;
+    [DataField] [AutoNetworkedField]
+    public string RegenerationKey = "regen";
 
     /// <summary>
-    ///     String key to identify the stamina regeneration within the drains dictionary.
+    /// How much stamina is regenerated per second.
     /// </summary>
-    [DataField, AutoNetworkedField]
-    public string RegenerationKey = "regen";
+    [DataField] [AutoNetworkedField]
+    public float RegenerationRate = -1.0f;
 }

@@ -1,20 +1,21 @@
 using Content.Goobstation.Shared.Wraith.Components.Mobs;
 using Content.Goobstation.Shared.Wraith.Events;
 using Content.Shared.Popups;
-using Content.Shared.StatusEffect;
 using Content.Shared.StatusEffectNew;
 using Content.Shared.Weapons.Melee;
 using Content.Shared.Whitelist;
 
 namespace Content.Goobstation.Shared.Wraith.Systems.Mobs;
+
 public sealed class RallySystem : EntitySystem
 {
     [Dependency] private readonly EntityLookupSystem _lookup = default!;
-    [Dependency] private readonly SharedPopupSystem _popup = default!;
-    [Dependency] private readonly EntityWhitelistSystem _whitelist = default!;
-    [Dependency] private readonly Content.Shared.StatusEffectNew.StatusEffectsSystem _status = default!;
 
     private readonly HashSet<Entity<MeleeWeaponComponent>> _melee = new();
+    [Dependency] private readonly SharedPopupSystem _popup = default!;
+    [Dependency] private readonly StatusEffectsSystem _status = default!;
+    [Dependency] private readonly EntityWhitelistSystem _whitelist = default!;
+
     public override void Initialize()
     {
         base.Initialize();

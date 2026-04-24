@@ -12,13 +12,11 @@
 using Content.Goobstation.Shared.Bingle;
 using Content.Shared.CombatMode;
 using Robust.Client.GameObjects;
-using Robust.Shared.GameObjects;
-using Robust.Shared.IoC;
 
 namespace Content.Goobstation.Client.Bingle;
 
 /// <summary>
-///   Handles the appearance of bingles.
+/// Handles the appearance of bingles.
 /// </summary>
 public sealed class BingleSystem : EntitySystem
 {

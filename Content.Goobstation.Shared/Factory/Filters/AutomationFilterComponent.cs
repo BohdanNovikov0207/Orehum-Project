@@ -12,7 +12,7 @@ namespace Content.Goobstation.Shared.Factory.Filters;
 /// Marker component for filter items.
 /// Only used for whitelisting, does nothing on its own.
 /// </summary>
-[RegisterComponent, NetworkedComponent]
+[RegisterComponent] [NetworkedComponent]
 public sealed partial class AutomationFilterComponent : Component;
 
 /// <summary>

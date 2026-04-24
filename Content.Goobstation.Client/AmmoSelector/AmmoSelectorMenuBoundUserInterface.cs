@@ -39,8 +39,6 @@ public sealed class AmmoSelectorMenuBoundUserInterface : BoundUserInterface
         _menu.OpenCenteredAt(_inputManager.MouseScreenPosition.Position / vpSize);
     }
 
-    public void SendAmmoSelectorSystemMessage(ProtoId<SelectableAmmoPrototype> protoId)
-    {
+    public void SendAmmoSelectorSystemMessage(ProtoId<SelectableAmmoPrototype> protoId) =>
         SendPredictedMessage(new AmmoSelectedMessage(protoId));
-    }
 }

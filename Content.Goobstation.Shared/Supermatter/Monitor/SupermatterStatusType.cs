@@ -7,7 +7,7 @@ using Robust.Shared.Serialization;
 
 namespace Content.Goobstation.Shared.Supermatter.Monitor;
 
-[Serializable, NetSerializable]
+[Serializable] [NetSerializable]
 public enum SupermatterStatusType : sbyte
 {
     Error = -1,
@@ -17,5 +17,5 @@ public enum SupermatterStatusType : sbyte
     Warning = 3,
     Danger = 4,
     Emergency = 5,
-    Delaminating = 6
+    Delaminating = 6,
 }

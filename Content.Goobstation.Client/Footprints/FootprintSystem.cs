@@ -16,10 +16,8 @@ public sealed class FootprintSystem : EntitySystem
         SubscribeNetworkEvent<FootprintChangedEvent>(OnFootprintChanged);
     }
 
-    private void OnComponentStartup(Entity<FootprintComponent> entity, ref ComponentStartup e)
-    {
+    private void OnComponentStartup(Entity<FootprintComponent> entity, ref ComponentStartup e) =>
         UpdateSprite(entity, entity);
-    }
 
     private void OnFootprintChanged(FootprintChangedEvent e)
     {
@@ -45,7 +43,9 @@ public sealed class FootprintSystem : EntitySystem
             sprite.LayerSetOffset(i, footprint.Footprints[i].Offset);
             sprite.LayerSetRotation(i, footprint.Footprints[i].Rotation);
             sprite.LayerSetColor(i, footprint.Footprints[i].Color);
-            sprite.LayerSetSprite(i, new SpriteSpecifier.Rsi(new("/Textures/_CorvaxNext/Effects/footprint.rsi"), footprint.Footprints[i].State));
+            sprite.LayerSetSprite(i,
+                new SpriteSpecifier.Rsi(new ResPath("/Textures/_CorvaxNext/Effects/footprint.rsi"),
+                    footprint.Footprints[i].State));
         }
     }
 }

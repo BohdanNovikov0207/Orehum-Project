@@ -20,11 +20,11 @@ namespace Content.Goobstation.Server.Shadowling.Systems.Abilities.PreAscension;
 /// </summary>
 public sealed class ShadowlingDestroyEnginesSystem : EntitySystem
 {
-    [Dependency] private readonly EmergencyShuttleSystem _emergency = default!;
-    [Dependency] private readonly RoundEndSystem _roundEnd = default!;
-    [Dependency] private readonly ChatSystem _chat = default!;
-    [Dependency] private readonly SharedPopupSystem _popup = default!;
     [Dependency] private readonly SharedActionsSystem _actions = default!;
+    [Dependency] private readonly ChatSystem _chat = default!;
+    [Dependency] private readonly EmergencyShuttleSystem _emergency = default!;
+    [Dependency] private readonly SharedPopupSystem _popup = default!;
+    [Dependency] private readonly RoundEndSystem _roundEnd = default!;
 
     public override void Initialize()
     {
@@ -55,6 +55,7 @@ public sealed class ShadowlingDestroyEnginesSystem : EntitySystem
                 return;
             }
         }
+
         if (_emergency.EmergencyShuttleArrived)
         {
             _popup.PopupEntity(Loc.GetString("shadowling-destroy-engines-arrived"), uid);

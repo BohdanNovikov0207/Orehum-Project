@@ -17,20 +17,20 @@ public sealed partial class HoloCigarAffectedGunComponent : Component
     public EntityUid GunOwner = EntityUid.Invalid;
 
     [ViewVariables]
-    public bool WasOriginallyMultishot = false;
+    public float OriginalHandDamageAmount;
 
     [ViewVariables]
     public float OriginalMissChance;
 
     [ViewVariables]
-    public float OriginalSpreadModifier;
-
-    [ViewVariables]
     public float OriginalSpreadAddition;
 
     [ViewVariables]
-    public float OriginalHandDamageAmount;
+    public float OriginalSpreadModifier;
 
     [ViewVariables]
     public float OriginalStaminaDamage;
+
+    [ViewVariables]
+    public bool WasOriginallyMultishot = false;
 }

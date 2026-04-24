@@ -11,22 +11,10 @@ namespace Content.Goobstation.Server.Implants.Components;
 public sealed partial class NutrimentPumpImplantComponent : Component
 {
     /// <summary>
-    /// Amount to modify hunger by.
-    /// </summary>
-    [DataField]
-    public float FoodRate = 15f;
-
-    /// <summary>
     /// Amount to modify thirst by.
     /// </summary>
     [DataField]
     public float DrinkRate = 40f;
-
-    /// <summary>
-    /// Next execution time. (Explanatory, I know.)
-    /// </summary>
-    [DataField]
-    public TimeSpan NextExecutionTime = TimeSpan.Zero;
 
     /// <summary>
     /// The time between each execution.
@@ -34,4 +22,16 @@ public sealed partial class NutrimentPumpImplantComponent : Component
     [ViewVariables(VVAccess.ReadWrite)]
     [AutoNetworkedField]
     public TimeSpan ExecutionInterval = TimeSpan.FromSeconds(1);
+
+    /// <summary>
+    /// Amount to modify hunger by.
+    /// </summary>
+    [DataField]
+    public float FoodRate = 15f;
+
+    /// <summary>
+    /// Next execution time. (Explanatory, I know.)
+    /// </summary>
+    [DataField]
+    public TimeSpan NextExecutionTime = TimeSpan.Zero;
 }

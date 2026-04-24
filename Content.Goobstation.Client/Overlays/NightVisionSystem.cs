@@ -16,8 +16,8 @@ namespace Content.Goobstation.Client.Overlays;
 
 public sealed class NightVisionSystem : EquipmentHudSystem<NightVisionComponent>
 {
-    [Dependency] private readonly IOverlayManager _overlayMan = default!;
     [Dependency] private readonly ILightManager _lightManager = default!;
+    [Dependency] private readonly IOverlayManager _overlayMan = default!;
 
     private BaseSwitchableOverlay<NightVisionComponent> _overlay = default!;
 
@@ -44,10 +44,7 @@ public sealed class NightVisionSystem : EquipmentHudSystem<NightVisionComponent>
             base.OnRefreshEquipmentHud(ent, ref args);
     }
 
-    private void OnToggle(Entity<NightVisionComponent> ent, ref SwitchableOverlayToggledEvent args)
-    {
-        RefreshOverlay();
-    }
+    private void OnToggle(Entity<NightVisionComponent> ent, ref SwitchableOverlayToggledEvent args) => RefreshOverlay();
 
     protected override void UpdateInternal(RefreshEquipmentHudEvent<NightVisionComponent> args)
     {
@@ -86,10 +83,7 @@ public sealed class NightVisionSystem : EquipmentHudSystem<NightVisionComponent>
         UpdateOverlay(null);
     }
 
-    private void UpdateNightVision(bool active)
-    {
-        _lightManager.DrawLighting = !active;
-    }
+    private void UpdateNightVision(bool active) => _lightManager.DrawLighting = !active;
 
     private void UpdateOverlay(NightVisionComponent? nvComp)
     {

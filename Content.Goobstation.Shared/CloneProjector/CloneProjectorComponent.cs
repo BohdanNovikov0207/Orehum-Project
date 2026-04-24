@@ -6,7 +6,6 @@
 
 using Content.Shared.Damage;
 using Content.Shared.Damage.Prototypes;
-using Content.Shared.Inventory;
 using Content.Shared.Whitelist;
 using Robust.Shared.Containers;
 using Robust.Shared.GameStates;
@@ -14,53 +13,26 @@ using Robust.Shared.Prototypes;
 
 namespace Content.Goobstation.Shared.CloneProjector;
 
-[RegisterComponent, NetworkedComponent, AutoGenerateComponentState]
+[RegisterComponent] [NetworkedComponent] [AutoGenerateComponentState]
 public sealed partial class CloneProjectorComponent : Component
 {
     /// <summary>
-    /// The UID of the active clone.
-    /// </summary>
-    [ViewVariables(VVAccess.ReadOnly), AutoNetworkedField]
-    public EntityUid? CloneUid;
-
-    [ViewVariables(VVAccess.ReadOnly), AutoNetworkedField]
-    public EntityUid? CurrentHost;
-
-    /// <summary>
-    /// How long it takes to regenerate the clone when destroyed.
+    /// The ID of the action used to activate the projector.
     /// </summary>
     [DataField]
-    public TimeSpan DestroyedCooldown = TimeSpan.FromSeconds(90);
+    public EntProtoId Action = "ActionActivateProjector";
 
-    /// <summary>
-    /// How long the host is stunned when the hologram is destroyed.
-    /// </summary>
-    [DataField]
-    public TimeSpan StunDuration = TimeSpan.FromSeconds(8);
-
-    /// <summary>
-    /// Should the host be stunned when the clone is destroyed?
-    /// </summary>
-    [DataField]
-    public bool DoStun = true;
-
-    /// <summary>
-    ///  How much damage does the host take when the clone is destroyed?
-    /// </summary>
-    [DataField]
-    public DamageSpecifier DamageOnDestroyed = new();
-
-    /// <summary>
-    /// Should the clone be prevented from using ranged weapons?
-    /// </summary>
-    [DataField]
-    public bool RestrictRangedWeapons = true;
+    [ViewVariables(VVAccess.ReadOnly)] [AutoNetworkedField]
+    public EntityUid? ActionEntity;
 
     [DataField]
     public ComponentRegistry? AddedComponents;
 
+    [ViewVariables(VVAccess.ReadOnly)]
+    public Container CloneContainer = new();
+
     [DataField]
-    public ComponentRegistry? RemovedComponents;
+    public ProtoId<DamageModifierSetPrototype> CloneDamageModifierSet = "LivingLight";
 
     /// <summary>
     /// Items on the host that *have* this component will not be duplicated.
@@ -74,14 +46,53 @@ public sealed partial class CloneProjectorComponent : Component
     [DataField]
     public EntityWhitelist? ClonedItemWhitelist;
 
-    /// <summary>
-    /// If the entity using this projector matches the whitelist, prevent use.
-    /// </summary>
     [DataField]
-    public EntityWhitelist? UserBlacklist;
+    public LocId CloneGeneratedMessage = "gemini-projector-clone-created";
 
     [DataField]
-    public ProtoId<DamageModifierSetPrototype> CloneDamageModifierSet ="LivingLight";
+    public LocId CloneRetrievedMessage = "gemini-projector-clone-retrieved";
+
+    /// <summary>
+    /// The UID of the active clone.
+    /// </summary>
+    [ViewVariables(VVAccess.ReadOnly)] [AutoNetworkedField]
+    public EntityUid? CloneUid;
+
+    [ViewVariables(VVAccess.ReadOnly)] [AutoNetworkedField]
+    public EntityUid? CurrentHost;
+
+    /// <summary>
+    /// How much damage does the host take when the clone is destroyed?
+    /// </summary>
+    [DataField]
+    public DamageSpecifier DamageOnDestroyed = new();
+
+    /// <summary>
+    /// How long it takes to regenerate the clone when destroyed.
+    /// </summary>
+    [DataField]
+    public TimeSpan DestroyedCooldown = TimeSpan.FromSeconds(90);
+
+    /// <summary>
+    /// Should the host be stunned when the clone is destroyed?
+    /// </summary>
+    [DataField]
+    public bool DoStun = true;
+
+    [DataField]
+    public LocId EquippedMessage = "gemini-projector-installed";
+
+    [DataField]
+    public LocId FlavorText = "gemini-projector-clone-flavor-text";
+
+    [DataField]
+    public LocId GhostRoleDescription = "ghost-role-information-gemini-clone-description";
+
+    [DataField]
+    public LocId GhostRoleName = "ghost-role-information-gemini-clone-name";
+
+    [DataField]
+    public LocId GhostRoleRules = "ghost-role-information-familiar-rules";
 
     /// <summary>
     /// The suffix attached to the end of this clones name.
@@ -90,28 +101,13 @@ public sealed partial class CloneProjectorComponent : Component
     public LocId NameSuffix = "gemini-projector-clone-name-suffix";
 
     [DataField]
-    public LocId FlavorText = "gemini-projector-clone-flavor-text";
+    public ComponentRegistry? RemovedComponents;
 
+    /// <summary>
+    /// Should the clone be prevented from using ranged weapons?
+    /// </summary>
     [DataField]
-    public LocId CloneGeneratedMessage = "gemini-projector-clone-created";
-
-    [DataField]
-    public LocId CloneRetrievedMessage = "gemini-projector-clone-retrieved";
-
-    [DataField]
-    public LocId EquippedMessage = "gemini-projector-installed";
-
-    [DataField]
-    public LocId UnequippedMessage = "gemini-projector-removed";
-
-    [DataField]
-    public LocId GhostRoleName = "ghost-role-information-gemini-clone-name";
-
-    [DataField]
-    public LocId GhostRoleDescription = "ghost-role-information-gemini-clone-description";
-
-    [DataField]
-    public LocId GhostRoleRules = "ghost-role-information-familiar-rules";
+    public bool RestrictRangedWeapons = true;
 
     /// <summary>
     /// How much the strip time should be increased by.
@@ -119,15 +115,18 @@ public sealed partial class CloneProjectorComponent : Component
     [DataField]
     public TimeSpan StripTimeAddition = TimeSpan.FromSeconds(15);
 
-    [ViewVariables(VVAccess.ReadOnly)]
-    public Container CloneContainer = new();
-
     /// <summary>
-    /// The ID of the action used to activate the projector.
+    /// How long the host is stunned when the hologram is destroyed.
     /// </summary>
     [DataField]
-    public EntProtoId Action = "ActionActivateProjector";
+    public TimeSpan StunDuration = TimeSpan.FromSeconds(8);
 
-    [ViewVariables(VVAccess.ReadOnly), AutoNetworkedField]
-    public EntityUid? ActionEntity;
+    [DataField]
+    public LocId UnequippedMessage = "gemini-projector-removed";
+
+    /// <summary>
+    /// If the entity using this projector matches the whitelist, prevent use.
+    /// </summary>
+    [DataField]
+    public EntityWhitelist? UserBlacklist;
 }

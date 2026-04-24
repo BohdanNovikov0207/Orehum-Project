@@ -13,7 +13,7 @@ namespace Content.Goobstation.Shared.Enchanting.Components;
 /// Randomizes your insulation every time you get shocked.
 /// Higher levels make the RNG more favourable.
 /// </summary>
-[RegisterComponent, NetworkedComponent, Access(typeof(BudgetInsulatedEnchantSystem))]
+[RegisterComponent] [NetworkedComponent] [Access(typeof(BudgetInsulatedEnchantSystem))]
 [AutoGenerateComponentState]
 [EntityCategory("Enchants")]
 public sealed partial class BudgetInsulatedEnchantComponent : Component
@@ -38,13 +38,13 @@ public sealed partial class BudgetInsulatedEnchantComponent : Component
         2.5f,
         3f,
         3.5f,
-        4f
+        4f,
     };
 
     /// <summary>
     /// The coefficient used for the next shock.
     /// Networked so if electrocution gets predicted it just werks.
     /// </summary>
-    [DataField, AutoNetworkedField]
+    [DataField] [AutoNetworkedField]
     public float NextCoefficient;
 }

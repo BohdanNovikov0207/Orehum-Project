@@ -8,7 +8,7 @@ using Content.Goobstation.Shared.Enchanting.Components;
 namespace Content.Goobstation.Shared.Enchanting.Systems;
 
 /// <summary>
-/// Adds enchants on mapinit for <see cref="EnchantFillComponent"/>.
+/// Adds enchants on mapinit for <see cref="EnchantFillComponent" />.
 /// </summary>
 public sealed class EnchantFillSystem : EntitySystem
 {

@@ -8,8 +8,6 @@
 
 using Content.Goobstation.Shared.Emoting;
 using Content.Shared.Actions;
-using Content.Shared.Damage;
-using Content.Shared.Damage.Components;
 using Content.Shared.Damage.Systems;
 using Content.Shared.Gravity;
 using Content.Shared.Movement.Components;
@@ -21,9 +19,10 @@ public sealed class DashActionSystem : EntitySystem
 {
     [Dependency] private readonly SharedActionsSystem _actions = default!;
     [Dependency] private readonly SharedGravitySystem _gravity = default!;
+    [Dependency] private readonly SharedStaminaSystem _stamina = default!;
     [Dependency] private readonly ThrowingSystem _throwing = default!;
     [Dependency] private readonly SharedTransformSystem _transform = default!;
-    [Dependency] private readonly SharedStaminaSystem _stamina = default!;
+
     public override void Initialize()
     {
         base.Initialize();
@@ -65,13 +64,9 @@ public sealed class DashActionSystem : EntitySystem
         }
     }
 
-    private void OnComponentInit(EntityUid uid, DashActionComponent comp, ref ComponentInit args)
-    {
+    private void OnComponentInit(EntityUid uid, DashActionComponent comp, ref ComponentInit args) =>
         comp.ActionUid = _actions.AddAction(uid, comp.ActionProto);
-    }
 
-    private void OnComponentShutdown(EntityUid uid, DashActionComponent comp, ref ComponentShutdown args)
-    {
+    private void OnComponentShutdown(EntityUid uid, DashActionComponent comp, ref ComponentShutdown args) =>
         _actions.RemoveAction(comp.ActionUid);
-    }
 }

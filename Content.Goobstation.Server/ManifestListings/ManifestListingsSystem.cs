@@ -29,7 +29,7 @@ public sealed class ManifestListingsSystem : EntitySystem
 
         if (!listings.Listings.TryGetValue(args.Store.Id, out var list))
         {
-            list = new();
+            list = new List<ListingData>();
             listings.Listings.Add(args.Store.Id, list);
         }
 
@@ -64,9 +64,7 @@ public sealed class ManifestListingsSystem : EntitySystem
                 ignoredIds.Add(data.ProductUpgradeId);
                 var upgrade = list.FirstOrDefault(x => x.ID == data.ProductUpgradeId);
                 if (upgrade != null)
-                {
                     info[data.ID] += upgrade.PurchaseAmount;
-                }
             }
 
             foreach (var (dataId, count) in info)

@@ -19,10 +19,10 @@ public sealed partial class XenobiologyBountyEntry : BoxContainer
 {
     [Dependency] private readonly IPrototypeManager _prototype = default!;
 
+    private TimeSpan _untilNextSkip;
+
     public Action? OnFulfillButtonPressed;
     public Action? OnSkipButtonPressed;
-
-    private TimeSpan _untilNextSkip;
 
     public XenobiologyBountyEntry(XenobiologyBountyData bounty, TimeSpan untilNextSkip)
     {

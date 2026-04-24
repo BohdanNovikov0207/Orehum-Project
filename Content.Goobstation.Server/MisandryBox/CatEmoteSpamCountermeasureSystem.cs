@@ -15,30 +15,33 @@ namespace Content.Goobstation.Server.MisandryBox;
 // Now that's a mouthful
 public sealed class CatEmoteSpamCountermeasureSystem : EntitySystem
 {
-    [Dependency] private readonly ThunderstrikeSystem _thunderstrike = default!;
-    [Dependency] private readonly IRobustRandom _rand = default!;
-
     private const float ClearInterval = 20.0f;
     private const float PitchModulo = 0.08f;
     private const int LowerBound = 2; // Shoo away any shits with server vv from killing everyone on 1 emote
 
     [ViewVariables(VVAccess.ReadWrite)]
-    private int _hardEmoteThreshold = 20;
-
-    [ViewVariables(VVAccess.ReadWrite)]
-    private int _softThresholdVariance = 10;
-
-    [ViewVariables(VVAccess.ReadWrite)]
-    private float _postSoftThresholdProbability = 0.08f;
-
-    [ViewVariables(VVAccess.ReadWrite)]
-    private float _softThresholdRefreshCooldown = 34f;
+    private readonly int _hardEmoteThreshold = 20;
 
     [ViewVariables(VVAccess.ReadOnly)]
-    // ReSharper disable once UnusedMember.Local
-    private int SoftThreshold => GetSoftThreshold();
+    private readonly Dictionary<EntityUid, int> _meowTracker = [];
+
+    [ViewVariables(VVAccess.ReadWrite)]
+    private readonly float _postSoftThresholdProbability = 0.08f;
+
+    [Dependency] private readonly IRobustRandom _rand = default!;
+
+    [ViewVariables(VVAccess.ReadWrite)]
+    private readonly float _softThresholdRefreshCooldown = 34f;
+
+    [ViewVariables(VVAccess.ReadWrite)]
+    private readonly int _softThresholdVariance = 10;
+
+    [Dependency] private readonly ThunderstrikeSystem _thunderstrike = default!;
 
     private int? _softThreshold;
+    private float _timeSinceLastClear;
+
+    private float _timeSinceLastRefresh;
 
     /// <summary>
     /// Ash offenders on proc? Tell them what they should do?
@@ -47,10 +50,8 @@ public sealed class CatEmoteSpamCountermeasureSystem : EntitySystem
     public bool DrasticMeasures = true;
 
     [ViewVariables(VVAccess.ReadOnly)]
-    private Dictionary<EntityUid, int> _meowTracker = [];
-    private float _timeSinceLastClear = 0f;
-
-    private float _timeSinceLastRefresh = 0f;
+    // ReSharper disable once UnusedMember.Local
+    private int SoftThreshold => GetSoftThreshold();
 
     public override void Initialize()
     {
@@ -66,10 +67,7 @@ public sealed class CatEmoteSpamCountermeasureSystem : EntitySystem
         ev.Pitch = shift * PitchModulo;
     }
 
-    private int GetCount(EntityUid entity)
-    {
-        return _meowTracker.TryGetValue(entity, out var count) ? count : 0;
-    }
+    private int GetCount(EntityUid entity) => _meowTracker.TryGetValue(entity, out var count) ? count : 0;
 
     public override void Update(float frameTime)
     {
@@ -125,7 +123,7 @@ public sealed class CatEmoteSpamCountermeasureSystem : EntitySystem
         // This is ground control to major tom
         var steps = count - soft;
         // By default, this is 8% per step over. 10 over soft threshold is 80%.
-        var chance = steps*_postSoftThresholdProbability;
+        var chance = steps * _postSoftThresholdProbability;
 
         if (_rand.Prob(chance))
             Smite(uid, false);
@@ -144,8 +142,6 @@ public sealed class CatEmoteSpamCountermeasureSystem : EntitySystem
     /// </summary>
     /// <param name="uid">Target entity</param>
     /// <param name="killOverride">Optional override for the kill parameter. If null, uses DrasticMeasures</param>
-    private void Smite(EntityUid uid, bool? killOverride = null)
-    {
-        _thunderstrike.Smite(uid, kill: killOverride ?? DrasticMeasures);
-    }
+    private void Smite(EntityUid uid, bool? killOverride = null) =>
+        _thunderstrike.Smite(uid, killOverride ?? DrasticMeasures);
 }

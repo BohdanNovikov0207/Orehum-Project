@@ -40,5 +40,4 @@ public sealed class ActiveMultihitSystem : EntitySystem
 
         RemComp(ent.Owner, ent.Comp);
     }
-
 }

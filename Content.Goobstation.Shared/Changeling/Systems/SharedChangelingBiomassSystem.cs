@@ -22,14 +22,14 @@ namespace Content.Goobstation.Shared.Changeling.Systems;
 
 public abstract class SharedChangelingBiomassSystem : EntitySystem
 {
-    [Dependency] private readonly IPrototypeManager _proto = default!;
+    [Dependency] private readonly SharedBloodstreamSystem _blood = default!;
     [Dependency] private readonly DamageableSystem _dmg = default!;
     [Dependency] private readonly MobStateSystem _mob = default!;
     [Dependency] private readonly MobThresholdSystem _mobThreshold = default!;
-    [Dependency] private readonly SharedBloodstreamSystem _blood = default!;
-    [Dependency] private readonly SharedInternalResourcesSystem _resource = default!;
     [Dependency] private readonly SharedPopupSystem _popup = default!;
+    [Dependency] private readonly IPrototypeManager _proto = default!;
     [Dependency] private readonly SharedPuddleSystem _puddle = default!;
+    [Dependency] private readonly SharedInternalResourcesSystem _resource = default!;
     [Dependency] private readonly SharedStunSystem _stun = default!;
 
     private EntityQuery<AbsorbedComponent> _absorbQuery;
@@ -44,7 +44,8 @@ public abstract class SharedChangelingBiomassSystem : EntitySystem
         SubscribeLocalEvent<ChangelingBiomassComponent, ComponentShutdown>(OnShutdown);
 
         SubscribeLocalEvent<ChangelingBiomassComponent, InternalResourcesThresholdMetEvent>(OnThresholdMetEvent);
-        SubscribeLocalEvent<ChangelingBiomassComponent, InternalResourcesRegenModifierEvent>(OnChangelingChemicalRegenEvent);
+        SubscribeLocalEvent<ChangelingBiomassComponent, InternalResourcesRegenModifierEvent>(
+            OnChangelingChemicalRegenEvent);
         SubscribeLocalEvent<ChangelingBiomassComponent, RejuvenateEvent>(OnRejuvenate);
 
         _absorbQuery = GetEntityQuery<AbsorbedComponent>();
@@ -70,7 +71,8 @@ public abstract class SharedChangelingBiomassSystem : EntitySystem
 
     #region Event Handlers
 
-    private void OnThresholdMetEvent(Entity<ChangelingBiomassComponent> ent, ref InternalResourcesThresholdMetEvent args)
+    private void OnThresholdMetEvent(Entity<ChangelingBiomassComponent> ent,
+        ref InternalResourcesThresholdMetEvent args)
     {
         if (ent.Comp.ResourceData == null
             || args.Data.InternalResourcesType != ent.Comp.ResourceData.InternalResourcesType)
@@ -86,19 +88,21 @@ public abstract class SharedChangelingBiomassSystem : EntitySystem
 
             case "Second":
 
-            _stun.TryUpdateStunDuration(ent, ent.Comp.SecondWarnStun);
-            DoPopup(ent, ent.Comp.SecondWarnPopup, PopupType.MediumCaution);
+                _stun.TryUpdateStunDuration(ent, ent.Comp.SecondWarnStun);
+                DoPopup(ent, ent.Comp.SecondWarnPopup, PopupType.MediumCaution);
 
                 break;
 
             case "Third":
 
-            _stun.TryUpdateStunDuration(ent, ent.Comp.ThirdWarnStun);
+                _stun.TryUpdateStunDuration(ent, ent.Comp.ThirdWarnStun);
 
                 if (!_blood.TryModifyBloodLevel(ent.Owner, -ent.Comp.BloodCoughAmount)
                     || !_bloodQuery.TryComp(ent, out var bloodComp))
                 {
-                    _stun.TryKnockdown(ent.Owner, ent.Comp.ThirdWarnStun, false); // knockdown if there isnt any blood to cough up
+                    _stun.TryKnockdown(ent.Owner,
+                        ent.Comp.ThirdWarnStun,
+                        false); // knockdown if there isnt any blood to cough up
                     return;
                 }
 
@@ -128,7 +132,8 @@ public abstract class SharedChangelingBiomassSystem : EntitySystem
         }
     }
 
-    private void OnChangelingChemicalRegenEvent(Entity<ChangelingBiomassComponent> ent, ref InternalResourcesRegenModifierEvent args)
+    private void OnChangelingChemicalRegenEvent(Entity<ChangelingBiomassComponent> ent,
+        ref InternalResourcesRegenModifierEvent args)
     {
         if (args.Data.InternalResourcesType != ent.Comp.ChemResourceType)
             return;
@@ -149,6 +154,7 @@ public abstract class SharedChangelingBiomassSystem : EntitySystem
     #region Helper Methods
 
     public readonly ProtoId<DamageTypePrototype> Genetic = "Cellular";
+
     private void KillChangeling(Entity<ChangelingBiomassComponent> ent)
     {
         var genetic = _proto.Index(Genetic);
@@ -157,7 +163,10 @@ public abstract class SharedChangelingBiomassSystem : EntitySystem
             return;
 
         var damagespec = new DamageSpecifier(genetic, (FixedPoint2) totalDamage);
-        _dmg.TryChangeDamage(ent, damagespec, targetPart: TargetBodyPart.All, splitDamage: SplitDamageBehavior.SplitEnsureAllOrganic);
+        _dmg.TryChangeDamage(ent,
+            damagespec,
+            targetPart: TargetBodyPart.All,
+            splitDamage: SplitDamageBehavior.SplitEnsureAllOrganic);
 
         EnsureComp<AbsorbedComponent>(ent);
     }
@@ -167,10 +176,8 @@ public abstract class SharedChangelingBiomassSystem : EntitySystem
         // go to ChangelingBiomassSystem for the logic
     }
 
-    private void DoPopup(Entity<ChangelingBiomassComponent> ent, LocId popup, PopupType popupType)
-    {
+    private void DoPopup(Entity<ChangelingBiomassComponent> ent, LocId popup, PopupType popupType) =>
         _popup.PopupEntity(Loc.GetString(popup), ent, ent, popupType);
-    }
 
     #endregion
 }

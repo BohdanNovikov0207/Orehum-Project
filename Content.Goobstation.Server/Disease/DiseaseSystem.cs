@@ -1,23 +1,22 @@
-using Content.Shared.Rejuvenate;
-using Content.Goobstation.Shared.Disease;
-using Robust.Shared.Map;
-using Robust.Shared.Prototypes;
-using Robust.Shared.Random;
 using System.Diagnostics.CodeAnalysis;
 using System.Linq;
 using System.Numerics;
+using Content.Goobstation.Shared.Disease;
 using Content.Goobstation.Shared.Disease.Components;
 using Content.Goobstation.Shared.Disease.Systems;
 using Content.Goobstation.Shared.EntityEffects.Disease;
-using Content.Shared.EntityEffects;
+using Content.Shared.Rejuvenate;
 using Robust.Server.Containers;
+using Robust.Shared.Map;
+using Robust.Shared.Prototypes;
+using Robust.Shared.Random;
 
 namespace Content.Goobstation.Server.Disease;
 
 public sealed partial class DiseaseSystem : SharedDiseaseSystem
 {
-    [Dependency] private readonly IRobustRandom _random = default!;
     [Dependency] private readonly ContainerSystem _container = default!;
+    [Dependency] private readonly IRobustRandom _random = default!;
 
     public override void Initialize()
     {
@@ -91,17 +90,19 @@ public sealed partial class DiseaseSystem : SharedDiseaseSystem
     }
     */
 
-    private void OnRejuvenate(Entity<DiseaseCarrierComponent> ent, ref RejuvenateEvent args)
-    {
+    private void OnRejuvenate(Entity<DiseaseCarrierComponent> ent, ref RejuvenateEvent args) =>
         TryCureAll((ent, ent.Comp));
-    }
 
     #region public API
 
     /// <summary>
     /// Tries to infect the given target with the given disease prototype
     /// </summary>
-    public override EntityUid? DoInfectionAttempt(EntityUid target, EntProtoId proto, float power, float chance, ProtoId<DiseaseSpreadPrototype> spreadType)
+    public override EntityUid? DoInfectionAttempt(EntityUid target,
+        EntProtoId proto,
+        float power,
+        float chance,
+        ProtoId<DiseaseSpreadPrototype> spreadType)
     {
         var ent = Spawn(proto);
         if (DoInfectionAttempt(target, ent, power, chance, spreadType, false))
@@ -148,8 +149,12 @@ public sealed partial class DiseaseSystem : SharedDiseaseSystem
             return false;
 
         if (TryComp<DiseaseComponent>(disease, out var diseaseComp))
+        {
             foreach (var effect in diseaseComp.Effects.ContainedEntities)
+            {
                 CleanupEffect((disease, diseaseComp), effect);
+            }
+        }
 
         QueueDel(disease);
         Dirty(ent);
@@ -176,12 +181,15 @@ public sealed partial class DiseaseSystem : SharedDiseaseSystem
     /// <summary>
     /// Tries to infect the entity with a given disease prototype
     /// </summary>
-    public override bool TryInfect(Entity<DiseaseCarrierComponent?> ent, EntProtoId diseaseId, [NotNullWhen(true)] out EntityUid? disease, bool force = false)
+    public override bool TryInfect(Entity<DiseaseCarrierComponent?> ent,
+        EntProtoId diseaseId,
+        [NotNullWhen(true)] out EntityUid? disease,
+        bool force = false)
     {
         disease = null;
 
         if (force)
-            EnsureComp<DiseaseCarrierComponent>(ent, out ent.Comp);
+            EnsureComp(ent, out ent.Comp);
 
         if (!Resolve(ent, ref ent.Comp, false))
             return false;
@@ -192,6 +200,7 @@ public sealed partial class DiseaseSystem : SharedDiseaseSystem
             QueueDel(spawned);
             return false;
         }
+
         disease = spawned;
         return true;
     }
@@ -223,7 +232,6 @@ public sealed partial class DiseaseSystem : SharedDiseaseSystem
     {
         foreach (var diseaseUid in carrier.Diseases.ContainedEntities)
         {
-
             if (!EntityManager.TryGetComponent<DiseaseComponent>(diseaseUid, out var disease))
                 continue;
 
@@ -237,5 +245,6 @@ public sealed partial class DiseaseSystem : SharedDiseaseSystem
             EntityManager.System<DiseaseSystem>().MutateDisease((diseaseUid, disease), args.MutationRate * amt);
         }
     }
+
     #endregion
 }

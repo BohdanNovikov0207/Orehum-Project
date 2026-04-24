@@ -17,29 +17,28 @@ public sealed partial class ImmunityModifier : EntityEffect
     public float GainRateModifier = 0.002f;
 
     /// <summary>
-    /// How much to add to the immunity's strength.
-    /// </summary>
-    [DataField]
-    public float StrengthModifier = 0.02f;
-
-    /// <summary>
     /// How long the modifier applies (in seconds).
     /// Is scaled by reagent amount if used with an EntityEffectReagentArgs.
     /// </summary>
     [DataField]
     public float StatusLifetime = 2f;
 
-    protected override string? ReagentEffectGuidebookText(IPrototypeManager prototype, IEntitySystemManager entSys)
-    {
-        return Loc.GetString("reagent-effect-guidebook-immunity-modifier",
+    /// <summary>
+    /// How much to add to the immunity's strength.
+    /// </summary>
+    [DataField]
+    public float StrengthModifier = 0.02f;
+
+    protected override string? ReagentEffectGuidebookText(IPrototypeManager prototype, IEntitySystemManager entSys) =>
+        Loc.GetString("reagent-effect-guidebook-immunity-modifier",
             ("chance", Probability),
             ("gainrate", GainRateModifier),
             ("strength", StrengthModifier),
             ("time", StatusLifetime));
-    }
 
     /// <summary>
-    /// Remove reagent at set rate, changes the immunity modifiers and adds a ImmunityModifierMetabolismComponent if not already there.
+    /// Remove reagent at set rate, changes the immunity modifiers and adds a ImmunityModifierMetabolismComponent if not
+    /// already there.
     /// </summary>
     public override void Effect(EntityEffectBaseArgs args)
     {
@@ -52,13 +51,15 @@ public sealed partial class ImmunityModifier : EntityEffect
         var statusLifetime = StatusLifetime;
 
         if (args is EntityEffectReagentArgs reagentArgs)
-        {
             statusLifetime *= reagentArgs.Scale.Float();
-        }
 
         IncreaseTimer(status, statusLifetime, args.EntityManager, args.TargetEntity);
     }
-    public void IncreaseTimer(ImmunityModifierMetabolismComponent status, float time,IEntityManager entityManager, EntityUid uid)
+
+    public void IncreaseTimer(ImmunityModifierMetabolismComponent status,
+        float time,
+        IEntityManager entityManager,
+        EntityUid uid)
     {
         var gameTiming = IoCManager.Resolve<IGameTiming>();
 

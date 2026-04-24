@@ -8,36 +8,35 @@
 //
 // SPDX-License-Identifier: AGPL-3.0-or-later
 
-using Content.Goobstation.Shared.Blob;
-using Content.Shared.Damage;
 using Content.Goobstation.Maths.FixedPoint;
+using Content.Shared.Damage;
 using Robust.Shared.GameStates;
 
 namespace Content.Goobstation.Shared.Blob.Components;
 
-[RegisterComponent, NetworkedComponent, AutoGenerateComponentState(true), Access(typeof(SharedBlobbernautSystem))]
+[RegisterComponent] [NetworkedComponent] [AutoGenerateComponentState(true)] [Access(typeof(SharedBlobbernautSystem))]
 public sealed partial class BlobbernautComponent : Component
 {
-    [DataField("color"), AutoNetworkedField]
+    [DataField("color")] [AutoNetworkedField]
     [Access(Other = AccessPermissions.ReadWrite)]
     public Color Color = Color.White;
 
-    [ViewVariables(VVAccess.ReadWrite), DataField("damageFrequency")]
-    public float DamageFrequency = 5;
-
-    [ViewVariables(VVAccess.ReadOnly)]
-    public float NextDamage = 0;
-
-    [ViewVariables(VVAccess.ReadOnly), DataField("damage")]
+    [ViewVariables(VVAccess.ReadOnly)] [DataField("damage")]
     public DamageSpecifier Damage = new()
     {
         DamageDict = new Dictionary<string, FixedPoint2>
         {
             { "Piercing", 25 },
-        }
+        },
     };
+
+    [ViewVariables(VVAccess.ReadWrite)] [DataField("damageFrequency")]
+    public float DamageFrequency = 5;
 
     [ViewVariables(VVAccess.ReadOnly)]
     [Access(Other = AccessPermissions.ReadWrite)]
     public EntityUid? Factory = default!;
+
+    [ViewVariables(VVAccess.ReadOnly)]
+    public float NextDamage = 0;
 }

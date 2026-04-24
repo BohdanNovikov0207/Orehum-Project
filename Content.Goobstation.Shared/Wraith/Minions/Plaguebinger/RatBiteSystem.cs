@@ -9,10 +9,10 @@ using Robust.Shared.Prototypes;
 
 namespace Content.Goobstation.Shared.Wraith.Minions.Plaguebringer;
 
-public sealed partial class RatBiteSystem : EntitySystem
+public sealed class RatBiteSystem : EntitySystem
 {
-    [Dependency] private readonly SharedSolutionContainerSystem _solution = default!;
     [Dependency] private readonly SharedPopupSystem _popup = default!;
+    [Dependency] private readonly SharedSolutionContainerSystem _solution = default!;
 
     public override void Initialize()
     {
@@ -33,6 +33,7 @@ public sealed partial class RatBiteSystem : EntitySystem
         _popup.PopupClient(Loc.GetString("wraith-plaguerat-bite-you-message", ("target", target)), uid, uid);
         args.Handled = true;
     }
+
     private bool TryInjectReagents(EntityUid target, Dictionary<ProtoId<ReagentPrototype>, FixedPoint2> reagents)
     {
         // Build up a solution from the bite's reagents.

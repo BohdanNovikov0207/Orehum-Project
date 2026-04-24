@@ -9,23 +9,23 @@
 //
 // SPDX-License-Identifier: AGPL-3.0-or-later
 
-using Content.Server.DeviceLinking.Systems;
-using Robust.Shared.Timing;
-using Robust.Shared.Physics.Events;
 using Content.Goobstation.Shared.Contraband;
+using Content.Server.DeviceLinking.Systems;
 using Content.Server.Power.EntitySystems;
 using Robust.Server.Audio;
+using Robust.Shared.Physics.Events;
 using Robust.Shared.Random;
+using Robust.Shared.Timing;
 
 namespace Content.Goobstation.Server.Contraband;
 
 public sealed class ContrabandDetectorSystem : SharedContrabandDetectorSystem
 {
     [Dependency] private readonly AudioSystem _audioSystem = default!;
-    [Dependency] private readonly PowerReceiverSystem _powerReceiverSystem = default!;
     [Dependency] private readonly DeviceLinkSystem _deviceLink = default!;
-    [Dependency] private readonly IGameTiming _timing = default!;
+    [Dependency] private readonly PowerReceiverSystem _powerReceiverSystem = default!;
     [Dependency] private readonly IRobustRandom _random = default!;
+    [Dependency] private readonly IGameTiming _timing = default!;
 
     public override void Initialize()
     {
@@ -47,13 +47,13 @@ public sealed class ContrabandDetectorSystem : SharedContrabandDetectorSystem
         component.Scanned.Add(args.OtherEntity, _timing.CurTime + component.ScanTimeOut);
 
         // We don't need to scan if IsFalseScanning.
-        bool isDetected = false;
+        var isDetected = false;
         if (!component.IsFalseScanning)
         {
             var list = FindContraband(args.OtherEntity);
 
             // XOR method to check both false negative and false positive outcomes
-            isDetected = list.Count > 0 ^ _random.Prob(component.FalseDetectingChance);
+            isDetected = (list.Count > 0) ^ _random.Prob(component.FalseDetectingChance);
         }
 
         if (isDetected)

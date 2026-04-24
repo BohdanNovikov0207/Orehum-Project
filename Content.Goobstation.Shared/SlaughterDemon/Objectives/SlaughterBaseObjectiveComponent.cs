@@ -9,8 +9,8 @@ namespace Content.Goobstation.Shared.SlaughterDemon.Objectives;
 public sealed partial class SlaughterBaseObjectiveComponent : Component
 {
     [DataField]
-    public string? Title;
+    public string? Description;
 
     [DataField]
-    public string? Description;
+    public string? Title;
 }

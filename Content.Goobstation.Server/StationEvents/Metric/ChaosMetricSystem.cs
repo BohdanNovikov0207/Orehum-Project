@@ -5,15 +5,13 @@
 //
 // SPDX-License-Identifier: AGPL-3.0-or-later
 
-using Content.Server.GameTicking;
-
 namespace Content.Goobstation.Server.StationEvents.Metric;
 
 /// <summary>
-///   Base class for systems which measure chaos.
-///   Chaos (in ChaosMetrics) is used by the GameDirector to decide which event should run next
-///   Subclasses can either calculate chaos in that instant or subscribe to events to track state
-///   over time in their component.
+/// Base class for systems which measure chaos.
+/// Chaos (in ChaosMetrics) is used by the GameDirector to decide which event should run next
+/// Subclasses can either calculate chaos in that instant or subscribe to events to track state
+/// over time in their component.
 /// </summary>
 public abstract class ChaosMetricSystem<T> : EntitySystem where T : Component
 {
@@ -32,5 +30,4 @@ public abstract class ChaosMetricSystem<T> : EntitySystem where T : Component
 
         args.Metrics += ourChaos;
     }
-
 }

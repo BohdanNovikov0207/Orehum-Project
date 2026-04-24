@@ -18,12 +18,13 @@ namespace Content.Goobstation.Shared.Wraith.Systems;
 /// </summary>
 public sealed class WraithPossessedSystem : EntitySystem
 {
-    [Dependency] private readonly IGameTiming _timing = default!;
+    [Dependency] private readonly ISharedAdminLogManager _admin = default!;
     [Dependency] private readonly SharedMindSystem _mind = default!;
     [Dependency] private readonly ISharedPlayerManager _player = default!;
+    [Dependency] private readonly IGameTiming _timing = default!;
     [Dependency] private readonly WraithRevenantSystem _wraithRevenant = default!;
-    [Dependency] private readonly ISharedAdminLogManager _admin = default!;
-    /// <inheritdoc/>
+
+    /// <inheritdoc />
     public override void Initialize()
     {
         base.Initialize();
@@ -95,14 +96,19 @@ public sealed class WraithPossessedSystem : EntitySystem
     }
 
     #region Helpers
+
     /// <summary>
     /// Starts the possession.
     /// Note: Do not use this if you are not a wraith entity lmao
     /// </summary>
-    /// <param name="ent"></param> The entity that is being possessed
-    /// <param name="possessor"></param> The possessor
-    /// <param name="possessorMind"></param> The possessor's mind
-    /// <param name="makeRev"></param> Whether to make the user into a Revenant
+    /// <param name="ent"></param>
+    /// The entity that is being possessed
+    /// <param name="possessor"></param>
+    /// The possessor
+    /// <param name="possessorMind"></param>
+    /// The possessor's mind
+    /// <param name="makeRev"></param>
+    /// Whether to make the user into a Revenant
     public void StartPossession(Entity<WraithPossessedComponent> ent,
         EntityUid possessor,
         EntityUid possessorMind,
@@ -124,7 +130,9 @@ public sealed class WraithPossessedSystem : EntitySystem
 
             _wraithRevenant.SetPassiveDamageValues((ent.Owner, rev), ent.Comp.RevenantDamageOvertime, alive);
 
-            _admin.Add(LogType.Mind, LogImpact.High, $"{ToPrettyString(possessor)} made a revenant (possessed) out of ${ToPrettyString(ent.Owner)}");
+            _admin.Add(LogType.Mind,
+                LogImpact.High,
+                $"{ToPrettyString(possessor)} made a revenant (possessed) out of ${ToPrettyString(ent.Owner)}");
             return;
         }
 
@@ -136,7 +144,9 @@ public sealed class WraithPossessedSystem : EntitySystem
             ent.Comp.NextUpdate = _timing.CurTime + ent.Comp.PossessionDuration;
             Dirty(ent);
 
-            _admin.Add(LogType.Mind, LogImpact.Medium, $"{ToPrettyString(possessor)} possessed the object ${ToPrettyString(ent.Owner)}");
+            _admin.Add(LogType.Mind,
+                LogImpact.Medium,
+                $"{ToPrettyString(possessor)} possessed the object ${ToPrettyString(ent.Owner)}");
         }
     }
 
@@ -170,11 +180,10 @@ public sealed class WraithPossessedSystem : EntitySystem
         if (ent.Comp.OriginalMind.HasValue
             && TryComp<MindComponent>(ent.Comp.OriginalMind.Value, out var mindComp)
             && _player.TryGetSessionById(mindComp.UserId, out _))
-        {
             _mind.TransferTo(ent.Comp.OriginalMind.Value, ent.Owner);
-        }
 
         RemCompDeferred<WraithPossessedComponent>(ent.Owner);
     }
+
     #endregion
 }

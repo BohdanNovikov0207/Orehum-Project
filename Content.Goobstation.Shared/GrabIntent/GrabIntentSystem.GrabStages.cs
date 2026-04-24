@@ -1,9 +1,6 @@
 using System.Linq;
 using Content.Goobstation.Common.Grab;
 using Content.Goobstation.Common.MartialArts;
-using Content.Shared._White.Grab;
-using Content.Shared.Alert;
-using Content.Shared.CombatMode;
 using Content.Shared.Damage.Components;
 using Content.Shared.IdentityManagement;
 using Content.Shared.Inventory.VirtualItem;
@@ -318,12 +315,10 @@ public sealed partial class GrabIntentSystem
             Dirty(pullable.Owner, pullable.Comp2);
     }
 
-    private List<EntityUid> GetGrabVirtualItems(EntityUid puller, EntityUid pullable)
-    {
-        return _handsSystem.EnumerateHeld(puller)
+    private List<EntityUid> GetGrabVirtualItems(EntityUid puller, EntityUid pullable) =>
+        _handsSystem.EnumerateHeld(puller)
             .Where(held => TryComp<VirtualItemComponent>(held, out var vi) && vi.BlockingEntity == pullable)
             .ToList();
-    }
 
     private bool TryUpdateGrabVirtualItems(
         Entity<PullerComponent, GrabIntentComponent> puller,
@@ -349,7 +344,10 @@ public sealed partial class GrabIntentSystem
                 if (_handsSystem.TryGetEmptyHand(puller.Owner, out _)
                     && _virtualSystem.TrySpawnVirtualItemInHand(pullable.Owner, puller.Owner, out _, true))
                     continue;
-                _popup.PopupPredicted(Loc.GetString("popup-grab-need-hand"), puller.Owner, puller.Owner, PopupType.Medium);
+                _popup.PopupPredicted(Loc.GetString("popup-grab-need-hand"),
+                    puller.Owner,
+                    puller.Owner,
+                    PopupType.Medium);
                 return false;
             }
         }

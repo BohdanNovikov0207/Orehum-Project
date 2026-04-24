@@ -22,10 +22,8 @@ public abstract class SharedLightDetectionDamageSystem : EntitySystem
         component.DetectionValue = component.DetectionValueMax;
     }
 
-    private void OnShutdown(EntityUid uid, LightDetectionDamageComponent component, ComponentShutdown args)
-    {
+    private void OnShutdown(EntityUid uid, LightDetectionDamageComponent component, ComponentShutdown args) =>
         _alerts.ClearAlert(uid, component.AlertProto);
-    }
 
     public void AddResistance(Entity<LightDetectionDamageComponent> ent, float amount)
     {

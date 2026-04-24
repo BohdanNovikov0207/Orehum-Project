@@ -12,7 +12,7 @@ namespace Content.Goobstation.Shared.Factory.Filters;
 /// <summary>
 /// Filter that combines 2 other filters using a logical operation.
 /// </summary>
-[RegisterComponent, NetworkedComponent, Access(typeof(AutomationFilterSystem))]
+[RegisterComponent] [NetworkedComponent] [Access(typeof(AutomationFilterSystem))]
 [AutoGenerateComponentState]
 public sealed partial class CombinedFilterComponent : Component
 {
@@ -41,6 +41,6 @@ public sealed partial class CombinedFilterComponent : Component
     /// <summary>
     /// Logic gate operation to check the inputs with.
     /// </summary>
-    [DataField, AutoNetworkedField]
+    [DataField] [AutoNetworkedField]
     public LogicGate Gate = LogicGate.Or;
 }

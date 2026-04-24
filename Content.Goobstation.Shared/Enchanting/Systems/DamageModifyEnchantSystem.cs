@@ -9,7 +9,7 @@ using Content.Shared.Damage;
 namespace Content.Goobstation.Shared.Enchanting.Systems;
 
 /// <summary>
-/// Handles damage modifier events for <see cref="DamageModifyEnchantComponent"/>.
+/// Handles damage modifier events for <see cref="DamageModifyEnchantComponent" />.
 /// </summary>
 public sealed class DamageModifyEnchantSystem : EntitySystem
 {
@@ -24,15 +24,11 @@ public sealed class DamageModifyEnchantSystem : EntitySystem
         SubscribeLocalEvent<DamageModifyEnchantComponent, DamageModifyEvent>(OnDamageModify);
     }
 
-    private void OnAdded(Entity<DamageModifyEnchantComponent> ent, ref EnchantAddedEvent args)
-    {
+    private void OnAdded(Entity<DamageModifyEnchantComponent> ent, ref EnchantAddedEvent args) =>
         ent.Comp.Modifier = (float) Math.Pow(ent.Comp.Factor, args.Level);
-    }
 
-    private void OnUpgraded(Entity<DamageModifyEnchantComponent> ent, ref EnchantUpgradedEvent args)
-    {
+    private void OnUpgraded(Entity<DamageModifyEnchantComponent> ent, ref EnchantUpgradedEvent args) =>
         ent.Comp.Modifier = (float) Math.Pow(ent.Comp.Factor, args.Level);
-    }
 
     private void OnDamageModify(Entity<DamageModifyEnchantComponent> ent, ref DamageModifyEvent args)
     {

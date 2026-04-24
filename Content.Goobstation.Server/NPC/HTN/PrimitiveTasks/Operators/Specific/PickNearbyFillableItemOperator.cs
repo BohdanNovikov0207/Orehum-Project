@@ -25,13 +25,13 @@ namespace Content.Goobstation.Server.NPC.HTN.PrimitiveTasks.Operators.Specific;
 public sealed partial class PickNearbyFillableItemOperator : HTNOperator
 {
     [Dependency] private readonly IEntityManager _entManager = default!;
-
-    private EntityWhitelistSystem _whitelistSystem = default!;
-    private SharedMaterialStorageSystem _sharedMaterialStorage = default!;
     private EntityLookupSystem _lookup = default!;
     private PathfindingSystem _pathfinding = default!;
     private SharedHandsSystem _sharedHandsSystem = default!;
+    private SharedMaterialStorageSystem _sharedMaterialStorage = default!;
     private TagSystem _tagSystem = default!;
+
+    private EntityWhitelistSystem _whitelistSystem = default!;
 
     [DataField] public string RangeKey = NPCBlackboard.FillbotPickupRange;
 
@@ -86,14 +86,18 @@ public sealed partial class PickNearbyFillableItemOperator : HTNOperator
                 continue;
 
             // only things that can go inside
-            if (linkedStorage != null && !_sharedMaterialStorage.CanInsertMaterialEntity(target, fillbot.LinkedSinkEntity!.Value))
+            if (linkedStorage != null &&
+                !_sharedMaterialStorage.CanInsertMaterialEntity(target, fillbot.LinkedSinkEntity!.Value))
                 continue;
 
             // trash only
             if (disposalUnit != null &&
                 (_whitelistSystem.IsWhitelistFail(disposalUnit.Whitelist, target)
-                    || !_tagSystem.HasTag(target, TrashProto)
-                    || _entManager.HasComponent<BodyPartComponent>(target))) // Robot is unable to insert bodyparts into Disposals for some reason
+                 || !_tagSystem.HasTag(target, TrashProto)
+                 || _entManager
+                     .HasComponent<
+                         BodyPartComponent>(
+                         target))) // Robot is unable to insert bodyparts into Disposals for some reason
                 continue;
 
             const float pathRange = SharedInteractionSystem.InteractionRange - 1;
@@ -102,11 +106,11 @@ public sealed partial class PickNearbyFillableItemOperator : HTNOperator
             if (path.Result == PathResult.NoPath)
                 continue;
 
-            return (true, new()
+            return (true, new Dictionary<string, object>
             {
-                {TargetKey, target},
-                {TargetMoveKey, _entManager.GetComponent<TransformComponent>(target).Coordinates},
-                {NPCBlackboard.PathfindKey, path},
+                { TargetKey, target },
+                { TargetMoveKey, _entManager.GetComponent<TransformComponent>(target).Coordinates },
+                { NPCBlackboard.PathfindKey, path },
             });
         }
 

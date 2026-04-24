@@ -1,27 +1,27 @@
 using Content.Goobstation.Shared.Augments;
-using Content.Server.Power.Components; // ough BatteryComponent why are you in server
+using Content.Server.Power.Components;
 using Content.Server.Power.EntitySystems;
 using Content.Server.PowerCell;
 using Content.Shared.Alert;
 using Content.Shared.Mobs.Systems;
 using Content.Shared.Popups;
 using Content.Shared.PowerCell;
-using Content.Shared.PowerCell.Components;
 using Robust.Shared.Timing;
+// ough BatteryComponent why are you in server
 
 namespace Content.Goobstation.Server.Augments;
 
 public sealed class AugmentPowerCellSystem : SharedAugmentPowerCellSystem
 {
+    private static readonly TimeSpan _updateDelay = TimeSpan.FromSeconds(2);
     [Dependency] private readonly AlertsSystem _alerts = default!;
     [Dependency] private readonly BatterySystem _battery = default!;
-    [Dependency] private readonly IGameTiming _timing = default!;
     [Dependency] private readonly MobStateSystem _mob = default!;
-    [Dependency] private readonly new PowerCellSystem _powerCell = default!;
     [Dependency] private readonly SharedPopupSystem _popup = default!;
+    [Dependency] private new readonly PowerCellSystem _powerCell = default!;
+    [Dependency] private readonly IGameTiming _timing = default!;
 
     private TimeSpan _nextUpdate = TimeSpan.Zero;
-    private static readonly TimeSpan _updateDelay = TimeSpan.FromSeconds(2);
 
     public override void Initialize()
     {
@@ -33,14 +33,14 @@ public sealed class AugmentPowerCellSystem : SharedAugmentPowerCellSystem
 
     private void OnFindBattery(Entity<HasAugmentPowerCellSlotComponent> ent, ref FindBatteryEvent args)
     {
-        if (GetBodyCell(ent) is {} battery)
+        if (GetBodyCell(ent) is { } battery)
             args.FoundBattery = battery;
     }
 
     private void OnBatteryAlert(Entity<HasAugmentPowerCellSlotComponent> ent, ref AugmentBatteryAlertEvent args)
     {
         var user = args.User;
-        if (GetBodyAugment(ent) is not {} augment || GetAugmentCell(augment) is not {} battery)
+        if (GetBodyAugment(ent) is not { } augment || GetAugmentCell(augment) is not { } battery)
         {
             _popup.PopupEntity(Loc.GetString("power-cell-no-battery"), user, user, PopupType.MediumCaution);
             return;
@@ -48,7 +48,9 @@ public sealed class AugmentPowerCellSystem : SharedAugmentPowerCellSystem
 
         var percent = 100f * battery.Comp.CurrentCharge / battery.Comp.MaxCharge;
         var draw = CompOrNull<PowerCellDrawComponent>(augment)?.DrawRate ?? 0f;
-        _popup.PopupEntity(Loc.GetString("augments-power-cell-info", ("percent", $"{percent:F0}"), ("draw", draw)), user, user);
+        _popup.PopupEntity(Loc.GetString("augments-power-cell-info", ("percent", $"{percent:F0}"), ("draw", draw)),
+            user,
+            user);
     }
 
     /// <summary>
@@ -71,7 +73,7 @@ public sealed class AugmentPowerCellSystem : SharedAugmentPowerCellSystem
     /// </summary>
     public Entity<BatteryComponent>? GetBodyCell(EntityUid body)
     {
-        if (GetBodyAugment(body) is {} augment && GetAugmentCell(augment) is {} battery)
+        if (GetBodyAugment(body) is { } augment && GetAugmentCell(augment) is { } battery)
             return battery;
 
         return null;
@@ -83,13 +85,13 @@ public sealed class AugmentPowerCellSystem : SharedAugmentPowerCellSystem
     /// </summary>
     public bool TryUseChargeBody(EntityUid body, float amount)
     {
-        if (GetBodyAugment(body) is not {} slot)
+        if (GetBodyAugment(body) is not { } slot)
         {
             _popup.PopupEntity(Loc.GetString("augments-no-power-cell-slot"), body, body, PopupType.MediumCaution);
             return false;
         }
 
-        if (GetAugmentCell(slot) is not {} battery)
+        if (GetAugmentCell(slot) is not { } battery)
         {
             _popup.PopupEntity(Loc.GetString("power-cell-no-battery"), body, body, PopupType.MediumCaution);
             return false;
@@ -118,16 +120,17 @@ public sealed class AugmentPowerCellSystem : SharedAugmentPowerCellSystem
         var query = EntityQueryEnumerator<HasAugmentPowerCellSlotComponent>();
         while (query.MoveNext(out var uid, out _))
         {
-            if (_mob.IsDead(uid) || GetBodyAugment(uid) is not {} augment)
+            if (_mob.IsDead(uid) || GetBodyAugment(uid) is not { } augment)
                 continue;
 
-            if (GetAugmentCell(augment) is not {} battery)
+            if (GetAugmentCell(augment) is not { } battery)
             {
                 if (_alerts.IsShowingAlert(uid, augment.Comp.BatteryAlert))
                 {
                     _alerts.ClearAlert(uid, augment.Comp.BatteryAlert);
                     _alerts.ShowAlert(uid, augment.Comp.NoBatteryAlert);
                 }
+
                 continue;
             }
 

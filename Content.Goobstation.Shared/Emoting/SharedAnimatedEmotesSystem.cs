@@ -20,13 +20,12 @@ namespace Content.Goobstation.Shared.Emoting;
 
 public abstract class SharedAnimatedEmotesSystem : EntitySystem
 {
-    [Dependency] private readonly IGameTiming _timing = default!;
-
     private const float DodgeStaminaCost = 20f;
     private const float BorgDodgeBatteryCost = 20f;
     private const string FlipDodgeEffect = "EffectParry";
 
     public static readonly TimeSpan FlipDuration = TimeSpan.FromMilliseconds(500);
+    [Dependency] private readonly IGameTiming _timing = default!;
 
     public override void Initialize()
     {
@@ -36,10 +35,8 @@ public abstract class SharedAnimatedEmotesSystem : EntitySystem
         SubscribeLocalEvent<AnimatedEmotesComponent, BeforeEmoteEvent>(OnBeforeEmote);
     }
 
-    private void OnGetState(Entity<AnimatedEmotesComponent> ent, ref ComponentGetState args)
-    {
+    private void OnGetState(Entity<AnimatedEmotesComponent> ent, ref ComponentGetState args) =>
         args.State = new AnimatedEmotesComponentState(ent.Comp.Emote);
-    }
 
     public override void Update(float frameTime)
     {

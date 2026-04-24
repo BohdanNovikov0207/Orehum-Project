@@ -20,10 +20,10 @@ namespace Content.Goobstation.Server.Shadowling.Systems.Abilities.CollectiveMind
 /// </summary>
 public sealed class ShadowlingBlindnessSmokeSystem : EntitySystem
 {
-    [Dependency] private readonly SmokeSystem _smoke = default!;
-    [Dependency] private readonly SharedTransformSystem _transform = default!;
     [Dependency] private readonly SharedActionsSystem _actions = default!;
     [Dependency] private readonly SharedAudioSystem _audio = default!;
+    [Dependency] private readonly SmokeSystem _smoke = default!;
+    [Dependency] private readonly SharedTransformSystem _transform = default!;
 
     public override void Initialize()
     {

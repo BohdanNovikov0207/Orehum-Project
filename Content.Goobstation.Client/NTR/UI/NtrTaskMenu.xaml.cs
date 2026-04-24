@@ -49,11 +49,12 @@ public sealed partial class NtrTaskMenu : FancyWindow
             entry.OnSkipButtonPressed += () => OnSkipButtonPressed?.Invoke(task.Id);
             BountyEntriesContainer.AddChild(entry);
         }
+
         BountyEntriesContainer.AddChild(new Control { MinHeight = 10 });
 
         var validHistory = history
             .Where(h => !string.IsNullOrEmpty(h.Task)
-                        && _prototypeManager.HasIndex<NtrTaskPrototype>(h.Task))
+                        && _prototypeManager.HasIndex(h.Task))
             .Reverse()
             .ToList();
 
@@ -61,6 +62,8 @@ public sealed partial class NtrTaskMenu : FancyWindow
         NoHistoryLabel.Visible = !validHistory.Any();
 
         foreach (var entry in validHistory)
+        {
             BountyHistoryContainer.AddChild(new NtrTaskHistoryEntry(entry));
+        }
     }
 }

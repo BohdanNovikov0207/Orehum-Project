@@ -14,15 +14,9 @@ using Robust.Shared.Serialization;
 
 namespace Content.Goobstation.Shared.Religion.Nullrod.Components;
 
-[RegisterComponent, NetworkedComponent, AutoGenerateComponentState]
+[RegisterComponent] [NetworkedComponent] [AutoGenerateComponentState]
 public sealed partial class NullrodComponent : Component
 {
-    /// <summary>
-    /// Whether non bible-users are able to use null rod
-    /// </summary>
-    [DataField]
-    public bool UntrainedUseRestriction;
-
     /// <summary>
     /// How much damage is dealt when an untrained user uses it.
     /// </summary>
@@ -30,16 +24,20 @@ public sealed partial class NullrodComponent : Component
     public DamageSpecifier DamageOnUntrainedUse = default!;
 
     /// <summary>
-    /// Which pop-up string to use.
-    /// </summary>
-    [DataField("UntrainedUseString", required: true)]
-    public string UntrainedUseString = default!;
-
-    /// <summary>
-    /// Which sound to play on untrained use.
+    /// The last entity attacked, used for popup purposes (avoid spam)
     /// </summary>
     [DataField]
-    public SoundSpecifier UntrainedUseSound = new SoundPathSpecifier("/Audio/Effects/hallelujah.ogg");
+    public EntityUid? LastAttackedEntity;
+
+    [DataField] [AutoNetworkedField]
+    public TimeSpan? NextPopupTime;
+
+    /// <summary>
+    /// When attempting attack against the same entity multiple times,
+    /// don't spam popups every frame and instead have a cooldown.
+    /// </summary>
+    [DataField]
+    public TimeSpan PopupCooldown = TimeSpan.FromSeconds(3.0);
 
     /// <summary>
     /// How long does the praying do-after take to complete?
@@ -48,40 +46,42 @@ public sealed partial class NullrodComponent : Component
     public TimeSpan PrayDoAfterDuration = TimeSpan.FromSeconds(5);
 
     /// <summary>
+    /// Used to recall certain state of nullrod
+    /// </summary>
+    [DataField]
+    public NullrodRecallType RecallType = NullrodRecallType.None;
+
+    /// <summary>
     /// Should the prayer be repeated endlessly until cancelled?
     /// </summary>
     [DataField]
     public bool RepeatPrayer;
 
     /// <summary>
-    ///     When attempting attack against the same entity multiple times,
-    ///     don't spam popups every frame and instead have a cooldown.
+    /// Whether non bible-users are able to use null rod
     /// </summary>
     [DataField]
-    public TimeSpan PopupCooldown = TimeSpan.FromSeconds(3.0);
-
-    [DataField, AutoNetworkedField]
-    public TimeSpan? NextPopupTime;
+    public bool UntrainedUseRestriction;
 
     /// <summary>
-    /// The last entity attacked, used for popup purposes (avoid spam)
+    /// Which sound to play on untrained use.
     /// </summary>
     [DataField]
-    public EntityUid? LastAttackedEntity;
+    public SoundSpecifier UntrainedUseSound = new SoundPathSpecifier("/Audio/Effects/hallelujah.ogg");
 
     /// <summary>
-    /// Used to recall certain state of nullrod
+    /// Which pop-up string to use.
     /// </summary>
-    [DataField]
-    public NullrodRecallType RecallType = NullrodRecallType.None;
+    [DataField("UntrainedUseString", required: true)]
+    public string UntrainedUseString = default!;
 }
 
-[Serializable, NetSerializable]
+[Serializable] [NetSerializable]
 public enum NullrodRecallType : byte
 {
     None, //Can't be recalled
     Normal, //Nothing special
     Unremoveable, //e.g Hand of God
     Embedded, //e.g Ancient Spear
-    DualWield //e.g Jackal and Casul
+    DualWield, //e.g Jackal and Casul
 }

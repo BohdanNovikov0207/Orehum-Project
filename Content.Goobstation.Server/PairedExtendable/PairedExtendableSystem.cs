@@ -4,7 +4,6 @@
 //
 // SPDX-License-Identifier: AGPL-3.0-or-later
 
-using System.Linq;
 using Content.Shared.Hands.Components;
 using Content.Shared.Hands.EntitySystems;
 using Content.Shared.Interaction.Components;
@@ -23,7 +22,12 @@ public sealed class PairedExtendableSystem : EntitySystem
     /// <param name="currentExtendable">Current extendable, if any</param>
     /// <param name="newExtendable">New extendable uid</param>
     /// <returns>false if there were to hands, they were busy etc., so an action that triggered this shouldn't be handled</returns>
-    public bool ToggleExtendable (EntityUid user, string protoId, HandLocation side, out EntityUid? newExtendable, EntityUid? currentExtendable = null, bool makeUnremovable = true)
+    public bool ToggleExtendable(EntityUid user,
+        string protoId,
+        HandLocation side,
+        out EntityUid? newExtendable,
+        EntityUid? currentExtendable = null,
+        bool makeUnremovable = true)
     {
         newExtendable = null;
         string? pickedHand = null;

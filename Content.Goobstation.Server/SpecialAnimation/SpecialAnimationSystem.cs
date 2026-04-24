@@ -65,7 +65,10 @@ public sealed class SpecialAnimationSystem : SharedSpecialAnimationSystem
     /// <param name="overrideText">If specified, will override the name that is located inside animation data</param>
     /// <param name="animationData">Options to show the animation</param>
     [PublicAPI]
-    public override void PlayAnimationForEntity(EntityUid sprite, EntityUid player, SpecialAnimationData? animationData = null, string? overrideText = null)
+    public override void PlayAnimationForEntity(EntityUid sprite,
+        EntityUid player,
+        SpecialAnimationData? animationData = null,
+        string? overrideText = null)
     {
         animationData ??= SpecialAnimationData.DefaultAnimation;
         animationData = animationData.WithSource(GetNetEntity(sprite));
@@ -86,7 +89,10 @@ public sealed class SpecialAnimationSystem : SharedSpecialAnimationSystem
     /// <param name="overrideText">If specified, will override the name that is located inside animation data</param>
     /// <param name="animationData">Options to show the animation</param>
     [PublicAPI]
-    public override void PlayAnimationFiltered(EntityUid sprite, Filter filter, SpecialAnimationData? animationData = null, string? overrideText = null)
+    public override void PlayAnimationFiltered(EntityUid sprite,
+        Filter filter,
+        SpecialAnimationData? animationData = null,
+        string? overrideText = null)
     {
         animationData ??= SpecialAnimationData.DefaultAnimation;
         animationData = animationData.WithSource(GetNetEntity(sprite));

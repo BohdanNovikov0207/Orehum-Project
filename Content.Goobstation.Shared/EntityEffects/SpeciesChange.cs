@@ -4,14 +4,10 @@
 //
 // SPDX-License-Identifier: AGPL-3.0-or-later
 
-using Content.Shared.Humanoid;
 using Content.Shared.EntityEffects;
 using Content.Shared.Humanoid.Prototypes;
 using JetBrains.Annotations;
 using Robust.Shared.Prototypes;
-using Content.Shared.Polymorph.Systems;
-using Content.Shared.Polymorph;
-using Content.Shared.Polymorph.Components;
 
 namespace Content.Goobstation.Shared.EntityEffects;
 
@@ -34,5 +30,4 @@ public sealed partial class SpeciesChange : EventEntityEffect<SpeciesChange>
         var ev = new SpeciesChange(NewSpecies);
         args.EntityManager.EventBus.RaiseLocalEvent(args.TargetEntity, ev);
     }
-
 }

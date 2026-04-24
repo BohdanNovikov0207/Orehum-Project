@@ -25,8 +25,8 @@ SPDX-License-Identifier: AGPL-3.0-or-later
     <BoxContainer Orientation="Horizontal">
         <BoxContainer Orientation="Vertical" MinWidth="200" Margin="10 10 15 10">
             <BoxContainer Orientation="Horizontal" HorizontalAlignment="Center" Margin="0 0 0 5">
-                <Label Text="Battery: " StyleClasses="LabelSubText"/>
-                <Label Name="BatteryStatusLabel" StyleClasses="LabelSubText" MinWidth="120"/>
+                <Label Text="Battery: " StyleClasses="LabelSubText" />
+                <Label Name="BatteryStatusLabel" StyleClasses="LabelSubText" MinWidth="120" />
             </BoxContainer>
             <Label Text="{Loc 'reagent-dispenser-window-amount-to-dispense-label'}" HorizontalAlignment="Center" />
             <ui:ButtonGrid
@@ -36,8 +36,7 @@ SPDX-License-Identifier: AGPL-3.0-or-later
                 HorizontalAlignment="Center"
                 Margin="5"
                 ButtonList="1,5,10,15,20,25,30,50,100"
-                RadioGroup="True">
-            </ui:ButtonGrid>
+                RadioGroup="True" />
             <Control VerticalExpand="True" />
             <Label Name="ContainerInfoName"
                    Access="Public"
@@ -96,4 +95,3 @@ SPDX-License-Identifier: AGPL-3.0-or-later
         </SplitContainer>
     </BoxContainer>
 </controls:FancyWindow>
-

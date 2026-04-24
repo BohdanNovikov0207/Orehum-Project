@@ -17,23 +17,25 @@ namespace Content.Goobstation.Client.Blob;
 
 public sealed class BlobbernautSystem : SharedBlobbernautSystem
 {
-
 }
 
 public sealed class BlobbernautVisualizerSystem : VisualizerSystem<BlobbernautComponent>
 {
+    private static readonly DamageStateVisualLayers[] Layers =
+    [
+        DamageStateVisualLayers.Base, DamageStateVisualLayers.BaseUnshaded,
+    ];
+
     public override void Initialize()
     {
         base.Initialize();
         SubscribeLocalEvent<BlobbernautComponent, AfterAutoHandleStateEvent>(OnBlobTileHandleState);
     }
 
-    private static readonly DamageStateVisualLayers[] Layers =
-    [
-        DamageStateVisualLayers.Base, DamageStateVisualLayers.BaseUnshaded,
-    ];
-
-    private void UpdateAppearance(EntityUid id, BlobbernautComponent blobbernaut, AppearanceComponent? appearance = null, SpriteComponent? sprite = null)
+    private void UpdateAppearance(EntityUid id,
+        BlobbernautComponent blobbernaut,
+        AppearanceComponent? appearance = null,
+        SpriteComponent? sprite = null)
     {
         if (!Resolve(id, ref appearance, ref sprite))
             return;
@@ -47,13 +49,11 @@ public sealed class BlobbernautVisualizerSystem : VisualizerSystem<BlobbernautCo
         }
     }
 
-    protected override void OnAppearanceChange(EntityUid uid, BlobbernautComponent component, ref AppearanceChangeEvent args)
-    {
-        UpdateAppearance(uid, component, args.Component, args.Sprite);
-    }
+    protected override void OnAppearanceChange(EntityUid uid,
+        BlobbernautComponent component,
+        ref AppearanceChangeEvent args) => UpdateAppearance(uid, component, args.Component, args.Sprite);
 
-    private void OnBlobTileHandleState(EntityUid uid, BlobbernautComponent component, ref AfterAutoHandleStateEvent args)
-    {
-        UpdateAppearance(uid, component);
-    }
+    private void OnBlobTileHandleState(EntityUid uid,
+        BlobbernautComponent component,
+        ref AfterAutoHandleStateEvent args) => UpdateAppearance(uid, component);
 }

@@ -4,14 +4,6 @@ namespace Content.Goobstation.Shared.HeatTint;
 public sealed partial class HeatTintComponent : Component
 {
     /// <summary>
-    /// Color gradient stops sorted by temperature (Kelvin).
-    /// The system interpolates between adjacent stops in OkLab color space.
-    /// Must have at least 2 entries.
-    /// </summary>
-    [DataField(required: true)]
-    public List<HeatTintPoint> ColorGradient = new();
-
-    /// <summary>
     /// Optional sprite layer map keys to tint.
     /// If null or empty, tints the entire sprite.
     /// </summary>
@@ -20,6 +12,14 @@ public sealed partial class HeatTintComponent : Component
 
     public Dictionary<int, Color> BaseColors = new();
 
+    /// <summary>
+    /// Color gradient stops sorted by temperature (Kelvin).
+    /// The system interpolates between adjacent stops in OkLab color space.
+    /// Must have at least 2 entries.
+    /// </summary>
+    [DataField(required: true)]
+    public List<HeatTintPoint> ColorGradient = new();
+
     public Dictionary<int, Color> LastAppliedColors = new();
 }
 
@@ -27,8 +27,8 @@ public sealed partial class HeatTintComponent : Component
 public sealed partial class HeatTintPoint
 {
     [DataField(required: true)]
-    public float Temperature;
+    public Color Color = Color.White;
 
     [DataField(required: true)]
-    public Color Color = Color.White;
+    public float Temperature;
 }

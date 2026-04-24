@@ -18,12 +18,12 @@ namespace Content.Goobstation.Shared.Shadowling.Systems.Abilities.CollectiveMind
 /// </summary>
 public sealed class ShadowlingEmpoweredEnthrallSystem : EntitySystem
 {
-    [Dependency] private readonly SharedDoAfterSystem _doAfter = default!;
-    [Dependency] private readonly SharedShadowlingSystem _shadowling = default!;
-    [Dependency] private readonly SharedPopupSystem _popup = default!;
     [Dependency] private readonly SharedActionsSystem _actions = default!;
+    [Dependency] private readonly SharedDoAfterSystem _doAfter = default!;
+    [Dependency] private readonly SharedPopupSystem _popup = default!;
+    [Dependency] private readonly SharedShadowlingSystem _shadowling = default!;
 
-    /// <inheritdoc/>
+    /// <inheritdoc />
     public override void Initialize()
     {
         base.Initialize();
@@ -40,7 +40,9 @@ public sealed class ShadowlingEmpoweredEnthrallSystem : EntitySystem
     private void OnShutdown(Entity<ShadowlingEmpoweredEnthrallComponent> ent, ref ComponentShutdown args)
         => _actions.RemoveAction(ent.Owner, ent.Comp.ActionEnt);
 
-    private void OnEmpEnthrall(EntityUid uid, ShadowlingEmpoweredEnthrallComponent component, EmpoweredEnthrallEvent args)
+    private void OnEmpEnthrall(EntityUid uid,
+        ShadowlingEmpoweredEnthrallComponent component,
+        EmpoweredEnthrallEvent args)
     {
         if (args.Handled)
             return;
@@ -67,7 +69,9 @@ public sealed class ShadowlingEmpoweredEnthrallSystem : EntitySystem
         args.Handled = true;
     }
 
-    private void OnEmpEnthrallDoAfter(EntityUid uid, ShadowlingEmpoweredEnthrallComponent component, EmpoweredEnthrallDoAfterEvent args)
+    private void OnEmpEnthrallDoAfter(EntityUid uid,
+        ShadowlingEmpoweredEnthrallComponent component,
+        EmpoweredEnthrallDoAfterEvent args)
     {
         if (args.Handled
             || args.Cancelled)

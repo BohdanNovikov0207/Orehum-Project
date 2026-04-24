@@ -9,16 +9,16 @@ namespace Content.Goobstation.Shared.Disease.Components;
 /// <summary>
 /// Component for disease behaviors
 /// </summary>
-[RegisterComponent, NetworkedComponent, AutoGenerateComponentState]
+[RegisterComponent] [NetworkedComponent] [AutoGenerateComponentState]
 [EntityCategory("Diseases")]
 public sealed partial class DiseaseEffectComponent : Component
 {
     /// <summary>
-    /// Strength of this effect
-    /// Changes on disease mutation
+    /// Contribution of this effect to disease complexity
+    /// Actual impact scales with severity
     /// </summary>
-    [DataField, AutoNetworkedField]
-    public float Severity = 1f; // don't bring this outside of expected bounds or viro will probably choke and die
+    [DataField]
+    public float Complexity = 10f;
 
     /// <summary>
     /// Minimum severity this effect can have
@@ -28,26 +28,30 @@ public sealed partial class DiseaseEffectComponent : Component
     public float MinSeverity = 0.1f;
 
     /// <summary>
-    /// Contribution of this effect to disease complexity
-    /// Actual impact scales with severity
+    /// Strength of this effect
+    /// Changes on disease mutation
     /// </summary>
-    [DataField]
-    public float Complexity = 10f;
+    [DataField] [AutoNetworkedField]
+    public float Severity = 1f; // don't bring this outside of expected bounds or viro will probably choke and die
 
     /// <summary>
     /// Get the complexity this effect is currently contributing.
     /// </summary>
-    public float GetComplexity()
-    {
-        return Complexity * Severity;
-    }
+    public float GetComplexity() => Complexity * Severity;
 }
 
 /// <summary>
-/// Base component for disease effects and conditions for which it makes sense to choose scaling off severity, time, or progress
+/// Base component for disease effects and conditions for which it makes sense to choose scaling off severity, time, or
+/// progress
 /// </summary>
 public abstract partial class ScalingDiseaseEffect : Component
 {
+    /// <summary>
+    /// Whether this effect or condition should scale from the progress of the host disease
+    /// </summary>
+    [DataField]
+    public bool ProgressScale = true;
+
     /// <summary>
     /// Whether this effect or condition should scale from effect severity
     /// </summary>
@@ -60,12 +64,6 @@ public abstract partial class ScalingDiseaseEffect : Component
     /// </summary>
     [DataField]
     public bool TimeScale = true;
-
-    /// <summary>
-    /// Whether this effect or condition should scale from the progress of the host disease
-    /// </summary>
-    [DataField]
-    public bool ProgressScale = true;
 }
 
 /// <summary>
@@ -111,19 +109,19 @@ public sealed partial class DiseaseSpreadEffectComponent : ScalingDiseaseEffect
 public sealed partial class DiseaseForceSpreadEffectComponent : ScalingDiseaseEffect
 {
     /// <summary>
-    /// Up to how far away entities to check
+    /// Whether to ensure StatusIconComponent on the spread-to entities for viro hud to work properly.
     /// </summary>
     [DataField]
-    public float Range = 2f;
+    public bool AddIcon = true;
 
     [DataField]
     public float Chance = 1f;
 
     /// <summary>
-    /// Whether to ensure StatusIconComponent on the spread-to entities for viro hud to work properly.
+    /// Up to how far away entities to check
     /// </summary>
     [DataField]
-    public bool AddIcon = true;
+    public float Range = 2f;
 
     [DataField]
     public DiseaseSpreadSpecifier SpreadParams = new(1f, 1f, "Debug");
@@ -136,12 +134,12 @@ public sealed partial class DiseaseForceSpreadEffectComponent : ScalingDiseaseEf
 [RegisterComponent]
 public sealed partial class DiseaseVomitEffectComponent : ScalingDiseaseEffect
 {
+    [DataField]
+    public float FoodChange = -40f;
+
     // maybe split thirst/food decrease and actual vomiting into separate effects?
     [DataField]
     public float ThirstChange = -40f;
-
-    [DataField]
-    public float FoodChange = -40f;
 }
 
 /// <summary>
@@ -177,17 +175,17 @@ public sealed partial class DiseaseFlashEffectComponent : ScalingDiseaseEffect
 [RegisterComponent]
 public sealed partial class DiseasePopupEffectComponent : Component
 {
-    [DataField]
-    public LocId String = "disease-effect-popup-default";
-
-    [DataField("popupType")]
-    public PopupType Type = PopupType.SmallCaution;
-
     /// <summary>
     /// Whether only the host should see the popup
     /// </summary>
     [DataField]
     public bool HostOnly = true;
+
+    [DataField]
+    public LocId String = "disease-effect-popup-default";
+
+    [DataField("popupType")]
+    public PopupType Type = PopupType.SmallCaution;
 }
 
 /// <summary>
@@ -197,16 +195,16 @@ public sealed partial class DiseasePopupEffectComponent : Component
 public sealed partial class DiseasePryTileEffectComponent : Component
 {
     /// <summary>
-    /// Up to how far away entities to check
-    /// </summary>
-    [DataField]
-    public float Range = 2f;
-
-    /// <summary>
     /// How many times to re-sample for a tile if we fail
     /// </summary>
     [DataField]
     public int Attempts = 1;
+
+    /// <summary>
+    /// Up to how far away entities to check
+    /// </summary>
+    [DataField]
+    public float Range = 2f;
 }
 
 /// <summary>
@@ -241,7 +239,8 @@ public sealed partial class DiseaseEmoteEffectComponent : Component
 }
 
 /// <summary>
-/// Causes the target component to have set fields have their chosen fields set to a multiple of the default specified according to effect application severity.
+/// Causes the target component to have set fields have their chosen fields set to a multiple of the default specified
+/// according to effect application severity.
 /// Can be used to have, say, gravity well component scale its acceleration from the effect severity.
 /// </summary>
 [RegisterComponent]

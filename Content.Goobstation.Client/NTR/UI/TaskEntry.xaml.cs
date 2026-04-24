@@ -20,21 +20,22 @@ using Robust.Client.UserInterface.Controls;
 using Robust.Client.UserInterface.XAML;
 using Robust.Shared.Prototypes;
 using Robust.Shared.Timing;
+
 // goidacore inside
 namespace Content.Goobstation.Client.NTR.UI;
 
 [GenerateTypedNameReferences]
 public sealed partial class TaskEntry : BoxContainer
 {
-    [Dependency] private readonly IPrototypeManager _prototype = default!;
     [Dependency] private readonly IGameTiming _gameTiming = default!;
+    [Dependency] private readonly IPrototypeManager _prototype = default!;
+
+    private readonly TimeSpan _skipAvailableTime;
+    private TimeSpan _nextUpdate = TimeSpan.Zero;
+    private bool _skipButtonAvailable;
 
     public Action? OnLabelButtonPressed;
     public Action? OnSkipButtonPressed;
-
-    private readonly TimeSpan _skipAvailableTime;
-    private bool _skipButtonAvailable;
-    private TimeSpan _nextUpdate = TimeSpan.Zero;
 
     public TaskEntry(NtrTaskData task, TimeSpan untilNextSkip)
     {
@@ -52,13 +53,16 @@ public sealed partial class TaskEntry : BoxContainer
         var items = new List<string>();
 
         foreach (var entry in taskPrototype.Entries)
+        {
             items.Add(Loc.GetString("ntr-bounty-console-manifest-entry",
                 ("amount", entry.Amount),
                 ("item", Loc.GetString(entry.Name))));
+        }
 
         ManifestLabel.SetMarkup(Loc.GetString("bounty-console-manifest-label", ("item", string.Join(", ", items))));
         RewardLabel.SetMarkup(Loc.GetString("ntr-bounty-console-reward-label", ("reward", taskPrototype.Reward)));
-        DescriptionLabel.SetMarkup(Loc.GetString("bounty-console-description-label", ("description", Loc.GetString(taskPrototype.Description))));
+        DescriptionLabel.SetMarkup(Loc.GetString("bounty-console-description-label",
+            ("description", Loc.GetString(taskPrototype.Description))));
         IdLabel.SetMarkup(Loc.GetString("bounty-console-id-label", ("id", task.Id)));
 
         PrintButton.OnPressed += _ => OnLabelButtonPressed?.Invoke();

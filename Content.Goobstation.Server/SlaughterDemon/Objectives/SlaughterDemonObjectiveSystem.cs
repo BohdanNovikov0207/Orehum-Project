@@ -21,21 +21,23 @@ namespace Content.Goobstation.Server.SlaughterDemon.Objectives;
 /// </summary>
 public sealed class SlaughterDemonObjectiveSystem : EntitySystem
 {
-    [Dependency] private readonly NumberObjectiveSystem _number = default!;
-    [Dependency] private readonly TargetObjectiveSystem _target = default!;
-    [Dependency] private readonly SharedMindSystem _mind = default!;
     [Dependency] private readonly MetaDataSystem _meta = default!;
+    [Dependency] private readonly SharedMindSystem _mind = default!;
+    [Dependency] private readonly NumberObjectiveSystem _number = default!;
     [Dependency] private readonly IRobustRandom _random = default!;
+    [Dependency] private readonly TargetObjectiveSystem _target = default!;
 
-    /// <inheritdoc/>
+    /// <inheritdoc />
     public override void Initialize()
     {
         base.Initialize();
 
         // Sets progress
         SubscribeLocalEvent<SlaughterDevourConditionComponent, ObjectiveGetProgressEvent>(OnGetDevourProgress);
-        SubscribeLocalEvent<SlaughterKillEveryoneConditionComponent, ObjectiveGetProgressEvent>(OnGetKillEveryoneProgress);
-        SubscribeLocalEvent<SlaughterKillTheWizardConditionComponent, ObjectiveGetProgressEvent>(OnGetWizardKillProgress);
+        SubscribeLocalEvent<SlaughterKillEveryoneConditionComponent, ObjectiveGetProgressEvent>(
+            OnGetKillEveryoneProgress);
+        SubscribeLocalEvent<SlaughterKillTheWizardConditionComponent, ObjectiveGetProgressEvent>(
+            OnGetWizardKillProgress);
         SubscribeLocalEvent<SlaughterBaseObjectiveComponent, ObjectiveGetProgressEvent>(OnGetBaseObjectiveProgress);
 
         // Sets the wizard
@@ -45,9 +47,10 @@ public sealed class SlaughterDemonObjectiveSystem : EntitySystem
 
         // Sets descriptions and titles
         SubscribeLocalEvent<SlaughterBaseObjectiveComponent, ObjectiveAfterAssignEvent>(OnAfterAssignObjective);
-        SubscribeLocalEvent<SlaughterKillTheWizardConditionComponent, ObjectiveAfterAssignEvent>(OnAfterKillTheWizardAssignObjective);
-        SubscribeLocalEvent<SlaughterKillEveryoneConditionComponent, ObjectiveAfterAssignEvent>(OnAfterKillEveryoneAssignObjective);
-
+        SubscribeLocalEvent<SlaughterKillTheWizardConditionComponent, ObjectiveAfterAssignEvent>(
+            OnAfterKillTheWizardAssignObjective);
+        SubscribeLocalEvent<SlaughterKillEveryoneConditionComponent, ObjectiveAfterAssignEvent>(
+            OnAfterKillEveryoneAssignObjective);
     }
 
     private void OnAfterKillTheWizardAssignObjective(Entity<SlaughterKillTheWizardConditionComponent> ent,
@@ -110,16 +113,20 @@ public sealed class SlaughterDemonObjectiveSystem : EntitySystem
         }
     }
 
-    private void OnGetBaseObjectiveProgress(Entity<SlaughterBaseObjectiveComponent> ent, ref ObjectiveGetProgressEvent args) =>
+    private void OnGetBaseObjectiveProgress(Entity<SlaughterBaseObjectiveComponent> ent,
+        ref ObjectiveGetProgressEvent args) =>
         args.Progress = 0.0f;
 
-    private void OnGetKillEveryoneProgress(Entity<SlaughterKillEveryoneConditionComponent> ent, ref ObjectiveGetProgressEvent args) =>
+    private void OnGetKillEveryoneProgress(Entity<SlaughterKillEveryoneConditionComponent> ent,
+        ref ObjectiveGetProgressEvent args) =>
         args.Progress = Progress(ent.Comp.Devoured, GetAllPlayers());
 
-    private void OnGetDevourProgress(Entity<SlaughterDevourConditionComponent> ent, ref ObjectiveGetProgressEvent args) =>
+    private void OnGetDevourProgress(Entity<SlaughterDevourConditionComponent> ent,
+        ref ObjectiveGetProgressEvent args) =>
         args.Progress = Progress(ent.Comp.Devour, _number.GetTarget(ent.Owner));
 
-    private void OnGetWizardKillProgress(Entity<SlaughterKillTheWizardConditionComponent> ent, ref ObjectiveGetProgressEvent args)
+    private void OnGetWizardKillProgress(Entity<SlaughterKillTheWizardConditionComponent> ent,
+        ref ObjectiveGetProgressEvent args)
     {
         if (!_target.GetTarget(ent.Owner, out var targetUid))
         {
@@ -138,14 +145,9 @@ public sealed class SlaughterDemonObjectiveSystem : EntitySystem
         return !_mind.IsCharacterDeadIc(mind) ? 0f : 1f;
     }
 
-    private static float Progress(int recruited, int target)
-    {
+    private static float Progress(int recruited, int target) =>
         // prevent divide-by-zero
-        return target == 0 ? 1f : MathF.Min(recruited / (float) target, 1f);
-    }
+        target == 0 ? 1f : MathF.Min(recruited / (float) target, 1f);
 
-    private int GetAllPlayers()
-    {
-        return EntityQuery<HumanoidAppearanceComponent, ActorComponent>().Count();
-    }
+    private int GetAllPlayers() => EntityQuery<HumanoidAppearanceComponent, ActorComponent>().Count();
 }

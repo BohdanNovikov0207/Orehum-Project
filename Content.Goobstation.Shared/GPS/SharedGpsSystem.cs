@@ -6,8 +6,8 @@ namespace Content.Goobstation.Shared.GPS;
 
 public abstract class SharedGpsSystem : EntitySystem
 {
-    [Dependency] protected readonly SharedUserInterfaceSystem UiSystem = default!;
     [Dependency] private readonly IGameTiming _timing = default!;
+    [Dependency] protected readonly SharedUserInterfaceSystem UiSystem = default!;
 
     public override void Initialize()
     {
@@ -23,15 +23,9 @@ public abstract class SharedGpsSystem : EntitySystem
         SubscribeLocalEvent<GPSComponent, AfterAutoHandleStateEvent>(OnHandleState);
     }
 
-    private void OnHandleState(Entity<GPSComponent> ent, ref AfterAutoHandleStateEvent args)
-    {
-        UpdateUi(ent);
-    }
+    private void OnHandleState(Entity<GPSComponent> ent, ref AfterAutoHandleStateEvent args) => UpdateUi(ent);
 
-    private void OnOpen(Entity<GPSComponent> ent, ref BeforeActivatableUIOpenEvent args)
-    {
-        Dirty(ent);
-    }
+    private void OnOpen(Entity<GPSComponent> ent, ref BeforeActivatableUIOpenEvent args) => Dirty(ent);
 
     private void OnSetTrackedEntity(Entity<GPSComponent> ent, ref GpsSetTrackedEntityMessage args)
     {

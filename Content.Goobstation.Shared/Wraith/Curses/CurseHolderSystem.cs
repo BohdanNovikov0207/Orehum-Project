@@ -11,12 +11,12 @@ namespace Content.Goobstation.Shared.Wraith.Curses;
 
 public abstract class SharedCurseHolderSystem : EntitySystem
 {
-    [Dependency] private readonly IGameTiming _timing = default!;
+    [Dependency] private readonly ISharedAdminLogManager _adminLogger = default!;
+    [Dependency] private readonly SharedEntityEffectSystem _effect = default!;
     [Dependency] private readonly INetManager _netManager = default!;
     [Dependency] private readonly IPrototypeManager _proto = default!;
     [Dependency] private readonly IRobustRandom _random = default!;
-    [Dependency] private readonly ISharedAdminLogManager _adminLogger = default!;
-    [Dependency] private readonly SharedEntityEffectSystem _effect = default!;
+    [Dependency] private readonly IGameTiming _timing = default!;
 
     public override void Initialize()
     {
@@ -87,11 +87,13 @@ public abstract class SharedCurseHolderSystem : EntitySystem
         ent.Comp.CurseStatusIcons.Add(curseIndex.StatusIcon.Value);
         Dirty(ent);
 
-        _adminLogger.Add(LogType.Action, LogImpact.Medium,
+        _adminLogger.Add(LogType.Action,
+            LogImpact.Medium,
             $"{ToPrettyString(ent.Comp.Curser)} cursed {ToPrettyString(ent.Owner)} with {curseIndex.Name}");
     }
 
     #region Helper
+
     private void DoCurseEffects(ProtoId<CursePrototype> curse, EntityUid target, CurseHolderComponent curseHolder)
     {
         if (_netManager.IsClient)
@@ -107,7 +109,9 @@ public abstract class SharedCurseHolderSystem : EntitySystem
             if (_random.Prob(chance))
             {
                 foreach (var effect in curseEffects)
+                {
                     _effect.Effect(effect, args);
+                }
 
                 curseHolder.CurseUpdate[curse] = _timing.CurTime + TimeSpan.FromSeconds(curseIndex.Update);
                 Dirty(target, curseHolder);
@@ -118,5 +122,6 @@ public abstract class SharedCurseHolderSystem : EntitySystem
         curseHolder.CurseUpdate[curse] = _timing.CurTime + TimeSpan.FromSeconds(curseIndex.Update);
         Dirty(target, curseHolder);
     }
+
     #endregion
 }

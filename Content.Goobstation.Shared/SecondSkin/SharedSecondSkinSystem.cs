@@ -21,13 +21,13 @@ namespace Content.Goobstation.Shared.SecondSkin;
 
 public abstract class SharedSecondSkinSystem : EntitySystem
 {
-    [Dependency] private readonly IPrototypeManager _proto = default!;
+    [Dependency] private readonly ActionContainerSystem _actionContainer = default!;
 
     [Dependency] private readonly SharedActionsSystem _actions = default!;
-    [Dependency] private readonly ActionContainerSystem _actionContainer = default!;
     [Dependency] private readonly SharedAudioSystem _audio = default!;
-    [Dependency] private readonly SharedItemSystem _itemSys = default!;
     [Dependency] private readonly SharedBodySystem _body = default!;
+    [Dependency] private readonly SharedItemSystem _itemSys = default!;
+    [Dependency] private readonly IPrototypeManager _proto = default!;
     [Dependency] private readonly ItemSlotsSystem _slots = default!;
 
     [Dependency] protected readonly SharedAppearanceSystem Appearance = default!;
@@ -276,7 +276,7 @@ public abstract class SharedSecondSkinSystem : EntitySystem
 
         if (layer == null)
         {
-            layer = new PrototypeLayerData()
+            layer = new PrototypeLayerData
             {
                 RsiPath = ent.Comp1.Sprite.RsiPath.ToString(),
                 State = ent.Comp1.State,
@@ -286,13 +286,13 @@ public abstract class SharedSecondSkinSystem : EntitySystem
                 value.Add(layer);
             else
             {
-                var defaultLayer = new PrototypeLayerData()
+                var defaultLayer = new PrototypeLayerData
                 {
                     RsiPath = ent.Comp2.RsiPath,
                     State = ent.Comp1.State,
                 };
 
-                ent.Comp2.ClothingVisuals[ent.Comp1.Slot] = new() { defaultLayer, layer };
+                ent.Comp2.ClothingVisuals[ent.Comp1.Slot] = new List<PrototypeLayerData> { defaultLayer, layer };
             }
         }
 

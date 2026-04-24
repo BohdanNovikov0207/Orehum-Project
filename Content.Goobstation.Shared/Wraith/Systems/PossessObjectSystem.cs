@@ -2,19 +2,20 @@ using Content.Goobstation.Shared.Wraith.Components;
 using Content.Goobstation.Shared.Wraith.Events;
 using Content.Shared.Mind;
 using Content.Shared.Popups;
-using Content.Shared.Revenant.Components;
 using Robust.Shared.Audio.Systems;
 using Robust.Shared.Prototypes;
 using Robust.Shared.Serialization.Manager;
 
 namespace Content.Goobstation.Shared.Wraith.Systems;
-public sealed partial class PossessObjectSystem : EntitySystem
+
+public sealed class PossessObjectSystem : EntitySystem
 {
-    [Dependency] private readonly ISerializationManager _seriMan = default!;
     [Dependency] private readonly SharedAudioSystem _audio = default!;
-    [Dependency] private readonly SharedPopupSystem _popup = default!;
     [Dependency] private readonly SharedMindSystem _mind = default!;
+    [Dependency] private readonly SharedPopupSystem _popup = default!;
     [Dependency] private readonly WraithPossessedSystem _possessed = default!;
+    [Dependency] private readonly ISerializationManager _seriMan = default!;
+
     public override void Initialize()
     {
         base.Initialize();
@@ -25,7 +26,6 @@ public sealed partial class PossessObjectSystem : EntitySystem
 
     private void OnPossess(Entity<PossessObjectComponent> ent, ref PossessObjectEvent args)
     {
-
         if (!_mind.TryGetMind(args.Performer, out var mindId, out _))
             return;
 

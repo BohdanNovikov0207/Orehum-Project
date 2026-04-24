@@ -6,7 +6,6 @@ using Content.Shared.Stunnable;
 using Content.Shared.Throwing;
 using Content.Shared.Whitelist;
 using Robust.Shared.Network;
-using Robust.Shared.Physics.Components;
 using Robust.Shared.Random;
 
 namespace Content.Goobstation.Shared.Wraith.Systems;
@@ -18,13 +17,13 @@ namespace Content.Goobstation.Shared.Wraith.Systems;
 public sealed class WraithCommandSystem : EntitySystem
 {
     [Dependency] private readonly EntityLookupSystem _lookupSystem = default!;
+    [Dependency] private readonly INetManager _netManager = default!;
+    [Dependency] private readonly IRobustRandom _random = default!;
+    [Dependency] private readonly SharedStunSystem _stun = default!;
     [Dependency] private readonly ThrowingSystem _throwingSystem = default!;
     [Dependency] private readonly EntityWhitelistSystem _whitelist = default!;
-    [Dependency] private readonly SharedStunSystem _stun = default!;
-    [Dependency] private readonly IRobustRandom _random = default!;
-    [Dependency] private readonly INetManager _netManager = default!;
 
-    /// <inheritdoc/>
+    /// <inheritdoc />
     public override void Initialize()
     {
         base.Initialize();

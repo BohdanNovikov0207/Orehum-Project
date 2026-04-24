@@ -13,11 +13,6 @@ namespace Content.Goobstation.Client.Devil.UI;
 [GenerateTypedNameReferences]
 public sealed partial class RevivalContractMenu : DefaultWindow
 {
-    public event Action? Accepted;
-    public event Action? Rejected;
-
-    public EntityUid? Entity { get; private set; }
-
     public RevivalContractMenu()
     {
         RobustXamlLoader.Load(this);
@@ -26,6 +21,10 @@ public sealed partial class RevivalContractMenu : DefaultWindow
         AcceptButton.OnPressed += OnAcceptPressed;
         RejectButton.OnPressed += OnRejectPressed;
     }
+
+    public EntityUid? Entity { get; private set; }
+    public event Action? Accepted;
+    public event Action? Rejected;
 
     private void OnAcceptPressed(BaseButton.ButtonEventArgs args)
     {
@@ -39,8 +38,5 @@ public sealed partial class RevivalContractMenu : DefaultWindow
         Close();
     }
 
-    public void SetEntity(EntityUid ent)
-    {
-        Entity = ent;
-    }
+    public void SetEntity(EntityUid ent) => Entity = ent;
 }

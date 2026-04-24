@@ -1,7 +1,6 @@
-using Content.Server.Chat.Systems;
-using Content.Shared.Mind.Components;
-using Content.Shared.Mind;
 using Content.Goobstation.Common.LastWords;
+using Content.Server.Chat.Systems;
+using Content.Shared.Mind;
 using Content.Shared.Mobs.Components;
 
 namespace Content.Goobstation.Server.LastWords;
@@ -9,10 +8,7 @@ namespace Content.Goobstation.Server.LastWords;
 public sealed class LastWordsSystem : EntitySystem
 {
     [Dependency] private readonly SharedMindSystem _mindSystem = default!;
-    public override void Initialize()
-    {
-        SubscribeLocalEvent<MobStateComponent, EntitySpokeEvent>(OnEntitySpoke);
-    }
+    public override void Initialize() => SubscribeLocalEvent<MobStateComponent, EntitySpokeEvent>(OnEntitySpoke);
 
     private void OnEntitySpoke(EntityUid uid, MobStateComponent _, EntitySpokeEvent args)
     {

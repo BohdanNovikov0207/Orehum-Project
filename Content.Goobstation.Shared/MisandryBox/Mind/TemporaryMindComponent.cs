@@ -1,6 +1,3 @@
-using Robust.Shared.GameObjects;
-using Robust.Shared.Serialization.Manager.Attributes;
-
 namespace Content.Goobstation.Shared.MisandryBox.Mind;
 
 /// <summary>
@@ -10,8 +7,8 @@ namespace Content.Goobstation.Shared.MisandryBox.Mind;
 public sealed partial class TemporaryMindComponent : Component
 {
     [DataField]
-    public EntityUid OriginalMind;
+    public EntityUid DisposableMind;
 
     [DataField]
-    public EntityUid DisposableMind;
+    public EntityUid OriginalMind;
 }

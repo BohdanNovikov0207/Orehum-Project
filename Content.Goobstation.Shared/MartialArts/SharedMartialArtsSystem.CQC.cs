@@ -24,13 +24,11 @@ using Content.Shared._Shitmed.Medical.Surgery.Traumas;
 using Content.Shared._Shitmed.Medical.Surgery.Traumas.Components;
 using Content.Shared._Shitmed.Medical.Surgery.Wounds.Components;
 using Content.Shared._Shitmed.Targeting;
-using Content.Shared.Bed.Sleep;
 using Content.Shared.Body.Components;
 using Content.Shared.Damage;
 using Content.Shared.Damage.Components;
 using Content.Shared.Damage.Prototypes;
 using Content.Shared.Interaction.Events;
-using Content.Shared.Mobs;
 using Content.Shared.Mobs.Components;
 using Content.Shared.Movement.Pulling.Components;
 using Content.Shared.Standing;
@@ -160,17 +158,17 @@ public partial class SharedMartialArtsSystem
                 }
 
                 // Leg sweep
-                 if (!TryComp<StandingStateComponent>(ent.Owner, out var standing)
-                     || standing.Standing
-                     || !TryComp<StandingStateComponent>(args.Target, out var targetStanding)
-                     || !targetStanding.Standing
-                     )
-                     break;
+                if (!TryComp<StandingStateComponent>(ent.Owner, out var standing)
+                    || standing.Standing
+                    || !TryComp<StandingStateComponent>(args.Target, out var targetStanding)
+                    || !targetStanding.Standing
+                   )
+                    break;
                 if (HasComp<KnockedDownComponent>(ent.Owner))
                     RemComp<KnockedDownComponent>(ent.Owner);
 
                 _standingState.Stand(ent.Owner);
-                _stun.TryKnockdown(args.Target, TimeSpan.FromSeconds(5), true);
+                _stun.TryKnockdown(args.Target, TimeSpan.FromSeconds(5));
                 ComboPopup(ent, args.Target, "Leg Sweep");
                 break;
         }
@@ -210,14 +208,15 @@ public partial class SharedMartialArtsSystem
         if (downed)
         {
             if (TryComp<StaminaComponent>(target, out var stamina) && stamina.Critical)
-                _newStatus.TryAddStatusEffectDuration(target, "StatusEffectForcedSleeping", out _, TimeSpan.FromSeconds(10));
+                _newStatus.TryAddStatusEffectDuration(target,
+                    "StatusEffectForcedSleeping",
+                    out _,
+                    TimeSpan.FromSeconds(10));
             DoDamage(ent, target, proto.DamageType, proto.ExtraDamage, out _, TargetBodyPart.Head);
             _stamina.TakeStaminaDamage(target, proto.StaminaDamage * 2 + 5, source: ent, applyResistances: true);
         }
         else
-        {
             _stamina.TakeStaminaDamage(target, proto.StaminaDamage, source: ent, applyResistances: true);
-        }
 
         if (TryComp<PullableComponent>(target, out var pullable))
             _pulling.TryStopPull(target, pullable, ent, true);
@@ -252,11 +251,11 @@ public partial class SharedMartialArtsSystem
 
         if (!_hands.TryGetActiveItem(target, out var activeItem))
             return;
-        if(!_hands.TryDrop(target, activeItem.Value))
+        if (!_hands.TryDrop(target, activeItem.Value))
             return;
         if (!_hands.TryGetEmptyHand(ent.Owner, out var emptyHand))
             return;
-        if(!_hands.TryPickup(ent, activeItem.Value, emptyHand))
+        if (!_hands.TryPickup(ent, activeItem.Value, emptyHand))
             return;
         _hands.SetActiveHand(ent.Owner, emptyHand);
     }

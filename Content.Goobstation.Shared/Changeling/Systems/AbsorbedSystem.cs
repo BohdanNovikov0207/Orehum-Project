@@ -15,7 +15,7 @@ using Content.Shared.Mobs;
 
 namespace Content.Goobstation.Shared.Changeling.Systems;
 
-public sealed partial class AbsorbedSystem : EntitySystem
+public sealed class AbsorbedSystem : EntitySystem
 {
     public override void Initialize()
     {
@@ -25,10 +25,8 @@ public sealed partial class AbsorbedSystem : EntitySystem
         SubscribeLocalEvent<AbsorbedComponent, MobStateChangedEvent>(OnMobStateChange);
     }
 
-    private void OnExamine(Entity<AbsorbedComponent> ent, ref ExaminedEvent args)
-    {
+    private void OnExamine(Entity<AbsorbedComponent> ent, ref ExaminedEvent args) =>
         args.PushMarkup(Loc.GetString("changeling-absorb-onexamine"));
-    }
 
     private void OnMobStateChange(Entity<AbsorbedComponent> ent, ref MobStateChangedEvent args)
     {

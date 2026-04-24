@@ -17,9 +17,9 @@ namespace Content.Goobstation.Client.Overlays;
 public sealed class ThermalVisionSystem : EquipmentHudSystem<ThermalVisionComponent>
 {
     [Dependency] private readonly IOverlayManager _overlayMan = default!;
+    private BaseSwitchableOverlay<ThermalVisionComponent> _overlay = default!;
 
     private ThermalVisionOverlay _thermalOverlay = default!;
-    private BaseSwitchableOverlay<ThermalVisionComponent> _overlay = default!;
 
     public override void Initialize()
     {
@@ -30,7 +30,7 @@ public sealed class ThermalVisionSystem : EquipmentHudSystem<ThermalVisionCompon
         _thermalOverlay = new ThermalVisionOverlay();
         _overlay = new BaseSwitchableOverlay<ThermalVisionComponent>
         {
-            RestrictToPlayerViewport = true
+            RestrictToPlayerViewport = true,
         };
     }
 
@@ -48,10 +48,8 @@ public sealed class ThermalVisionSystem : EquipmentHudSystem<ThermalVisionCompon
             base.OnRefreshEquipmentHud(ent, ref args);
     }
 
-    private void OnToggle(Entity<ThermalVisionComponent> ent, ref SwitchableOverlayToggledEvent args)
-    {
+    private void OnToggle(Entity<ThermalVisionComponent> ent, ref SwitchableOverlayToggledEvent args) =>
         RefreshOverlay();
-    }
 
     protected override void UpdateInternal(RefreshEquipmentHudEvent<ThermalVisionComponent> args)
     {

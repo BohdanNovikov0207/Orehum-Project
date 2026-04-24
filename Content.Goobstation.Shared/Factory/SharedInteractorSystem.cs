@@ -23,22 +23,22 @@ namespace Content.Goobstation.Shared.Factory;
 
 public abstract class SharedInteractorSystem : EntitySystem
 {
+    [Dependency] private readonly SharedAppearanceSystem _appearance = default!;
     [Dependency] private readonly AutomationSystem _automation = default!;
     [Dependency] private readonly AutomationFilterSystem _filter = default!;
-    [Dependency] private readonly CollisionWakeSystem _wake = default!;
-    [Dependency] private readonly EntityLookupSystem _lookup = default!;
-    [Dependency] private readonly SharedAppearanceSystem _appearance = default!;
-    [Dependency] private readonly SharedInteractionSystem _interaction = default!;
     [Dependency] private readonly SharedHandsSystem _hands = default!;
+    [Dependency] private readonly SharedInteractionSystem _interaction = default!;
+    [Dependency] private readonly EntityLookupSystem _lookup = default!;
     [Dependency] private readonly SharedMapSystem _map = default!;
+
+    private readonly HashSet<EntityUid> _targets = new();
+    [Dependency] private readonly CollisionWakeSystem _wake = default!;
     [Dependency] protected readonly StartableMachineSystem Machine = default!;
 
     private EntityQuery<ActiveDoAfterComponent> _doAfterQuery;
-    private EntityQuery<HandsComponent> _handsQuery;
     private EntityQuery<MapGridComponent> _gridQuery;
+    private EntityQuery<HandsComponent> _handsQuery;
     private EntityQuery<ThrownItemComponent> _thrownQuery;
-
-    private readonly HashSet<EntityUid> _targets = new();
 
     public override void Initialize()
     {
@@ -58,26 +58,23 @@ public abstract class SharedInteractorSystem : EntitySystem
         SubscribeLocalEvent<InteractorComponent, EntRemovedFromContainerMessage>(OnItemModified);
     }
 
-    private void OnInit(Entity<InteractorComponent> ent, ref ComponentInit args)
-    {
-        UpdateAppearance(ent);
-    }
+    private void OnInit(Entity<InteractorComponent> ent, ref ComponentInit args) => UpdateAppearance(ent);
 
     private void OnExamined(Entity<InteractorComponent> ent, ref ExaminedEvent args)
     {
         if (!args.IsInDetailsRange)
             return;
 
-        args.PushMarkup(_filter.GetSlot(ent) is {} filter
+        args.PushMarkup(_filter.GetSlot(ent) is { } filter
             ? Loc.GetString("robotic-arm-examine-filter", ("filter", filter))
             : Loc.GetString("robotic-arm-examine-no-filter"));
     }
 
     public bool IsValidTarget(Entity<InteractorComponent> ent, EntityUid target)
         => !_thrownQuery.HasComp(target) // thrown items move too fast to be "clicked" on...
-            && _filter.IsAllowed(_filter.GetSlot(ent), target); // ignore non-filtered entities
+           && _filter.IsAllowed(_filter.GetSlot(ent), target); // ignore non-filtered entities
 
-    private void OnItemModified<T>(Entity<InteractorComponent> ent, ref T args) where T: ContainerModifiedMessage
+    private void OnItemModified<T>(Entity<InteractorComponent> ent, ref T args) where T : ContainerModifiedMessage
     {
         if (args.Container.ID != ent.Comp.ToolContainerId)
             return;
@@ -103,12 +100,12 @@ public abstract class SharedInteractorSystem : EntitySystem
             return;
 
         var state = SignalState.Momentary;
-        args.Data?.TryGetValue<SignalState>("logic_state", out state);
+        args.Data?.TryGetValue("logic_state", out state);
         var alt = state switch
         {
             SignalState.Momentary => !ent.Comp.AltInteract,
             SignalState.Low => false,
-            SignalState.High => true
+            SignalState.High => true,
         };
         SetAltInteract(ent, alt);
     }
@@ -138,7 +135,7 @@ public abstract class SharedInteractorSystem : EntitySystem
 
     private void UpdateToolAppearance(EntityUid uid)
     {
-        var state = _hands.ActiveHandIsEmpty(uid) == false
+        var state = !_hands.ActiveHandIsEmpty(uid)
             ? InteractorState.Inactive
             : InteractorState.Empty;
         UpdateAppearance(uid, state);
@@ -171,7 +168,7 @@ public abstract class SharedInteractorSystem : EntitySystem
     /// </summary>
     public EntityUid? FindTarget(Entity<InteractorComponent> ent)
     {
-        if (Transform(ent).GridUid is not {} gridUid || !_gridQuery.TryComp(gridUid, out var grid))
+        if (Transform(ent).GridUid is not { } gridUid || !_gridQuery.TryComp(gridUid, out var grid))
             return null;
 
         var coords = TargetsPosition(ent);
@@ -184,6 +181,7 @@ public abstract class SharedInteractorSystem : EntitySystem
             if (IsValidTarget(ent, target))
                 return target;
         }
+
         return null;
     }
 }

@@ -15,13 +15,10 @@ namespace Content.Goobstation.Server.Stacks;
 /// </summary>
 public sealed class GoobStackSystem : GoobSharedStackSystem
 {
-
     [Dependency] private readonly StackSystem _stackSystem = default!;
-    /// <inheritdoc/>
-    public override void Initialize()
-    {
-        base.Initialize();
-    }
+
+    /// <inheritdoc />
+    public override void Initialize() => base.Initialize();
 
     // Goobstation - Custom stack splitting dialog
     protected override void OnCustomSplitMessage(Entity<StackComponent> ent, ref StackCustomSplitAmountMessage message)

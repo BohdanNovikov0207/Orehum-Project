@@ -9,14 +9,13 @@
 
 using System.Linq;
 using System.Text.RegularExpressions;
-using Content.Shared._Shitmed.Medical.Surgery.Wounds.Systems;
 using Content.Goobstation.Common.Paper;
 using Content.Goobstation.Server.Devil.Objectives.Components;
 using Content.Goobstation.Server.Possession;
+using Content.Goobstation.Shared.Changeling.Components;
 using Content.Goobstation.Shared.Devil;
 using Content.Goobstation.Shared.Devil.Condemned;
 using Content.Goobstation.Shared.Devil.Contract;
-using Content.Shared._Imp.Drone; // Goob - Moved to shared
 using Content.Server.Body.Systems;
 using Content.Server.Explosion.EntitySystems;
 using Content.Server.Hands.Systems;
@@ -24,6 +23,8 @@ using Content.Server.Implants;
 using Content.Server.Mind;
 using Content.Server.Polymorph.Systems;
 using Content.Shared._EinsteinEngines.Silicon.Components;
+using Content.Shared._Imp.Drone;
+using Content.Shared._Shitmed.Medical.Surgery.Wounds.Systems;
 using Content.Shared.Damage;
 using Content.Shared.Examine;
 using Content.Shared.Mindshield.Components;
@@ -37,24 +38,35 @@ using Robust.Shared.Audio.Systems;
 using Robust.Shared.Prototypes;
 using Robust.Shared.Random;
 using Robust.Shared.Utility;
-using Content.Goobstation.Shared.Changeling.Components;
+// Goob - Moved to shared
 
 namespace Content.Goobstation.Server.Devil.Contract;
 
 public sealed partial class DevilContractSystem : EntitySystem
 {
-    [Dependency] private readonly SharedPopupSystem _popupSystem = null!;
-    [Dependency] private readonly DamageableSystem _damageable = null!;
-    [Dependency] private readonly HandsSystem _hands = null!;
     [Dependency] private readonly SharedAudioSystem _audio = null!;
-    [Dependency] private readonly IPrototypeManager _prototypeManager = null!;
     [Dependency] private readonly BodySystem _bodySystem = null!;
-    [Dependency] private readonly WoundSystem _wounds = null!;
-    [Dependency] private readonly IRobustRandom _random = null!;
-    [Dependency] private readonly SubdermalImplantSystem _implant = null!;
-    [Dependency] private readonly PolymorphSystem _polymorph = null!;
+    [Dependency] private readonly DamageableSystem _damageable = null!;
     [Dependency] private readonly ExplosionSystem _explosion = null!;
+    [Dependency] private readonly HandsSystem _hands = null!;
+    [Dependency] private readonly SubdermalImplantSystem _implant = null!;
     [Dependency] private readonly MindSystem _mind = null!;
+    [Dependency] private readonly PolymorphSystem _polymorph = null!;
+    [Dependency] private readonly SharedPopupSystem _popupSystem = null!;
+    [Dependency] private readonly IPrototypeManager _prototypeManager = null!;
+    [Dependency] private readonly IRobustRandom _random = null!;
+
+    private readonly Dictionary<LocId, Func<DevilContractComponent, EntityUid?>> _targetResolvers = new()
+    {
+        // The contractee is who is making the deal.
+        ["devil-contract-contractee"] = comp => comp.Signer,
+        // The contractor is the entity offering the deal.
+        ["devil-contract-contractor"] = comp => comp.ContractOwner,
+    };
+
+    [Dependency] private readonly WoundSystem _wounds = null!;
+
+    private Regex _clauseRegex = null!;
 
     private ISawmill _sawmill = null!;
 
@@ -73,29 +85,21 @@ public sealed partial class DevilContractSystem : EntitySystem
         _sawmill = Logger.GetSawmill("devil-contract");
     }
 
-    private readonly Dictionary<LocId, Func<DevilContractComponent, EntityUid?>> _targetResolvers = new()
-    {
-        // The contractee is who is making the deal.
-        ["devil-contract-contractee"] = comp => comp.Signer,
-        // The contractor is the entity offering the deal.
-        ["devil-contract-contractor"] = comp => comp.ContractOwner,
-    };
-
-    private Regex _clauseRegex = null!;
-
     private void InitializeRegex()
     {
-        var escapedPatterns = _targetResolvers.Keys.Select(locId => Loc.GetString(locId)).ToList(); // malicious linq and regex
+        var escapedPatterns =
+            _targetResolvers.Keys.Select(locId => Loc.GetString(locId)).ToList(); // malicious linq and regex
         var targetPattern = string.Join("|", escapedPatterns);
 
         _clauseRegex = new Regex($@"^\s*(?<target>{targetPattern})\s*:\s*(?<clause>.+?)\s*$",
             RegexOptions.IgnoreCase | RegexOptions.Compiled | RegexOptions.Multiline);
     }
+
     private void OnGetVerbs(Entity<DevilContractComponent> contract, ref GetVerbsEvent<AlternativeVerb> args)
     {
         if (!args.CanInteract
-        || !args.CanAccess
-        || !TryComp<DevilComponent>(args.User, out var devilComp))
+            || !args.CanAccess
+            || !TryComp<DevilComponent>(args.User, out var devilComp))
             return;
 
         var user = args.User;
@@ -104,7 +108,7 @@ public sealed partial class DevilContractSystem : EntitySystem
         {
             Act = () => TryBurnContract(contract, (user, devilComp)),
             Text = Loc.GetString("burn-contract-prompt"),
-            Icon = new SpriteSpecifier.Rsi(new ("/Textures/Effects/fire.rsi"), "fire"),
+            Icon = new SpriteSpecifier.Rsi(new ResPath("/Textures/Effects/fire.rsi"), "fire"),
         };
 
         args.Verbs.Add(burnVerb);
@@ -114,14 +118,19 @@ public sealed partial class DevilContractSystem : EntitySystem
     {
         var coordinates = Transform(contract).Coordinates;
 
-        if (contract.Comp is not { IsContractFullySigned: true})
+        if (contract.Comp is not { IsContractFullySigned: true })
         {
             Spawn(devil.Comp.FireEffectProto, coordinates);
-            _audio.PlayPvs(devil.Comp.FwooshPath, coordinates, new AudioParams(-2f, 1f, SharedAudioSystem.DefaultSoundRange, 1f, false, 0f));
+            _audio.PlayPvs(devil.Comp.FwooshPath,
+                coordinates,
+                new AudioParams(-2f, 1f, SharedAudioSystem.DefaultSoundRange, 1f, false, 0f));
             QueueDel(contract);
         }
         else
-            _popupSystem.PopupCoordinates(Loc.GetString("burn-contract-popup-fail"), coordinates, devil, PopupType.MediumCaution);
+            _popupSystem.PopupCoordinates(Loc.GetString("burn-contract-popup-fail"),
+                coordinates,
+                devil,
+                PopupType.MediumCaution);
     }
 
     private void OnExamined(Entity<DevilContractComponent> contract, ref ExaminedEvent args)
@@ -133,17 +142,15 @@ public sealed partial class DevilContractSystem : EntitySystem
         args.PushMarkup(Loc.GetString("devil-contract-examined", ("weight", contract.Comp.ContractWeight)));
     }
 
-    private void OnEaten(Entity<DevilContractComponent> contract, ref FullyEatenEvent args)
-    {
+    private void OnEaten(Entity<DevilContractComponent> contract, ref FullyEatenEvent args) =>
         _explosion.QueueExplosion(
             args.User,
-            typeId: "Default",
-            totalIntensity: 1, // contract explosions should not cause any kind of major structural damage. you should at worst need to weld a window or repair a table.
-            slope: 1,
-            maxTileIntensity: 1,
+            "Default",
+            1, // contract explosions should not cause any kind of major structural damage. you should at worst need to weld a window or repair a table.
+            1,
+            1,
             maxTileBreak: 0,
             addLog: false);
-    }
 
     #region Signing Steps
 
@@ -194,7 +201,6 @@ public sealed partial class DevilContractSystem : EntitySystem
 
             args.Cancelled = true;
         }
-
     }
 
     private void OnSignStep(Entity<DevilContractComponent> contract, ref SignSuccessfulEvent args)
@@ -269,6 +275,7 @@ public sealed partial class DevilContractSystem : EntitySystem
         failReason = string.Empty;
         return true;
     }
+
     public bool TryTransferSouls(EntityUid devil, EntityUid contractee, int added)
     {
         // Can't sell what doesn't exist.
@@ -330,7 +337,8 @@ public sealed partial class DevilContractSystem : EntitySystem
             var targetKey = match.Groups["target"].Value.Trim().ToLowerInvariant().Replace(" ", "");
             var clauseKey = match.Groups["clause"].Value.Trim().ToLowerInvariant().Replace(" ", "");
 
-            var locId = _targetResolvers.Keys.FirstOrDefault(id => Loc.GetString(id).Equals(targetKey, StringComparison.OrdinalIgnoreCase));
+            var locId = _targetResolvers.Keys.FirstOrDefault(id =>
+                Loc.GetString(id).Equals(targetKey, StringComparison.OrdinalIgnoreCase));
             var resolver = _targetResolvers[locId];
 
             if (resolver(contract.Comp) == null)
@@ -348,7 +356,8 @@ public sealed partial class DevilContractSystem : EntitySystem
             // no duplicates
             if (!processedClauses.Add(clauseKey))
             {
-                _sawmill.Warning($"Attempted to apply duplicate clause: {clauseKey} on contract {ToPrettyString(contract)}");
+                _sawmill.Warning(
+                    $"Attempted to apply duplicate clause: {clauseKey} on contract {ToPrettyString(contract)}");
                 continue;
             }
 
@@ -358,11 +367,14 @@ public sealed partial class DevilContractSystem : EntitySystem
             if (targetEntity is not null)
                 ApplyEffectToTarget(targetEntity.Value, clause, contract);
             else
-                _sawmill.Warning($"Invalid target entity from resolver for clause {clauseKey} in contract {ToPrettyString(contract)}");
+                _sawmill.Warning(
+                    $"Invalid target entity from resolver for clause {clauseKey} in contract {ToPrettyString(contract)}");
         }
     }
 
-    private void ApplyEffectToTarget(EntityUid target, DevilClausePrototype clause, Entity<DevilContractComponent>? contract)
+    private void ApplyEffectToTarget(EntityUid target,
+        DevilClausePrototype clause,
+        Entity<DevilContractComponent>? contract)
     {
         //_sawmill.Debug($"Applying {clause.ID} effect to {ToPrettyString(target)}");
 
@@ -449,7 +461,9 @@ public sealed partial class DevilContractSystem : EntitySystem
         //_sawmill.Debug($"Polymorphed {ToPrettyString(target)} to {clause.Polymorph} ");
     }
 
-    private void DoSpecialActions(EntityUid target, Entity<DevilContractComponent>? contract, DevilClausePrototype clause)
+    private void DoSpecialActions(EntityUid target,
+        Entity<DevilContractComponent>? contract,
+        DevilClausePrototype clause)
     {
         if (clause.Event == null)
             return;
@@ -461,7 +475,7 @@ public sealed partial class DevilContractSystem : EntitySystem
             ev.Contract = contract;
 
         // you gotta cast this shit to object, don't ask me vro idk either
-        RaiseLocalEvent(target, (object)ev, true);
+        RaiseLocalEvent(target, (object) ev, true);
         //_sawmill.Debug($"Raising event: {(object)ev} on {ToPrettyString(target)}. ");
     }
 

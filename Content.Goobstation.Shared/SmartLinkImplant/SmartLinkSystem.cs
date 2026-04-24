@@ -39,10 +39,7 @@ public sealed class SmartLinkSystem : EntitySystem
 
         var arms = _body.GetBodyChildrenOfType(part.Body.Value, BodyPartType.Arm);
         if (arms.Count() != arms.Where(x => HasComp<SmartLinkArmComponent>(x.Id)).Count())
-        {
             RemComp<SmartLinkComponent>(part.Body.Value);
-            return;
-        }
         else
             EnsureComp<SmartLinkComponent>(part.Body.Value);
     }

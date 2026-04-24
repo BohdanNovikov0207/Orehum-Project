@@ -5,26 +5,26 @@ using Robust.Shared.Prototypes;
 
 namespace Content.Goobstation.Shared.Wraith.Collisions;
 
-[RegisterComponent, NetworkedComponent]
+[RegisterComponent] [NetworkedComponent]
 public sealed partial class StatusEffectOnCollideGhostComponent : Component
 {
-    [DataField]
-    public ProtoId<StatusEffectPrototype> StatusEffect = "Corporeal";
-
     [DataField]
     public string Component = "Corporeal";
 
     [DataField]
-    public EntityWhitelist? Whitelist;
-
-    [DataField]
     public TimeSpan Duration;
+
+    [ViewVariables]
+    public string FixtureId = "statusEffectCollision";
 
     [DataField]
     public bool Refresh = true;
 
-    [ViewVariables]
-    public string FixtureId = "statusEffectCollision";
+    [DataField]
+    public ProtoId<StatusEffectPrototype> StatusEffect = "Corporeal";
+
+    [DataField]
+    public EntityWhitelist? Whitelist;
 }
 
 /// <summary>

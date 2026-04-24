@@ -22,8 +22,9 @@ namespace Content.Goobstation.Server.Implants.Systems;
 public sealed class StypticStimulatorImplantSystem : EntitySystem
 {
     [Dependency] private readonly BloodstreamSystem _bloodstream = default!;
-    [Dependency] private readonly IGameTiming _gameTiming = default!;
     [Dependency] private readonly DamageableSystem _damageable = default!;
+    [Dependency] private readonly IGameTiming _gameTiming = default!;
+
     public override void Initialize()
     {
         base.Initialize();
@@ -60,8 +61,6 @@ public sealed class StypticStimulatorImplantSystem : EntitySystem
         }
     }
 
-    private void OnUnimplanted(Entity<StypticStimulatorImplantComponent> implant, ref EntGotRemovedFromContainerMessage args)
-    {
-        implant.Comp.User = null;
-    }
+    private void OnUnimplanted(Entity<StypticStimulatorImplantComponent> implant,
+        ref EntGotRemovedFromContainerMessage args) => implant.Comp.User = null;
 }

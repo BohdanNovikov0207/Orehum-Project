@@ -1,6 +1,5 @@
 using Content.Goobstation.Shared.Shadowling.Components;
 using Content.Server.Polymorph.Systems;
-using Content.Server.Storage.Components;
 using Content.Server.Storage.EntitySystems;
 using Content.Shared.Popups;
 using Content.Shared.Storage.Components;
@@ -13,19 +12,15 @@ namespace Content.Goobstation.Server.Shadowling.Systems;
 /// <summary>
 /// This handles the hatching process
 /// </summary>
-///
 public sealed class ShadowlingEggHatchSystem : EntitySystem
 {
-    [Dependency] private readonly PolymorphSystem _polymorph = default!;
-    [Dependency] private readonly IGameTiming _timing = default!;
-    [Dependency] private readonly EntityStorageSystem _entityStorage = default!;
-    [Dependency] private readonly SharedPopupSystem _popupSystem = default!;
     [Dependency] private readonly SharedAudioSystem _audio = default!;
+    [Dependency] private readonly EntityStorageSystem _entityStorage = default!;
+    [Dependency] private readonly PolymorphSystem _polymorph = default!;
+    [Dependency] private readonly SharedPopupSystem _popupSystem = default!;
+    [Dependency] private readonly IGameTiming _timing = default!;
 
-    public override void Initialize()
-    {
-        SubscribeLocalEvent<HatchingEggComponent, MapInitEvent>(OnMapInit);
-    }
+    public override void Initialize() => SubscribeLocalEvent<HatchingEggComponent, MapInitEvent>(OnMapInit);
 
     public override void Update(float frameTime)
     {
@@ -49,21 +44,21 @@ public sealed class ShadowlingEggHatchSystem : EntitySystem
                 if (_timing.CurTime >= comp.NextUpdate)
                     Cycle(sUid, uid, comp);
 
-                if (_timing.CurTime >= (comp.NextUpdate - TimeSpan.FromSeconds(12)) && !comp.HasFirstMessageAppeared)
+                if (_timing.CurTime >= comp.NextUpdate - TimeSpan.FromSeconds(12) && !comp.HasFirstMessageAppeared)
                 {
                     _popupSystem.PopupEntity(Loc.GetString("sling-hatch-first"), uid, sUid, PopupType.Medium);
                     _audio.PlayPvs(comp.CrackFirst, uid, AudioParams.Default.WithVolume(-2f));
                     comp.HasFirstMessageAppeared = true;
                 }
 
-                if (_timing.CurTime >= (comp.NextUpdate - TimeSpan.FromSeconds(7)) && !comp.HasSecondMessageAppeared)
+                if (_timing.CurTime >= comp.NextUpdate - TimeSpan.FromSeconds(7) && !comp.HasSecondMessageAppeared)
                 {
                     _popupSystem.PopupEntity(Loc.GetString("sling-hatch-second"), uid, sUid, PopupType.Medium);
                     _audio.PlayPvs(comp.CrackSecond, uid, AudioParams.Default.WithVolume(-2f));
                     comp.HasSecondMessageAppeared = true;
                 }
 
-                if (_timing.CurTime >= (comp.NextUpdate - TimeSpan.FromSeconds(3)) && !comp.HasThirdMessageAppeared)
+                if (_timing.CurTime >= comp.NextUpdate - TimeSpan.FromSeconds(3) && !comp.HasThirdMessageAppeared)
                 {
                     _popupSystem.PopupEntity(Loc.GetString("sling-hatch-third"), uid, sUid, PopupType.Medium);
                     _audio.PlayPvs(comp.CrackFirst, uid, AudioParams.Default.WithVolume(-2f).WithPitchScale(2f));
@@ -73,10 +68,8 @@ public sealed class ShadowlingEggHatchSystem : EntitySystem
         }
     }
 
-    public void OnMapInit(Entity<HatchingEggComponent> ent, ref MapInitEvent args)
-    {
+    public void OnMapInit(Entity<HatchingEggComponent> ent, ref MapInitEvent args) =>
         ent.Comp.NextUpdate = _timing.CurTime + ent.Comp.CooldownTimer;
-    }
 
     public void Cycle(EntityUid sling, EntityUid egg, HatchingEggComponent comp)
     {

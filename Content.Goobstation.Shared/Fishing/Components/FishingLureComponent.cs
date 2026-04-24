@@ -8,14 +8,14 @@ using Robust.Shared.GameStates;
 
 namespace Content.Goobstation.Shared.Fishing.Components;
 
-[RegisterComponent, NetworkedComponent, AutoGenerateComponentState]
+[RegisterComponent] [NetworkedComponent] [AutoGenerateComponentState]
 public sealed partial class FishingLureComponent : Component
 {
-    [DataField, AutoNetworkedField]
-    public EntityUid FishingRod;
-
-    [DataField, AutoNetworkedField]
+    [DataField] [AutoNetworkedField]
     public EntityUid? AttachedEntity;
+
+    [DataField] [AutoNetworkedField]
+    public EntityUid FishingRod;
 
     [ViewVariables]
     public TimeSpan NextUpdate;

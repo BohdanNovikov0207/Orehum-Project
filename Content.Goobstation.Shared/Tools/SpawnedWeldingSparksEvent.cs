@@ -8,10 +8,11 @@ namespace Content.Goobstation.Shared.Tools;
 /// <param name="targetEnt">The entity being welded.</param>
 /// <param name="sparksEnt">The welding sparks effect entity.</param>
 /// <param name="duration">How long should the animation take to complete.</param>
-[Serializable, NetSerializable]
-public sealed partial class SpawnedWeldingSparksEvent(NetEntity targetEnt, NetEntity sparksEnt, TimeSpan duration) : EntityEventArgs
+[Serializable] [NetSerializable]
+public sealed class SpawnedWeldingSparksEvent(NetEntity targetEnt, NetEntity sparksEnt, TimeSpan duration)
+    : EntityEventArgs
 {
-    public NetEntity TargetEnt = targetEnt;
-    public NetEntity SparksEnt = sparksEnt;
     public TimeSpan Duration = duration;
+    public NetEntity SparksEnt = sparksEnt;
+    public NetEntity TargetEnt = targetEnt;
 }

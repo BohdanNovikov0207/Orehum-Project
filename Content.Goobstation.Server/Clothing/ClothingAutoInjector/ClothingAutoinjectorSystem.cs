@@ -5,6 +5,7 @@
 //
 // SPDX-License-Identifier: AGPL-3.0-or-later
 
+using Content.Goobstation.Maths.FixedPoint;
 using Content.Goobstation.Shared.Clothing;
 using Content.Goobstation.Shared.Clothing.Components;
 using Content.Server.Popups;
@@ -13,7 +14,6 @@ using Content.Shared.Actions;
 using Content.Shared.Chemistry.Components;
 using Content.Shared.Chemistry.EntitySystems;
 using Content.Shared.Examine;
-using Content.Goobstation.Maths.FixedPoint;
 using Content.Shared.Inventory;
 using Content.Shared.Inventory.Events;
 using Content.Shared.Mobs;
@@ -26,12 +26,12 @@ namespace Content.Goobstation.Server.Clothing.Systems;
 /// This can be used for modsuit modules in the future.
 /// Currently, it allows you to have an entity inject regeants into itself, defined by a prototype.
 /// </summary>
-public sealed partial class ClothingAutoinjectorSystem : EntitySystem
+public sealed class ClothingAutoinjectorSystem : EntitySystem
 {
-    [Dependency] private readonly SharedSolutionContainerSystem _solution = default!;
     [Dependency] private readonly SharedActionsSystem _actions = default!;
-    [Dependency] private readonly PopupSystem _popup = default!;
     [Dependency] private readonly AudioSystem _audio = default!;
+    [Dependency] private readonly PopupSystem _popup = default!;
+    [Dependency] private readonly SharedSolutionContainerSystem _solution = default!;
     [Dependency] private readonly IGameTiming _timing = default!;
 
     public override void Initialize()
@@ -42,10 +42,13 @@ public sealed partial class ClothingAutoinjectorSystem : EntitySystem
         SubscribeLocalEvent<ClothingAutoInjectComponent, GotUnequippedEvent>(OnUnequipped);
         SubscribeLocalEvent<ClothingAutoInjectComponent, ExaminedEvent>(OnExamined);
         SubscribeLocalEvent<MobStateChangedEvent>(OnMobStateChange);
-        SubscribeLocalEvent<ClothingAutoInjectComponent, InventoryRelayedEvent<ClothingAutoInjectRelayedEvent>>(OnInject);
+        SubscribeLocalEvent<ClothingAutoInjectComponent, InventoryRelayedEvent<ClothingAutoInjectRelayedEvent>>(
+            OnInject);
     }
 
-    private void OnInjectorActivated(EntityUid uid, ClothingAutoInjectComponent component, ref ActionActivateAutoInjectorEvent args)
+    private void OnInjectorActivated(EntityUid uid,
+        ClothingAutoInjectComponent component,
+        ref ActionActivateAutoInjectorEvent args)
     {
         if (args.Handled)
             return;
@@ -62,7 +65,9 @@ public sealed partial class ClothingAutoinjectorSystem : EntitySystem
     {
         var solution = new Solution();
         foreach (var reagent in reagents)
+        {
             solution.AddReagent(reagent.Key, reagent.Value);
+        }
 
         if (!_solution.TryGetInjectableSolution(uid, out var targetSolution, out _))
             return false;
@@ -70,16 +75,16 @@ public sealed partial class ClothingAutoinjectorSystem : EntitySystem
         return _solution.TryAddSolution(targetSolution.Value, solution);
     }
 
-    private void OnMobStateChange(MobStateChangedEvent args)
-    {
-        RaiseLocalEvent(args.Target, new ClothingAutoInjectRelayedEvent(args.Target, args.NewMobState));
-    }
+    private void OnMobStateChange(MobStateChangedEvent args) => RaiseLocalEvent(args.Target,
+        new ClothingAutoInjectRelayedEvent(args.Target, args.NewMobState));
 
-    private void OnInject(EntityUid uid, ClothingAutoInjectComponent comp, InventoryRelayedEvent<ClothingAutoInjectRelayedEvent> args)
+    private void OnInject(EntityUid uid,
+        ClothingAutoInjectComponent comp,
+        InventoryRelayedEvent<ClothingAutoInjectRelayedEvent> args)
     {
         if (args.Args.NewState != MobState.Critical
-        || comp.NextAutoInjectTime > _timing.CurTime)
-        return;
+            || comp.NextAutoInjectTime > _timing.CurTime)
+            return;
 
         TryInjectReagents(args.Args.Target, comp.Reagents);
         _audio.PlayPvs(comp.InjectSound, args.Args.Target);
@@ -110,7 +115,8 @@ public sealed partial class ClothingAutoinjectorSystem : EntitySystem
 
         var onMsg = component.NextAutoInjectTime < _timing.CurTime
             ? Loc.GetString("comp-autoinjector-examined-on")
-            : Loc.GetString("comp-autoinjector-examined-off", ("time", Math.Floor(component.NextAutoInjectTime.TotalSeconds - _timing.CurTime.TotalSeconds)));
+            : Loc.GetString("comp-autoinjector-examined-off",
+                ("time", Math.Floor(component.NextAutoInjectTime.TotalSeconds - _timing.CurTime.TotalSeconds)));
         args.PushMarkup(onMsg);
     }
 }

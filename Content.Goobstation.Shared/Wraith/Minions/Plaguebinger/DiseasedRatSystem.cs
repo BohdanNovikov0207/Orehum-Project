@@ -49,10 +49,12 @@ public abstract class SharedDiseasedRatSystem : EntitySystem
         unlockedForm = null;
         return false;
     }
+
     #endregion
 
     #region Server
-    protected virtual void Evolve(EntityUid uid, ProtoId<DiseasedRatFormUnlockPrototype> newProto) {}
+
+    protected virtual void Evolve(EntityUid uid, ProtoId<DiseasedRatFormUnlockPrototype> newProto) { }
 
     #endregion
 }

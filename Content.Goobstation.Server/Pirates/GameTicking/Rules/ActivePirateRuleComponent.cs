@@ -15,7 +15,7 @@ namespace Content.Goobstation.Server.Pirates.GameTicking.Rules;
 [RegisterComponent]
 public sealed partial class ActivePirateRuleComponent : Component
 {
-    public List<Entity<MindComponent>> Pirates = new();
-    [ViewVariables(VVAccess.ReadWrite)] public float Credits = 0f;
     [ViewVariables(VVAccess.ReadWrite)] public EntityUid? BoundSiphon;
+    [ViewVariables(VVAccess.ReadWrite)] public float Credits = 0f;
+    public List<Entity<MindComponent>> Pirates = new();
 }

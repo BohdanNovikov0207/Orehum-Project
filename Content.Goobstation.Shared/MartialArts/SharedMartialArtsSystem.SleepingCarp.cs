@@ -35,7 +35,8 @@ public partial class SharedMartialArtsSystem
     {
         SubscribeLocalEvent<CanPerformComboComponent, SleepingCarpGnashingTeethPerformedEvent>(OnSleepingCarpGnashing);
         SubscribeLocalEvent<CanPerformComboComponent, SleepingCarpKneeHaulPerformedEvent>(OnSleepingCarpKneeHaul);
-        SubscribeLocalEvent<CanPerformComboComponent, SleepingCarpCrashingWavesPerformedEvent>(OnSleepingCarpCrashingWaves);
+        SubscribeLocalEvent<CanPerformComboComponent, SleepingCarpCrashingWavesPerformedEvent>(
+            OnSleepingCarpCrashingWaves);
 
         SubscribeLocalEvent<GrantSleepingCarpComponent, UseInHandEvent>(OnGrantSleepingCarp);
     }
@@ -50,8 +51,8 @@ public partial class SharedMartialArtsSystem
         if (ent.Comp.MaximumUses <= ent.Comp.CurrentUses)
         {
             _popupSystem.PopupEntity(Loc.GetString("cqc-fail-used", ("manual", Identity.Entity(ent, EntityManager))),
-            args.User,
-            args.User);
+                args.User,
+                args.User);
             return;
         }
 
@@ -135,17 +136,18 @@ public partial class SharedMartialArtsSystem
         if (!downed)
         {
             var saying =
-                Enumerable.ElementAt(martialArtProto.RandomSayings, _random.Next(martialArtProto.RandomSayings.Count));
+                martialArtProto.RandomSayings.ElementAt(_random.Next(martialArtProto.RandomSayings.Count));
             var ev = new SleepingCarpSaying(saying);
             RaiseLocalEvent(ent, ev);
         }
         else
         {
             var saying =
-                Enumerable.ElementAt(martialArtProto.RandomSayingsDowned, _random.Next(martialArtProto.RandomSayingsDowned.Count));
+                martialArtProto.RandomSayingsDowned.ElementAt(_random.Next(martialArtProto.RandomSayingsDowned.Count));
             var ev = new SleepingCarpSaying(saying);
             RaiseLocalEvent(ent, ev);
         }
+
         ent.Comp.LastAttacks.Clear();
     }
 
@@ -168,6 +170,7 @@ public partial class SharedMartialArtsSystem
             _stamina.TakeStaminaDamage(target, proto.StaminaDamage - 20, applyResistances: true);
             _hands.TryDrop(target);
         }
+
         if (TryComp<PullableComponent>(target, out var pullable))
             _pulling.TryStopPull(target, pullable, ent, true);
         _audio.PlayPvs(new SoundPathSpecifier("/Audio/Weapons/genhit3.ogg"), target);

@@ -13,13 +13,13 @@ namespace Content.Goobstation.Shared.Wraith.Revenant;
 
 public sealed class TouchOfEvilSystem : EntitySystem
 {
+    [Dependency] private readonly ISharedAdminLogManager _admin = default!;
+    [Dependency] private readonly SharedPopupSystem _popups = default!;
+    [Dependency] private readonly StatusEffectsSystem _statusEffects = default!;
     [Dependency] private readonly GrabThrownSystem _throw = default!;
     [Dependency] private readonly SharedTransformSystem _transform = default!;
-    [Dependency] private readonly StatusEffectsSystem _statusEffects = default!;
-    [Dependency] private readonly SharedPopupSystem _popups = default!;
-    [Dependency] private readonly ISharedAdminLogManager _admin = default!;
 
-    /// <inheritdoc/>
+    /// <inheritdoc />
     public override void Initialize()
     {
         base.Initialize();
@@ -59,7 +59,10 @@ public sealed class TouchOfEvilSystem : EntitySystem
             || !TryComp<MeleeWeaponComponent>(args.Target, out var melee))
             return;
 
-        _popups.PopupClient(Loc.GetString("revenant-touch-of-evil-start"), args.Target, args.Target, PopupType.LargeCaution);
+        _popups.PopupClient(Loc.GetString("revenant-touch-of-evil-start"),
+            args.Target,
+            args.Target,
+            PopupType.LargeCaution);
         _admin.Add(LogType.Action, LogImpact.Low, $"{args.Target}'s Touch of Evil duration has started");
 
         touch.OriginalDamage = melee.Damage;

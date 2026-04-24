@@ -13,9 +13,6 @@ namespace Content.Goobstation.Server.Flashbang;
 public sealed partial class FlashbangComponent : Component
 {
     [DataField]
-    public float StunTime = 2f;
-
-    [DataField]
     public float KnockdownTime = 10f;
 
     /// <summary>
@@ -23,4 +20,7 @@ public sealed partial class FlashbangComponent : Component
     /// </summary>
     [DataField]
     public float MinProtectionRange;
+
+    [DataField]
+    public float StunTime = 2f;
 }

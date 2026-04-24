@@ -10,7 +10,7 @@ using Content.Shared.Weapons.Melee.Events;
 namespace Content.Goobstation.Shared.Enchanting.Systems;
 
 /// <summary>
-/// Handles events for <see cref="FortuneEnchantComponent"/>.
+/// Handles events for <see cref="FortuneEnchantComponent" />.
 /// </summary>
 public sealed class FortuneEnchantSystem : EntitySystem
 {
@@ -29,20 +29,13 @@ public sealed class FortuneEnchantSystem : EntitySystem
         SubscribeLocalEvent<FortuneEnchantComponent, MeleeHitEvent>(OnMeleeHit);
     }
 
-    private void OnAdded(Entity<FortuneEnchantComponent> ent, ref EnchantAddedEvent args)
-    {
-        SetChance(ent, args.Level);
-    }
+    private void OnAdded(Entity<FortuneEnchantComponent> ent, ref EnchantAddedEvent args) => SetChance(ent, args.Level);
 
-    private void OnUpgraded(Entity<FortuneEnchantComponent> ent, ref EnchantUpgradedEvent args)
-    {
+    private void OnUpgraded(Entity<FortuneEnchantComponent> ent, ref EnchantUpgradedEvent args) =>
         SetChance(ent, args.Level);
-    }
 
-    private void SetChance(Entity<FortuneEnchantComponent> ent, int level)
-    {
-        ent.Comp.Chance = 1f + ent.Comp.BaseChance * (float) level;
-    }
+    private void SetChance(Entity<FortuneEnchantComponent> ent, int level) =>
+        ent.Comp.Chance = 1f + ent.Comp.BaseChance * level;
 
     private void OnMeleeHit(Entity<FortuneEnchantComponent> ent, ref MeleeHitEvent args)
     {

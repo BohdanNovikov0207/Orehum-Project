@@ -6,10 +6,9 @@
 //
 // SPDX-License-Identifier: AGPL-3.0-or-later
 
-using Content.Server.Explosion.EntitySystems;
+using Content.Goobstation.Maths.FixedPoint;
 using Content.Shared.Chemistry.Components.SolutionManager;
 using Content.Shared.Chemistry.EntitySystems;
-using Content.Goobstation.Maths.FixedPoint;
 using Content.Shared.Trigger.Systems;
 using Robust.Shared.Containers;
 
@@ -26,7 +25,9 @@ public sealed class TriggerOnSolutionInsertSystem : EntitySystem
         SubscribeLocalEvent<TriggerOnSolutionInsertComponent, EntInsertedIntoContainerMessage>(OnEntInserted);
     }
 
-    private void OnEntInserted(EntityUid uid, TriggerOnSolutionInsertComponent component, EntInsertedIntoContainerMessage args)
+    private void OnEntInserted(EntityUid uid,
+        TriggerOnSolutionInsertComponent component,
+        EntInsertedIntoContainerMessage args)
     {
         if (component.ContainerName != null && args.Container.ID != component.ContainerName)
             return; // abort if only want insert into correnct container
@@ -48,7 +49,9 @@ public sealed class TriggerOnSolutionInsertSystem : EntitySystem
     }
 
     //Gonna get recursive up in here
-    private FixedPoint2 RecursiveCheckForSolution(EntityUid uid, TriggerOnSolutionInsertComponent component, float depth)
+    private FixedPoint2 RecursiveCheckForSolution(EntityUid uid,
+        TriggerOnSolutionInsertComponent component,
+        float depth)
     {
         var solutionFound = FixedPoint2.Zero;
         if (TryComp<ContainerManagerComponent>(uid, out var containerManager) && depth < component.Depth)
@@ -57,20 +60,20 @@ public sealed class TriggerOnSolutionInsertSystem : EntitySystem
             {
                 foreach (var ent in container.ContainedEntities)
                 {
-                    solutionFound += RecursiveCheckForSolution(ent, component, depth+1);
+                    solutionFound += RecursiveCheckForSolution(ent, component, depth + 1);
                 }
             }
         }
-        if (TryComp<SolutionContainerManagerComponent>(uid, out var solutionContainerManager)){
+
+        if (TryComp<SolutionContainerManagerComponent>(uid, out var solutionContainerManager))
+        {
             foreach (var solutionContainer in solutionContainerManager.Containers)
             {
-                if (_solutionContainers.TryGetSolution(uid, solutionContainer, out var _, out var solution))
-                {
+                if (_solutionContainers.TryGetSolution(uid, solutionContainer, out _, out var solution))
                     solutionFound += solution.GetTotalPrototypeQuantity(component.SolutionName);
-                }
             }
         }
+
         return solutionFound;
     }
-
 }

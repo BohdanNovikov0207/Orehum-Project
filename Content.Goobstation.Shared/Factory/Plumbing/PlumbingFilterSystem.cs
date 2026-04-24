@@ -7,8 +7,8 @@ namespace Content.Goobstation.Shared.Factory.Plumbing;
 
 public sealed class PlumbingFilterSystem : EntitySystem
 {
-    [Dependency] private readonly IPrototypeManager _proto = default!;
     [Dependency] private readonly SharedPopupSystem _popup = default!;
+    [Dependency] private readonly IPrototypeManager _proto = default!;
 
     private EntityQuery<PlumbingFilterComponent> _query;
 
@@ -19,10 +19,11 @@ public sealed class PlumbingFilterSystem : EntitySystem
         _query = GetEntityQuery<PlumbingFilterComponent>();
 
         SubscribeLocalEvent<PlumbingFilterComponent, ExaminedEvent>(OnExamined);
-        Subs.BuiEvents<PlumbingFilterComponent>(PlumbingFilterUiKey.Key, subs =>
-        {
-            subs.Event<PlumbingFilterChangeMessage>(OnChange);
-        });
+        Subs.BuiEvents<PlumbingFilterComponent>(PlumbingFilterUiKey.Key,
+            subs =>
+            {
+                subs.Event<PlumbingFilterChangeMessage>(OnChange);
+            });
     }
 
     private void OnExamined(Entity<PlumbingFilterComponent> ent, ref ExaminedEvent args)
@@ -30,7 +31,7 @@ public sealed class PlumbingFilterSystem : EntitySystem
         if (!args.IsInDetailsRange)
             return;
 
-        if (ent.Comp.Filter is not {} filter)
+        if (ent.Comp.Filter is not { } filter)
         {
             args.PushMarkup(Loc.GetString("plumbing-filter-unset"));
             return;
@@ -43,11 +44,11 @@ public sealed class PlumbingFilterSystem : EntitySystem
     private void OnChange(Entity<PlumbingFilterComponent> ent, ref PlumbingFilterChangeMessage args)
     {
         if (args.Filter == ent.Comp.Filter
-            || (args.Filter is {} filter
-            && !_proto.HasIndex(filter)))
+            || args.Filter is { } filter
+            && !_proto.HasIndex(filter))
             return;
 
-        var msg = args.Filter is {} filter2 // chud language
+        var msg = args.Filter is { } filter2 // chud language
             ? Loc.GetString("plumbing-filter-changed", ("reagent", _proto.Index(filter2).LocalizedName))
             : Loc.GetString("plumbing-filter-removed");
         _popup.PopupClient(msg, ent, args.Actor);

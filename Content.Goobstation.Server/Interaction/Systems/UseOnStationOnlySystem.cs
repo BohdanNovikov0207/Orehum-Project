@@ -12,10 +12,10 @@ using Content.Server.Station.Systems;
 
 namespace Content.Goobstation.Server.Interaction.Systems;
 
-public sealed partial class UseOnStationOnlySystem : EntitySystem
+public sealed class UseOnStationOnlySystem : EntitySystem
 {
-    [Dependency] private readonly StationSystem _station = default!;
     [Dependency] private readonly PopupSystem _popup = default!;
+    [Dependency] private readonly StationSystem _station = default!;
 
     public override void Initialize()
     {

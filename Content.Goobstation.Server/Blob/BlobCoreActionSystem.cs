@@ -41,29 +41,31 @@ namespace Content.Goobstation.Server.Blob;
 
 public sealed class BlobCoreActionSystem : SharedBlobCoreActionSystem
 {
-    [Dependency] private readonly PopupSystem _popup = default!;
-    [Dependency] private readonly IConfigurationManager _cfg = default!;
-    [Dependency] private readonly IRobustRandom _random = default!;
-    [Dependency] private readonly BlobCoreSystem _blobCoreSystem = default!;
-    [Dependency] private readonly ExplosionSystem _explosionSystem = default!;
-    [Dependency] private readonly FlammableSystem _flammable = default!;
-    [Dependency] private readonly EmpSystem _empSystem = default!;
-    [Dependency] private readonly AudioSystem _audioSystem = default!;
-    [Dependency] private readonly ITileDefinitionManager _tileDefinitionManager = default!;
-    [Dependency] private readonly IGameTiming _gameTiming = default!;
-    [Dependency] private readonly SharedTransformSystem _transform = default!;
-    [Dependency] private readonly DamageableSystem _damageableSystem = default!;
-    [Dependency] private readonly MapSystem _mapSystem = default!;
-    [Dependency] private readonly IMapManager _mapManager = default!;
-    [Dependency] private readonly BlobTileSystem _blobTileSystem = default!;
     //[Dependency] private readonly GridFixtureSystem _gridFixture = default!;
 
     private const double ActionJobTime = 0.005;
+
+    private static readonly TimeSpan GCd = TimeSpan.FromMilliseconds(333); // GCD?
     private readonly JobQueue _actionJobQueue = new(ActionJobTime);
+    [Dependency] private readonly AudioSystem _audioSystem = default!;
+    [Dependency] private readonly BlobCoreSystem _blobCoreSystem = default!;
+    [Dependency] private readonly BlobTileSystem _blobTileSystem = default!;
+    [Dependency] private readonly IConfigurationManager _cfg = default!;
+    [Dependency] private readonly DamageableSystem _damageableSystem = default!;
+    [Dependency] private readonly EmpSystem _empSystem = default!;
+    [Dependency] private readonly ExplosionSystem _explosionSystem = default!;
+    [Dependency] private readonly FlammableSystem _flammable = default!;
+    [Dependency] private readonly IGameTiming _gameTiming = default!;
+    [Dependency] private readonly IMapManager _mapManager = default!;
+    [Dependency] private readonly MapSystem _mapSystem = default!;
+    [Dependency] private readonly PopupSystem _popup = default!;
+    [Dependency] private readonly IRobustRandom _random = default!;
+    [Dependency] private readonly ITileDefinitionManager _tileDefinitionManager = default!;
+    [Dependency] private readonly SharedTransformSystem _transform = default!;
+    private EntityQuery<BlobCoreComponent> _blobCoreQuery;
 
     private bool _canGrowInSpace = true;
     private EntityQuery<BlobTileComponent> _tileQuery;
-    private EntityQuery<BlobCoreComponent> _blobCoreQuery;
 
     public override void Initialize()
     {
@@ -83,28 +85,15 @@ public sealed class BlobCoreActionSystem : SharedBlobCoreActionSystem
         _actionJobQueue.Process();
     }
 
-    public sealed class BlobMouseActionProcess(
-        Entity<BlobObserverComponent> ent,
+    private void BlobInteract(Entity<BlobObserverComponent> observer,
         Entity<BlobCoreComponent> core,
-        BlobCoreActionSystem system,
-        InteractEvent args,
-        double maxTime,
-        CancellationToken cancellation = default)
-        : Job<object>(maxTime, cancellation)
-    {
-        protected override async Task<object?> Process()
-        {
-            system.BlobInteract(ent, core, args);
-            return null;
-        }
-    }
-
-    private void BlobInteract(Entity<BlobObserverComponent> observer, Entity<BlobCoreComponent> core, InteractEvent args)
+        InteractEvent args)
     {
         if (TerminatingOrDeleted(observer) || TerminatingOrDeleted(core))
             return;
 
-        var location = args.ClickLocation.AlignWithClosestGridTile(entityManager: EntityManager, mapManager: _mapManager);
+        var location =
+            args.ClickLocation.AlignWithClosestGridTile(entityManager: EntityManager, mapManager: _mapManager);
 
         if (!location.IsValid(EntityManager))
             return;
@@ -112,25 +101,26 @@ public sealed class BlobCoreActionSystem : SharedBlobCoreActionSystem
         var gridUid = _transform.GetGrid(location);
 
         if (!TryComp<MapGridComponent>(gridUid, out var grid))
-        {
             return;
-        }
 
         var fromTile = FindNearBlobTile(location, (gridUid.Value, grid));
 
         #region OnTarget
+
         if (args.Target != null && !HasComp<BlobMobComponent>(args.Target))
         {
             if (_tileQuery.TryComp(args.Target.Value, out var tileComp) && tileComp.Core != null)
                 return;
 
             var target = args.Target;
-            if (fromTile != null && HasComp<DestructibleComponent>(target) && !HasComp<ItemComponent>(target) && !HasComp<SubFloorHideComponent>(target))
+            if (fromTile != null && HasComp<DestructibleComponent>(target) && !HasComp<ItemComponent>(target) &&
+                !HasComp<SubFloorHideComponent>(target))
             {
                 BlobTargetAttack(core, fromTile.Value, target.Value);
                 return;
             }
         }
+
         #endregion
 
         var targetTile = _mapSystem.GetTileRef(gridUid.Value, grid, location);
@@ -145,9 +135,7 @@ public sealed class BlobCoreActionSystem : SharedBlobCoreActionSystem
         }
 
         if (_mapSystem.GetAnchoredEntities(gridUid.Value, grid, targetTile.GridIndices).Any(_tileQuery.HasComponent))
-        {
             return;
-        }
 
         var node = _blobCoreSystem.GetNearNode(location, core.Comp.TilesRadiusLimit);
 
@@ -290,7 +278,6 @@ public sealed class BlobCoreActionSystem : SharedBlobCoreActionSystem
         _audioSystem.PlayPvs(ent.Comp.AttackSound, from, AudioParams.Default);
     }
 
-    private static readonly TimeSpan GCd = TimeSpan.FromMilliseconds(333); // GCD?
     private void OnInteract(EntityUid uid, BlobObserverComponent observerComponent, AfterInteractEvent args)
     {
         if (args.Target == args.User)
@@ -311,23 +298,45 @@ public sealed class BlobCoreActionSystem : SharedBlobCoreActionSystem
         blobCoreComponent.NextAction = _gameTiming.CurTime + GCd;
 
         _actionJobQueue.EnqueueJob(new BlobMouseActionProcess(
-            (uid,observerComponent),
+            (uid, observerComponent),
             (observerComponent.Core.Value, blobCoreComponent),
             this,
             args,
             ActionJobTime
         ));
     }
+
     private void OnInteractTarget(Entity<BlobObserverComponent> ent, ref UserActivateInWorldEvent args)
     {
-        var ev = new AfterInteractEvent(args.User, EntityUid.Invalid, args.Target, Transform(args.Target).Coordinates, true);
+        var ev = new AfterInteractEvent(args.User,
+            EntityUid.Invalid,
+            args.Target,
+            Transform(args.Target).Coordinates,
+            true);
         OnInteract(ent, ent, ev); // proxy?
         args.Handled = ev.Handled;
     }
+
     private void OnInteractController(Entity<BlobObserverControllerComponent> ent, ref AfterInteractEvent args)
     {
         var ev = new AfterInteractEvent(args.User, EntityUid.Invalid, args.Target, args.ClickLocation, true);
         OnInteract(ent.Comp.Blob, ent.Comp.Blob, ev); // proxy?
         args.Handled = ev.Handled;
+    }
+
+    public sealed class BlobMouseActionProcess(
+        Entity<BlobObserverComponent> ent,
+        Entity<BlobCoreComponent> core,
+        BlobCoreActionSystem system,
+        InteractEvent args,
+        double maxTime,
+        CancellationToken cancellation = default)
+        : Job<object>(maxTime, cancellation)
+    {
+        protected override async Task<object?> Process()
+        {
+            system.BlobInteract(ent, core, args);
+            return null;
+        }
     }
 }

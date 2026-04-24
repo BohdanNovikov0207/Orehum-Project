@@ -28,13 +28,16 @@ public abstract class SharedPoweredSealableClothingSystem : EntitySystem
         base.Initialize();
 
         SubscribeLocalEvent<SealableClothingRequiresPowerComponent, MapInitEvent>(OnRequiresPowerMapInit);
-        SubscribeLocalEvent<SealableClothingRequiresPowerComponent, ClothingSealAttemptEvent>(OnRequiresPowerSealAttempt);
-        SubscribeLocalEvent<SealableClothingRequiresPowerComponent, AttemptChangePanelEvent>(OnRequiresPowerChangePanelAttempt);
+        SubscribeLocalEvent<SealableClothingRequiresPowerComponent, ClothingSealAttemptEvent>(
+            OnRequiresPowerSealAttempt);
+        SubscribeLocalEvent<SealableClothingRequiresPowerComponent, AttemptChangePanelEvent>(
+            OnRequiresPowerChangePanelAttempt);
     }
 
     private void OnRequiresPowerMapInit(Entity<SealableClothingRequiresPowerComponent> entity, ref MapInitEvent args)
     {
-        if (!TryComp(entity, out SealableClothingControlComponent? control) || !TryComp(entity, out PowerCellDrawComponent? draw))
+        if (!TryComp(entity, out SealableClothingControlComponent? control) ||
+            !TryComp(entity, out PowerCellDrawComponent? draw))
             return;
 
         draw.Enabled = control.IsCurrentlySealed;
@@ -43,9 +46,11 @@ public abstract class SharedPoweredSealableClothingSystem : EntitySystem
     /// <summary>
     /// Checks if control have enough power to seal
     /// </summary>
-    private void OnRequiresPowerSealAttempt(Entity<SealableClothingRequiresPowerComponent> entity, ref ClothingSealAttemptEvent args)
+    private void OnRequiresPowerSealAttempt(Entity<SealableClothingRequiresPowerComponent> entity,
+        ref ClothingSealAttemptEvent args)
     {
-        if (!TryComp(entity, out SealableClothingControlComponent? controlComp) || !TryComp(entity, out PowerCellDrawComponent? cellDrawComp) || args.Cancelled)
+        if (!TryComp(entity, out SealableClothingControlComponent? controlComp) ||
+            !TryComp(entity, out PowerCellDrawComponent? cellDrawComp) || args.Cancelled)
             return;
 
         // Prevents sealing if wires panel is opened
@@ -60,7 +65,8 @@ public abstract class SharedPoweredSealableClothingSystem : EntitySystem
         if (controlComp.IsCurrentlySealed)
             return;
 
-        if (!_powerCellSystem.HasDrawCharge(entity, cellDrawComp) || !_powerCellSystem.HasActivatableCharge(entity, cellDrawComp))
+        if (!_powerCellSystem.HasDrawCharge(entity, cellDrawComp) ||
+            !_powerCellSystem.HasActivatableCharge(entity, cellDrawComp))
         {
             _popupSystem.PopupClient(Loc.GetString(entity.Comp.NotPoweredPopup), entity, args.User);
             args.Cancel();
@@ -70,7 +76,8 @@ public abstract class SharedPoweredSealableClothingSystem : EntitySystem
     /// <summary>
     /// Prevents wires panel from opening if clothing is sealed
     /// </summary>
-    private void OnRequiresPowerChangePanelAttempt(Entity<SealableClothingRequiresPowerComponent> entity, ref AttemptChangePanelEvent args)
+    private void OnRequiresPowerChangePanelAttempt(Entity<SealableClothingRequiresPowerComponent> entity,
+        ref AttemptChangePanelEvent args)
     {
         if (args.Cancelled || !TryComp(entity, out SealableClothingControlComponent? controlComp))
             return;
@@ -82,4 +89,3 @@ public abstract class SharedPoweredSealableClothingSystem : EntitySystem
         }
     }
 }
-

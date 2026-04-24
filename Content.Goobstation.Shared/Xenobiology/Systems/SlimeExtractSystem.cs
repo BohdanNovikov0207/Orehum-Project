@@ -15,7 +15,7 @@ using Content.Shared.Examine;
 namespace Content.Goobstation.Shared.Xenobiology.Systems;
 
 // This handles slime extracts.
-public sealed partial class SlimeExtractSystem : EntitySystem
+public sealed class SlimeExtractSystem : EntitySystem
 {
     [Dependency] private readonly SharedSolutionContainerSystem _solution = default!;
 

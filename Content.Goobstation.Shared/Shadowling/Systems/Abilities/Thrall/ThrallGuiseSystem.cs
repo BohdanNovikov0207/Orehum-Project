@@ -14,9 +14,9 @@ namespace Content.Goobstation.Shared.Shadowling.Systems.Abilities.Thrall;
 /// </summary>
 public sealed class ThrallGuiseSystem : EntitySystem
 {
-    [Dependency] private readonly IGameTiming _timing = default!;
-    [Dependency] private readonly SharedStealthSystem _stealth = default!;
     [Dependency] private readonly SharedActionsSystem _actions = default!;
+    [Dependency] private readonly SharedStealthSystem _stealth = default!;
+    [Dependency] private readonly IGameTiming _timing = default!;
 
     public override void Initialize()
     {
@@ -51,13 +51,9 @@ public sealed class ThrallGuiseSystem : EntitySystem
                 if (TryComp<StealthComponent>(uid, out var stealth))
                 {
                     if (lightDetection.OnLight)
-                    {
                         _stealth.SetVisibility(uid, 0.5f, stealth);
-                    }
                     else
-                    {
                         _stealth.SetVisibility(uid, -1f, stealth);
-                    }
                 }
             }
 

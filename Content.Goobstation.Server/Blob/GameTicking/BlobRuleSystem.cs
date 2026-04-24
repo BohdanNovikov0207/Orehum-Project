@@ -36,16 +36,18 @@ namespace Content.Goobstation.Server.Blob.GameTicking;
 
 public sealed class BlobRuleSystem : GameRuleSystem<BlobRuleComponent>
 {
-    [Dependency] private readonly MindSystem _mindSystem = default!;
-    [Dependency] private readonly RoundEndSystem _roundEndSystem = default!;
-    [Dependency] private readonly ChatSystem _chatSystem = default!;
-    [Dependency] private readonly NukeCodePaperSystem _nukeCode = default!;
-    [Dependency] private readonly StationSystem _stationSystem = default!;
-    [Dependency] private readonly ObjectivesSystem _objectivesSystem = default!;
+    private const string StationAlertCritical = "delta";
+    private const string StationAlertDetected = "red";
     [Dependency] private readonly AlertLevelSystem _alertLevelSystem = default!;
     [Dependency] private readonly IChatManager _chatManager = default!;
-    [Dependency] private readonly IPlayerManager _player = default!;
+    [Dependency] private readonly ChatSystem _chatSystem = default!;
     [Dependency] private readonly EmergencyShuttleSystem _emergency = default!;
+    [Dependency] private readonly MindSystem _mindSystem = default!;
+    [Dependency] private readonly NukeCodePaperSystem _nukeCode = default!;
+    [Dependency] private readonly ObjectivesSystem _objectivesSystem = default!;
+    [Dependency] private readonly IPlayerManager _player = default!;
+    [Dependency] private readonly RoundEndSystem _roundEndSystem = default!;
+    [Dependency] private readonly StationSystem _stationSystem = default!;
 
     public override void Initialize()
     {
@@ -54,12 +56,15 @@ public sealed class BlobRuleSystem : GameRuleSystem<BlobRuleComponent>
         SubscribeLocalEvent<BlobRuleComponent, AfterAntagEntitySelectedEvent>(AfterAntagSelected);
     }
 
-    protected override void Started(EntityUid uid, BlobRuleComponent component, GameRuleComponent gameRule, GameRuleStartedEvent args)
+    protected override void Started(EntityUid uid,
+        BlobRuleComponent component,
+        GameRuleComponent gameRule,
+        GameRuleStartedEvent args)
     {
         var activeRules = QueryActiveRules();
         while (activeRules.MoveNext(out var entityUid, out _, out _, out _))
         {
-            if(uid == entityUid)
+            if (uid == entityUid)
                 continue;
 
             GameTicker.EndGameRule(uid, gameRule);
@@ -68,11 +73,14 @@ public sealed class BlobRuleSystem : GameRuleSystem<BlobRuleComponent>
         }
     }
 
-    protected override void ActiveTick(EntityUid uid, BlobRuleComponent component, GameRuleComponent gameRule, float frameTime)
+    protected override void ActiveTick(EntityUid uid,
+        BlobRuleComponent component,
+        GameRuleComponent gameRule,
+        float frameTime)
     {
         component.Accumulator += frameTime;
 
-        if(component.Accumulator < 10)
+        if (component.Accumulator < 10)
             return;
 
         component.Accumulator = 0;
@@ -83,9 +91,7 @@ public sealed class BlobRuleSystem : GameRuleSystem<BlobRuleComponent>
         {
             if (TerminatingOrDeleted(ent, md) ||
                 !CheckBlobInStation(ent, xform, out var stationUid))
-            {
                 continue;
-            }
 
             check.TryAdd(stationUid.Value, 0);
 
@@ -98,7 +104,9 @@ public sealed class BlobRuleSystem : GameRuleSystem<BlobRuleComponent>
         }
     }
 
-    private bool CheckBlobInStation(EntityUid blobCore, TransformComponent? xform, [NotNullWhen(true)] out EntityUid? stationUid)
+    private bool CheckBlobInStation(EntityUid blobCore,
+        TransformComponent? xform,
+        [NotNullWhen(true)] out EntityUid? stationUid)
     {
         var station = _stationSystem.GetOwningStation(blobCore, xform);
         if (station == null || !HasComp<StationEventEligibleComponent>(station.Value))
@@ -112,9 +120,6 @@ public sealed class BlobRuleSystem : GameRuleSystem<BlobRuleComponent>
         stationUid = station.Value;
         return true;
     }
-
-    private const string StationAlertCritical = "delta";
-    private const string StationAlertDetected = "red";
 
     private void CheckChangeStage(
         Entity<StationBlobConfigComponent?> stationUid,
@@ -138,7 +143,7 @@ public sealed class BlobRuleSystem : GameRuleSystem<BlobRuleComponent>
                 Color.Red);
         }
         else if (blobTilesCount >= (stationUid.Comp?.StageBegin ?? StationBlobConfigComponent.DefaultStageBegin)
-                 && _roundEndSystem.ExpectedCountdownEnd != null && _emergency.EmergencyShuttleArrived) 
+                 && _roundEndSystem.ExpectedCountdownEnd != null && _emergency.EmergencyShuttleArrived)
         {
             _chatSystem.DispatchStationAnnouncement(stationUid,
                 Loc.GetString("blob-alert-shuttle-arrived"),
@@ -147,10 +152,11 @@ public sealed class BlobRuleSystem : GameRuleSystem<BlobRuleComponent>
                 null,
                 Color.OrangeRed);
         }
-        
+
         switch (blobRuleComp.Stage)
         {
-            case BlobStage.Default when blobTilesCount >= (stationUid.Comp?.StageBegin ?? StationBlobConfigComponent.DefaultStageBegin):
+            case BlobStage.Default when blobTilesCount >=
+                                        (stationUid.Comp?.StageBegin ?? StationBlobConfigComponent.DefaultStageBegin):
                 blobRuleComp.Stage = BlobStage.Begin;
 
                 _chatSystem.DispatchGlobalAnnouncement(
@@ -164,58 +170,61 @@ public sealed class BlobRuleSystem : GameRuleSystem<BlobRuleComponent>
 
                 RaiseLocalEvent(stationUid,
                     new BlobChangeLevelEvent
-                {
-                    Station = stationUid,
-                    Level = blobRuleComp.Stage
-                },
-                    broadcast: true);
+                    {
+                        Station = stationUid,
+                        Level = blobRuleComp.Stage,
+                    },
+                    true);
                 return;
-            case BlobStage.Begin when blobTilesCount >= (stationUid.Comp?.StageCritical ?? StationBlobConfigComponent.DefaultStageCritical):
+            case BlobStage.Begin when blobTilesCount >=
+                                      (stationUid.Comp?.StageCritical ??
+                                       StationBlobConfigComponent.DefaultStageCritical):
             {
-                if (_nukeCode.SendNukeCodes(stationUid))//send the nuke code?
+                if (_nukeCode.SendNukeCodes(stationUid)) //send the nuke code?
                 {
                     blobRuleComp.Stage = BlobStage.Critical;
                     _chatSystem.DispatchGlobalAnnouncement(
-                    Loc.GetString("blob-alert-critical"),
-                    stationName,
-                    true,
-                    blobRuleComp.CriticalAudio,
-                    Color.Red);
+                        Loc.GetString("blob-alert-critical"),
+                        stationName,
+                        true,
+                        blobRuleComp.CriticalAudio,
+                        Color.Red);
                 }
                 else
                 {
                     blobRuleComp.Stage = BlobStage.Critical;
                     _chatSystem.DispatchGlobalAnnouncement(
-                    Loc.GetString("blob-alert-critical-NoNukeCode"),
-                    stationName,
-                    true,
-                    blobRuleComp.CriticalAudio,
-                    Color.Red);
+                        Loc.GetString("blob-alert-critical-NoNukeCode"),
+                        stationName,
+                        true,
+                        blobRuleComp.CriticalAudio,
+                        Color.Red);
                 }
 
                 _alertLevelSystem.SetLevel(stationUid, StationAlertCritical, true, true, true, true);
 
                 RaiseLocalEvent(stationUid,
                     new BlobChangeLevelEvent
-                {
-                    Station = stationUid,
-                    Level = blobRuleComp.Stage
-                },
-                    broadcast: true);
+                    {
+                        Station = stationUid,
+                        Level = blobRuleComp.Stage,
+                    },
+                    true);
                 return;
             }
-            case BlobStage.Critical when blobTilesCount >= (stationUid.Comp?.StageTheEnd ?? StationBlobConfigComponent.DefaultStageEnd):
+            case BlobStage.Critical when blobTilesCount >=
+                                         (stationUid.Comp?.StageTheEnd ?? StationBlobConfigComponent.DefaultStageEnd):
             {
                 blobRuleComp.Stage = BlobStage.TheEnd;
                 _roundEndSystem.EndRound();
 
                 RaiseLocalEvent(stationUid,
                     new BlobChangeLevelEvent
-                {
-                    Station = stationUid,
-                    Level = blobRuleComp.Stage
-                },
-                    broadcast: true);
+                    {
+                        Station = stationUid,
+                        Level = blobRuleComp.Stage,
+                    },
+                    true);
                 return;
             }
         }
@@ -280,7 +289,6 @@ public sealed class BlobRuleSystem : GameRuleSystem<BlobRuleComponent>
             {
                 foreach (var objective in objectiveGroup)
                 {
-
                     var info = _objectivesSystem.GetInfo(objective, mindId, mind);
                     if (info == null)
                         continue;
@@ -319,8 +327,6 @@ public sealed class BlobRuleSystem : GameRuleSystem<BlobRuleComponent>
         comp.TransformationDelay = 10 * 60; // 10min
     }
 
-    private void AfterAntagSelected(EntityUid uid, BlobRuleComponent component, AfterAntagEntitySelectedEvent args)
-    {
+    private void AfterAntagSelected(EntityUid uid, BlobRuleComponent component, AfterAntagEntitySelectedEvent args) =>
         MakeBlob(args.EntityUid);
-    }
 }

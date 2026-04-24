@@ -13,10 +13,10 @@ namespace Content.Goobstation.Client.TapeRecorder.UI;
 public sealed class TapeRecorderBoundUserInterface(EntityUid owner, Enum uiKey) : BoundUserInterface(owner, uiKey)
 {
     [ViewVariables]
-    private TapeRecorderWindow? _window;
+    private TimeSpan _printCooldown;
 
     [ViewVariables]
-    private TimeSpan _printCooldown;
+    private TapeRecorderWindow? _window;
 
     protected override void Open()
     {
@@ -34,10 +34,11 @@ public sealed class TapeRecorderBoundUserInterface(EntityUid owner, Enum uiKey) 
 
         _window?.UpdatePrint(true);
 
-        Timer.Spawn(_printCooldown, () =>
-        {
-            _window?.UpdatePrint(false);
-        });
+        Timer.Spawn(_printCooldown,
+            () =>
+            {
+                _window?.UpdatePrint(false);
+            });
     }
 
     protected override void UpdateState(BoundUserInterfaceState state)

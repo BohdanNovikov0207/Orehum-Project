@@ -18,11 +18,11 @@ namespace Content.Goobstation.Server.MisandryBox.Mind;
 /// </summary>
 public sealed class TemporaryMindSystem : EntitySystem
 {
-    [Dependency] private readonly MindSystem _mind = default!;
     [Dependency] private readonly GhostSystem _ghost = default!;
     [Dependency] private readonly MetaDataSystem _meta = default!;
-    [Dependency] private readonly SharedTransformSystem _transform = default!;
+    [Dependency] private readonly MindSystem _mind = default!;
     [Dependency] private readonly IPlayerManager _playerManager = default!;
+    [Dependency] private readonly SharedTransformSystem _transform = default!;
 
     public override void Initialize()
     {

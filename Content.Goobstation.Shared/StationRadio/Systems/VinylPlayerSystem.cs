@@ -13,11 +13,11 @@ namespace Content.Goobstation.Shared.StationRadio.Systems;
 
 public sealed class VinylPlayerSystem : EntitySystem
 {
+    [Dependency] private readonly SharedAudioSystem _audio = default!;
+    [Dependency] private readonly SharedDeviceLinkSystem _deviceLinkSystem = default!;
 
     [Dependency] private readonly INetManager _net = default!;
-    [Dependency] private readonly SharedAudioSystem _audio = default!;
     [Dependency] private readonly SharedPowerReceiverSystem _power = default!;
-    [Dependency] private readonly SharedDeviceLinkSystem _deviceLinkSystem = default!;
 
     public override void Initialize()
     {
@@ -49,7 +49,7 @@ public sealed class VinylPlayerSystem : EntitySystem
             return;
 
         var query = EntityQueryEnumerator<StationRadioReceiverComponent>();
-        while (query.MoveNext(out var receiver, out var _))
+        while (query.MoveNext(out var receiver, out _))
         {
             RaiseLocalEvent(receiver, new StationRadioMediaStoppedEvent());
         }
@@ -57,10 +57,14 @@ public sealed class VinylPlayerSystem : EntitySystem
 
     private void OnVinylInserted(EntityUid uid, VinylPlayerComponent comp, EntInsertedIntoContainerMessage args)
     {
-        if (!TryComp(args.Entity, out VinylComponent? vinylcomp) || _net.IsClient || vinylcomp.Song == null || !_power.IsPowered(uid))
+        if (!TryComp(args.Entity, out VinylComponent? vinylcomp) || _net.IsClient || vinylcomp.Song == null ||
+            !_power.IsPowered(uid))
             return;
 
-        var audio = _audio.PlayPredicted(vinylcomp.Song, uid, uid, AudioParams.Default.WithVolume(3f).WithMaxDistance(4.5f));
+        var audio = _audio.PlayPredicted(vinylcomp.Song,
+            uid,
+            uid,
+            AudioParams.Default.WithVolume(3f).WithMaxDistance(4.5f));
         if (audio != null)
             comp.SoundEntity = audio.Value.Entity;
 
@@ -92,7 +96,7 @@ public sealed class VinylPlayerSystem : EntitySystem
             return;
 
         var query = EntityQueryEnumerator<StationRadioReceiverComponent>();
-        while (query.MoveNext(out var receiver, out var _))
+        while (query.MoveNext(out var receiver, out _))
         {
             RaiseLocalEvent(receiver, new StationRadioMediaStoppedEvent());
         }
@@ -105,11 +109,10 @@ public sealed class VinylPlayerSystem : EntitySystem
             foreach (var linked in source.LinkedPorts.Keys)
             {
                 if (HasComp<RadioRigComponent>(linked) && CheckForRadioServer(linked))
-                {
                     return true;
-                }
             }
         }
+
         return false;
     }
 
@@ -120,11 +123,10 @@ public sealed class VinylPlayerSystem : EntitySystem
             foreach (var linked in source.LinkedSources)
             {
                 if (HasComp<StationRadioServerComponent>(linked))
-                {
                     return true;
-                }
             }
         }
+
         return false;
     }
 }

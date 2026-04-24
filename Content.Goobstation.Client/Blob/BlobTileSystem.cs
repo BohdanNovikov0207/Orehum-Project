@@ -17,7 +17,11 @@ namespace Content.Goobstation.Client.Blob;
 
 public sealed class BlobTileSystem : SharedBlobTileSystem
 {
-    protected override void TryUpgrade(Entity<BlobTileComponent> target, Entity<BlobCoreComponent> core, EntityUid observer) { }
+    protected override void TryUpgrade(Entity<BlobTileComponent> target,
+        Entity<BlobCoreComponent> core,
+        EntityUid observer)
+    {
+    }
 }
 
 public sealed class BlobTileVisualizerSystem : VisualizerSystem<BlobTileComponent>
@@ -28,12 +32,15 @@ public sealed class BlobTileVisualizerSystem : VisualizerSystem<BlobTileComponen
         SubscribeLocalEvent<BlobTileComponent, AfterAutoHandleStateEvent>(OnBlobTileHandleState);
     }
 
-    private void UpdateAppearance(EntityUid id, BlobTileComponent tile, AppearanceComponent? appearance = null, SpriteComponent? sprite = null)
+    private void UpdateAppearance(EntityUid id,
+        BlobTileComponent tile,
+        AppearanceComponent? appearance = null,
+        SpriteComponent? sprite = null)
     {
         if (!Resolve(id, ref appearance, ref sprite))
             return;
 
-        foreach (var key in new []{ DamageStateVisualLayers.Base, DamageStateVisualLayers.BaseUnshaded })
+        foreach (var key in new[] { DamageStateVisualLayers.Base, DamageStateVisualLayers.BaseUnshaded })
         {
             if (!sprite.LayerMapTryGet(key, out _))
                 continue;
@@ -42,13 +49,11 @@ public sealed class BlobTileVisualizerSystem : VisualizerSystem<BlobTileComponen
         }
     }
 
-    protected override void OnAppearanceChange(EntityUid uid, BlobTileComponent component, ref AppearanceChangeEvent args)
-    {
-        UpdateAppearance(uid, component, args.Component, args.Sprite);
-    }
+    protected override void OnAppearanceChange(EntityUid uid,
+        BlobTileComponent component,
+        ref AppearanceChangeEvent args) => UpdateAppearance(uid, component, args.Component, args.Sprite);
 
-    private void OnBlobTileHandleState(EntityUid uid, BlobTileComponent component, ref AfterAutoHandleStateEvent args)
-    {
+    private void
+        OnBlobTileHandleState(EntityUid uid, BlobTileComponent component, ref AfterAutoHandleStateEvent args) =>
         UpdateAppearance(uid, component);
-    }
 }

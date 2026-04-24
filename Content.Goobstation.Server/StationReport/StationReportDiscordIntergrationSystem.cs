@@ -1,13 +1,11 @@
-using System;
-using System.Text.RegularExpressions;
 using System.Net.Http;
 using System.Text;
+using System.Text.Json;
+using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 using Content.Goobstation.Common.CCVar;
 using Content.Goobstation.Common.StationReport;
-using Robust.Shared.GameObjects;
 using Robust.Shared.Configuration;
-using Robust.Shared.IoC;
 
 namespace Content.Goobstation.Server.StationReportDiscordIntergrationSystem;
 
@@ -15,20 +13,6 @@ public sealed class StationReportDiscordIntergrationSystem : EntitySystem
 {
     //thank you Timfa for writing this code
     private static readonly HttpClient client = new();
-    [Dependency] private readonly IConfigurationManager _cfg = default!;
-
-    private string? _webhookUrl;
-
-    public override void Initialize()
-    {
-        base.Initialize();
-
-        //subscribes to the endroundevent and Stationreportevent
-        SubscribeLocalEvent<StationReportEvent>(OnStationReportReceived);
-
-        // Keep track of CCVar value, update if changed
-        _cfg.OnValueChanged(GoobCVars.StationReportDiscordWebHook, url => _webhookUrl = url, true);
-    }
 
     public static string? report;
 
@@ -48,8 +32,23 @@ public sealed class StationReportDiscordIntergrationSystem : EntitySystem
         new(@"\[head=3\]", @"### "),
         new(@"\[head=4\]", @"-# "),
         new(@"\[/head\]", @""),
-        new(@"\[/?color(=[#0-9a-zA-Z]+)?\]", @"")
+        new(@"\[/?color(=[#0-9a-zA-Z]+)?\]", @""),
     };
+
+    [Dependency] private readonly IConfigurationManager _cfg = default!;
+
+    private string? _webhookUrl;
+
+    public override void Initialize()
+    {
+        base.Initialize();
+
+        //subscribes to the endroundevent and Stationreportevent
+        SubscribeLocalEvent<StationReportEvent>(OnStationReportReceived);
+
+        // Keep track of CCVar value, update if changed
+        _cfg.OnValueChanged(GoobCVars.StationReportDiscordWebHook, url => _webhookUrl = url, true);
+    }
 
     private void OnStationReportReceived(StationReportEvent ev)
     {
@@ -59,7 +58,9 @@ public sealed class StationReportDiscordIntergrationSystem : EntitySystem
             return;
 
         foreach (var replacement in _replacements)
+        {
             report = Regex.Replace(report, replacement.Tag, replacement.Replacement);
+        }
 
         // Run async without blocking
         _ = SendMessageAsync(report);
@@ -71,7 +72,7 @@ public sealed class StationReportDiscordIntergrationSystem : EntitySystem
             return;
 
         var payload = new { content = message };
-        var json = System.Text.Json.JsonSerializer.Serialize(payload);
+        var json = JsonSerializer.Serialize(payload);
         var content = new StringContent(json, Encoding.UTF8, "application/json");
 
         try
@@ -81,13 +82,13 @@ public sealed class StationReportDiscordIntergrationSystem : EntitySystem
         }
         catch (Exception)
         {
-
         }
     }
 
     public struct TagReplacement
     {
         public string Tag, Replacement;
+
         public TagReplacement(string tag, string replacement)
         {
             Tag = tag;

@@ -8,7 +8,6 @@ using Content.Shared.Chemistry.Components;
 using Content.Shared.DeviceLinking;
 using Content.Shared.Whitelist;
 using Robust.Shared.Prototypes;
-using Robust.Shared.Serialization.Manager.Attributes;
 
 namespace Content.Goobstation.Shared.Factory.Slots;
 
@@ -18,6 +17,17 @@ namespace Content.Goobstation.Shared.Factory.Slots;
 [ImplicitDataDefinitionForInheritors]
 public abstract partial class AutomationSlot
 {
+    [Dependency] public readonly IEntityManager EntMan = default!;
+    protected SharedDeviceLinkSystem _device;
+    protected AutomationFilterSystem _filter;
+    protected EntityWhitelistSystem _whitelist;
+
+    /// <summary>
+    /// Blacklist that can be used in YML regardless of slot type.
+    /// </summary>
+    [DataField]
+    public EntityWhitelist? Blacklist;
+
     /// <summary>
     /// The input port for this slot, or null if can only be used as an output.
     /// </summary>
@@ -31,30 +41,19 @@ public abstract partial class AutomationSlot
     public ProtoId<SourcePortPrototype>? Output;
 
     /// <summary>
+    /// The automated machine this slot belongs to.
+    /// </summary>
+    [ViewVariables]
+    public EntityUid Owner;
+
+    /// <summary>
     /// Whitelist that can be used in YML regardless of slot type.
     /// </summary>
     [DataField]
     public EntityWhitelist? Whitelist;
 
     /// <summary>
-    /// Blacklist that can be used in YML regardless of slot type.
-    /// </summary>
-    [DataField]
-    public EntityWhitelist? Blacklist;
-
-    /// <summary>
-    /// The automated machine this slot belongs to.
-    /// </summary>
-    [ViewVariables]
-    public EntityUid Owner;
-
-    [Dependency] public readonly IEntityManager EntMan = default!;
-    protected AutomationFilterSystem _filter;
-    protected EntityWhitelistSystem _whitelist;
-    protected SharedDeviceLinkSystem _device;
-
-    /// <summary>
-    /// Initialize the slot after <see cref="Owner"/> is set.
+    /// Initialize the slot after <see cref="Owner" /> is set.
     /// System dependencies don't work so inheritors have to call <c>base.Initialize()</c> and then add their systems.
     /// </summary>
     public virtual void Initialize()
@@ -70,38 +69,30 @@ public abstract partial class AutomationSlot
     /// Try to insert an item into the slot, returning true if it was removed from its previous container.
     /// Inheritors must override this and use <c>if (!base.Insert(uid, item)) return false;</c>
     /// </summary>
-    public virtual bool Insert(EntityUid item)
-    {
-        return CanInsert(item);
-    }
+    public virtual bool Insert(EntityUid item) => CanInsert(item);
 
     /// <summary>
     /// Check if an item can be inserted into the slot, returning true if it can.
     /// Inheritors must override this and use <c>if (!base.CanInsert(uid, item)) return false;</c>
     /// </summary>
-    public virtual bool CanInsert(EntityUid item)
-    {
-        return _whitelist.CheckBoth(item, whitelist: Whitelist, blacklist: Blacklist);
-    }
+    public virtual bool CanInsert(EntityUid item) =>
+        _whitelist.CheckBoth(item, whitelist: Whitelist, blacklist: Blacklist);
 
     /// <summary>
     /// Get an item that can be taken from this slot, which has to match a given filter.
     /// If there are multiple items, which one returned is arbitrary and should not be relied upon.
     /// This should be "pure" and not actually modify anything.
     /// </summary>
-    public virtual EntityUid? GetItem(EntityUid? filter)
-    {
-        return null;
-    }
+    public virtual EntityUid? GetItem(EntityUid? filter) => null;
 
     /// <summary>
     /// Called to add all of this slot's ports to the machine.
     /// </summary>
     public virtual void AddPorts()
     {
-        if (Input is {} input)
+        if (Input is { } input)
             _device.EnsureSinkPorts(Owner, input);
-        if (Output is {} output)
+        if (Output is { } output)
             _device.EnsureSourcePorts(Owner, output);
     }
 
@@ -110,9 +101,9 @@ public abstract partial class AutomationSlot
     /// </summary>
     public virtual void RemovePorts()
     {
-        if (Input is {} input)
+        if (Input is { } input)
             _device.RemoveSinkPort(Owner, input);
-        if (Output is {} output)
+        if (Output is { } output)
             _device.RemoveSourcePort(Owner, output);
     }
 

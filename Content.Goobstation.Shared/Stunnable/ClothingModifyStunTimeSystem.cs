@@ -29,10 +29,8 @@ public sealed class ClothingModifyStunTimeSystem : EntitySystem
     }
 
     private void OnModifyStunTime(Entity<ClothingModifyStunTimeComponent> ent,
-        ref InventoryRelayedEvent<ModifyStunTimeEvent> args)
-    {
+        ref InventoryRelayedEvent<ModifyStunTimeEvent> args) =>
         args.Args.Modifier *= ent.Comp.Modifier;
-    }
 
     public float GetModifier(EntityUid uid)
     {

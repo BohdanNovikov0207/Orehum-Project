@@ -11,11 +11,10 @@ using Content.Goobstation.Common.MartialArts;
 using Content.Goobstation.Shared.Emoting;
 using Content.Goobstation.Shared.MartialArts.Components;
 using Content.Goobstation.Shared.MartialArts.Events;
-using Content.Goobstation.Shared.Weapons.MeleeVulnerability;
 using Content.Goobstation.Shared.Sprinting;
+using Content.Goobstation.Shared.Weapons.MeleeVulnerability;
 using Content.Shared.Interaction.Events;
 using Content.Shared.Movement.Pulling.Components;
-using Content.Shared.Stunnable;
 using Content.Shared.Weapons.Melee;
 using Content.Shared.Weapons.Melee.Events;
 using Robust.Shared.Physics.Components;
@@ -166,7 +165,11 @@ public abstract partial class SharedMartialArtsSystem
             return;
 
         var speedMultiplier = 1f / MathF.Max(1f, power);
-        _movementMod.TryUpdateMovementSpeedModDuration(target, MartsGenericSlow, args.SlowDownTime * power, speedMultiplier, speedMultiplier);
+        _movementMod.TryUpdateMovementSpeedModDuration(target,
+            MartsGenericSlow,
+            args.SlowDownTime * power,
+            speedMultiplier,
+            speedMultiplier);
         _modifier.RefreshMovementSpeedModifiers(target);
         DoDamage(ent, target, proto.DamageType, proto.ExtraDamage * power, out _);
         _audio.PlayPvs(args.Sound, target);
@@ -243,10 +246,8 @@ public abstract partial class SharedMartialArtsSystem
         Dirty(uid, multComp);
     }
 
-    private float GetCapoeiraPower(BaseCapoeiraEvent ev, float velocity)
-    {
-        return Math.Clamp(velocity * ev.VelocityPowerMultiplier, ev.MinPower, ev.MaxPower);
-    }
+    private float GetCapoeiraPower(BaseCapoeiraEvent ev, float velocity) =>
+        Math.Clamp(velocity * ev.VelocityPowerMultiplier, ev.MinPower, ev.MaxPower);
 
     private bool TryPerformCapoeiraMove(EntityUid uid, BaseCapoeiraEvent ev, out float power)
     {
@@ -265,8 +266,6 @@ public abstract partial class SharedMartialArtsSystem
         return false;
     }
 
-    private float GetVelocity(EntityUid uid)
-    {
-        return TryComp(uid, out PhysicsComponent? physics) ? physics.LinearVelocity.Length() : 0f;
-    }
+    private float GetVelocity(EntityUid uid) =>
+        TryComp(uid, out PhysicsComponent? physics) ? physics.LinearVelocity.Length() : 0f;
 }

@@ -1,21 +1,22 @@
+using Content.Goobstation.Shared.Silicons;
 using Content.Server.EUI;
 using Content.Shared.Eui;
-using Robust.Shared.Network;
-
-using Content.Server.Silicons.StationAi;
-using Content.Goobstation.Shared.Silicons;
 using Content.Shared.Silicons.StationAi;
+using Robust.Shared.Network;
 
 namespace Content.Goobstation.Server.Silicons;
 
 public sealed class StationAiEarlyLeaveEui : BaseEui
 {
-    private readonly Entity<StationAiCoreComponent> _aiCore;
     private readonly EntityUid _ai;
-    private readonly NetUserId _userId;
+    private readonly Entity<StationAiCoreComponent> _aiCore;
     private readonly StationAiEarlyLeaveSystem _leaveSystem;
+    private readonly NetUserId _userId;
 
-    public StationAiEarlyLeaveEui(Entity<StationAiCoreComponent> aiCore, EntityUid ai, NetUserId userId, StationAiEarlyLeaveSystem leaveSystem)
+    public StationAiEarlyLeaveEui(Entity<StationAiCoreComponent> aiCore,
+        EntityUid ai,
+        NetUserId userId,
+        StationAiEarlyLeaveSystem leaveSystem)
     {
         _aiCore = aiCore;
         _ai = ai;

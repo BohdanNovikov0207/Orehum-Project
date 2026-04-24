@@ -9,10 +9,10 @@ namespace Content.Goobstation.Shared.Harvestable;
 /// </summary>
 public sealed class HarvestableSystem : EntitySystem
 {
-    [Dependency] private readonly SharedHandsSystem _handSystem = default!;
     [Dependency] private readonly SharedDoAfterSystem _doAfter = default!;
+    [Dependency] private readonly SharedHandsSystem _handSystem = default!;
 
-    /// <inheritdoc/>
+    /// <inheritdoc />
     public override void Initialize()
     {
         base.Initialize();
@@ -28,9 +28,13 @@ public sealed class HarvestableSystem : EntitySystem
         args.Handled = TryHarvest(ent, args.User);
     }
 
-    private bool TryHarvest(Entity<HarvestableComponent> ent, EntityUid harvester)
-    {
-        return _doAfter.TryStartDoAfter(new DoAfterArgs(EntityManager, harvester, ent.Comp.Delay, new HarvestedDoAfterEvent(), ent.Owner, ent.Owner)
+    private bool TryHarvest(Entity<HarvestableComponent> ent, EntityUid harvester) =>
+        _doAfter.TryStartDoAfter(new DoAfterArgs(EntityManager,
+            harvester,
+            ent.Comp.Delay,
+            new HarvestedDoAfterEvent(),
+            ent.Owner,
+            ent.Owner)
         {
             BreakOnMove = true,
             BreakOnDamage = true,
@@ -40,7 +44,6 @@ public sealed class HarvestableSystem : EntitySystem
             CancelDuplicate = true,
             NeedHand = true,
         });
-    }
 
     private void OnHarvestedDoAfter(Entity<HarvestableComponent> ent, ref HarvestedDoAfterEvent args)
     {
@@ -48,14 +51,14 @@ public sealed class HarvestableSystem : EntitySystem
             || args.Cancelled)
             return;
 
-        Harvest(ent,args.User);
+        Harvest(ent, args.User);
         args.Handled = true;
     }
 
     public void Harvest(Entity<HarvestableComponent> ent, EntityUid harvester)
     {
         // Harvest part
-        var activeHand =  _handSystem.GetActiveHand(harvester);
+        var activeHand = _handSystem.GetActiveHand(harvester);
 
         if (ent.Comp.Loot != null)
         {

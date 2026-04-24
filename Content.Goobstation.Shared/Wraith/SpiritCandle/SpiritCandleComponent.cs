@@ -6,26 +6,23 @@ using Robust.Shared.Serialization;
 
 namespace Content.Goobstation.Shared.Wraith.SpiritCandle;
 
-[RegisterComponent, NetworkedComponent]
+[RegisterComponent] [NetworkedComponent]
 public sealed partial class SpiritCandleComponent : Component
 {
+    /// <summary>
+    /// Whether the candle has been lit or not
+    /// </summary>
+    [ViewVariables]
+    public bool Active;
+
     [ViewVariables]
     public EntityUid? AreaUid;
-
-    [DataField]
-    public EntProtoId SpiritArea = "SpiritCandleRevealArea";
-
-    [DataField]
-    public TimeSpan CorporealDuration = TimeSpan.FromSeconds(15);
-
-    [DataField]
-    public TimeSpan WeakenedDuration = TimeSpan.FromSeconds(15);
 
     [ViewVariables]
     public ProtoId<StatusEffectPrototype> Corporeal = "Corporeal";
 
-    [ViewVariables]
-    public EntProtoId Weakened = "StatusEffectWeakenedWraith";
+    [DataField]
+    public TimeSpan CorporealDuration = TimeSpan.FromSeconds(15);
 
     /// <summary>
     /// The entity that holds the area
@@ -33,23 +30,27 @@ public sealed partial class SpiritCandleComponent : Component
     [ViewVariables]
     public EntityUid? Holder;
 
-    /// <summary>
-    /// Whether the candle has been lit or not
-    /// </summary>
-    [ViewVariables]
-    public bool Active;
+    [DataField]
+    public EntProtoId SpiritArea = "SpiritCandleRevealArea";
 
     [DataField]
     public SoundSpecifier SuccessSound = new SoundPathSpecifier("/Audio/_Goobstation/Wraith/wraithwhisper1.ogg");
+
+    [ViewVariables]
+    public EntProtoId Weakened = "StatusEffectWeakenedWraith";
+
+    [DataField]
+    public TimeSpan WeakenedDuration = TimeSpan.FromSeconds(15);
 
     #region Visuals
 
     [DataField] public string OneCharge = "eye";
     [DataField] public string TwoCharge = "eyes";
+
     #endregion
 }
 
-[Serializable, NetSerializable]
+[Serializable] [NetSerializable]
 public enum SpiritCandleVisuals : byte
 {
     Layer,

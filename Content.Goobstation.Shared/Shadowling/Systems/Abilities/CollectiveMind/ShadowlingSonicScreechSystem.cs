@@ -21,19 +21,20 @@ namespace Content.Goobstation.Shared.Shadowling.Systems.Abilities.CollectiveMind
 
 /// <summary>
 /// This handles the Sonic Screech ability logic.
-/// Sonic Screech "confuses" and "deafens" (flash effect + tinnitus sound) nearby people, damages windows, and stuns silicons/borgs. All in one pack!
+/// Sonic Screech "confuses" and "deafens" (flash effect + tinnitus sound) nearby people, damages windows, and stuns
+/// silicons/borgs. All in one pack!
 /// </summary>
 public sealed class ShadowlingSonicScreechSystem : EntitySystem
 {
+    [Dependency] private readonly SharedActionsSystem _actions = default!;
+    [Dependency] private readonly SharedAudioSystem _audio = default!;
+    [Dependency] private readonly DamageableSystem _damageable = default!;
     [Dependency] private readonly EntityLookupSystem _lookup = default!;
+    [Dependency] private readonly INetManager _net = default!;
+    [Dependency] private readonly SharedPopupSystem _popups = default!;
     [Dependency] private readonly SharedStunSystem _stun = default!;
     [Dependency] private readonly TagSystem _tag = default!;
-    [Dependency] private readonly DamageableSystem _damageable = default!;
-    [Dependency] private readonly SharedActionsSystem _actions = default!;
-    [Dependency] private readonly SharedPopupSystem _popups = default!;
-    [Dependency] private readonly SharedAudioSystem _audio = default!;
     [Dependency] private readonly SharedTransformSystem _transform = default!;
-    [Dependency] private readonly INetManager _net = default!;
 
     public override void Initialize()
     {

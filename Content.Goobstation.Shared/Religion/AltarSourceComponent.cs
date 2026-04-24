@@ -9,26 +9,24 @@ using Robust.Shared.Prototypes;
 
 namespace Content.Goobstation.Shared.Religion.Nullrod;
 
-    [RegisterComponent]
-    public sealed partial class AltarSourceComponent : Component
-    {
+[RegisterComponent]
+public sealed partial class AltarSourceComponent : Component
+{
+    /// <summary>
+    /// Which effect to display.
+    /// </summary>
+    [DataField]
+    public EntProtoId EffectProto = "EffectSpark";
 
-        /// <summary>
-        /// Which prototype to create.
-        /// </summary>
-        [DataField]
-        public EntProtoId RodProto = "Nullrod";
+    /// <summary>
+    /// Which prototype to create.
+    /// </summary>
+    [DataField]
+    public EntProtoId RodProto = "Nullrod";
 
-        /// <summary>
-        /// Which effect to display.
-        /// </summary>
-        [DataField]
-        public EntProtoId EffectProto = "EffectSpark";
-
-        /// <summary>
-        /// Which sound effect to play.
-        /// </summary>
-        [DataField]
-        public SoundSpecifier? SoundPath;
-
-    }
+    /// <summary>
+    /// Which sound effect to play.
+    /// </summary>
+    [DataField]
+    public SoundSpecifier? SoundPath;
+}

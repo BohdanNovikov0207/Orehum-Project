@@ -6,41 +6,51 @@ namespace Content.Goobstation.Shared.Disease.Systems;
 
 public partial class SharedDiseaseSystem
 {
+    public const float MinMutationRate = 0.0001f;
+
     /// <summary>
     /// Makes a clone of the provided disease entity
     /// </summary>
-    public virtual EntityUid? TryClone(Entity<DiseaseComponent?> ent)
-    {
+    public virtual EntityUid? TryClone(Entity<DiseaseComponent?> ent) =>
         // do nothing on client
-        return null;
-    }
+        null;
 
     /// <summary>
     /// Tries to infect the given target with the given disease prototype
     /// </summary>
-    public EntityUid? DoInfectionAttempt(EntityUid target, EntProtoId proto, DiseaseSpreadSpecifier spreadParams)
-    {
-        return DoInfectionAttempt(target, proto, spreadParams.Power, spreadParams.Chance, spreadParams.Type);
-    }
+    public EntityUid? DoInfectionAttempt(EntityUid target, EntProtoId proto, DiseaseSpreadSpecifier spreadParams) =>
+        DoInfectionAttempt(target, proto, spreadParams.Power, spreadParams.Chance, spreadParams.Type);
 
     /// <summary>
     /// Tries to infect the given target with the given disease prototype
     /// </summary>
-    public virtual EntityUid? DoInfectionAttempt(EntityUid target, EntProtoId proto, float power, float chance, ProtoId<DiseaseSpreadPrototype> spreadType)
-    {
+    public virtual EntityUid? DoInfectionAttempt(EntityUid target,
+        EntProtoId proto,
+        float power,
+        float chance,
+        ProtoId<DiseaseSpreadPrototype> spreadType) =>
         // do nothing on client
-        return null;
-    }
+        null;
 
-    public bool DoInfectionAttempt(EntityUid target, EntityUid disease, DiseaseSpreadSpecifier spreadParams, bool clone = true)
-    {
-        return DoInfectionAttempt(target, disease, spreadParams.Power, spreadParams.Chance, spreadParams.Type, clone);
-    }
+    public bool DoInfectionAttempt(EntityUid target,
+        EntityUid disease,
+        DiseaseSpreadSpecifier spreadParams,
+        bool clone = true) => DoInfectionAttempt(target,
+        disease,
+        spreadParams.Power,
+        spreadParams.Chance,
+        spreadParams.Type,
+        clone);
 
     /// <summary>
     /// Tries to infect the given target with the given disease, clones and mutates the provided disease by default
     /// </summary>
-    public bool DoInfectionAttempt(EntityUid target, EntityUid disease, float power, float chance, ProtoId<DiseaseSpreadPrototype> spreadType, bool clone = true)
+    public bool DoInfectionAttempt(EntityUid target,
+        EntityUid disease,
+        float power,
+        float chance,
+        ProtoId<DiseaseSpreadPrototype> spreadType,
+        bool clone = true)
     {
         if (!TryComp<DiseaseComponent>(disease, out var diseaseComp))
             return false;
@@ -75,12 +85,13 @@ public partial class SharedDiseaseSystem
                 infectDisease = newDisease.Value;
             }
 
-            bool success = TryInfect(target, infectDisease);
+            var success = TryInfect(target, infectDisease);
             if (!success && newDisease != null)
                 QueueDel(newDisease);
 
             return success;
         }
+
         return false;
     }
 
@@ -88,21 +99,14 @@ public partial class SharedDiseaseSystem
     /// Makes a random disease from a base prototype
     /// By default, will avoid changing anything already present in the base prototype
     /// </summary>
-    public virtual EntityUid? MakeRandomDisease(EntProtoId baseProto, float complexity, float mutationChance = 0f)
-    {
+    public virtual EntityUid? MakeRandomDisease(EntProtoId baseProto, float complexity, float mutationChance = 0f) =>
         // do nothing on client
-        return null;
-    }
+        null;
 
     /// <summary>
     /// Chance function that can take arbitrarily large values
     /// </summary>
-    public bool ExpProb(float prob)
-    {
-        return _random.Prob(1f - MathF.Exp(-prob));
-    }
-
-    public const float MinMutationRate = 0.0001f;
+    public bool ExpProb(float prob) => _random.Prob(1f - MathF.Exp(-prob));
 
     /// <summary>
     /// Mutate the provided disease
@@ -114,20 +118,22 @@ public partial class SharedDiseaseSystem
             return;
 
         // if you're reading this and want something to affect mutation rate, make and use an event for it
-        float rate = mutationRate ?? ent.Comp.MutationRate;
+        var rate = mutationRate ?? ent.Comp.MutationRate;
 
         if (rate < MinMutationRate)
             return;
 
         // parameter mutation
         ent.Comp.MutationRate *= MathF.Exp(_random.NextFloat(-1f, 1f) * ent.Comp.MutationMutationCoefficient * rate);
-        ent.Comp.ImmunityGainRate *= MathF.Exp(_random.NextFloat(-1f, 1f) * ent.Comp.ImmunityGainMutationCoefficient * rate);
-        ent.Comp.InfectionRate *= MathF.Exp(_random.NextFloat(-1f, 1f) * ent.Comp.InfectionRateMutationCoefficient * rate);
+        ent.Comp.ImmunityGainRate *=
+            MathF.Exp(_random.NextFloat(-1f, 1f) * ent.Comp.ImmunityGainMutationCoefficient * rate);
+        ent.Comp.InfectionRate *=
+            MathF.Exp(_random.NextFloat(-1f, 1f) * ent.Comp.InfectionRateMutationCoefficient * rate);
         // note that this is actually the "target" complexity, actual complexity is brought to this value at the end of this method
         ent.Comp.Complexity *= MathF.Exp(_random.NextFloat(-1f, 1f) * ent.Comp.ComplexityMutationCoefficient * rate);
 
         // effect mutation
-        float effectProb = 1f - MathF.Exp(-ent.Comp.EffectMutationCoefficient * rate);
+        var effectProb = 1f - MathF.Exp(-ent.Comp.EffectMutationCoefficient * rate);
         for (var limit = 0; limit < 20 && _random.Prob(effectProb); limit++) // no infinite loop
         {
             if (_random.Prob(0.5f)) // half chance to remove effect, half chance to add
@@ -145,7 +151,8 @@ public partial class SharedDiseaseSystem
         // effect severity mutation
         foreach (var effectUid in ent.Comp.Effects.ContainedEntities)
         {
-            if (!EffectQuery.TryComp(effectUid, out var effect) || !ExpProb(ent.Comp.SeverityMutationCoefficient * rate))
+            if (!EffectQuery.TryComp(effectUid, out var effect) ||
+                !ExpProb(ent.Comp.SeverityMutationCoefficient * rate))
                 continue;
             effect.Severity = _random.NextFloat(effect.MinSeverity, MaxEffectSeverity);
             Dirty(effectUid, effect);
@@ -163,6 +170,7 @@ public partial class SharedDiseaseSystem
             minComplexity += effect.Complexity * effect.MinSeverity;
             maxComplexity += effect.Complexity * MaxEffectSeverity;
         }
+
         // try to adjust complexity to target
         // will hopefully succeed on first iteration
         // if it doesn't, whatever the user did, I don't trust it to not infinite loop
@@ -180,9 +188,7 @@ public partial class SharedDiseaseSystem
                     maxComplexity -= changedEffect.Value.Comp.Complexity * MaxEffectSeverity;
                 }
                 else
-                {
                     break;
-                }
             }
             // we have too little effects
             else if (ent.Comp.Complexity > maxComplexity)
@@ -195,9 +201,7 @@ public partial class SharedDiseaseSystem
                     maxComplexity += changedEffect.Value.Comp.Complexity * MaxEffectSeverity;
                 }
                 else
-                {
                     break;
-                }
             }
             else
             {
@@ -206,6 +210,7 @@ public partial class SharedDiseaseSystem
                     Log.Error($"Disease {ToPrettyString(ent)} tried to mutate effects, but had no effects.");
                     break;
                 }
+
                 // by how much we need to adjust complexity
                 var delta = ent.Comp.Complexity - complexity;
 
@@ -228,13 +233,16 @@ public partial class SharedDiseaseSystem
                         // we can bring delta to 0 so do it
                         effect.Severity = targetSeverity;
                     else
-                        effect.Severity = delta > 0 ? _random.NextFloat(effect.Severity, bringUpper) : _random.NextFloat(effect.MinSeverity, bringLower);
+                        effect.Severity = delta > 0
+                            ? _random.NextFloat(effect.Severity, bringUpper)
+                            : _random.NextFloat(effect.MinSeverity, bringLower);
 
                     Dirty(effectUid, effect);
 
                     // update our current complexity since we updated the effect severity
                     complexity += effect.GetComplexity() - oldComplexity;
                 }
+
                 break;
             }
         }

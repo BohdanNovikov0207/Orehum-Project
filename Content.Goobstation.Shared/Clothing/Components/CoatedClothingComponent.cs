@@ -2,8 +2,8 @@ using Robust.Shared.GameStates;
 
 namespace Content.Goobstation.Shared.Clothing.Components;
 
-[RegisterComponent, NetworkedComponent]
+[RegisterComponent] [NetworkedComponent]
 public sealed partial class CoatedClothingComponent : Component
 {
-    public List<string> CoatingNames = new List<string>();
+    public List<string> CoatingNames = new();
 }

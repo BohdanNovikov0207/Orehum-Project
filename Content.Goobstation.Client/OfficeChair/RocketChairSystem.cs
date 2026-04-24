@@ -6,4 +6,4 @@ using Content.Goobstation.Shared.OfficeChair;
 
 namespace Content.Goobstation.Client.OfficeChair;
 
-public sealed partial class RocketChairSystem : SharedRocketChairSystem;
+public sealed class RocketChairSystem : SharedRocketChairSystem;

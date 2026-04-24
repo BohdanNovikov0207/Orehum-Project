@@ -25,11 +25,13 @@ namespace Content.Goobstation.Server.Blob;
 
 public sealed class BlobNodeSystem : EntitySystem
 {
+    private const double PulseJobTime = 0.005;
+    [Dependency] private readonly BlobCoreSystem _blobCoreSystem = default!;
     [Dependency] private readonly EntityLookupSystem _lookup = default!;
     [Dependency] private readonly MapSystem _map = default!;
-    [Dependency] private readonly IRobustRandom _random = default!;
-    [Dependency] private readonly BlobCoreSystem _blobCoreSystem = default!;
     [Dependency] private readonly MobStateSystem _mob = default!;
+    private readonly JobQueue _pulseJobQueue = new(PulseJobTime);
+    [Dependency] private readonly IRobustRandom _random = default!;
 
     private EntityQuery<BlobTileComponent> _tileQuery;
 
@@ -56,7 +58,7 @@ public sealed class BlobNodeSystem : EntitySystem
 
         foreach (var lookupUid in _lookup.GetEntitiesInRange<BlobMobComponent>(xform.Coordinates, ent.Comp.PulseRadius))
         {
-            if(_mob.IsDead(lookupUid))
+            if (_mob.IsDead(lookupUid))
                 continue;
             var evMob = new BlobMobGetPulseEvent
             {
@@ -67,38 +69,17 @@ public sealed class BlobNodeSystem : EntitySystem
         }
     }
 
-    private const double PulseJobTime = 0.005;
-    private readonly JobQueue _pulseJobQueue = new(PulseJobTime);
-
-    public sealed class BlobPulse(
-        BlobNodeSystem system,
-        Entity<BlobNodeComponent> ent,
-        double maxTime,
-        CancellationToken cancellation = default)
-        : Job<object>(maxTime, cancellation)
-    {
-        protected override async Task<object?> Process()
-        {
-            system.Pulse(ent);
-            return null;
-        }
-    }
-
-    private void OnTerminating(EntityUid uid, BlobNodeComponent component, ref EntityTerminatingEvent args)
-    {
+    private void OnTerminating(EntityUid uid, BlobNodeComponent component, ref EntityTerminatingEvent args) =>
         OnDestruction(uid, component, new DestructionEventArgs());
-    }
 
     private IEnumerable<Entity<BlobTileComponent>> GetSpecialBlobsTiles(BlobNodeComponent component)
     {
-        if (!TerminatingOrDeleted(component.BlobFactory) && _tileQuery.TryComp(component.BlobFactory, out var tileFactoryComponent))
-        {
+        if (!TerminatingOrDeleted(component.BlobFactory) &&
+            _tileQuery.TryComp(component.BlobFactory, out var tileFactoryComponent))
             yield return (component.BlobFactory.Value, tileFactoryComponent);
-        }
-        if (!TerminatingOrDeleted(component.BlobResource) && _tileQuery.TryComp(component.BlobResource, out var tileResourceComponent))
-        {
+        if (!TerminatingOrDeleted(component.BlobResource) &&
+            _tileQuery.TryComp(component.BlobResource, out var tileResourceComponent))
             yield return (component.BlobResource.Value, tileResourceComponent);
-        }
     }
 
     private void OnDestruction(EntityUid uid, BlobNodeComponent component, DestructionEventArgs args)
@@ -125,17 +106,15 @@ public sealed class BlobNodeSystem : EntitySystem
         var localPos = xform.Coordinates.Position;
 
         if (!TryComp<MapGridComponent>(xform.GridUid, out var grid))
-        {
             return;
-        }
 
         if (!_tileQuery.TryGetComponent(ent, out var blobTileComponent) || blobTileComponent.Core == null)
             return;
 
         var innerTiles = _map.GetLocalTilesIntersecting(xform.GridUid.Value,
                 grid,
-            new Box2(localPos + new Vector2(-radius, -radius), localPos + new Vector2(radius, radius)),
-            false)
+                new Box2(localPos + new Vector2(-radius, -radius), localPos + new Vector2(radius, radius)),
+                false)
             .ToArray();
 
         _random.Shuffle(innerTiles);
@@ -150,7 +129,7 @@ public sealed class BlobNodeSystem : EntitySystem
 
                 var ev = new BlobTileGetPulseEvent
                 {
-                    Handled = explain
+                    Handled = explain,
                 };
                 RaiseLocalEvent(tile, ev);
                 explain = false; // WTF?
@@ -180,7 +159,22 @@ public sealed class BlobNodeSystem : EntitySystem
                 QueueDel(ent);
                 continue;
             }
-            _pulseJobQueue.EnqueueJob(new BlobPulse(this,(ent, comp), PulseJobTime));
+
+            _pulseJobQueue.EnqueueJob(new BlobPulse(this, (ent, comp), PulseJobTime));
+        }
+    }
+
+    public sealed class BlobPulse(
+        BlobNodeSystem system,
+        Entity<BlobNodeComponent> ent,
+        double maxTime,
+        CancellationToken cancellation = default)
+        : Job<object>(maxTime, cancellation)
+    {
+        protected override async Task<object?> Process()
+        {
+            system.Pulse(ent);
+            return null;
         }
     }
 }

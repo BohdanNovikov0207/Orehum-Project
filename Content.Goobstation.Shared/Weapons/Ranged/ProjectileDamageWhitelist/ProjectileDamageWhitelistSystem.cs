@@ -13,8 +13,9 @@ namespace Content.Goobstation.Shared.Weapons.Ranged.ProjectileDamageWhitelist;
 
 public sealed class ProjectileDamageWhitelistSystem : EntitySystem
 {
-    [Dependency] private readonly EntityWhitelistSystem _whitelist = default!;
     [Dependency] private readonly DamageableSystem _damageable = default!;
+    [Dependency] private readonly EntityWhitelistSystem _whitelist = default!;
+
     public override void Initialize()
     {
         base.Initialize();

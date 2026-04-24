@@ -1,3 +1,4 @@
+using System.Diagnostics.CodeAnalysis;
 using Content.Shared._Imp.Drone;
 using Content.Shared.Access.Systems;
 using Content.Shared.PAI;
@@ -6,19 +7,17 @@ using Content.Shared.Silicons.StationAi;
 using Content.Shared.StatusIcon;
 using Content.Shared.StatusIcon.Components;
 using Robust.Shared.Prototypes;
-using System.Diagnostics.CodeAnalysis;
 
 namespace Content.Goobstation.Shared.Radio;
 
 public sealed class RadioJobIconSystem : EntitySystem
 {
-    [Dependency] private readonly AccessReaderSystem _accessReader = default!;
-    [Dependency] private readonly SharedIdCardSystem _idCardSystem = default!;
-
     // These are static vars rather than being inlined so that the YAML linter can verify that they actually exist.
     private static readonly ProtoId<JobIconPrototype> JobIconAI = new("JobIconStationAi");
     private static readonly ProtoId<JobIconPrototype> JobIconBorg = new("JobIconBorg");
     private static readonly ProtoId<JobIconPrototype> JobIconNoID = new("JobIconNoId");
+    [Dependency] private readonly AccessReaderSystem _accessReader = default!;
+    [Dependency] private readonly SharedIdCardSystem _idCardSystem = default!;
 
 
     /// <summary>
@@ -26,12 +25,21 @@ public sealed class RadioJobIconSystem : EntitySystem
     /// </summary>
     /// <param name="ent">The entity making a radio message.</param>
     /// <param name="jobIcon">
-    /// The prototype ID of <paramref name="ent"/>'s job icon.<br/>
-    /// If the method returns <see langword="false"/> then this will be <see langword="null"/>, otherwise it will always have a non-null value, defaulting to <c>"JobIconNoId"</c>.
+    /// The prototype ID of <paramref name="ent" />'s job icon.<br />
+    /// If the method returns <see langword="false" /> then this will be <see langword="null" />, otherwise it will always have
+    /// a non-null value, defaulting to <c>"JobIconNoId"</c>.
     /// </param>
-    /// <param name="jobName">The name of <paramref name="ent"/>'s job. If they don't <i>have</i> a job, (either none at all or "Unknown") then this will be <see langword="null"/>.</param>
-    /// <returns>If <paramref name="ent"/> has a valid job icon, returns <see langword="true"/> and sets the out parameters. Otherwise returns <see langword="false"/>.</returns>
-    public bool TryGetJobIcon(EntityUid ent, [NotNullWhen(true)] out ProtoId<JobIconPrototype>? jobIcon, out string? jobName)
+    /// <param name="jobName">
+    /// The name of <paramref name="ent" />'s job. If they don't <i>have</i> a job, (either none at all
+    /// or "Unknown") then this will be <see langword="null" />.
+    /// </param>
+    /// <returns>
+    /// If <paramref name="ent" /> has a valid job icon, returns <see langword="true" /> and sets the out parameters.
+    /// Otherwise returns <see langword="false" />.
+    /// </returns>
+    public bool TryGetJobIcon(EntityUid ent,
+        [NotNullWhen(true)] out ProtoId<JobIconPrototype>? jobIcon,
+        out string? jobName)
     {
         // If they're an AI/borg/other silicon, they get to return early and skip the `StatusIconComponent` check.
         if (TryGetSiliconIcon(ent, out jobIcon, out jobName))
@@ -50,7 +58,9 @@ public sealed class RadioJobIconSystem : EntitySystem
         return true;
     }
 
-    private bool TryGetSiliconIcon(EntityUid ent, [NotNullWhen(true)] out ProtoId<JobIconPrototype>? jobIcon, out string? jobName)
+    private bool TryGetSiliconIcon(EntityUid ent,
+        [NotNullWhen(true)] out ProtoId<JobIconPrototype>? jobIcon,
+        out string? jobName)
     {
         if (HasComp<StationAiHeldComponent>(ent))
         {
@@ -58,9 +68,12 @@ public sealed class RadioJobIconSystem : EntitySystem
             jobName = Loc.GetString("job-name-station-ai");
             return true;
         }
+
         if (HasComp<BorgChassisComponent>(ent)
             || HasComp<BorgBrainComponent>(ent)
-            || HasComp<PAIComponent>(ent) // pAIs and Drones don't have radio access, but they can still get picked up by an intercom.
+            ||
+            HasComp<PAIComponent>(
+                ent) // pAIs and Drones don't have radio access, but they can still get picked up by an intercom.
             || HasComp<DroneComponent>(ent))
         {
             jobIcon = JobIconBorg;
@@ -73,14 +86,14 @@ public sealed class RadioJobIconSystem : EntitySystem
         return false;
     }
 
-    private bool TryGetEquippedIDJob(EntityUid ent, [NotNullWhen(true)] out ProtoId<JobIconPrototype>? jobIcon, out string? jobName)
+    private bool TryGetEquippedIDJob(EntityUid ent,
+        [NotNullWhen(true)] out ProtoId<JobIconPrototype>? jobIcon,
+        out string? jobName)
     {
         jobIcon = jobName = null;
         // Ideally this would only use `SharedIdCardSystem.TryFindIdCard()` rather than needing accessReader, but currently that doesn't check the offhand.
         if (!_accessReader.FindAccessItemsInventory(ent, out var items))
-        {
             return false;
-        }
 
         foreach (var item in items)
         {

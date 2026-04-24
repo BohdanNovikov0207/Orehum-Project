@@ -13,11 +13,11 @@ namespace Content.Goobstation.Shared.Factory.Slots;
 /// </summary>
 public sealed partial class AutomatedBeakerSlot : AutomationSlot
 {
-    [DataField]
-    public string SlotName = "beakerSlot";
-
     private ItemSlotsSystem _slots;
     private SharedSolutionContainerSystem _solution;
+
+    [DataField]
+    public string SlotName = "beakerSlot";
 
     public override void Initialize()
     {
@@ -29,7 +29,7 @@ public sealed partial class AutomatedBeakerSlot : AutomationSlot
 
     public override Entity<SolutionComponent>? GetSolution()
     {
-        if (_slots.GetItemOrNull(Owner, SlotName) is not {} beaker)
+        if (_slots.GetItemOrNull(Owner, SlotName) is not { } beaker)
             return null;
 
         _solution.TryGetFitsInDispenser(beaker, out var solution, out _);

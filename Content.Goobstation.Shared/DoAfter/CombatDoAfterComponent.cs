@@ -7,34 +7,17 @@ using Robust.Shared.GameStates;
 
 namespace Content.Goobstation.Shared.DoAfter;
 
-[RegisterComponent, NetworkedComponent, AutoGenerateComponentState]
+[RegisterComponent] [NetworkedComponent] [AutoGenerateComponentState]
 public sealed partial class CombatDoAfterComponent : Component
 {
-    [ViewVariables, AutoNetworkedField]
-    public ushort? DoAfterId;
-
-    [ViewVariables, AutoNetworkedField]
-    public EntityUid? DoAfterUser;
-
-    // Only one trigger currently supported
-    [NonSerialized, DataField(required: true)]
-    public BaseCombatDoAfterSuccessEvent Trigger;
-
-    // Required for throw trigger which activates after dropping item
-    [DataField]
-    public TimeSpan DropCancelDelay = TimeSpan.Zero;
-
-    [DataField]
-    public float Delay = 2f;
-
-    [DataField]
-    public float DelayVariation = 0.3f;
-
     [DataField]
     public float ActivationTolerance = 0.3f;
 
     [DataField]
-    public bool Hidden;
+    public bool AlwaysTriggerOnSelf = true;
+
+    [DataField]
+    public bool BreakOnDamage;
 
     [DataField]
     public bool BreakOnMove;
@@ -43,17 +26,34 @@ public sealed partial class CombatDoAfterComponent : Component
     public bool BreakOnWeightlessMove;
 
     [DataField]
-    public bool BreakOnDamage;
+    public Color? ColorOverride = Color.Red;
+
+    [DataField]
+    public float Delay = 2f;
+
+    [DataField]
+    public float DelayVariation = 0.3f;
+
+    [ViewVariables] [AutoNetworkedField]
+    public ushort? DoAfterId;
+
+    [ViewVariables] [AutoNetworkedField]
+    public EntityUid? DoAfterUser;
+
+    // Required for throw trigger which activates after dropping item
+    [DataField]
+    public TimeSpan DropCancelDelay = TimeSpan.Zero;
+
+    [DataField]
+    public bool Hidden;
 
     [DataField]
     public bool MultiplyDelay;
 
     [DataField]
-    public Color? ColorOverride = Color.Red;
-
-    [DataField]
     public Color? SuccessColorOverride = Color.Lime;
 
-    [DataField]
-    public bool AlwaysTriggerOnSelf = true;
+    // Only one trigger currently supported
+    [NonSerialized] [DataField(required: true)]
+    public BaseCombatDoAfterSuccessEvent Trigger;
 }

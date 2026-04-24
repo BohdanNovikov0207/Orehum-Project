@@ -16,7 +16,6 @@ using Content.Server.Spreader;
 using Content.Shared.Chemistry.Components;
 using Content.Shared.Chemistry.Reaction;
 using Content.Shared.Coordinates.Helpers;
-using Content.Shared.EntityEffects.Effects;
 using Robust.Shared.Map;
 
 namespace Content.Goobstation.Server.Xenobiology.Systems;
@@ -34,7 +33,6 @@ public class XenobiologyMiscSystems : EntitySystem
 
     public void OnExtinguish(EntityUid uid, ReactiveComponent component, ref ExtinguishNearby args)
     {
-
         var lookupSys = EntityManager.System<EntityLookupSystem>();
         var flamSys = EntityManager.System<FlammableSystem>();
 
@@ -71,7 +69,6 @@ public class XenobiologyMiscSystems : EntitySystem
 
     public void OnSmoke(EntityUid uid, ReactiveComponent component, ref DoSmokeEntityEffect args)
     {
-
         var mapMan = IoCManager.Resolve<IMapManager>();
         var transformSys = EntityManager.System<SharedTransformSystem>();
         var spreaderSys = EntityManager.System<SpreaderSystem>();
@@ -101,5 +98,4 @@ public class XenobiologyMiscSystems : EntitySystem
 
         smokeSys.StartSmoke(ent, args.Solution, args.Duration, args.SpreadAmount, smoke);
     }
-
 }

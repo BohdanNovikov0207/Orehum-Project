@@ -10,10 +10,7 @@ public sealed class JoinQueueManager
     [Dependency] private readonly IStateManager _state = default!;
 
 
-    public void Initialize()
-    {
-        _net.RegisterNetMessage<QueueUpdateMessage>(OnQueueUpdate);
-    }
+    public void Initialize() => _net.RegisterNetMessage<QueueUpdateMessage>(OnQueueUpdate);
 
 
     private void OnQueueUpdate(QueueUpdateMessage msg)
@@ -26,8 +23,6 @@ public sealed class JoinQueueManager
             newState.OnQueueUpdate(msg);
         }
         else
-        {
             ((QueueState) _state.CurrentState).OnQueueUpdate(msg);
-        }
     }
 }

@@ -10,14 +10,14 @@ using Robust.Shared.Serialization;
 
 namespace Content.Goobstation.Shared.FloorCleaner;
 
-[Serializable, NetSerializable]
+[Serializable] [NetSerializable]
 public sealed partial class FloorCleanerDoAfterEvent : DoAfterEvent
 {
-    [DataField(required: true)]
-    public List<NetEntity> Entities = default!;
-
     [DataField]
     public HashSet<(uint Index, Decal Decal)> Decals = default!;
+
+    [DataField(required: true)]
+    public List<NetEntity> Entities = default!;
 
     public FloorCleanerDoAfterEvent(List<NetEntity> entities, HashSet<(uint Index, Decal Decal)> decals)
     {

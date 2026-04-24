@@ -5,14 +5,14 @@ using Robust.Shared.Serialization.TypeSerializers.Implementations.Custom.Prototy
 namespace Content.Shared._Goobstation.Security.ContrabandIcons.Prototypes;
 
 [Prototype("contrabandIcon")]
-public sealed partial class ContrabandIconPrototype : StatusIconPrototype, IInheritingPrototype
+public sealed class ContrabandIconPrototype : StatusIconPrototype, IInheritingPrototype
 {
-        /// <inheritdoc />
-        [ParentDataField(typeof(AbstractPrototypeIdArraySerializer<ContrabandIconPrototype>))]
-        public string[]? Parents { get; private set; }
+    /// <inheritdoc />
+    [ParentDataField(typeof(AbstractPrototypeIdArraySerializer<ContrabandIconPrototype>))]
+    public string[]? Parents { get; private set; }
 
-        /// <inheritdoc />
-        [NeverPushInheritance]
-        [AbstractDataField]
-        public bool Abstract { get; private set; }
+    /// <inheritdoc />
+    [NeverPushInheritance]
+    [AbstractDataField]
+    public bool Abstract { get; private set; }
 }

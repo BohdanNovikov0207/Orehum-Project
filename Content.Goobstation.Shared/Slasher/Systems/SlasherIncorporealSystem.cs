@@ -1,69 +1,68 @@
-using Content.Goobstation.Shared.PhaseShift;
-using Content.Goobstation.Shared.Slasher.Components;
-using Content.Goobstation.Shared.Slasher.Events;
-using Content.Shared.Actions;
-using Content.Shared.Actions.Components;
-using Content.Shared.Actions.Events;
-using Content.Shared.Flash;
-using Content.Shared.Interaction.Events;
-using Content.Shared.Popups;
-using Content.Shared.Stealth;
-using Content.Shared.Stealth.Components;
-using Content.Shared.Movement.Pulling.Events;
-using Content.Shared.Movement.Pulling.Components;
-using Robust.Shared.Network;
-using Content.Shared.Damage;
-using Content.Shared.Tag;
-using Content.Shared.Doors.Systems;
-using Content.Shared.Movement.Components;
-using Content.Shared.Speech.Muting;
 using Content.Goobstation.Common.Atmos;
 using Content.Goobstation.Common.Body.Components;
 using Content.Goobstation.Common.Temperature.Components;
-using Content.Shared.Physics;
-using Content.Shared.DoAfter;
-using Robust.Shared.Timing;
-using Robust.Shared.Physics.Components;
 using Content.Goobstation.Shared.Overlays;
-using Content.Shared.Inventory.VirtualItem;
-using Content.Shared.Hands.EntitySystems;
-using Content.Shared.Hands.Components;
-using Robust.Shared.Audio.Systems;
-using Content.Shared.Hands;
-using Content.Shared.Standing;
-using Content.Goobstation.Shared.Supermatter.Components;
-using Content.Shared.Body.Part;
-using Robust.Shared.Physics.Systems;
-using Robust.Shared.Physics;
-using Content.Shared.Throwing;
+using Content.Goobstation.Shared.PhaseShift;
+using Content.Goobstation.Shared.Slasher.Components;
+using Content.Goobstation.Shared.Slasher.Events;
 using Content.Goobstation.Shared.Sprinting;
+using Content.Goobstation.Shared.Supermatter.Components;
+using Content.Shared.Actions;
+using Content.Shared.Actions.Components;
+using Content.Shared.Actions.Events;
+using Content.Shared.Body.Part;
+using Content.Shared.Damage;
+using Content.Shared.DoAfter;
+using Content.Shared.Doors.Systems;
+using Content.Shared.Flash;
+using Content.Shared.Hands;
+using Content.Shared.Hands.Components;
+using Content.Shared.Hands.EntitySystems;
+using Content.Shared.Interaction.Events;
+using Content.Shared.Inventory.VirtualItem;
+using Content.Shared.Movement.Components;
+using Content.Shared.Movement.Pulling.Components;
+using Content.Shared.Movement.Pulling.Events;
+using Content.Shared.Physics;
+using Content.Shared.Popups;
+using Content.Shared.Speech.Muting;
+using Content.Shared.Standing;
+using Content.Shared.Stealth;
+using Content.Shared.Stealth.Components;
 using Content.Shared.Stunnable;
+using Content.Shared.Tag;
+using Content.Shared.Throwing;
 using Content.Shared.Trigger;
 using Content.Shared.Trigger.Components.Triggers;
+using Robust.Shared.Audio.Systems;
+using Robust.Shared.Network;
+using Robust.Shared.Physics;
+using Robust.Shared.Physics.Components;
+using Robust.Shared.Physics.Systems;
+using Robust.Shared.Timing;
 
 namespace Content.Goobstation.Shared.Slasher.Systems;
 
 public sealed class SlasherIncorporealSystem : EntitySystem
 {
-    [Dependency] private readonly SharedActionsSystem _actions = default!;
-    [Dependency] private readonly SharedPopupSystem _popup = default!;
-    [Dependency] private readonly SharedStealthSystem _stealth = default!;
-    [Dependency] private readonly INetManager _net = default!;
-    [Dependency] private readonly TagSystem _tags = default!;
-    [Dependency] private readonly SharedEyeSystem _eye = default!;
-    [Dependency] private readonly EntityLookupSystem _lookup = default!;
-    [Dependency] private readonly SharedDoAfterSystem _doAfter = default!;
-    [Dependency] private readonly StandingStateSystem _standing = default!;
-    [Dependency] private readonly IGameTiming _timing = default!;
-    [Dependency] private readonly SharedHandsSystem _hands = default!;
-    [Dependency] private readonly SharedVirtualItemSystem _virtualItem = default!;
-    [Dependency] private readonly SharedAudioSystem _audio = default!;
-    [Dependency] private readonly SharedPhysicsSystem _physics = default!;
-    [Dependency] private readonly FixtureSystem _fixtures = default!;
-    [Dependency] private readonly SlasherObserverCheckSystem _observerCheck = default!;
-    [Dependency] private readonly SharedSprintingSystem _sprinting = default!;
-
     private const string FootstepSoundTag = "FootstepSound";
+    [Dependency] private readonly SharedActionsSystem _actions = default!;
+    [Dependency] private readonly SharedAudioSystem _audio = default!;
+    [Dependency] private readonly SharedDoAfterSystem _doAfter = default!;
+    [Dependency] private readonly SharedEyeSystem _eye = default!;
+    [Dependency] private readonly FixtureSystem _fixtures = default!;
+    [Dependency] private readonly SharedHandsSystem _hands = default!;
+    [Dependency] private readonly EntityLookupSystem _lookup = default!;
+    [Dependency] private readonly INetManager _net = default!;
+    [Dependency] private readonly SlasherObserverCheckSystem _observerCheck = default!;
+    [Dependency] private readonly SharedPhysicsSystem _physics = default!;
+    [Dependency] private readonly SharedPopupSystem _popup = default!;
+    [Dependency] private readonly SharedSprintingSystem _sprinting = default!;
+    [Dependency] private readonly StandingStateSystem _standing = default!;
+    [Dependency] private readonly SharedStealthSystem _stealth = default!;
+    [Dependency] private readonly TagSystem _tags = default!;
+    [Dependency] private readonly IGameTiming _timing = default!;
+    [Dependency] private readonly SharedVirtualItemSystem _virtualItem = default!;
 
     public override void Initialize()
     {
@@ -129,7 +128,7 @@ public sealed class SlasherIncorporealSystem : EntitySystem
             ent.Comp.IncorporealizeDelay,
             new SlasherIncorporealizeDoAfterEvent(),
             ent.Owner,
-            target: ent.Owner)
+            ent.Owner)
         {
             BreakOnMove = true,
             BreakOnDamage = true,
@@ -187,7 +186,8 @@ public sealed class SlasherIncorporealSystem : EntitySystem
         args.Handled = true;
     }
 
-    private void OnIncorporealizeDoAfter(Entity<SlasherIncorporealComponent> ent, ref SlasherIncorporealizeDoAfterEvent args)
+    private void OnIncorporealizeDoAfter(Entity<SlasherIncorporealComponent> ent,
+        ref SlasherIncorporealizeDoAfterEvent args)
     {
         if (args.Cancelled || args.Handled)
             return;
@@ -221,7 +221,7 @@ public sealed class SlasherIncorporealSystem : EntitySystem
         var phase = new PhaseShiftedComponent
         {
             SpawnEffects = false,
-            MovementSpeedBuff = 5.5f
+            MovementSpeedBuff = 5.5f,
         };
         AddComp(uid, phase);
 
@@ -323,6 +323,7 @@ public sealed class SlasherIncorporealSystem : EntitySystem
 
         var curTime = _timing.CurTime;
         foreach (var action in _actions.GetActions(ent.Owner))
+        {
             if (action.Comp.Cooldown is { } cooldown && cooldown.End > curTime)
             {
                 // Store the remaining cooldown duration
@@ -331,8 +332,8 @@ public sealed class SlasherIncorporealSystem : EntitySystem
 
                 // Make the cooldown basically never end to pause it
                 _actions.SetCooldown(action.Owner, cooldown.Start, TimeSpan.MaxValue);
-
             }
+        }
     }
 
     private void UnfreezeCooldowns(Entity<SlasherIncorporealComponent> ent)
@@ -342,7 +343,9 @@ public sealed class SlasherIncorporealSystem : EntitySystem
 
         var curTime = _timing.CurTime;
         foreach (var (actionId, remainingTime) in ent.Comp.FrozenCooldowns)
+        {
             _actions.SetCooldown(actionId, curTime, curTime + remainingTime);
+        }
 
         ent.Comp.FrozenCooldowns.Clear();
     }
@@ -355,7 +358,9 @@ public sealed class SlasherIncorporealSystem : EntitySystem
             args.Cancelled = true;
     }
 
-    private void OnBeforeDamageBodyPart(EntityUid uid, DamageableComponent damageable, ref BeforeDamageChangedEvent args)
+    private void OnBeforeDamageBodyPart(EntityUid uid,
+        DamageableComponent damageable,
+        ref BeforeDamageChangedEvent args)
     {
         // Check if this is a body part, and if so, check if the parent body is an incorporeal slasher
         if (!TryComp<BodyPartComponent>(uid, out var bodyPart) || bodyPart.Body == null)
@@ -461,7 +466,9 @@ public sealed class SlasherIncorporealSystem : EntitySystem
             args.Cancelled = true;
     }
 
-    private void OnProximityTriggerAttempt(EntityUid uid, TriggerOnProximityComponent component, ref AttemptTriggerEvent args)
+    private void OnProximityTriggerAttempt(EntityUid uid,
+        TriggerOnProximityComponent component,
+        ref AttemptTriggerEvent args)
     {
         if (args.User == null)
             return;
@@ -477,7 +484,8 @@ public sealed class SlasherIncorporealSystem : EntitySystem
             return false;
 
         var slasherTransform = _physics.GetPhysicsTransform(uid);
-        var entities = _lookup.GetEntitiesInRange(uid, 0.5f, LookupFlags.Static | LookupFlags.Dynamic | LookupFlags.Sundries);
+        var entities =
+            _lookup.GetEntitiesInRange(uid, 0.5f, LookupFlags.Static | LookupFlags.Dynamic | LookupFlags.Sundries);
 
         foreach (var entity in entities)
         {

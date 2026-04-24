@@ -22,17 +22,17 @@ namespace Content.Goobstation.Shared.SpecialPassives.SuperAdrenaline;
 
 public sealed class SharedSuperAdrenalineSystem : EntitySystem
 {
-    [Dependency] private readonly IGameTiming _timing = default!;
     [Dependency] private readonly AlertsSystem _alerts = default!;
     [Dependency] private readonly ConsciousnessSystem _consciousness = default!;
     [Dependency] private readonly DamageableSystem _damageable = default!;
     [Dependency] private readonly PainSystem _pain = default!;
     [Dependency] private readonly SleepingSystem _sleep = default!;
+    [Dependency] private readonly IGameTiming _timing = default!;
 
     private EntityQuery<MobStateComponent> _mobstateQuery;
     private EntityQuery<NerveSystemComponent> _nerveQuery;
-    private EntityQuery<StaminaComponent> _staminaQuery;
     private EntityQuery<SleepingComponent> _sleepingQuery;
+    private EntityQuery<StaminaComponent> _staminaQuery;
 
     public override void Initialize()
     {
@@ -113,7 +113,8 @@ public sealed class SharedSuperAdrenalineSystem : EntitySystem
     private void OnRemoved(Entity<SuperAdrenalineComponent> ent, ref ComponentRemove args)
     {
         if (ent.Comp.AlertId != null)
-            _alerts.ClearAlert(ent, (ProtoId<AlertPrototype>) ent.Comp.AlertId); // incase there was still time left on removal
+            _alerts.ClearAlert(ent,
+                (ProtoId<AlertPrototype>) ent.Comp.AlertId); // incase there was still time left on removal
     }
 
     public override void Update(float frameTime)
@@ -151,6 +152,7 @@ public sealed class SharedSuperAdrenalineSystem : EntitySystem
         Dirty(ent, stam);
 
         if (ent.Comp.PassiveDamage != null)
+        {
             _damageable.TryChangeDamage(
                 ent,
                 ent.Comp.PassiveDamage,
@@ -158,48 +160,11 @@ public sealed class SharedSuperAdrenalineSystem : EntitySystem
                 false,
                 targetPart: TargetBodyPart.All,
                 splitDamage: SplitDamageBehavior.SplitEnsureAllOrganic);
+        }
     }
-
-    #region Event Handlers
-    private void OnAttemptStun(Entity<SuperAdrenalineComponent> ent, ref BeforeStunEvent args)
-    {
-        args.Cancelled = ent.Comp.IgnoreStun;
-    }
-
-    private void OnAttemptKnockdown(Entity<SuperAdrenalineComponent> ent, ref BeforeKnockdownEvent args)
-    {
-        args.Cancelled = ent.Comp.IgnoreKnockdown;
-    }
-
-    // this won't stop slowdown from non TrySlowdown sources (such as stepping on lava)
-    private void OnAttemptTrySlowdown(Entity<SuperAdrenalineComponent> ent, ref BeforeTrySlowdownEvent args)
-    {
-        args.Cancelled = ent.Comp.IgnoreStunSlowdown;
-    }
-
-    private void OnDamageSlowdown(Entity<SuperAdrenalineComponent> ent, ref ModifySlowOnDamageSpeedEvent args)
-    {
-        args.Speed = ent.Comp.IgnoreDamageSlowdown ? 1f : args.Speed;
-    }
-
-    private void OnAttemptSleep(Entity<SuperAdrenalineComponent> ent, ref TryingToSleepEvent args)
-    {
-        args.Cancelled = ent.Comp.IgnoreSleep;
-    }
-
-    private void OnAttemptDelayedKnockdown(Entity<SuperAdrenalineComponent> ent, ref DelayedKnockdownAttemptEvent args)
-    {
-        if (ent.Comp.IgnoreKnockdown)
-            args.Cancel();
-    }
-
-    private void OnMobStateChange(Entity<SuperAdrenalineComponent> ent, ref MobStateChangedEvent args)
-    {
-        ent.Comp.Mobstate = args.NewMobState;
-    }
-    #endregion
 
     #region Helper Methods
+
     private bool TryValidMobstateCheck(Entity<SuperAdrenalineComponent> ent)
     {
         if (ent.Comp.Mobstate == MobState.Dead)
@@ -210,5 +175,35 @@ public sealed class SharedSuperAdrenalineSystem : EntitySystem
 
         return true;
     }
+
+    #endregion
+
+    #region Event Handlers
+
+    private void OnAttemptStun(Entity<SuperAdrenalineComponent> ent, ref BeforeStunEvent args) =>
+        args.Cancelled = ent.Comp.IgnoreStun;
+
+    private void OnAttemptKnockdown(Entity<SuperAdrenalineComponent> ent, ref BeforeKnockdownEvent args) =>
+        args.Cancelled = ent.Comp.IgnoreKnockdown;
+
+    // this won't stop slowdown from non TrySlowdown sources (such as stepping on lava)
+    private void OnAttemptTrySlowdown(Entity<SuperAdrenalineComponent> ent, ref BeforeTrySlowdownEvent args) =>
+        args.Cancelled = ent.Comp.IgnoreStunSlowdown;
+
+    private void OnDamageSlowdown(Entity<SuperAdrenalineComponent> ent, ref ModifySlowOnDamageSpeedEvent args) =>
+        args.Speed = ent.Comp.IgnoreDamageSlowdown ? 1f : args.Speed;
+
+    private void OnAttemptSleep(Entity<SuperAdrenalineComponent> ent, ref TryingToSleepEvent args) =>
+        args.Cancelled = ent.Comp.IgnoreSleep;
+
+    private void OnAttemptDelayedKnockdown(Entity<SuperAdrenalineComponent> ent, ref DelayedKnockdownAttemptEvent args)
+    {
+        if (ent.Comp.IgnoreKnockdown)
+            args.Cancel();
+    }
+
+    private void OnMobStateChange(Entity<SuperAdrenalineComponent> ent, ref MobStateChangedEvent args) =>
+        ent.Comp.Mobstate = args.NewMobState;
+
     #endregion
 }

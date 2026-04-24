@@ -17,7 +17,7 @@ using Robust.Shared.Prototypes;
 namespace Content.Goobstation.Shared.SetSelector;
 
 /// <summary>
-/// <see cref="SetSelectorComponent"/>
+/// <see cref="SetSelectorComponent" />
 /// this system links the interface to the logic, and will spawn sets selected by the player in the interface
 /// </summary>
 public sealed class SetSelectorSystem : EntitySystem
@@ -50,14 +50,12 @@ public sealed class SetSelectorSystem : EntitySystem
 
         // Randomize sets available for selection
         var sets = selector.Comp.PossibleSets.ToArray();
-        new System.Random().Shuffle(sets);
+        new Random().Shuffle(sets);
         selector.Comp.AvailableSets = sets.Take(selector.Comp.SetsToSelect).ToList();
     }
 
-    private void OnUIOpened(Entity<SetSelectorComponent> selector, ref BoundUIOpenedEvent args)
-    {
+    private void OnUIOpened(Entity<SetSelectorComponent> selector, ref BoundUIOpenedEvent args) =>
         UpdateUI(selector.Owner, selector.Comp);
-    }
 
     private void OnApprove(Entity<SetSelectorComponent> selector, ref SetSelectorApproveMessage args)
     {
@@ -119,7 +117,7 @@ public sealed class SetSelectorSystem : EntitySystem
             return true;
 
         if (Transform(container.Owner).ParentUid.IsValid()
-        && _container.TryGetContainingContainer(container.Owner, out var newContainer))
+            && _container.TryGetContainingContainer(container.Owner, out var newContainer))
             return RecursiveInsert(ent, newContainer, ignoredContainers);
 
         return false;
@@ -129,7 +127,7 @@ public sealed class SetSelectorSystem : EntitySystem
     {
         // Switch selecting set
         if (!selector.Comp.SelectedSets.Remove(args.SetNumber))
-             selector.Comp.SelectedSets.Add(args.SetNumber);
+            selector.Comp.SelectedSets.Add(args.SetNumber);
 
         UpdateUI(selector.Owner, selector.Comp);
     }
@@ -153,6 +151,8 @@ public sealed class SetSelectorSystem : EntitySystem
             data.Add(i, info);
         }
 
-        _ui.SetUiState(uid, SetSelectorUIKey.Key, new SetSelectorBoundUserInterfaceState(data, component.MaxSelectedSets));
+        _ui.SetUiState(uid,
+            SetSelectorUIKey.Key,
+            new SetSelectorBoundUserInterfaceState(data, component.MaxSelectedSets));
     }
 }

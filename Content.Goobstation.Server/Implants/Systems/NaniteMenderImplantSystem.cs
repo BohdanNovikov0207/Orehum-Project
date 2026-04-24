@@ -16,15 +16,17 @@ namespace Content.Goobstation.Server.Implants.Systems;
 
 public sealed class NaniteMenderImplantSystem : EntitySystem
 {
-    [Dependency] private readonly RejuvenateSystem _rejuvenate = default!;
     [Dependency] private readonly JitteringSystem _jittering = default!;
     [Dependency] private readonly PopupSystem _popup = default!;
+    [Dependency] private readonly RejuvenateSystem _rejuvenate = default!;
+
     public override void Initialize()
     {
         base.Initialize();
 
         SubscribeLocalEvent<NaniteMendEvent>(OnNaniteMend);
     }
+
     private void OnNaniteMend(NaniteMendEvent args)
     {
         var popup = Loc.GetString("nanite-mend-popup");
@@ -33,5 +35,4 @@ public sealed class NaniteMenderImplantSystem : EntitySystem
         _jittering.AddJitter(args.Target);
         _rejuvenate.PerformRejuvenate(args.Target);
     }
-
 }

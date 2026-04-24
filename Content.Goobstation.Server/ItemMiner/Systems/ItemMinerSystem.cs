@@ -6,29 +6,29 @@
 
 using Content.Goobstation.Common.ItemMiner;
 using Content.Goobstation.Shared.ItemMiner;
-using Content.Shared.Containers.ItemSlots;
-using Content.Shared.Stacks;
 using Content.Server.Power.EntitySystems;
 using Content.Server.Stack;
+using Content.Shared.Containers.ItemSlots;
+using Content.Shared.Stacks;
 using Robust.Shared.Audio.Systems;
 using Robust.Shared.Containers;
-using Robust.Shared.Timing;
 using Robust.Shared.Prototypes;
+using Robust.Shared.Timing;
 
 namespace Content.Goobstation.Server.ItemMiner;
 
 public sealed class ItemMinerSystem : EntitySystem
 {
-    [Dependency] private readonly IGameTiming _timing = default!;
-    [Dependency] private readonly IPrototypeManager _proto = default!;
-    [Dependency] private readonly ItemSlotsSystem _itemSlots = default!;
-    [Dependency] private readonly PowerReceiverSystem _power = default!;
     [Dependency] private readonly SharedAudioSystem _audio = default!;
     [Dependency] private readonly SharedContainerSystem _container = default!;
-    [Dependency] private readonly StackSystem _stack = default!;
+    [Dependency] private readonly ItemSlotsSystem _itemSlots = default!;
 
     // no freezing the game
-    private TimeSpan _minInterval = TimeSpan.FromSeconds(0.001f);
+    private readonly TimeSpan _minInterval = TimeSpan.FromSeconds(0.001f);
+    [Dependency] private readonly PowerReceiverSystem _power = default!;
+    [Dependency] private readonly IPrototypeManager _proto = default!;
+    [Dependency] private readonly StackSystem _stack = default!;
+    [Dependency] private readonly IGameTiming _timing = default!;
 
     public override void Initialize()
     {
@@ -36,10 +36,8 @@ public sealed class ItemMinerSystem : EntitySystem
         SubscribeLocalEvent<ItemMinerComponent, MapInitEvent>(OnInit);
     }
 
-    private void OnInit(Entity<ItemMinerComponent> ent, ref MapInitEvent args)
-    {
+    private void OnInit(Entity<ItemMinerComponent> ent, ref MapInitEvent args) =>
         ent.Comp.NextAt = _timing.CurTime + ent.Comp.Interval;
-    }
 
     public override void Update(float frameTime)
     {
@@ -67,7 +65,8 @@ public sealed class ItemMinerSystem : EntitySystem
             {
                 if (miner.Interval < _minInterval)
                 {
-                    Log.Error($"Item miner {ToPrettyString(uid)} had very low interval {miner.Interval}, change Amount instead");
+                    Log.Error(
+                        $"Item miner {ToPrettyString(uid)} had very low interval {miner.Interval}, change Amount instead");
                     miner.NextAt += TimeSpan.FromSeconds(1f); // don't spam it
                     continue;
                 }
@@ -85,22 +84,24 @@ public sealed class ItemMinerSystem : EntitySystem
                     continue;
                 }
 
-                EntityUid? slotItem = slot == null ? null : slot.Item;
+                var slotItem = slot == null ? null : slot.Item;
                 if (slot != null && slotItem == null)
                 {
                     var slotEnt = Spawn(miner.Proto, xform.Coordinates);
                     if (slot.ContainerSlot == null || !_container.Insert(slotEnt, slot.ContainerSlot))
                     {
-                        Log.Error($"Item miner {ToPrettyString(uid)} failed to insert newly spawned entity into slot {miner.ItemSlotId}");
+                        Log.Error(
+                            $"Item miner {ToPrettyString(uid)} failed to insert newly spawned entity into slot {miner.ItemSlotId}");
                         miner.NextAt += TimeSpan.FromSeconds(1f); // don't spam it
                         QueueDel(slotEnt);
                         continue;
                     }
+
                     slotItem = slotEnt;
                     spawned++;
                 }
 
-                EntityUid minedUid = slotItem ?? Spawn(miner.Proto, xform.Coordinates);
+                var minedUid = slotItem ?? Spawn(miner.Proto, xform.Coordinates);
                 if (slotItem == null)
                     spawned++;
 
@@ -124,7 +125,10 @@ public sealed class ItemMinerSystem : EntitySystem
                 else if (slot == null)
                 {
                     for (var i = 0; i < miner.Amount - spawned; i++)
+                    {
                         Spawn(miner.Proto, xform.Coordinates);
+                    }
+
                     spawned = miner.Amount;
                 }
                 // if it's not stackable and we're using a slot, just don't spawn more than 1

@@ -9,7 +9,7 @@ using Content.Shared.Weapons.Melee.Components;
 namespace Content.Goobstation.Shared.Enchanting.Systems;
 
 /// <summary>
-/// Controls <see cref="MeleeThrowOnHitComponent"/> values with the enchant level.
+/// Controls <see cref="MeleeThrowOnHitComponent" /> values with the enchant level.
 /// </summary>
 public sealed class KnockbackEnchantSystem : EntitySystem
 {
@@ -23,15 +23,10 @@ public sealed class KnockbackEnchantSystem : EntitySystem
         SubscribeLocalEvent<KnockbackEnchantComponent, EnchantUpgradedEvent>(OnUpgraded);
     }
 
-    private void OnAdded(Entity<KnockbackEnchantComponent> ent, ref EnchantAddedEvent args)
-    {
-        Modify(ent, (float) args.Level);
-    }
+    private void OnAdded(Entity<KnockbackEnchantComponent> ent, ref EnchantAddedEvent args) => Modify(ent, args.Level);
 
-    private void OnUpgraded(Entity<KnockbackEnchantComponent> ent, ref EnchantUpgradedEvent args)
-    {
-        Modify(ent, (float) args.Level / (float) args.OldLevel);
-    }
+    private void OnUpgraded(Entity<KnockbackEnchantComponent> ent, ref EnchantUpgradedEvent args) =>
+        Modify(ent, args.Level / (float) args.OldLevel);
 
     private void Modify(EntityUid uid, float factor)
     {

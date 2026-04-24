@@ -5,7 +5,7 @@ using Content.Shared.Polymorph;
 
 namespace Content.Goobstation.Server.Changeling;
 
-public sealed partial class VoidAdaptionSystem : SharedVoidAdaptionSystem
+public sealed class VoidAdaptionSystem : SharedVoidAdaptionSystem
 {
     [Dependency] private readonly PolymorphSystem _polymorph = default!;
 

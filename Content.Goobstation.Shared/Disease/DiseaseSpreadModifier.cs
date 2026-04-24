@@ -1,30 +1,24 @@
-using Robust.Shared.Serialization;
 using Robust.Shared.Prototypes;
+using Robust.Shared.Serialization;
 
 namespace Content.Goobstation.Shared.Disease;
 
-[DataDefinition, Serializable, NetSerializable]
+[DataDefinition] [Serializable] [NetSerializable]
 public sealed partial class DiseaseSpreadModifier
 {
-    /// <summary>
-    /// How much to modify spread attempts' power.
-    /// </summary>
-    [DataField]
-    public Dictionary<ProtoId<DiseaseSpreadPrototype>, float> PowerModifiers = new();
-
     /// <summary>
     /// By how much to multiply spread attempts' chance.
     /// </summary>
     [DataField]
     public Dictionary<ProtoId<DiseaseSpreadPrototype>, float> ChanceMultipliers = new();
 
-    public float PowerMod(ProtoId<DiseaseSpreadPrototype> proto)
-    {
-        return PowerModifiers.GetValueOrDefault(proto, 0f);
-    }
+    /// <summary>
+    /// How much to modify spread attempts' power.
+    /// </summary>
+    [DataField]
+    public Dictionary<ProtoId<DiseaseSpreadPrototype>, float> PowerModifiers = new();
 
-    public float ChanceMult(ProtoId<DiseaseSpreadPrototype> proto)
-    {
-        return ChanceMultipliers.GetValueOrDefault(proto, 1f);
-    }
+    public float PowerMod(ProtoId<DiseaseSpreadPrototype> proto) => PowerModifiers.GetValueOrDefault(proto, 0f);
+
+    public float ChanceMult(ProtoId<DiseaseSpreadPrototype> proto) => ChanceMultipliers.GetValueOrDefault(proto, 1f);
 }

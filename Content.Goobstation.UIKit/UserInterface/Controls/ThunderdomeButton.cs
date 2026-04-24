@@ -1,5 +1,4 @@
 using Robust.Client.Graphics;
-using Robust.Client.UserInterface;
 using Robust.Client.UserInterface.Controls;
 using Robust.Shared.Input;
 
@@ -7,27 +6,10 @@ namespace Content.Goobstation.UIKit.UserInterface.Controls;
 
 public sealed class ThunderdomeButton : PanelContainer
 {
-    public event Action? OnPressed;
+    private readonly Label _label;
 
     private readonly StyleBoxFlat _styleBox;
-    private readonly Label _label;
     private bool _disabled;
-
-    public bool Disabled
-    {
-        get => _disabled;
-        set
-        {
-            _disabled = value;
-            UpdateVisual();
-        }
-    }
-
-    public string Text
-    {
-        get => _label.Text ?? string.Empty;
-        set => _label.Text = value;
-    }
 
     public ThunderdomeButton()
     {
@@ -76,6 +58,24 @@ public sealed class ThunderdomeButton : PanelContainer
 
         OnMouseExited += _ => UpdateVisual();
     }
+
+    public bool Disabled
+    {
+        get => _disabled;
+        set
+        {
+            _disabled = value;
+            UpdateVisual();
+        }
+    }
+
+    public string Text
+    {
+        get => _label.Text ?? string.Empty;
+        set => _label.Text = value;
+    }
+
+    public event Action? OnPressed;
 
     private void UpdateVisual()
     {

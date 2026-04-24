@@ -1,5 +1,5 @@
-using Robust.Client.GameObjects;
 using Content.Goobstation.Shared.Wraith.Components;
+using Robust.Client.GameObjects;
 
 namespace Content.Goobstation.Client.Wraith;
 
@@ -42,4 +42,3 @@ public sealed class FadingInSystem : EntitySystem
         }
     }
 }
-

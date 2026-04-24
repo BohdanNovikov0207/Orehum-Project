@@ -1,9 +1,9 @@
-using Robust.Shared.Serialization;
 using Robust.Shared.Prototypes;
+using Robust.Shared.Serialization;
 
 namespace Content.Goobstation.Shared.Disease;
 
-[DataDefinition, Serializable, NetSerializable]
+[DataDefinition] [Serializable] [NetSerializable]
 public sealed partial class DiseaseSpreadSpecifier
 {
     /// <summary>

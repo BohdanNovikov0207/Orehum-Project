@@ -4,7 +4,7 @@ using Content.Shared.Slippery;
 namespace Content.Goobstation.Shared.Enchanting.Systems;
 
 /// <summary>
-/// Controls <see cref="SlipperyComponent"/> values with the enchant level.
+/// Controls <see cref="SlipperyComponent" /> values with the enchant level.
 /// </summary>
 public sealed class SlipperyEnchantSystem : EntitySystem
 {
@@ -18,15 +18,11 @@ public sealed class SlipperyEnchantSystem : EntitySystem
         SubscribeLocalEvent<SlipperyEnchantComponent, EnchantUpgradedEvent>(OnUpgraded);
     }
 
-    private void OnAdded(Entity<SlipperyEnchantComponent> ent, ref EnchantAddedEvent args)
-    {
-        Modify(args.Item, ent.Comp.BaseModifier * (float) args.Level);
-    }
+    private void OnAdded(Entity<SlipperyEnchantComponent> ent, ref EnchantAddedEvent args) =>
+        Modify(args.Item, ent.Comp.BaseModifier * args.Level);
 
-    private void OnUpgraded(Entity<SlipperyEnchantComponent> ent, ref EnchantUpgradedEvent args)
-    {
-        Modify(args.Item, (float) args.Level / (float) args.OldLevel);
-    }
+    private void OnUpgraded(Entity<SlipperyEnchantComponent> ent, ref EnchantUpgradedEvent args) =>
+        Modify(args.Item, args.Level / (float) args.OldLevel);
 
     private void Modify(EntityUid item, float factor)
     {

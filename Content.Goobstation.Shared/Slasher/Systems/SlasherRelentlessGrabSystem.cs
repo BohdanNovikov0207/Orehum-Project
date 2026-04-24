@@ -1,5 +1,4 @@
 using Content.Goobstation.Common.Grab;
-using Content.Goobstation.Common.MartialArts;
 using Content.Goobstation.Common.Weapons;
 using Content.Goobstation.Shared.Slasher.Components;
 using Content.Goobstation.Shared.Slasher.Events;
@@ -29,15 +28,11 @@ public sealed class SlasherRelentlessGrabSystem : EntitySystem
         SubscribeLocalEvent<SlasherRelentlessGrabComponent, LightAttackSpecialInteractionEvent>(OnLightAttackSpecial);
     }
 
-    private void OnMapInit(Entity<SlasherRelentlessGrabComponent> ent, ref MapInitEvent args)
-    {
+    private void OnMapInit(Entity<SlasherRelentlessGrabComponent> ent, ref MapInitEvent args) =>
         _actions.AddAction(ent.Owner, ref ent.Comp.ActionEnt, ent.Comp.ActionId);
-    }
 
-    private void OnShutdown(Entity<SlasherRelentlessGrabComponent> ent, ref ComponentShutdown args)
-    {
+    private void OnShutdown(Entity<SlasherRelentlessGrabComponent> ent, ref ComponentShutdown args) =>
         _actions.RemoveAction(ent.Comp.ActionEnt);
-    }
 
     private void OnActivate(Entity<SlasherRelentlessGrabComponent> ent, ref SlasherRelentlessGrabEvent args)
     {
@@ -52,7 +47,8 @@ public sealed class SlasherRelentlessGrabSystem : EntitySystem
         args.Handled = true;
     }
 
-    private void OnLightAttackSpecial(Entity<SlasherRelentlessGrabComponent> ent, ref LightAttackSpecialInteractionEvent args)
+    private void OnLightAttackSpecial(Entity<SlasherRelentlessGrabComponent> ent,
+        ref LightAttackSpecialInteractionEvent args)
     {
         if (!ent.Comp.Ready || args.Target == null)
             return;

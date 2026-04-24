@@ -18,9 +18,9 @@ namespace Content.Goobstation.Client.Clothing;
 public sealed class ToggleableClothingBoundUserInterface : BoundUserInterface
 {
     [Dependency] private readonly IClyde _displayManager = default!;
-    [Dependency] private readonly IInputManager _inputManager = default!;
 
-    private IEntityManager _entityManager;
+    private readonly IEntityManager _entityManager;
+    [Dependency] private readonly IInputManager _inputManager = default!;
     private ToggleableClothingRadialMenu? _menu;
 
     public ToggleableClothingBoundUserInterface(EntityUid owner, Enum uiKey) : base(owner, uiKey)

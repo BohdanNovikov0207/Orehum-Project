@@ -6,5 +6,5 @@ namespace Content.Goobstation.Shared.Xenomorph;
 /// Component added to a body that enables surgeries to create xeno organ slots.
 /// This lets you become a xeno-catboy hybrid.
 /// </summary>
-[RegisterComponent, NetworkedComponent]
+[RegisterComponent] [NetworkedComponent]
 public sealed partial class XenoCompatibleComponent : Component;

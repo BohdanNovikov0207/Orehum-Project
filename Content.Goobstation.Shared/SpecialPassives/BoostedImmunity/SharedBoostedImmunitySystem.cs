@@ -1,3 +1,4 @@
+using System.Linq;
 using Content.Goobstation.Common.Atmos;
 using Content.Goobstation.Common.Medical;
 using Content.Goobstation.Maths.FixedPoint;
@@ -16,20 +17,19 @@ using Content.Shared.Mobs.Components;
 using Content.Shared.StatusEffect;
 using Robust.Shared.Prototypes;
 using Robust.Shared.Timing;
-using System.Linq;
 
 namespace Content.Goobstation.Shared.SpecialPassives.BoostedImmunity;
 
 public abstract class SharedBoostedImmunitySystem : EntitySystem
 {
-    [Dependency] private readonly IGameTiming _timing = default!;
-    [Dependency] private readonly IPrototypeManager _proto = default!;
     [Dependency] private readonly AlertsSystem _alerts = default!;
     [Dependency] private readonly BlindableSystem _blindSys = default!;
-    [Dependency] private readonly DamageableSystem _dmg = default!;
     [Dependency] private readonly SharedBloodstreamSystem _bloodSys = default!;
+    [Dependency] private readonly DamageableSystem _dmg = default!;
     [Dependency] private readonly SharedDrunkSystem _drunkSys = default!;
+    [Dependency] private readonly IPrototypeManager _proto = default!;
     [Dependency] private readonly StatusEffectsSystem _status = default!;
+    [Dependency] private readonly IGameTiming _timing = default!;
 
     private EntityQuery<DamageableComponent> _damageableQuery;
     private EntityQuery<MobStateComponent> _mobStateQuery;
@@ -75,7 +75,8 @@ public abstract class SharedBoostedImmunitySystem : EntitySystem
     private void OnRemoved(Entity<BoostedImmunityComponent> ent, ref ComponentRemove args)
     {
         if (ent.Comp.AlertId != null)
-            _alerts.ClearAlert(ent, (ProtoId<AlertPrototype>) ent.Comp.AlertId); // incase there was still time left on removal
+            _alerts.ClearAlert(ent,
+                (ProtoId<AlertPrototype>) ent.Comp.AlertId); // incase there was still time left on removal
     }
 
     public override void Update(float frameTime)
@@ -123,20 +124,19 @@ public abstract class SharedBoostedImmunitySystem : EntitySystem
     }
 
     #region Event Handlers
-    private void OnMobStateChange(Entity<BoostedImmunityComponent> ent, ref MobStateChangedEvent args)
-    {
-        ent.Comp.Mobstate = args.NewMobState;
-    }
 
-    private void OnBeforeVomitEvent(Entity<BoostedImmunityComponent> ent, ref BeforeVomitEvent args)
-    {
+    private void OnMobStateChange(Entity<BoostedImmunityComponent> ent, ref MobStateChangedEvent args) =>
+        ent.Comp.Mobstate = args.NewMobState;
+
+    private void OnBeforeVomitEvent(Entity<BoostedImmunityComponent> ent, ref BeforeVomitEvent args) =>
         args.Cancelled = ent.Comp.ResistNausea;
-    }
+
     #endregion
 
     #region Helper Methods
 
     public readonly ProtoId<DamageGroupPrototype> ToxinDamageGroup = "Toxin";
+
     private void HealDamage(Entity<BoostedImmunityComponent> ent)
     {
         // the dmg groups
@@ -148,20 +148,27 @@ public abstract class SharedBoostedImmunitySystem : EntitySystem
 
         var toxinDiv =
             toxinTypes.DamageTypes.Count(type =>
-            damage.Damage.DamageDict.GetValueOrDefault(type)
-            != FixedPoint2.Zero);
+                damage.Damage.DamageDict.GetValueOrDefault(type)
+                != FixedPoint2.Zero);
 
         var toxinHealAmount = ent.Comp.ToxinHeal / toxinDiv;
 
         var healSpec = new DamageSpecifier();
 
         foreach (var tox in toxinTypes.DamageTypes)
+        {
             healSpec.DamageDict.Add(tox, toxinHealAmount);
+        }
 
         healSpec.DamageDict.Add("Cellular", ent.Comp.CellularHeal);
 
         // heal the damage
-        _dmg.TryChangeDamage(ent, healSpec, true, false, targetPart: TargetBodyPart.All, splitDamage: SplitDamageBehavior.SplitEnsureAllOrganic);
+        _dmg.TryChangeDamage(ent,
+            healSpec,
+            true,
+            false,
+            targetPart: TargetBodyPart.All,
+            splitDamage: SplitDamageBehavior.SplitEnsureAllOrganic);
         HealEyes(ent);
     }
 

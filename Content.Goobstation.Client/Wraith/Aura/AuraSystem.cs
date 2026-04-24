@@ -1,8 +1,8 @@
+using System.Numerics;
 using Content.Goobstation.Shared.Wraith.Aura;
 using Robust.Client.GameObjects;
 using Robust.Client.Graphics;
 using Robust.Shared.Prototypes;
-using System.Numerics;
 
 namespace Content.Goobstation.Client.Wraith.Aura;
 
@@ -16,7 +16,8 @@ public sealed class AuraSystem : EntitySystem
     [Dependency] private readonly IPrototypeManager _protoMan = default!;
 
     private ShaderInstance _shader = default!;
-    /// <inheritdoc/>
+
+    /// <inheritdoc />
     public override void Initialize()
     {
         base.Initialize();
@@ -50,7 +51,8 @@ public sealed class AuraSystem : EntitySystem
     private void OnShaderRender(Entity<AuraComponent> ent, ref BeforePostShaderRenderEvent args)
     {
         _shader.SetParameter("distortion", ent.Comp.Distortion);
-        _shader.SetParameter("auraColor", new Vector3(ent.Comp.AuraColor.A, ent.Comp.AuraColor.R, ent.Comp.AuraColor.G));
+        _shader.SetParameter("auraColor",
+            new Vector3(ent.Comp.AuraColor.A, ent.Comp.AuraColor.R, ent.Comp.AuraColor.G));
         _shader.SetParameter("mango", ent.Comp.AuraFarm);
     }
 }

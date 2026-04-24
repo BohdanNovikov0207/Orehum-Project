@@ -14,28 +14,7 @@ namespace Content.Goobstation.Server.OnPray.HealNearOnPray;
 public sealed partial class HealNearOnPrayComponent : Component
 {
     [DataField]
-    public DamageSpecifier Healing = new();
-
-    [DataField]
     public DamageSpecifier Damage = new();
-
-    /// <summary>
-    /// Which sound to play on heal.
-    /// </summary>
-    [DataField]
-    public SoundSpecifier HealSoundPath = new SoundPathSpecifier("/Audio/Effects/holy.ogg");
-
-    /// <summary>
-    /// Which sound to play on damage.
-    /// </summary>
-    [DataField]
-    public SoundSpecifier SizzleSoundPath = new SoundPathSpecifier("/Audio/Effects/lightburn.ogg");
-
-    /// <summary>
-    /// Which effect to display on heal.
-    /// </summary>
-    [DataField]
-    public EntProtoId HealEffect = "EffectSpark";
 
     /// <summary>
     /// Which effect to display on damage.
@@ -46,6 +25,27 @@ public sealed partial class HealNearOnPrayComponent : Component
     [DataField]
     public List<EntityUid> HealedEntities = new();
 
+    /// <summary>
+    /// Which effect to display on heal.
+    /// </summary>
+    [DataField]
+    public EntProtoId HealEffect = "EffectSpark";
+
+    [DataField]
+    public DamageSpecifier Healing = new();
+
+    /// <summary>
+    /// Which sound to play on heal.
+    /// </summary>
+    [DataField]
+    public SoundSpecifier HealSoundPath = new SoundPathSpecifier("/Audio/Effects/holy.ogg");
+
     [DataField]
     public int Range = 5;
+
+    /// <summary>
+    /// Which sound to play on damage.
+    /// </summary>
+    [DataField]
+    public SoundSpecifier SizzleSoundPath = new SoundPathSpecifier("/Audio/Effects/lightburn.ogg");
 }

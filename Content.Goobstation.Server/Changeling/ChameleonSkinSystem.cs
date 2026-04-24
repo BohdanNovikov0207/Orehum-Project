@@ -5,7 +5,7 @@ using Content.Shared.Polymorph;
 
 namespace Content.Goobstation.Server.Changeling;
 
-public sealed partial class ChameleonSkinSystem : SharedChameleonSkinSystem
+public sealed class ChameleonSkinSystem : SharedChameleonSkinSystem
 {
     [Dependency] private readonly PolymorphSystem _polymorph = default!;
 

@@ -4,11 +4,11 @@ using Content.Shared.NPC.Prototypes;
 using Robust.Shared.Prototypes;
 
 namespace Content.Goobstation.Server.EntityEffects;
+
 public sealed partial class ChangeFactionNearbyEffect : EntityEffect
 {
-    [DataField(required: true)] public ProtoId<NpcFactionPrototype> NewFaction;
-
     [DataField] public float Duration = 0f;
+    [DataField(required: true)] public ProtoId<NpcFactionPrototype> NewFaction;
 
     [DataField] public float Radius = 5f;
 
@@ -21,6 +21,8 @@ public sealed partial class ChangeFactionNearbyEffect : EntityEffect
         var cf = args.EntityManager.System<ChangeFactionStatusEffectSystem>();
 
         foreach (var entity in lookupSys.GetEntitiesInRange(args.TargetEntity, Radius))
+        {
             cf.TryChangeFaction(entity, NewFaction, out _, Duration);
+        }
     }
 }

@@ -8,7 +8,6 @@
 // SPDX-License-Identifier: AGPL-3.0-or-later
 
 using System.Linq;
-using Content.Goobstation.Common.Research;
 using Content.Shared.Research.Components;
 using Content.Shared.Research.Prototypes;
 using JetBrains.Annotations;
@@ -21,7 +20,8 @@ namespace Content.Goobstation.Client.Research.UI;
 public sealed class FancyResearchConsoleBoundUserInterface : BoundUserInterface
 {
     [ViewVariables]
-    private FancyResearchConsoleMenu? _consoleMenu;  // Goobstation R&D Console rework - ResearchConsoleMenu -> FancyResearchConsoleMenu
+    private FancyResearchConsoleMenu?
+        _consoleMenu; // Goobstation R&D Console rework - ResearchConsoleMenu -> FancyResearchConsoleMenu
 
     public FancyResearchConsoleBoundUserInterface(EntityUid owner, Enum uiKey) : base(owner, uiKey)
     {
@@ -33,7 +33,8 @@ public sealed class FancyResearchConsoleBoundUserInterface : BoundUserInterface
 
         var owner = Owner;
 
-        _consoleMenu = this.CreateWindow<FancyResearchConsoleMenu>();   // Goobstation R&D Console rework - ResearchConsoleMenu -> FancyResearchConsoleMenu
+        _consoleMenu =
+            this.CreateWindow<FancyResearchConsoleMenu>(); // Goobstation R&D Console rework - ResearchConsoleMenu -> FancyResearchConsoleMenu
         _consoleMenu.SetEntity(owner);
         _consoleMenu.OnClose += () => _consoleMenu = null;
 

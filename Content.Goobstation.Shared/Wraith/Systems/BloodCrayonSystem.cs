@@ -7,6 +7,7 @@ using Content.Shared.Hands.EntitySystems;
 using Content.Shared.Interaction;
 
 namespace Content.Goobstation.Shared.Wraith.Systems;
+
 public sealed class BloodCrayonSystem : EntitySystem
 {
     [Dependency] private readonly SharedHandsSystem _handsSystem = default!;
@@ -16,7 +17,7 @@ public sealed class BloodCrayonSystem : EntitySystem
     {
         base.Initialize();
 
-        SubscribeLocalEvent<BloodCrayonComponent, AfterInteractEvent>(OnCrayonUse, before: [typeof(SharedCrayonSystem)]);
+        SubscribeLocalEvent<BloodCrayonComponent, AfterInteractEvent>(OnCrayonUse, [typeof(SharedCrayonSystem)]);
         SubscribeLocalEvent<BloodWritingComponent, BloodWritingEvent>(OnBloodWritingAction);
     }
 
@@ -40,6 +41,7 @@ public sealed class BloodCrayonSystem : EntitySystem
             PredictedQueueDel(ent.Comp.BloodCrayon);
             ent.Comp.BloodCrayon = null;
         }
+
         Dirty(ent);
 
         args.Handled = true;

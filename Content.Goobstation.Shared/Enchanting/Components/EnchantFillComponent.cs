@@ -11,7 +11,7 @@ namespace Content.Goobstation.Shared.Enchanting.Components;
 /// <summary>
 /// Gives an entity enchants by default.
 /// </summary>
-[RegisterComponent, Access(typeof(EnchantFillSystem))]
+[RegisterComponent] [Access(typeof(EnchantFillSystem))]
 public sealed partial class EnchantFillComponent : Component
 {
     /// <summary>

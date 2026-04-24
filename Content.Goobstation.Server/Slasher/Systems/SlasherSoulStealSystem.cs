@@ -1,3 +1,4 @@
+using System.Linq;
 using Content.Goobstation.Server.Devil.Contract;
 using Content.Goobstation.Shared.Slasher.Components;
 using Content.Goobstation.Shared.Slasher.Events;
@@ -7,6 +8,7 @@ using Content.Server.AlertLevel;
 using Content.Server.Atmos.EntitySystems;
 using Content.Server.Chat.Systems;
 using Content.Server.Ghost;
+using Content.Server.Light.Components;
 using Content.Server.Light.EntitySystems;
 using Content.Server.Station.Systems;
 using Content.Shared.Actions;
@@ -24,14 +26,12 @@ using Content.Shared.Standing;
 using Content.Shared.Throwing;
 using Content.Shared.Weapons.Melee.Events;
 using Content.Shared.Weather;
+using Robust.Server.GameObjects;
 using Robust.Shared.Audio.Systems;
 using Robust.Shared.Prototypes;
 using Robust.Shared.Random;
 using Robust.Shared.Timing;
 using FixedPoint2 = Content.Goobstation.Maths.FixedPoint.FixedPoint2;
-using System.Linq;
-using Content.Server.Light.Components;
-using Robust.Server.GameObjects;
 
 namespace Content.Goobstation.Server.Slasher.Systems;
 
@@ -41,26 +41,26 @@ namespace Content.Goobstation.Server.Slasher.Systems;
 public sealed class SlasherSoulStealSystem : EntitySystem
 {
     [Dependency] private readonly SharedActionsSystem _actions = default!;
-    [Dependency] private readonly MobStateSystem _mobState = default!;
-    [Dependency] private readonly StandingStateSystem _standing = default!;
-    [Dependency] private readonly SharedPopupSystem _popup = default!;
-    [Dependency] private readonly SharedHandsSystem _hands = default!;
-    [Dependency] private readonly SharedDoAfterSystem _doAfter = default!;
+    [Dependency] private readonly AlertLevelSystem _alertLevel = default!;
+    [Dependency] private readonly AtmosphereSystem _atmos = default!;
+    [Dependency] private readonly SharedAudioSystem _audio = default!;
+    [Dependency] private readonly ChatSystem _chatSystem = default!;
     [Dependency] private readonly DamageableSystem _damageable = default!;
     [Dependency] private readonly DevilContractSystem _devilContractSystem = default!;
+    [Dependency] private readonly SharedDoAfterSystem _doAfter = default!;
+    [Dependency] private readonly SharedHandsSystem _hands = default!;
+    [Dependency] private readonly PoweredLightSystem _light = default!;
+    [Dependency] private readonly EntityLookupSystem _lookup = default!;
     [Dependency] private readonly SharedMindSystem _mindSystem = default!;
-    [Dependency] private readonly SharedAudioSystem _audio = default!;
-    [Dependency] private readonly IGameTiming _timing = default!;
-    [Dependency] private readonly AtmosphereSystem _atmos = default!;
-    [Dependency] private readonly StationSystem _stationSystem = default!;
-    [Dependency] private readonly ChatSystem _chatSystem = default!;
-    [Dependency] private readonly AlertLevelSystem _alertLevel = default!;
-    [Dependency] private readonly SharedWeatherSystem _weather = default!;
+    [Dependency] private readonly MobStateSystem _mobState = default!;
+    [Dependency] private readonly SharedPopupSystem _popup = default!;
     [Dependency] private readonly IPrototypeManager _protoMan = default!;
     [Dependency] private readonly IRobustRandom _random = default!;
-    [Dependency] private readonly EntityLookupSystem _lookup = default!;
-    [Dependency] private readonly PoweredLightSystem _light = default!;
     [Dependency] private readonly SlasherRegenerateSystem _regenerate = default!;
+    [Dependency] private readonly StandingStateSystem _standing = default!;
+    [Dependency] private readonly StationSystem _stationSystem = default!;
+    [Dependency] private readonly IGameTiming _timing = default!;
+    [Dependency] private readonly SharedWeatherSystem _weather = default!;
 
     public override void Initialize()
     {
@@ -77,15 +77,11 @@ public sealed class SlasherSoulStealSystem : EntitySystem
         SubscribeLocalEvent<SlasherSoulStealComponent, DamageModifyEvent>(OnDamageModify);
     }
 
-    private void OnMapInit(Entity<SlasherSoulStealComponent> ent, ref MapInitEvent args)
-    {
+    private void OnMapInit(Entity<SlasherSoulStealComponent> ent, ref MapInitEvent args) =>
         _actions.AddAction(ent.Owner, ref ent.Comp.ActionEntity, ent.Comp.ActionId);
-    }
 
-    private void OnShutdown(Entity<SlasherSoulStealComponent> ent, ref ComponentShutdown args)
-    {
+    private void OnShutdown(Entity<SlasherSoulStealComponent> ent, ref ComponentShutdown args) =>
         _actions.RemoveAction(ent.Comp.ActionEntity);
-    }
 
     /// <summary>
     /// Handles the soul steal event
@@ -101,7 +97,7 @@ public sealed class SlasherSoulStealSystem : EntitySystem
         var target = args.Target;
 
         // Check rather our victim has a mind
-        if (!_mindSystem.TryGetMind(target, out _, out MindComponent? _))
+        if (!_mindSystem.TryGetMind(target, out _, out var _))
         {
             _popup.PopupEntity(Loc.GetString("slasher-soulsteal-fail-no-mind"), user, user);
             args.Handled = true;
@@ -136,25 +132,33 @@ public sealed class SlasherSoulStealSystem : EntitySystem
         }
 
         // DoAfter, starting the do-after to the next tick to avoid modifying ActiveDoAfterComponent when active.
-        Timer.Spawn(_timing.TickPeriod, () =>
-        {
-            if (!Exists(user) || !Exists(target))
-                return;
-
-            _doAfter.TryStartDoAfter(new DoAfterArgs(EntityManager, user, ent.Comp.Soulstealdoafterduration,
-                new SlasherSoulStealDoAfterEvent(), user, target: target)
+        Timer.Spawn(_timing.TickPeriod,
+            () =>
             {
-                BreakOnDamage = true,
-                BreakOnMove = true,
-                DistanceThreshold = 2f,
-                RequireCanInteract = false
+                if (!Exists(user) || !Exists(target))
+                    return;
+
+                _doAfter.TryStartDoAfter(new DoAfterArgs(EntityManager,
+                    user,
+                    ent.Comp.Soulstealdoafterduration,
+                    new SlasherSoulStealDoAfterEvent(),
+                    user,
+                    target)
+                {
+                    BreakOnDamage = true,
+                    BreakOnMove = true,
+                    DistanceThreshold = 2f,
+                    RequireCanInteract = false,
+                });
             });
-        });
 
         // Popup for user
         _popup.PopupEntity(Loc.GetString("slasher-soulsteal-start", ("target", target)), user, user);
         // Popup for victim only
-        _popup.PopupEntity(Loc.GetString("slasher-soulsteal-start-victim", ("user", user)), target, target, PopupType.MediumCaution);
+        _popup.PopupEntity(Loc.GetString("slasher-soulsteal-start-victim", ("user", user)),
+            target,
+            target,
+            PopupType.MediumCaution);
         args.Handled = true;
     }
 
@@ -175,7 +179,7 @@ public sealed class SlasherSoulStealSystem : EntitySystem
         _audio.PlayPvs(ent.Comp.SoulStealSound, target);
 
         // Release ammonia gas into the atmosphere
-        var tileMix = _atmos.GetTileMixture(target, excite: true);
+        var tileMix = _atmos.GetTileMixture(target, true);
         tileMix?.AdjustMoles(Gas.Ammonia, comp.MolesAmmonia);
 
         var alive = _mobState.IsAlive(target);
@@ -190,6 +194,7 @@ public sealed class SlasherSoulStealSystem : EntitySystem
 
         // Update absorb souls objective progress
         if (_mindSystem.TryGetMind(user, out var mindId, out var mind))
+        {
             foreach (var objUid in mind.Objectives)
             {
                 if (!TryComp<SlasherAbsorbSoulsConditionComponent>(objUid, out var absorbObj))
@@ -199,6 +204,7 @@ public sealed class SlasherSoulStealSystem : EntitySystem
                 Dirty(objUid, absorbObj);
                 break;
             }
+        }
 
         // Apply devil clause downside
         _devilContractSystem.AddRandomNegativeClauseSlasher(target);
@@ -221,7 +227,10 @@ public sealed class SlasherSoulStealSystem : EntitySystem
             comp.HasUnlockedPossession = true;
             EnsureComp<SlasherPossessionComponent>(user);
 
-            _popup.PopupEntity(Loc.GetString("slasher-soulsteal-unlock-possession"), user, user, PopupType.LargeCaution);
+            _popup.PopupEntity(Loc.GetString("slasher-soulsteal-unlock-possession"),
+                user,
+                user,
+                PopupType.LargeCaution);
             specialUnlockHappened = true;
         }
 
@@ -238,7 +247,7 @@ public sealed class SlasherSoulStealSystem : EntitySystem
             if (station != null)
             {
                 // Set station to red alert
-                _alertLevel.SetLevel(station.Value, "red", true, true, true, false);
+                _alertLevel.SetLevel(station.Value, "red", true, true, true);
 
                 // Make it rain in space
                 var xform = Transform(user);
@@ -248,10 +257,10 @@ public sealed class SlasherSoulStealSystem : EntitySystem
                 _chatSystem.DispatchStationAnnouncement(
                     station.Value,
                     Loc.GetString("slasher-soulsteal-ascendance"),
-                    sender: Loc.GetString("comms-console-announcement-title-centcom"),
-                    playDefaultSound: false,
-                    announcementSound: null,
-                    colorOverride: Color.Red);
+                    Loc.GetString("comms-console-announcement-title-centcom"),
+                    false,
+                    null,
+                    Color.Red);
 
                 _audio.PlayGlobal(comp.AscendanceSound, _stationSystem.GetInOwningStation(station.Value), true);
             }
@@ -262,10 +271,16 @@ public sealed class SlasherSoulStealSystem : EntitySystem
 
         // Popup for user only
         if (!specialUnlockHappened)
-            _popup.PopupEntity(Loc.GetString("slasher-soulsteal-success", ("target", target)), user, user, PopupType.LargeCaution);
+            _popup.PopupEntity(Loc.GetString("slasher-soulsteal-success", ("target", target)),
+                user,
+                user,
+                PopupType.LargeCaution);
 
         // Popup for victim only
-        _popup.PopupEntity(Loc.GetString("slasher-soulsteal-success-victim", ("user", user)), target, target, PopupType.LargeCaution);
+        _popup.PopupEntity(Loc.GetString("slasher-soulsteal-success-victim", ("user", user)),
+            target,
+            target,
+            PopupType.LargeCaution);
         Dirty(user, comp);
     }
 
@@ -439,6 +454,7 @@ public sealed class SlasherSoulStealSystem : EntitySystem
             // For powered lights, 50/50 chance to either flicker or destroy the bulb
             if (TryComp<PoweredLightComponent>(entity, out var lightComp) && _random.Prob(0.5f))
                 // Destroy the light bulb
+            {
                 if (_light.TryDestroyBulb(entity, lightComp))
                     handled = true;
                 else
@@ -448,6 +464,7 @@ public sealed class SlasherSoulStealSystem : EntitySystem
                     RaiseLocalEvent(entity, ev);
                     handled = ev.Handled;
                 }
+            }
 
             if (handled)
                 flickerCounter++;

@@ -21,8 +21,6 @@ public sealed class ItemToggleColorSystem : EntitySystem
         SubscribeLocalEvent<ItemToggleColorComponent, ItemToggledEvent>(OnLightToggled);
     }
 
-    private void OnLightToggled(Entity<ItemToggleColorComponent> ent, ref ItemToggledEvent args)
-    {
+    private void OnLightToggled(Entity<ItemToggleColorComponent> ent, ref ItemToggledEvent args) =>
         _appearance.SetData(ent, ToggleableVisuals.Enabled, args.Activated);
-    }
 }

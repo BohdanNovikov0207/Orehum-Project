@@ -7,13 +7,19 @@ namespace Content.Goobstation.Shared.Slasher.Components;
 /// <summary>
 /// Check for observers.
 /// </summary>
-[RegisterComponent, NetworkedComponent, AutoGenerateComponentState]
+[RegisterComponent] [NetworkedComponent] [AutoGenerateComponentState]
 public sealed partial class SlasherObserverCheckComponent : Component
 {
     /// <summary>
+    /// The alert prototype to show.
+    /// </summary>
+    [DataField]
+    public ProtoId<AlertPrototype> Alert = "SlasherSeen";
+
+    /// <summary>
     /// Whether the slasher is currently being observed.
     /// </summary>
-    [DataField, AutoNetworkedField]
+    [DataField] [AutoNetworkedField]
     public bool IsObserved;
 
     /// <summary>
@@ -21,10 +27,4 @@ public sealed partial class SlasherObserverCheckComponent : Component
     /// </summary>
     [DataField]
     public float Range = 10f;
-
-    /// <summary>
-    /// The alert prototype to show.
-    /// </summary>
-    [DataField]
-    public ProtoId<AlertPrototype> Alert = "SlasherSeen";
 }

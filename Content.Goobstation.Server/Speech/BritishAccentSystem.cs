@@ -45,4 +45,4 @@ public sealed class BritishAccentSystem : EntitySystem
 
         args.Message = message;
     }
-};
+}

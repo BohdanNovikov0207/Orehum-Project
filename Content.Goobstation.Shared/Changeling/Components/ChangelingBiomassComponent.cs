@@ -9,20 +9,17 @@ namespace Content.Goobstation.Shared.Changeling.Components;
 /// <summary>
 /// Component used to mark changelings that use biomass. Typically only via Awakened Instinct.
 /// </summary>
-[RegisterComponent, NetworkedComponent, AutoGenerateComponentState]
+[RegisterComponent] [NetworkedComponent] [AutoGenerateComponentState]
 public sealed partial class ChangelingBiomassComponent : Component
 {
-    /// <summary>
-    /// The internal resource prototype to be added.
-    /// </summary>
-    [DataField, AutoNetworkedField]
-    public string ResourceProto = "ChangelingBiomass";
+    [DataField] [AutoNetworkedField]
+    public FixedPoint2 BloodCoughAmount = 2f;
 
     /// <summary>
-    /// The InternalResourcesData of the prototype.
+    /// The amount that the changeling's chemical regeneration multiplier will increase by
     /// </summary>
-    [DataField, AutoNetworkedField]
-    public InternalResourcesData? ResourceData;
+    [DataField] [AutoNetworkedField]
+    public float ChemicalBoost = 0.25f;
 
     /// <summary>
     /// The ProtoID of the changeling chemicals.
@@ -30,37 +27,40 @@ public sealed partial class ChangelingBiomassComponent : Component
     [DataField]
     public ProtoId<InternalResourcesPrototype> ChemResourceType = "ChangelingChemicals";
 
-    /// <summary>
-    /// The amount that the changeling's chemical regeneration multiplier will increase by
-    /// </summary>
-    [DataField, AutoNetworkedField]
-    public float ChemicalBoost = 0.25f;
+    [DataField]
+    public ProtoId<EmotePrototype> CoughEmote = "Cough";
 
     // first threshold
     [DataField]
     public LocId FirstWarnPopup = "changeling-biomass-warn-first";
 
+    // final threshold (death)
+    [DataField]
+    public LocId NoBiomassPopup = "changeling-biomass-warn-death";
+
+    /// <summary>
+    /// The InternalResourcesData of the prototype.
+    /// </summary>
+    [DataField] [AutoNetworkedField]
+    public InternalResourcesData? ResourceData;
+
+    /// <summary>
+    /// The internal resource prototype to be added.
+    /// </summary>
+    [DataField] [AutoNetworkedField]
+    public string ResourceProto = "ChangelingBiomass";
+
     // second threshold
     [DataField]
     public LocId SecondWarnPopup = "changeling-biomass-warn-second";
 
-    [DataField, AutoNetworkedField]
+    [DataField] [AutoNetworkedField]
     public TimeSpan SecondWarnStun = TimeSpan.FromSeconds(1);
 
     // third threshold
     [DataField]
     public LocId ThirdWarnPopup = "changeling-biomass-warn-third";
 
-    [DataField, AutoNetworkedField]
+    [DataField] [AutoNetworkedField]
     public TimeSpan ThirdWarnStun = TimeSpan.FromSeconds(2);
-
-    [DataField, AutoNetworkedField]
-    public FixedPoint2 BloodCoughAmount = 2f;
-
-    [DataField]
-    public ProtoId<EmotePrototype> CoughEmote = "Cough";
-
-    // final threshold (death)
-    [DataField]
-    public LocId NoBiomassPopup = "changeling-biomass-warn-death";
 }

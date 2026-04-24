@@ -18,20 +18,18 @@ namespace Content.Goobstation.Shared.Interaction;
 
 public sealed class BackEquipSystem : EntitySystem
 {
+    [Dependency] private readonly ActionBlockerSystem _actionBlocker = default!;
     [Dependency] private readonly SharedHandsSystem _hands = default!;
     [Dependency] private readonly InventorySystem _inventory = default!;
     [Dependency] private readonly SharedPopupSystem _popup = default!;
-    [Dependency] private readonly ActionBlockerSystem _actionBlocker = default!;
 
-    public override void Initialize()
-    {
+    public override void Initialize() =>
         CommandBinds.Builder
             .Bind(ContentKeyFunctions.SmartEquipBack,
                 InputCmdHandler.FromDelegate(HandleEquipToBack,
                     handle: false,
                     outsidePrediction: false)) // Goobstation - Smart equip to back
             .Register<BackEquipSystem>();
-    }
 
     public override void Shutdown()
     {
@@ -40,10 +38,7 @@ public sealed class BackEquipSystem : EntitySystem
         CommandBinds.Unregister<BackEquipSystem>();
     }
 
-    private void HandleEquipToBack(ICommonSession? session)
-    {
-        HandleEquipToSlot(session, "suitstorage");
-    }
+    private void HandleEquipToBack(ICommonSession? session) => HandleEquipToSlot(session, "suitstorage");
 
     private void HandleEquipToSlot(ICommonSession? session, string equipmentSlot)
     {
@@ -97,6 +92,7 @@ public sealed class BackEquipSystem : EntitySystem
             _inventory.TryEquip(uid, handItem.Value, equipmentSlot, predicted: true, checkDoafter: true);
             return;
         }
+
         if (handItem != null)
             return;
 
@@ -105,6 +101,7 @@ public sealed class BackEquipSystem : EntitySystem
             _popup.PopupClient(Loc.GetString(inventoryReason), uid, uid);
             return;
         }
+
         _inventory.TryUnequip(uid, equipmentSlot, inventory: inventory, predicted: true, checkDoafter: true);
         _hands.TryPickup(uid, slotItem, handsComp: hands);
     }

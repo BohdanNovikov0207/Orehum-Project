@@ -9,7 +9,7 @@ using Content.Server.Atmos.Components;
 namespace Content.Goobstation.Server.Enchanting.Systems;
 
 /// <summary>
-/// Controls <see cref="IgniteOnMeleeHitComponent"/> fire stacks with enchant level.
+/// Controls <see cref="IgniteOnMeleeHitComponent" /> fire stacks with enchant level.
 /// </summary>
 public sealed class FireAspectEnchantSystem : EntitySystem
 {
@@ -21,18 +21,11 @@ public sealed class FireAspectEnchantSystem : EntitySystem
         SubscribeLocalEvent<FireAspectEnchantComponent, EnchantUpgradedEvent>(OnUpgraded);
     }
 
-    private void OnAdded(Entity<FireAspectEnchantComponent> ent, ref EnchantAddedEvent args)
-    {
+    private void OnAdded(Entity<FireAspectEnchantComponent> ent, ref EnchantAddedEvent args) =>
         Add(ent, ent.Comp.StacksPerLevel * args.Level);
-    }
 
-    private void OnUpgraded(Entity<FireAspectEnchantComponent> ent, ref EnchantUpgradedEvent args)
-    {
+    private void OnUpgraded(Entity<FireAspectEnchantComponent> ent, ref EnchantUpgradedEvent args) =>
         Add(ent, ent.Comp.StacksPerLevel * (args.Level - args.OldLevel));
-    }
 
-    private void Add(EntityUid uid, float stacks)
-    {
-        EnsureComp<IgniteOnMeleeHitComponent>(uid).FireStacks += stacks;
-    }
+    private void Add(EntityUid uid, float stacks) => EnsureComp<IgniteOnMeleeHitComponent>(uid).FireStacks += stacks;
 }

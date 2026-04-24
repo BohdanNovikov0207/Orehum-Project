@@ -13,7 +13,6 @@
 using Content.Goobstation.Common.Traits;
 using Content.Shared._Shitmed.Body.Components;
 using Content.Shared.Body.Components;
-using Content.Shared.Body.Part;
 
 namespace Content.Goobstation.Shared.Traits.Assorted;
 
@@ -33,7 +32,9 @@ public sealed class LegsStartParalyzedSystem : EntitySystem
             return;
 
         foreach (var legEntity in body.LegEntities)
+        {
             EnsureComp<LimbParalyzedComponent>(legEntity);
+        }
     }
 
     private void OnRemoved(EntityUid uid, LegsStartParalyzedComponent component, ComponentRemove args)
@@ -42,6 +43,8 @@ public sealed class LegsStartParalyzedSystem : EntitySystem
             return;
 
         foreach (var legEntity in body.LegEntities)
+        {
             RemComp<LimbParalyzedComponent>(legEntity);
+        }
     }
 }

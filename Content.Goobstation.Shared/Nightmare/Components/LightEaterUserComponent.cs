@@ -6,21 +6,21 @@ namespace Content.Goobstation.Shared.Nightmare.Components;
 /// <summary>
 /// This is used for indicating that the user owns this action
 /// </summary>
-[RegisterComponent, NetworkedComponent]
+[RegisterComponent] [NetworkedComponent]
 public sealed partial class LightEaterUserComponent : Component
 {
-    [DataField]
-    public EntProtoId ActionId = "ActionLightEater";
-
     [DataField]
     public EntityUid? ActionEnt;
 
     [DataField]
-    public EntProtoId LightEaterProto = "LightEaterArmBlade";
+    public EntProtoId ActionId = "ActionLightEater";
 
     [DataField]
     public bool Activated;
 
     [DataField]
     public EntityUid? LightEaterEntity;
+
+    [DataField]
+    public EntProtoId LightEaterProto = "LightEaterArmBlade";
 }

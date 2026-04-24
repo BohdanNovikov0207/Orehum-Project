@@ -15,11 +15,11 @@ namespace Content.Goobstation.Shared.Weapons.Ranged.ProjectileDamageWhitelist;
 public sealed partial class ProjectileDamageWhitelistComponent : Component
 {
     [DataField]
-    public DamageSpecifier Damage = new ();
+    public DamageSpecifier Damage = new();
 
     [DataField]
     public bool IgnoreResistances;
 
     [DataField]
-    public EntityWhitelist Whitelist = new ();
+    public EntityWhitelist Whitelist = new();
 }

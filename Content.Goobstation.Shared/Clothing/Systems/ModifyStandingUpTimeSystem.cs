@@ -36,13 +36,11 @@ public sealed class MultiplyStandingUpTimeSystem : EntitySystem
         args.PushMarkup(msg);
     }
 
-    private void OnInventoryGetMultiplier(Entity<ModifyStandingUpTimeComponent> ent, ref InventoryRelayedEvent<GetStandingUpTimeMultiplierEvent> args)
-    {
+    private void OnInventoryGetMultiplier(Entity<ModifyStandingUpTimeComponent> ent,
+        ref InventoryRelayedEvent<GetStandingUpTimeMultiplierEvent> args) =>
         args.Args.Multiplier *= ent.Comp.Multiplier;
-    }
 
-    private void OnGetMultiplier(Entity<ModifyStandingUpTimeComponent> ent, ref GetStandingUpTimeMultiplierEvent args)
-    {
+    private void
+        OnGetMultiplier(Entity<ModifyStandingUpTimeComponent> ent, ref GetStandingUpTimeMultiplierEvent args) =>
         args.Multiplier *= ent.Comp.Multiplier;
-    }
 }

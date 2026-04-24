@@ -8,10 +8,10 @@ using Content.Shared.Rejuvenate;
 
 namespace Content.Goobstation.Shared.Changeling.Systems;
 
-public abstract partial class SharedChangelingChemicalSystem : EntitySystem
+public abstract class SharedChangelingChemicalSystem : EntitySystem
 {
-    [Dependency] private readonly SharedInternalResourcesSystem _resource = default!;
     [Dependency] private readonly SharedPopupSystem _popup = default!;
+    [Dependency] private readonly SharedInternalResourcesSystem _resource = default!;
 
     private EntityQuery<InternalResourcesComponent> _resourceQuery;
 
@@ -44,9 +44,16 @@ public abstract partial class SharedChangelingChemicalSystem : EntitySystem
             _resource.TryRemoveInternalResource(ent, ent.Comp.ResourceProto, resComp);
     }
 
+    #region Helper Methods
+
+    private bool OnFire(Entity<ChangelingChemicalComponent> ent) => HasComp<OnFireComponent>(ent);
+
+    #endregion
+
     #region Event Handlers
 
-    private void BeforeResourceRegenEvent(Entity<ChangelingChemicalComponent> ent, ref InternalResourcesRegenModifierEvent args)
+    private void BeforeResourceRegenEvent(Entity<ChangelingChemicalComponent> ent,
+        ref InternalResourcesRegenModifierEvent args)
     {
         if (ent.Comp.ResourceData == null
             || args.Data.InternalResourcesType != ent.Comp.ResourceData.InternalResourcesType)
@@ -64,15 +71,6 @@ public abstract partial class SharedChangelingChemicalSystem : EntitySystem
         _resource.TryUpdateResourcesAmount(ent, ent.Comp.ResourceData, ent.Comp.ResourceData.MaxAmount);
 
         _popup.PopupEntity(Loc.GetString(ent.Comp.RejuvenatePopup), ent, ent);
-    }
-
-    #endregion
-
-    #region Helper Methods
-
-    private bool OnFire(Entity<ChangelingChemicalComponent> ent)
-    {
-        return HasComp<OnFireComponent>(ent);
     }
 
     #endregion

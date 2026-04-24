@@ -15,9 +15,6 @@ public sealed partial class StackFilterWindow : FancyWindow
 {
     [Dependency] private readonly EntityManager _entMan = default!;
 
-    public event Action<int>? OnSetMin;
-    public event Action<int>? OnSetSize;
-
     public StackFilterWindow()
     {
         IoCManager.InjectDependencies(this);
@@ -45,6 +42,9 @@ public sealed partial class StackFilterWindow : FancyWindow
                 OnSetSize?.Invoke(size);
         };
     }
+
+    public event Action<int>? OnSetMin;
+    public event Action<int>? OnSetSize;
 
     public void SetEntity(EntityUid uid)
     {

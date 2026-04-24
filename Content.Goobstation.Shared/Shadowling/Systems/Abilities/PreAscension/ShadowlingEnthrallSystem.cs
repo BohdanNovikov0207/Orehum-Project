@@ -18,10 +18,10 @@ namespace Content.Goobstation.Shared.Shadowling.Systems.Abilities.PreAscension;
 /// </summary>
 public sealed class ShadowlingEnthrallSystem : EntitySystem
 {
-    [Dependency] private readonly SharedShadowlingSystem _shadowling = default!;
     [Dependency] private readonly SharedActionsSystem _actions = default!;
-    [Dependency] private readonly SharedPopupSystem _popup = default!;
     [Dependency] private readonly SharedDoAfterSystem _doAfter = default!;
+    [Dependency] private readonly SharedPopupSystem _popup = default!;
+    [Dependency] private readonly SharedShadowlingSystem _shadowling = default!;
 
     public override void Initialize()
     {

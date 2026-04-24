@@ -15,16 +15,10 @@ namespace Content.Goobstation.Shared.Containers.OnCollide;
 /// When this component is added we remove everything from the container
 /// when the entity collides (and the collidable whitelist passes if given)
 /// </summary>
-[RegisterComponent, NetworkedComponent]
+[RegisterComponent] [NetworkedComponent]
 [Access(typeof(RemoveFromContainerOnCollideSystem))]
 public sealed partial class RemoveFromContainerOnCollideComponent : Component
 {
-    /// <summary>
-    /// ID of the target container
-    /// </summary>
-    [DataField("container", required: true)]
-    public string Container = default!;
-
     /// <summary>
     /// Entities we can collide with without removing from the container
     /// </summary>
@@ -32,12 +26,38 @@ public sealed partial class RemoveFromContainerOnCollideComponent : Component
     public EntityWhitelist? CollidableEntities;
 
     /// <summary>
-    /// Min velocity we need to remove everything in the container.
-    /// Represented in meters/tiles per second
+    /// ID of the target container
     /// </summary>
-    [DataField("requiredVelocity")]
+    [DataField("container", required: true)]
+    public string Container = default!;
+
+    /// <summary>
+    /// Whether or not to throw the container contents around after colliding
+    /// </summary>
+    [DataField("ejectAfterRemove")]
     [ViewVariables(VVAccess.ReadWrite)]
-    public float RequiredVelocity;
+    public bool EjectAfterRemove = true;
+
+    /// <summary>
+    /// Pushback we get when throwing
+    /// </summary>
+    [DataField("ejectPushbackRatio")]
+    [ViewVariables(VVAccess.ReadWrite)]
+    public float EjectPushbackRatio;
+
+    /// <summary>
+    /// Min and max angles to give to our random throws
+    /// </summary>
+    [DataField("ejectRange")]
+    [ViewVariables(VVAccess.ReadWrite)]
+    public (float Min, float Max) EjectRange = (1f, 2f);
+
+    /// <summary>
+    /// Force of our throws
+    /// </summary>
+    [DataField("ejectStrength")]
+    [ViewVariables(VVAccess.ReadWrite)]
+    public float EjectStrength = 5f;
 
     /// <summary>
     /// Whether or not try to remove everything inside the container
@@ -56,30 +76,10 @@ public sealed partial class RemoveFromContainerOnCollideComponent : Component
     public bool RemoveStrapped = true;
 
     /// <summary>
-    /// Whether or not to throw the container contents around after colliding
+    /// Min velocity we need to remove everything in the container.
+    /// Represented in meters/tiles per second
     /// </summary>
-    [DataField("ejectAfterRemove")]
+    [DataField("requiredVelocity")]
     [ViewVariables(VVAccess.ReadWrite)]
-    public bool EjectAfterRemove = true;
-
-    /// <summary>
-    /// Min and max angles to give to our random throws
-    /// </summary>
-    [DataField("ejectRange")]
-    [ViewVariables(VVAccess.ReadWrite)]
-    public (float Min, float Max) EjectRange = (1f, 2f);
-
-    /// <summary>
-    /// Force of our throws
-    /// </summary>
-    [DataField("ejectStrength")]
-    [ViewVariables(VVAccess.ReadWrite)]
-    public float EjectStrength = 5f;
-
-    /// <summary>
-    /// Pushback we get when throwing
-    /// </summary>
-    [DataField("ejectPushbackRatio")]
-    [ViewVariables(VVAccess.ReadWrite)]
-    public float EjectPushbackRatio;
+    public float RequiredVelocity;
 }

@@ -6,27 +6,24 @@
 //
 // SPDX-License-Identifier: AGPL-3.0-or-later
 
-using Robust.Shared.Prototypes;
 using Robust.Shared.Random;
 
 namespace Content.Goobstation.Server.RandomChanceSpawner;
 
-public sealed partial class RandomChanceSpawnerSystem : EntitySystem
+public sealed class RandomChanceSpawnerSystem : EntitySystem
 {
     [Dependency] private readonly IRobustRandom _random = default!;
 
-    public override void Initialize()
-    {
-        SubscribeLocalEvent<RandomChanceSpawnerComponent, MapInitEvent>(OnMapInit);
-    }
+    public override void Initialize() => SubscribeLocalEvent<RandomChanceSpawnerComponent, MapInitEvent>(OnMapInit);
 
     public void OnMapInit(Entity<RandomChanceSpawnerComponent> ent, ref MapInitEvent args)
     {
-        foreach(KeyValuePair<EntProtoId, float> kvp in ent.Comp.ToSpawn)
+        foreach (var kvp in ent.Comp.ToSpawn)
         {
             if (kvp.Value >= _random.NextFloat(0.0f, 1.0f))
                 Spawn(kvp.Key, Transform(ent).Coordinates);
         }
+
         EntityManager.QueueDeleteEntity(ent);
     }
 }

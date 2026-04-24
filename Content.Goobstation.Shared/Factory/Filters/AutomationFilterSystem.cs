@@ -17,26 +17,24 @@ using Content.Shared.Mobs;
 using Content.Shared.Mobs.Components;
 using Content.Shared.Popups;
 using Content.Shared.Stacks;
-using Robust.Shared.Prototypes;
 
 namespace Content.Goobstation.Shared.Factory.Filters;
 
 public sealed class AutomationFilterSystem : EntitySystem
 {
-    [Dependency] private readonly ItemSlotsSystem _slots = default!;
-    [Dependency] private readonly ItemToggleSystem _toggle = default!;
+    public static readonly int GateCount = Enum.GetValues(typeof(LogicGate)).Length;
     [Dependency] private readonly SharedCuffableSystem _cuffable = default!;
     [Dependency] private readonly SharedPopupSystem _popup = default!;
+    [Dependency] private readonly ItemSlotsSystem _slots = default!;
     [Dependency] private readonly SharedStackSystem _stack = default!;
+    [Dependency] private readonly ItemToggleSystem _toggle = default!;
 
     private EntityQuery<AnchorableComponent> _anchorableQuery;
     private EntityQuery<CuffableComponent> _cuffableQuery;
-    private EntityQuery<FilterSlotComponent> _slotQuery;
     private EntityQuery<LabelComponent> _labelQuery;
     private EntityQuery<MobStateComponent> _mobQuery;
+    private EntityQuery<FilterSlotComponent> _slotQuery;
     private EntityQuery<StackComponent> _stackQuery;
-
-    public static readonly int GateCount = Enum.GetValues(typeof(LogicGate)).Length;
 
     public override void Initialize()
     {
@@ -49,26 +47,29 @@ public sealed class AutomationFilterSystem : EntitySystem
         _mobQuery = GetEntityQuery<MobStateComponent>();
         _stackQuery = GetEntityQuery<StackComponent>();
 
-        Subs.BuiEvents<LabelFilterComponent>(LabelFilterUiKey.Key, subs =>
-        {
-            subs.Event<LabelFilterSetLabelMessage>(OnLabelSet);
-        });
+        Subs.BuiEvents<LabelFilterComponent>(LabelFilterUiKey.Key,
+            subs =>
+            {
+                subs.Event<LabelFilterSetLabelMessage>(OnLabelSet);
+            });
         SubscribeLocalEvent<LabelFilterComponent, ExaminedEvent>(OnLabelExamined);
         SubscribeLocalEvent<LabelFilterComponent, AutomationFilterEvent>(OnLabelFilter);
 
-        Subs.BuiEvents<NameFilterComponent>(NameFilterUiKey.Key, subs =>
-        {
-            subs.Event<NameFilterSetNameMessage>(OnNameSet);
-            subs.Event<NameFilterSetModeMessage>(OnNameSetMode);
-        });
+        Subs.BuiEvents<NameFilterComponent>(NameFilterUiKey.Key,
+            subs =>
+            {
+                subs.Event<NameFilterSetNameMessage>(OnNameSet);
+                subs.Event<NameFilterSetModeMessage>(OnNameSetMode);
+            });
         SubscribeLocalEvent<NameFilterComponent, ExaminedEvent>(OnNameExamined);
         SubscribeLocalEvent<NameFilterComponent, AutomationFilterEvent>(OnNameFilter);
 
-        Subs.BuiEvents<StackFilterComponent>(StackFilterUiKey.Key, subs =>
-        {
-            subs.Event<StackFilterSetMinMessage>(OnStackSetMin);
-            subs.Event<StackFilterSetSizeMessage>(OnStackSetSize);
-        });
+        Subs.BuiEvents<StackFilterComponent>(StackFilterUiKey.Key,
+            subs =>
+            {
+                subs.Event<StackFilterSetMinMessage>(OnStackSetMin);
+                subs.Event<StackFilterSetSizeMessage>(OnStackSetSize);
+            });
         SubscribeLocalEvent<StackFilterComponent, ExaminedEvent>(OnStackExamined);
         SubscribeLocalEvent<StackFilterComponent, AutomationFilterEvent>(OnStackFilter);
         SubscribeLocalEvent<StackFilterComponent, AutomationFilterSplitEvent>(OnStackSplit);
@@ -79,20 +80,22 @@ public sealed class AutomationFilterSystem : EntitySystem
         SubscribeLocalEvent<CombinedFilterComponent, AutomationFilterEvent>(OnCombinedFilter);
         SubscribeLocalEvent<CombinedFilterComponent, AutomationFilterSplitEvent>(OnCombinedSplit);
 
-        Subs.BuiEvents<PressureFilterComponent>(PressureFilterUiKey.Key, subs =>
-        {
-            subs.Event<PressureFilterSetMinMessage>(OnPressureSetMin);
-            subs.Event<PressureFilterSetMaxMessage>(OnPressureSetMax);
-        });
+        Subs.BuiEvents<PressureFilterComponent>(PressureFilterUiKey.Key,
+            subs =>
+            {
+                subs.Event<PressureFilterSetMinMessage>(OnPressureSetMin);
+                subs.Event<PressureFilterSetMaxMessage>(OnPressureSetMax);
+            });
         SubscribeLocalEvent<PressureFilterComponent, ExaminedEvent>(OnPressureExamined);
         // OnPressureFilter is in server because atmos is serverside
 
         SubscribeLocalEvent<AnchorFilterComponent, AutomationFilterEvent>(OnAnchorFilter);
 
-        Subs.BuiEvents<MobFilterComponent>(MobFilterUiKey.Key, subs =>
-        {
-            subs.Event<MobFilterToggleMessage>(OnMobToggle);
-        });
+        Subs.BuiEvents<MobFilterComponent>(MobFilterUiKey.Key,
+            subs =>
+            {
+                subs.Event<MobFilterToggleMessage>(OnMobToggle);
+            });
         SubscribeLocalEvent<MobFilterComponent, ExaminedEvent>(OnMobExamined);
         SubscribeLocalEvent<MobFilterComponent, AutomationFilterEvent>(OnMobFilter);
 
@@ -177,13 +180,13 @@ public sealed class AutomationFilterSystem : EntitySystem
             NameFilterMode.Contain => name.Contains(check),
             NameFilterMode.Start => name.StartsWith(check),
             NameFilterMode.End => name.EndsWith(check),
-            NameFilterMode.Match => name == check
+            NameFilterMode.Match => name == check,
         };
         // entity names usually don't change except for the end including a label
         args.CouldAllow = ent.Comp.Mode switch
         {
             NameFilterMode.End | NameFilterMode.Match => true,
-            _ => false
+            _ => false,
         };
     }
 
@@ -221,10 +224,8 @@ public sealed class AutomationFilterSystem : EntitySystem
         args.CouldAllow = true;
     }
 
-    private void OnStackSplit(Entity<StackFilterComponent> ent, ref AutomationFilterSplitEvent args)
-    {
+    private void OnStackSplit(Entity<StackFilterComponent> ent, ref AutomationFilterSplitEvent args) =>
         args.Size = ent.Comp.Size;
-    }
 
     /* Combined filter */
 
@@ -280,7 +281,7 @@ public sealed class AutomationFilterSystem : EntitySystem
             LogicGate.Xor => a != b,
             LogicGate.Nor => !(a || b),
             LogicGate.Nand => !(a && b),
-            LogicGate.Xnor => a == b
+            LogicGate.Xnor => a == b,
         };
         args.CouldAllow = couldAllowA || couldAllowB; // if any subfilter could allow it, this could allow it too
     }
@@ -397,6 +398,7 @@ public sealed class AutomationFilterSystem : EntitySystem
     }
 
     #region Public API
+
     /// <summary>
     /// Returns true if an item is allowed by the filter, false if it's blocked.
     /// If there is no filter, items are always allowed.
@@ -404,7 +406,7 @@ public sealed class AutomationFilterSystem : EntitySystem
     public bool IsAllowed(EntityUid? filter, EntityUid item, out bool couldAllow)
     {
         couldAllow = false;
-        if (filter is not {} uid)
+        if (filter is not { } uid)
             return true;
 
         var ev = new AutomationFilterEvent(item);
@@ -416,16 +418,18 @@ public sealed class AutomationFilterSystem : EntitySystem
     public bool IsAllowed(EntityUid? filter, EntityUid item) => IsAllowed(filter, item, out _);
 
     /// <summary>
-    /// Inverse of <see cref="IsAllowed"/>.
+    /// Inverse of <see cref="IsAllowed" />.
     /// </summary>
-    public bool IsBlocked(EntityUid? filter, EntityUid item, out bool couldAllow) => !IsAllowed(filter, item, out couldAllow);
+    public bool IsBlocked(EntityUid? filter, EntityUid item, out bool couldAllow) =>
+        !IsAllowed(filter, item, out couldAllow);
 
     public bool IsBlocked(EntityUid? filter, EntityUid item) => IsBlocked(filter, item, out _);
 
     /// <summary>
     /// Returns true if an item can never be allowed by a filter, even if some data about it changes.
     /// </summary>
-    public bool IsAlwaysBlocked(EntityUid? filter, EntityUid item) => IsBlocked(filter, item, out var couldAllow) && !couldAllow;
+    public bool IsAlwaysBlocked(EntityUid? filter, EntityUid item) =>
+        IsBlocked(filter, item, out var couldAllow) && !couldAllow;
 
     /// <summary>
     /// Gets the split size for a filter.
@@ -434,7 +438,7 @@ public sealed class AutomationFilterSystem : EntitySystem
     /// </summary>
     public int GetSplitSize(EntityUid? filter)
     {
-        if (filter is not {} uid)
+        if (filter is not { } uid)
             return 0;
 
         var ev = new AutomationFilterSplitEvent();
@@ -463,9 +467,7 @@ public sealed class AutomationFilterSystem : EntitySystem
     /// <summary>
     /// Get the filter in a machine's filter slot, or null if it has none.
     /// </summary>
-    public EntityUid? GetSlot(EntityUid uid)
-    {
-        return _slotQuery.CompOrNull(uid)?.Filter;
-    }
+    public EntityUid? GetSlot(EntityUid uid) => _slotQuery.CompOrNull(uid)?.Filter;
+
     #endregion
 }

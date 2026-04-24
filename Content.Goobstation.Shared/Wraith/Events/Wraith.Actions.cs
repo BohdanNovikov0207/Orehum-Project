@@ -5,8 +5,8 @@ using Robust.Shared.Serialization;
 
 namespace Content.Goobstation.Shared.Wraith.Events;
 
-
 #region Base Wraith
+
 public sealed partial class HauntEvent : InstantActionEvent;
 
 public sealed partial class WhisperEvent : InstantActionEvent;
@@ -15,7 +15,7 @@ public sealed partial class BloodWritingEvent : InstantActionEvent;
 
 public sealed partial class AbsorbCorpseEvent : EntityTargetActionEvent;
 
-[Serializable, NetSerializable]
+[Serializable] [NetSerializable]
 public sealed partial class AbsorbCorpseDoAfter : SimpleDoAfterEvent;
 
 public sealed partial class SpookEvent : WorldTargetActionEvent;

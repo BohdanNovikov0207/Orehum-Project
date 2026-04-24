@@ -25,30 +25,30 @@ using Robust.Shared.Utility;
 
 namespace Content.Goobstation.Shared.Changeling.Systems;
 
-public abstract partial class SharedChangelingStasisSystem : EntitySystem
+public abstract class SharedChangelingStasisSystem : EntitySystem
 {
-    [Dependency] private readonly DamageableSystem _dmg = default!;
-    [Dependency] private readonly MobThresholdSystem _mob = default!;
-    [Dependency] private readonly MobStateSystem _state = default!;
-    [Dependency] private readonly PullingSystem _pull = default!;
     [Dependency] private readonly SharedActionsSystem _actions = default!;
     [Dependency] private readonly SharedBloodstreamSystem _blood = default!;
     [Dependency] private readonly SharedBodySystem _body = default!;
+    [Dependency] private readonly DamageableSystem _dmg = default!;
+    [Dependency] private readonly SharedMindSystem _mind = default!;
+    [Dependency] private readonly MobThresholdSystem _mob = default!;
     [Dependency] private readonly SharedPopupSystem _popup = default!;
+    [Dependency] private readonly PullingSystem _pull = default!;
+    [Dependency] private readonly MobStateSystem _state = default!;
     [Dependency] private readonly SharedStunSystem _stun = default!;
     [Dependency] private readonly SharedSuicideSystem _suicide = default!;
     [Dependency] private readonly TraumaSystem _trauma = default!;
     [Dependency] private readonly WoundSystem _wound = default!;
-    [Dependency] private readonly SharedMindSystem _mind = default!;
 
     private EntityQuery<AbsorbedComponent> _absorbQuery;
+    private EntityQuery<BloodstreamComponent> _bloodQuery;
     private EntityQuery<BodyComponent> _bodyQuery;
     private EntityQuery<BoneComponent> _boneQuery;
-    private EntityQuery<BloodstreamComponent> _bloodQuery;
     private EntityQuery<DamageableComponent> _dmgQuery;
     private EntityQuery<MindContainerComponent> _mindQuery;
-    private EntityQuery<MobThresholdsComponent> _thresholdQuery;
     private EntityQuery<PullableComponent> _pullQuery;
+    private EntityQuery<MobThresholdsComponent> _thresholdQuery;
     private EntityQuery<WoundableComponent> _woundQuery;
 
     public override void Initialize()
@@ -92,6 +92,7 @@ public abstract partial class SharedChangelingStasisSystem : EntitySystem
     }
 
     #region Event Handlers
+
     private void OnStasisAction(Entity<ChangelingStasisComponent> ent, ref ChangelingStasisEvent args)
     {
         if (!ent.Comp.IsInStasis)
@@ -119,19 +120,14 @@ public abstract partial class SharedChangelingStasisSystem : EntitySystem
     }
 
     // prevents you from cheesing the no-ghost mechanic
-    private void OnSuccumb(Entity<ChangelingStasisComponent> ent, ref CritSuccumbEvent args)
-    {
-        args.Handled = true;
-    }
+    private void OnSuccumb(Entity<ChangelingStasisComponent> ent, ref CritSuccumbEvent args) => args.Handled = true;
 
-    private void OnLastWords(Entity<ChangelingStasisComponent> ent, ref CritLastWordsEvent args)
-    {
-        args.Handled = true;
-    }
+    private void OnLastWords(Entity<ChangelingStasisComponent> ent, ref CritLastWordsEvent args) => args.Handled = true;
 
     #endregion
 
     #region Helper Methods
+
     private void EnterStasis(Entity<ChangelingStasisComponent> ent)
     {
         if (ent.Comp.IsInStasis
@@ -202,7 +198,7 @@ public abstract partial class SharedChangelingStasisSystem : EntitySystem
             return;
 
         if (_pullQuery.TryComp(ent, out var pullComp)
-           && _pull.IsPulled(ent, pullComp))
+            && _pull.IsPulled(ent, pullComp))
         {
             var puller = pullComp.Puller;
 
@@ -272,8 +268,12 @@ public abstract partial class SharedChangelingStasisSystem : EntitySystem
         if (_bodyQuery.TryComp(ent, out var bodyComp))
         {
             if (_trauma.TryGetBodyTraumas(ent, out var traumas, bodyComp: bodyComp))
+            {
                 foreach (var trauma in traumas)
+                {
                     _trauma.RemoveTrauma(trauma);
+                }
+            }
 
             foreach (var bodyPart in _body.GetBodyChildren(ent, bodyComp))
             {
@@ -318,15 +318,11 @@ public abstract partial class SharedChangelingStasisSystem : EntitySystem
         mind.PreventGhosting = state;
     }
 
-    private void DoPopup(Entity<ChangelingStasisComponent> ent, LocId popup)
-    {
+    private void DoPopup(Entity<ChangelingStasisComponent> ent, LocId popup) =>
         _popup.PopupClient(Loc.GetString(popup), ent, ent);
-    }
 
-    private void DoPopupOthers(Entity<ChangelingStasisComponent> ent, string popup)
-    {
+    private void DoPopupOthers(Entity<ChangelingStasisComponent> ent, string popup) =>
         _popup.PopupPredicted(popup, ent, ent);
-    }
 
     #endregion
 }

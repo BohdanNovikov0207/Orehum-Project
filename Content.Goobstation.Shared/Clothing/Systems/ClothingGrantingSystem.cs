@@ -36,9 +36,11 @@ public sealed class ClothingGrantingSystem : EntitySystem
 
     private void OnCompEquip(EntityUid uid, ClothingGrantComponentComponent component, GotEquippedEvent args)
     {
-        if (!TryComp<ClothingComponent>(uid, out var clothing)) return;
+        if (!TryComp<ClothingComponent>(uid, out var clothing))
+            return;
 
-        if (!clothing.Slots.HasFlag(args.SlotFlags)) return;
+        if (!clothing.Slots.HasFlag(args.SlotFlags))
+            return;
 
         // Goobstation
         //if (component.Components.Count > 1)
@@ -58,7 +60,7 @@ public sealed class ClothingGrantingSystem : EntitySystem
 
             var temp = (object) newComp;
             _serializationManager.CopyTo(data.Component, ref temp);
-            EntityManager.AddComponent(args.Equipee, (Component)temp!);
+            EntityManager.AddComponent(args.Equipee, (Component) temp!);
 
             component.Active[name] = true; // Goobstation
         }

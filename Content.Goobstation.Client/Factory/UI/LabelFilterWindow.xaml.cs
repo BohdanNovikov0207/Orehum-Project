@@ -15,8 +15,6 @@ public sealed partial class LabelFilterWindow : FancyWindow
 {
     [Dependency] private readonly EntityManager _entMan = default!;
 
-    public event Action<string>? OnSetLabel;
-
     public LabelFilterWindow()
     {
         IoCManager.InjectDependencies(this);
@@ -24,6 +22,8 @@ public sealed partial class LabelFilterWindow : FancyWindow
 
         LabelEdit.OnTextChanged += _ => OnSetLabel?.Invoke(LabelEdit.Text);
     }
+
+    public event Action<string>? OnSetLabel;
 
     public void SetEntity(EntityUid uid)
     {

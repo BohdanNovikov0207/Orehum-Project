@@ -15,14 +15,14 @@ namespace Content.Goobstation.Common.Silicons.Components;
 public sealed partial class ActiveExperimentalLawProviderComponent : Component
 {
     [DataField]
-    public string OldSiliconLawsetId = string.Empty;
+    public SoundSpecifier? LawRewardSound = new SoundPathSpecifier("/Audio/Misc/cryo_warning.ogg");
 
     [DataField]
-    public float Timer = 120.0f;
+    public string OldSiliconLawsetId = string.Empty;
 
     [DataField]
     public int RewardPoints = 5000;
 
     [DataField]
-    public SoundSpecifier? LawRewardSound = new SoundPathSpecifier("/Audio/Misc/cryo_warning.ogg");
+    public float Timer = 120.0f;
 }

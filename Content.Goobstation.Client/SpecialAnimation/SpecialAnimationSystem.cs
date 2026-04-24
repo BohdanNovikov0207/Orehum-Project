@@ -12,13 +12,11 @@ using Robust.Shared.Prototypes;
 
 namespace Content.Goobstation.Client.SpecialAnimation;
 
-
 public sealed class SpecialAnimationSystem : SharedSpecialAnimationSystem
 {
+    private readonly SpecialAnimationOverlay _overlay = new();
     [Dependency] private readonly IOverlayManager _overlayMan = default!;
     [Dependency] private readonly IPlayerManager _player = default!;
-
-    private readonly SpecialAnimationOverlay _overlay = new();
 
     public override void Initialize()
     {
@@ -43,15 +41,13 @@ public sealed class SpecialAnimationSystem : SharedSpecialAnimationSystem
         }
     }
 
-    private void OnPlayerAttached(EntityUid uid, SpecialAnimationViewerComponent component, LocalPlayerAttachedEvent args)
-    {
-        _overlayMan.AddOverlay(_overlay);
-    }
+    private void OnPlayerAttached(EntityUid uid,
+        SpecialAnimationViewerComponent component,
+        LocalPlayerAttachedEvent args) => _overlayMan.AddOverlay(_overlay);
 
-    private void OnPlayerDetached(EntityUid uid, SpecialAnimationViewerComponent component, LocalPlayerDetachedEvent args)
-    {
-        _overlayMan.RemoveOverlay(_overlay);
-    }
+    private void OnPlayerDetached(EntityUid uid,
+        SpecialAnimationViewerComponent component,
+        LocalPlayerDetachedEvent args) => _overlayMan.RemoveOverlay(_overlay);
 
     private void OnActorInit(EntityUid uid, SpecialAnimationViewerComponent component, ComponentInit args)
     {

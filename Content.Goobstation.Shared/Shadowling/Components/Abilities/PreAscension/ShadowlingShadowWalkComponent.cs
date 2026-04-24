@@ -7,38 +7,20 @@ namespace Content.Goobstation.Shared.Shadowling.Components.Abilities.PreAscensio
 /// <summary>
 /// This is used for Shadow Walk ability. Will also be used on Lesser Shadowlings.
 /// </summary>
-[RegisterComponent, NetworkedComponent]
+[RegisterComponent] [NetworkedComponent]
 public sealed partial class ShadowlingShadowWalkComponent : Component
 {
     [DataField]
-    public EntProtoId ActionId = "ActionShadowWalk";
-
-    [DataField]
     public EntityUid? ActionEnt;
 
-    /// <summary>
-    /// Indicates whether the ability is active, or not.
-    /// </summary>
     [DataField]
-    public bool IsActive;
+    public EntProtoId ActionId = "ActionShadowWalk";
 
     /// <summary>
-    /// Indicates the new walking speed of the ability user.
+    /// Avoids duplicate effects.
     /// </summary>
     [DataField]
-    public float WalkSpeedModifier = 1.5f;
-
-    /// <summary>
-    /// Indicates the new running speed of the ability user.
-    /// </summary>
-    [DataField]
-    public float RunSpeedModifier = 1.5f;
-
-    /// <summary>
-    /// Indicates how long it lasts once deactivated.
-    /// </summary>
-    [DataField]
-    public TimeSpan TimeUntilDeactivation = TimeSpan.FromSeconds(10);
+    public bool EffectActivated;
 
     /// <summary>
     /// Indicates when the effect should activate.
@@ -47,14 +29,20 @@ public sealed partial class ShadowlingShadowWalkComponent : Component
     [DataField]
     public TimeSpan EffectOutTimer = TimeSpan.FromSeconds(0.6);
 
+    /// <summary>
+    /// Indicates whether the ability is active, or not.
+    /// </summary>
+    [DataField]
+    public bool IsActive;
+
     [DataField]
     public TimeSpan NextUpdate = TimeSpan.Zero;
 
     /// <summary>
-    /// Avoids duplicate effects.
+    /// Indicates the new running speed of the ability user.
     /// </summary>
     [DataField]
-    public bool EffectActivated;
+    public float RunSpeedModifier = 1.5f;
 
     /// <summary>
     /// The prototype of the effect once you use the ability
@@ -73,4 +61,16 @@ public sealed partial class ShadowlingShadowWalkComponent : Component
     /// </summary>
     [DataField]
     public SoundSpecifier? ShadowWalkSound = new SoundPathSpecifier("/Audio/_EinsteinEngines/Effects/bamf.ogg");
+
+    /// <summary>
+    /// Indicates how long it lasts once deactivated.
+    /// </summary>
+    [DataField]
+    public TimeSpan TimeUntilDeactivation = TimeSpan.FromSeconds(10);
+
+    /// <summary>
+    /// Indicates the new walking speed of the ability user.
+    /// </summary>
+    [DataField]
+    public float WalkSpeedModifier = 1.5f;
 }

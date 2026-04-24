@@ -15,8 +15,8 @@ namespace Content.Goobstation.Shared.TableSlam;
 public sealed partial class PostTabledComponent : Component
 {
     [DataField]
-    public TimeSpan PostTabledShovableTime = TimeSpan.Zero;
+    public float ParalyzeChance = 0.35f;
 
     [DataField]
-    public float ParalyzeChance = 0.35f;
+    public TimeSpan PostTabledShovableTime = TimeSpan.Zero;
 }

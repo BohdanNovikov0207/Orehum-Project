@@ -1,6 +1,6 @@
 using Content.Goobstation.Shared.DarkLord;
-using Robust.Shared.Random;
 using Content.Server.GameTicking;
+using Robust.Shared.Random;
 
 namespace Content.Goobstation.Server.DarkLord;
 
@@ -8,6 +8,7 @@ public sealed class DarkLordSystem : EntitySystem
 {
     [Dependency] private readonly IEntitySystemManager _entitySystemManager = default!;
     [Dependency] private readonly IRobustRandom _random = default!;
+
     public override void Initialize()
     {
         base.Initialize();

@@ -5,26 +5,20 @@
 //
 // SPDX-License-Identifier: AGPL-3.0-or-later
 
-using System.Linq;
 using Content.Goobstation.Server.StationEvents.Metric.Components;
-using Content.Server.Chemistry.Containers.EntitySystems;
 using Content.Shared.Chemistry.Components.SolutionManager;
 using Content.Shared.Chemistry.EntitySystems;
-using Content.Goobstation.Maths.FixedPoint;
 using Content.Shared.Fluids.Components;
 using Prometheus;
 
 namespace Content.Goobstation.Server.StationEvents.Metric;
 
 /// <summary>
-///   Measure the mess of the station in puddles on the floor
-///
-///   Jani - JaniMetricComponent.Puddles points per BaselineQty of various substances
+/// Measure the mess of the station in puddles on the floor
+/// Jani - JaniMetricComponent.Puddles points per BaselineQty of various substances
 /// </summary>
 public sealed class PuddleMetricSystem : ChaosMetricSystem<PuddleMetricComponent>
 {
-    [Dependency] private readonly SharedSolutionContainerSystem _solutionContainerSystem = default!;
-
     private static readonly Gauge PuddlesTotal = Metrics.CreateGauge(
         "game_director_metric_puddle_total",
         "Total number of puddles counted.");
@@ -37,8 +31,12 @@ public sealed class PuddleMetricSystem : ChaosMetricSystem<PuddleMetricComponent
         "game_director_metric_puddle_mess_chaos_calculated",
         "Calculated chaos value contributed by puddles.");
 
+    [Dependency] private readonly SharedSolutionContainerSystem _solutionContainerSystem = default!;
 
-    protected override ChaosMetrics CalculateChaos(EntityUid uid, PuddleMetricComponent component, CalculateChaosEvent args)
+
+    protected override ChaosMetrics CalculateChaos(EntityUid uid,
+        PuddleMetricComponent component,
+        CalculateChaosEvent args)
     {
         // Add up the pain of all the puddles
         var query = EntityQueryEnumerator<PuddleComponent, SolutionContainerManagerComponent>();
@@ -59,7 +57,9 @@ public sealed class PuddleMetricSystem : ChaosMetricSystem<PuddleMetricComponent
 
             foreach (var substance in puddleSolution.Value.Comp.Solution.Contents)
             {
-                var substanceChaos = component.Puddles.GetValueOrDefault(substance.Reagent.Prototype, component.PuddleDefault).Double();
+                var substanceChaos = component.Puddles
+                    .GetValueOrDefault(substance.Reagent.Prototype, component.PuddleDefault)
+                    .Double();
                 currentPuddleChaos += Math.Round(substanceChaos * substance.Quantity.Double());
             }
 
@@ -71,9 +71,9 @@ public sealed class PuddleMetricSystem : ChaosMetricSystem<PuddleMetricComponent
         MessChaosCalculated.Set(messChaos);
 
 
-        var chaos = new ChaosMetrics(new Dictionary<ChaosMetric, double>()
+        var chaos = new ChaosMetrics(new Dictionary<ChaosMetric, double>
         {
-            {ChaosMetric.Mess, messChaos},
+            { ChaosMetric.Mess, messChaos },
         });
         return chaos;
     }

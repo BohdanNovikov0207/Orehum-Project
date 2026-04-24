@@ -1,3 +1,4 @@
+using System.Linq;
 using Content.Goobstation.Shared.Wraith.Components;
 using Content.Goobstation.Shared.Wraith.Components.Mobs;
 using Content.Shared.Mobs.Systems;
@@ -7,18 +8,16 @@ using Robust.Shared.Physics.Systems;
 using Robust.Shared.Prototypes;
 using Robust.Shared.Random;
 using Robust.Shared.Timing;
-using System.Linq;
-using Robust.Server.GameObjects;
 
 namespace Content.Goobstation.Server.Wraith.Systems;
 
 public sealed class VoidPortalSystem : EntitySystem
 {
-    [Dependency] private readonly IGameTiming _timing = default!;
-    [Dependency] private readonly IRobustRandom _random = default!;
-    [Dependency] private readonly MobStateSystem _mobState = default!;
     [Dependency] private readonly EntityLookupSystem _lookup = default!;
+    [Dependency] private readonly MobStateSystem _mobState = default!;
     [Dependency] private readonly SharedPhysicsSystem _physics = default!;
+    [Dependency] private readonly IRobustRandom _random = default!;
+    [Dependency] private readonly IGameTiming _timing = default!;
 
     public override void Initialize()
     {
@@ -54,7 +53,7 @@ public sealed class VoidPortalSystem : EntitySystem
         portal.Accumulator = _timing.CurTime + portal.SpawnInterval;
 
         // --- Wave Power Growth ---
-        var gained = portal.PowerGainPerTick + (portal.ExtraPower * portal.WavesCompleted);
+        var gained = portal.PowerGainPerTick + portal.ExtraPower * portal.WavesCompleted;
         portal.CurrentPower = Math.Min(portal.CurrentPower + gained, portal.MaxPower);
 
         portal.WavesCompleted++;
@@ -71,7 +70,9 @@ public sealed class VoidPortalSystem : EntitySystem
         // Determine valid spawn coordinates
         EntityCoordinates spawnCoords = default;
         var attempts = 0;
-        const int MaxAttempts = 1000; // Lower this if too intensive, but realistically it is unlikely for the portal to have to loop 1000 times before finding an unobstructed tile.
+        const int
+            MaxAttempts =
+                1000; // Lower this if too intensive, but realistically it is unlikely for the portal to have to loop 1000 times before finding an unobstructed tile.
 
         do
         {
@@ -82,38 +83,34 @@ public sealed class VoidPortalSystem : EntitySystem
                     grid.Value,
                     center.X + _random.Next(-portal.OffsetForSpawn, portal.OffsetForSpawn + 1),
                     center.Y + _random.Next(-portal.OffsetForSpawn, portal.OffsetForSpawn + 1)
-                  )
+                )
                 : center;
 
             // --- Obstruction check ---
             var tempEnt = Spawn(portal.EmptyPortal, spawnCoords);
-            bool obstructed = _physics.GetEntitiesIntersectingBody(tempEnt, (int) CollisionGroup.Impassable).Count > 0;
+            var obstructed = _physics.GetEntitiesIntersectingBody(tempEnt, (int) CollisionGroup.Impassable).Count > 0;
             QueueDel(tempEnt);
 
             if (!obstructed)
                 break;
-
-        } while (attempts < MaxAttempts); // If it does not find a unobstructed tile it just spawns anyway at the last coordinate.
+        } while
+            (attempts < MaxAttempts); // If it does not find a unobstructed tile it just spawns anyway at the last coordinate.
 
         // Count alive summoned mobs nearby
         var nearbyEntities = _lookup.GetEntitiesInRange(spawnCoords, portal.SearchRange);
         nearbyEntities.RemoveWhere(e => !HasComp<VoidSummonedComponent>(e));
-        int aliveSummonedCount = nearbyEntities.Count(e => !_mobState.IsDead(e));
+        var aliveSummonedCount = nearbyEntities.Count(e => !_mobState.IsDead(e));
 
         // Decide what to spawn
         EntProtoId protoToSpawn;
 
         if (aliveSummonedCount >= portal.MaxEntitiesAlive || portal.MobEntries.Count == 0)
-        {
             protoToSpawn = portal.EmptyPortal;
-        }
         else
         {
             var affordable = portal.MobEntries.Where(e => e.Cost <= portal.CurrentPower).ToList();
             if (affordable.Count == 0)
-            {
                 protoToSpawn = portal.EmptyPortal;
-            }
             else
             {
                 var entry = _random.Pick(affordable);

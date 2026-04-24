@@ -24,24 +24,25 @@ public abstract class SharedZombieBlobSystem : EntitySystem
         base.Initialize();
 
         SubscribeLocalEvent<ZombieBlobComponent, ShotAttemptedEvent>(OnAttemptShoot);
-        SubscribeLocalEvent<BoundUserInterfaceMessageAttempt>(OnBoundUserInterface, after: [typeof(SharedInteractionSystem)]);
+        SubscribeLocalEvent<BoundUserInterfaceMessageAttempt>(OnBoundUserInterface,
+            after: [typeof(SharedInteractionSystem)]);
     }
 
     private void OnBoundUserInterface(BoundUserInterfaceMessageAttempt args)
     {
-        if(
+        if (
             args.Cancelled ||
             !TryComp<ActivatableUIComponent>(args.Target, out var uiComp) ||
             !HasComp<ZombieBlobComponent>(args.Actor))
             return;
 
-        if(uiComp.RequiresComplex)
+        if (uiComp.RequiresComplex)
             args.Cancel();
     }
 
     private void OnAttemptShoot(Entity<ZombieBlobComponent> ent, ref ShotAttemptedEvent args)
     {
-        if(ent.Comp.CanShoot)
+        if (ent.Comp.CanShoot)
             return;
 
         _popup.PopupClient(Loc.GetString("blob-no-using-guns-popup"), ent, ent);

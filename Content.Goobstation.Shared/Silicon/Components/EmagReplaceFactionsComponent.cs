@@ -13,20 +13,14 @@ namespace Content.Goobstation.Shared.Silicon.Components;
 /// <summary>
 /// Replaces the entities' factions when emagged.
 /// </summary>
-[RegisterComponent, NetworkedComponent]
+[RegisterComponent] [NetworkedComponent]
 [Access(typeof(MedibotSystem))]
 public sealed partial class EmagReplaceFactionsComponent : Component
 {
     /// <summary>
-    /// How long should the entity be stunned for the emagger to get out of the way? Defaults to five seconds.
-    /// </summary>
-    [DataField(required: false)]
-    public int StunSeconds = 5;
-
-    /// <summary>
     /// Factions to replace from the original set.
     /// </summary>
-    [DataField(required: true), ViewVariables(VVAccess.ReadWrite)]
+    [DataField(required: true)] [ViewVariables(VVAccess.ReadWrite)]
     public List<string> Factions = [];
 
     /// <summary>
@@ -35,6 +29,12 @@ public sealed partial class EmagReplaceFactionsComponent : Component
     [DataField]
     public SoundSpecifier SparkSound = new SoundCollectionSpecifier("sparks")
     {
-        Params = AudioParams.Default.WithVolume(8f)
+        Params = AudioParams.Default.WithVolume(8f),
     };
+
+    /// <summary>
+    /// How long should the entity be stunned for the emagger to get out of the way? Defaults to five seconds.
+    /// </summary>
+    [DataField(required: false)]
+    public int StunSeconds = 5;
 }

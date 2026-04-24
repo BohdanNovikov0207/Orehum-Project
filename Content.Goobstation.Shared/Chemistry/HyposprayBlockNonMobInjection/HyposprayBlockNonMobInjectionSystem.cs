@@ -19,9 +19,12 @@ public sealed class HyposprayBlockNonMobInjectionSystem : EntitySystem
     {
         base.Initialize();
 
-        SubscribeLocalEvent<HyposprayBlockNonMobInjectionComponent, AfterInteractEvent>(OnAfterInteract, before: new []{typeof(HypospraySystem)});
-        SubscribeLocalEvent<HyposprayBlockNonMobInjectionComponent, MeleeHitEvent>(OnAttack, before: new []{typeof(HypospraySystem)});
-        SubscribeLocalEvent<HyposprayBlockNonMobInjectionComponent, UseInHandEvent>(OnUseInHand, before: new []{typeof(HypospraySystem)});
+        SubscribeLocalEvent<HyposprayBlockNonMobInjectionComponent, AfterInteractEvent>(OnAfterInteract,
+            new[] { typeof(HypospraySystem) });
+        SubscribeLocalEvent<HyposprayBlockNonMobInjectionComponent, MeleeHitEvent>(OnAttack,
+            new[] { typeof(HypospraySystem) });
+        SubscribeLocalEvent<HyposprayBlockNonMobInjectionComponent, UseInHandEvent>(OnUseInHand,
+            new[] { typeof(HypospraySystem) });
     }
 
     private void OnUseInHand(Entity<HyposprayBlockNonMobInjectionComponent> ent, ref UseInHandEvent args)
@@ -42,8 +45,5 @@ public sealed class HyposprayBlockNonMobInjectionSystem : EntitySystem
             args.Handled = true;
     }
 
-    private bool IsMob(EntityUid uid)
-    {
-        return HasComp<MobStateComponent>(uid);
-    }
+    private bool IsMob(EntityUid uid) => HasComp<MobStateComponent>(uid);
 }

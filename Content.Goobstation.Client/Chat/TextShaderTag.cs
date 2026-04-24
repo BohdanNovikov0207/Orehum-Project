@@ -11,8 +11,8 @@ namespace Content.Goobstation.Client.Chat;
 
 public sealed class TextShaderTag : IMarkupTagHandler
 {
-    [Dependency] private readonly IPrototypeManager _proto = default!;
     [Dependency] private readonly IResourceCache _cache = default!;
+    [Dependency] private readonly IPrototypeManager _proto = default!;
 
     public string Name => "textshader";
 

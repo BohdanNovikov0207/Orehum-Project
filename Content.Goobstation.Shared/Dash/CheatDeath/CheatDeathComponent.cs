@@ -10,14 +10,20 @@ using Robust.Shared.Prototypes;
 
 namespace Content.Goobstation.Shared.CheatDeath;
 
-[RegisterComponent, NetworkedComponent]
+[RegisterComponent] [NetworkedComponent]
 public sealed partial class CheatDeathComponent : Component
 {
+    [DataField]
+    public EntProtoId ActionCheatDeath = "ActionCheatDeath";
+
+    [DataField]
+    public EntityUid? ActionEntity;
+
     /// <summary>
-    /// How many revives does this entity have remaining.
+    /// Can this entity heal themselves while not being dead?
     /// </summary>
     [DataField]
-    public int ReviveAmount = 1;
+    public bool CanCheatStanding;
 
     /// <summary>
     /// Self-explanatory.
@@ -26,17 +32,12 @@ public sealed partial class CheatDeathComponent : Component
     public bool InfiniteRevives;
 
     /// <summary>
-    /// Can this entity heal themselves while not being dead?
+    /// How many revives does this entity have remaining.
     /// </summary>
     [DataField]
-    public bool CanCheatStanding;
-
-    [DataField]
-    public EntProtoId ActionCheatDeath = "ActionCheatDeath";
-
-    [DataField]
-    public EntityUid? ActionEntity;
-
+    public int ReviveAmount = 1;
 }
 
-public sealed partial class CheatDeathEvent : InstantActionEvent { }
+public sealed partial class CheatDeathEvent : InstantActionEvent
+{
+}

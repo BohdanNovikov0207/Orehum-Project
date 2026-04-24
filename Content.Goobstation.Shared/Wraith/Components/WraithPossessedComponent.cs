@@ -7,26 +7,20 @@ namespace Content.Goobstation.Shared.Wraith.Components;
 /// <summary>
 /// Marks the entity as possessed by another entity.
 /// </summary>
-[RegisterComponent, NetworkedComponent]
+[RegisterComponent] [NetworkedComponent]
 [AutoGenerateComponentState]
 public sealed partial class WraithPossessedComponent : Component
 {
-    /// <summary>
-    /// The possessor of the entity
-    /// </summary>
-    [DataField, AutoNetworkedField]
-    public EntityUid? Possessor;
+    [DataField] [AutoNetworkedField]
+    public bool CancelEarly;
 
-    /// <summary>
-    /// The possessor's mind
-    /// </summary>
-    [DataField, AutoNetworkedField]
-    public EntityUid? PossessorMind;
+    [ViewVariables] [AutoNetworkedField]
+    public TimeSpan NextUpdate = TimeSpan.Zero;
 
     /// <summary>
     /// The original mind
     /// </summary>
-    [DataField, AutoNetworkedField]
+    [DataField] [AutoNetworkedField]
     public EntityUid? OriginalMind;
 
     /// <summary>
@@ -35,37 +29,44 @@ public sealed partial class WraithPossessedComponent : Component
     [DataField]
     public TimeSpan PossessionDuration = TimeSpan.FromSeconds(30f);
 
-    [ViewVariables, AutoNetworkedField]
-    public TimeSpan NextUpdate = TimeSpan.Zero;
+    /// <summary>
+    /// The possessor of the entity
+    /// </summary>
+    [DataField] [AutoNetworkedField]
+    public EntityUid? Possessor;
 
-    [DataField, AutoNetworkedField]
-    public bool CancelEarly;
+    /// <summary>
+    /// The possessor's mind
+    /// </summary>
+    [DataField] [AutoNetworkedField]
+    public EntityUid? PossessorMind;
 
-    [DataField, AutoNetworkedField]
+    [DataField] [AutoNetworkedField]
     public DamageSpecifier RevenantDamageOvertime = new()
     {
         DamageDict = new Dictionary<string, FixedPoint2>
         {
-            {"Caustic", 8}
-        }
+            { "Caustic", 8 },
+        },
     };
 }
 
 /// <summary>
-///  Raised when the possession starts
+/// Raised when the possession starts
 /// </summary>
 [ByRefEvent]
 public record struct PossessionStartedEvent;
 
 /// <summary>
-///  Raised when the possession ends
+/// Raised when the possession ends
 /// </summary>
 [ByRefEvent]
 public record struct PossessionEndedEvent;
 
 /// <summary>
-///  Raised when possessing a fresh corpse as a Wraith
+/// Raised when possessing a fresh corpse as a Wraith
 /// </summary>
-/// <param name="Possessor"></param> The wraith
+/// <param name="Possessor"></param>
+/// The wraith
 [ByRefEvent]
 public record struct RevenantPossessedEvent(EntityUid? Possessor);

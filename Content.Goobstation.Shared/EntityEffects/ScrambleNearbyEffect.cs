@@ -12,11 +12,10 @@ using Robust.Shared.Prototypes;
 namespace Content.Goobstation.Shared.EntityEffects;
 
 /// <summary>
-///     Scrambles the dna of nearby humanoids.
+/// Scrambles the dna of nearby humanoids.
 /// </summary>
 public sealed partial class ScrambleNearbyEffect : EventEntityEffect<ScrambleNearbyEffect>
 {
-
     [DataField] public float Radius = 7;
 
     public ScrambleNearbyEffect(float radius)
@@ -26,10 +25,10 @@ public sealed partial class ScrambleNearbyEffect : EventEntityEffect<ScrambleNea
 
     public override bool ShouldLog => true;
 
+    public override LogImpact LogImpact => LogImpact.Medium;
+
     protected override string? ReagentEffectGuidebookText(IPrototypeManager prototype, IEntitySystemManager entSys)
         => Loc.GetString("reagent-effect-guidebook-scramble-nearby");
-
-    public override LogImpact LogImpact => LogImpact.Medium;
 
     public override void Effect(EntityEffectBaseArgs args)
     {

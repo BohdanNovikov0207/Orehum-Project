@@ -76,9 +76,11 @@ public abstract class SharedBlobPodSystem : EntitySystem
             args.Cancel();
             return;
         }
+
         if (!TryComp<MobStateComponent>(args.UnEquipTarget, out var mobStateComponent))
             return;
-        if (_mobs.IsDead(args.UnEquipTarget,mobStateComponent) || _mobs.IsCritical(args.UnEquipTarget,mobStateComponent))
+        if (_mobs.IsDead(args.UnEquipTarget, mobStateComponent) ||
+            _mobs.IsCritical(args.UnEquipTarget, mobStateComponent))
             return;
         if (!HasComp<ZombieBlobComponent>(args.UnEquipTarget))
             return;
@@ -104,7 +106,7 @@ public abstract class SharedBlobPodSystem : EntitySystem
             },
             Text = Loc.GetString("blob-pod-verb-zombify"),
             // Icon = new SpriteSpecifier.Texture(new ("/Textures/")),
-            Priority = 2
+            Priority = 2,
         };
         args.Verbs.Add(verb);
     }
@@ -112,7 +114,7 @@ public abstract class SharedBlobPodSystem : EntitySystem
     public abstract bool NpcStartZombify(EntityUid uid, EntityUid argsTarget, BlobPodComponent component);
 }
 
-[Serializable, NetSerializable]
+[Serializable] [NetSerializable]
 public sealed partial class BlobPodZombifyDoAfterEvent : SimpleDoAfterEvent
 {
 }

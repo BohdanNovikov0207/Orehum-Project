@@ -12,7 +12,6 @@ using Content.Goobstation.Common.BlockTeleport;
 using Content.Goobstation.Common.Effects;
 using Content.Goobstation.Common.Grab;
 using Content.Goobstation.Shared.GrabIntent;
-using Content.Goobstation.Common.MartialArts;
 using Content.Shared.Destructible.Thresholds;
 using Content.Shared.Movement.Pulling.Components;
 using Content.Shared.Movement.Pulling.Systems;
@@ -28,15 +27,15 @@ using Robust.Shared.Random;
 namespace Content.Goobstation.Shared.Teleportation.Systems;
 
 [Virtual]
-public partial class SharedRandomTeleportSystem : EntitySystem
+public class SharedRandomTeleportSystem : EntitySystem
 {
-    [Dependency] private readonly IMapManager _mapManager = default!;
-    [Dependency] private readonly IRobustRandom _random = default!;
     [Dependency] private readonly SharedAudioSystem _audio = default!;
-    [Dependency] private readonly SharedTransformSystem _xform = default!;
-    [Dependency] private readonly PullingSystem _pullingSystem = default!;
-    [Dependency] private readonly SparksSystem _sparks = default!;
     [Dependency] private readonly SharedMapSystem _map = default!;
+    [Dependency] private readonly IMapManager _mapManager = default!;
+    [Dependency] private readonly PullingSystem _pullingSystem = default!;
+    [Dependency] private readonly IRobustRandom _random = default!;
+    [Dependency] private readonly SparksSystem _sparks = default!;
+    [Dependency] private readonly SharedTransformSystem _xform = default!;
 
     private EntityQuery<PhysicsComponent> _physicsQuery;
 
@@ -50,7 +49,11 @@ public partial class SharedRandomTeleportSystem : EntitySystem
     public bool RandomTeleport(EntityUid target, RandomTeleportComponent rtp, bool sound = true, bool @event = true)
         => RandomTeleport(target, rtp, out _, sound, @event);
 
-    public bool RandomTeleport(EntityUid target, RandomTeleportComponent rtp, out Vector2? finalWorldPos, bool sound = true, bool @event = true)
+    public bool RandomTeleport(EntityUid target,
+        RandomTeleportComponent rtp,
+        out Vector2? finalWorldPos,
+        bool sound = true,
+        bool @event = true)
     {
         finalWorldPos = null;
 
@@ -58,12 +61,18 @@ public partial class SharedRandomTeleportSystem : EntitySystem
             return false;
 
         // play sound before and after teleport if playSound is true
-        if (sound) _audio.PlayPvs(rtp.DepartureSound, Transform(target).Coordinates, AudioParams.Default);
+        if (sound)
+            _audio.PlayPvs(rtp.DepartureSound, Transform(target).Coordinates, AudioParams.Default);
         _sparks.DoSparks(Transform(target).Coordinates); // also sparks!!
 
-        finalWorldPos = RandomTeleport(target, rtp.Radius, rtp.TeleportAttempts, rtp.ForceSafeTeleport, rtp.TeleportPulledEntities);
+        finalWorldPos = RandomTeleport(target,
+            rtp.Radius,
+            rtp.TeleportAttempts,
+            rtp.ForceSafeTeleport,
+            rtp.TeleportPulledEntities);
 
-        if (sound) _audio.PlayPvs(rtp.ArrivalSound, Transform(target).Coordinates, AudioParams.Default);
+        if (sound)
+            _audio.PlayPvs(rtp.ArrivalSound, Transform(target).Coordinates, AudioParams.Default);
         _sparks.DoSparks(Transform(target).Coordinates);
 
         return true;
@@ -78,7 +87,11 @@ public partial class SharedRandomTeleportSystem : EntitySystem
         return _random.NextAngle().ToVec() * distance;
     }
 
-    public Vector2? RandomTeleport(EntityUid uid, MinMax radius, int triesBase = 10, bool forceSafe = true, bool teleportPulledEntities = false)
+    public Vector2? RandomTeleport(EntityUid uid,
+        MinMax radius,
+        int triesBase = 10,
+        bool forceSafe = true,
+        bool teleportPulledEntities = false)
     {
         var xform = Transform(uid);
         var entityCoords = _xform.ToMapCoordinates(xform.Coordinates);
@@ -90,7 +103,8 @@ public partial class SharedRandomTeleportSystem : EntitySystem
         var tries = triesBase;
 
         // If forcing a safe teleport, try double the attempts but gradually lower radius in the second half of them
-        if (forceSafe) tries *= 2;
+        if (forceSafe)
+            tries *= 2;
 
         // How far outwards from the minimum radius we can teleport
         var extraRadiusBase = radius.Max - radius.Min;
@@ -132,7 +146,8 @@ public partial class SharedRandomTeleportSystem : EntitySystem
         }
 
         // We haven't found a valid teleport, so just teleport to any spot in range
-        if (!foundValid) targetCoords = entityCoords.Offset(GetTeleportVector(radius.Min, extraRadiusBase));
+        if (!foundValid)
+            targetCoords = entityCoords.Offset(GetTeleportVector(radius.Min, extraRadiusBase));
 
         // if we teleport the pulled entity goes with us
         EntityUid? pullableEntity = null;

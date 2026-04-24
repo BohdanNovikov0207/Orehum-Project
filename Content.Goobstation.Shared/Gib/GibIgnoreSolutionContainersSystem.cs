@@ -19,7 +19,7 @@ public sealed class GibIgnoreSolutionContainersSystem : EntitySystem
     {
         foreach (var container in _soln.EnumerateSolutionContainers(ent.AsNullable()))
         {
-            args.ExcludedContainers ??= new();
+            args.ExcludedContainers ??= new List<string>();
             args.ExcludedContainers.Add(container);
         }
     }

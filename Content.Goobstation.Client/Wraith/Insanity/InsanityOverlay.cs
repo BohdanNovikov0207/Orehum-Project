@@ -1,32 +1,32 @@
+using System.Numerics;
 using Robust.Client.Graphics;
 using Robust.Client.Player;
 using Robust.Shared.Enums;
 using Robust.Shared.Prototypes;
-using System.Numerics;
 
 namespace Content.Goobstation.Client.Wraith.Insanity;
 
 public sealed class InsanityOverlay : Overlay
 {
     private static readonly ProtoId<ShaderPrototype> Shader = "Insanity";
+    [Dependency] private readonly IEntityManager _entityManager = default!;
+    private readonly ShaderInstance _insanityShader;
+    [Dependency] private readonly IPlayerManager _playerManager = default!;
 
     [Dependency] private readonly IPrototypeManager _prototypeManager = default!;
-    [Dependency] private readonly IPlayerManager _playerManager = default!;
-    [Dependency] private readonly IEntityManager _entityManager = default!;
-
-    public override OverlaySpace Space => OverlaySpace.WorldSpace;
-    public override bool RequestScreenTexture => true;
-    private readonly ShaderInstance _insanityShader;
+    private Color _effectColor = Color.Red;
+    private float _radius = 1f;
 
     private float _speed = 1f;
-    private float _radius = 1f;
-    private Color _effectColor = Color.Red;
 
     public InsanityOverlay()
     {
         IoCManager.InjectDependencies(this);
         _insanityShader = _prototypeManager.Index(Shader).InstanceUnique();
     }
+
+    public override OverlaySpace Space => OverlaySpace.WorldSpace;
+    public override bool RequestScreenTexture => true;
 
     protected override bool BeforeDraw(in OverlayDrawArgs args)
     {
@@ -40,12 +40,14 @@ public sealed class InsanityOverlay : Overlay
     }
 
     #region Public
+
     public void SetValues(float speed, float radius, Color color)
     {
         _speed = speed;
         _radius = radius;
         _effectColor = color;
     }
+
     #endregion
 
     protected override void Draw(in OverlayDrawArgs args)
@@ -54,7 +56,8 @@ public sealed class InsanityOverlay : Overlay
             return;
 
         var handle = args.WorldHandle;
-        _insanityShader.SetParameter("effect_color", new Vector4(_effectColor.R, _effectColor.G, _effectColor.B, _effectColor.A));
+        _insanityShader.SetParameter("effect_color",
+            new Vector4(_effectColor.R, _effectColor.G, _effectColor.B, _effectColor.A));
         _insanityShader.SetParameter("radius", _radius);
         _insanityShader.SetParameter("speed", _speed);
         _insanityShader.SetParameter("SCREEN_TEXTURE", ScreenTexture);

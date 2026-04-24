@@ -6,39 +6,39 @@ using Robust.Shared.Prototypes;
 
 namespace Content.Goobstation.Shared.Wraith.Revenant;
 
-[RegisterComponent, NetworkedComponent]
+[RegisterComponent] [NetworkedComponent]
 public sealed partial class RevenantShockwaveComponent : Component
 {
-    [DataField]
-    public SoundSpecifier? ShockSound = new SoundPathSpecifier("/Audio/_Goobstation/Wraith/revshock.ogg");
-
-    /// <summary>
-    ///  Search range of shockwave
-    /// </summary>
-    [DataField]
-    public float SearchRange = 8f;
-
-    /// <summary>
-    ///  How many tiles to pry
-    /// </summary>
-    [DataField]
-    public float TilesToPry = 10;
-
     /// <summary>
     /// How long to knockdown people
     /// </summary>
     [DataField]
     public TimeSpan KnockdownDuration = TimeSpan.FromSeconds(10f);
 
-    [ViewVariables]
-    public ProtoId<TagPrototype> WindowTag = "Window";
+    /// <summary>
+    /// Search range of shockwave
+    /// </summary>
+    [DataField]
+    public float SearchRange = 8f;
 
-    [ViewVariables]
-    public ProtoId<TagPrototype> WallTag = "Wall";
+    [DataField]
+    public SoundSpecifier? ShockSound = new SoundPathSpecifier("/Audio/_Goobstation/Wraith/revshock.ogg");
 
     /// <summary>
     /// Damage dealt to windows and walls
     /// </summary>
     [DataField]
     public DamageSpecifier? StructureDamage = new();
+
+    /// <summary>
+    /// How many tiles to pry
+    /// </summary>
+    [DataField]
+    public float TilesToPry = 10;
+
+    [ViewVariables]
+    public ProtoId<TagPrototype> WallTag = "Wall";
+
+    [ViewVariables]
+    public ProtoId<TagPrototype> WindowTag = "Window";
 }

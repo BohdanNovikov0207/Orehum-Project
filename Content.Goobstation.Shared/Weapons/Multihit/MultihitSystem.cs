@@ -7,7 +7,6 @@ using System.Linq;
 using Content.Shared._Shitcode.Heretic.Systems;
 using Content.Shared.CombatMode;
 using Content.Shared.Hands.EntitySystems;
-using Content.Shared.Heretic;
 using Content.Shared.Weapons.Melee;
 using Content.Shared.Weapons.Melee.Events;
 using Content.Shared.Whitelist;
@@ -19,15 +18,15 @@ namespace Content.Goobstation.Shared.Weapons.Multihit;
 
 public sealed class MultihitSystem : EntitySystem
 {
-    [Dependency] private readonly SharedHandsSystem _hands = default!;
-    [Dependency] private readonly SharedMeleeWeaponSystem _melee = default!;
-    [Dependency] private readonly SharedTransformSystem _transform = default!;
-    [Dependency] private readonly EntityWhitelistSystem _whitelist = default!;
     [Dependency] private readonly SharedCombatModeSystem _combatMode = default!;
+    [Dependency] private readonly SharedHandsSystem _hands = default!;
+    [Dependency] private readonly SharedHereticSystem _heretic = default!;
+    [Dependency] private readonly SharedMeleeWeaponSystem _melee = default!;
     [Dependency] private readonly INetManager _net = default!;
     [Dependency] private readonly ISharedPlayerManager _player = default!;
     [Dependency] private readonly IGameTiming _timing = default!;
-    [Dependency] private readonly SharedHereticSystem _heretic = default!;
+    [Dependency] private readonly SharedTransformSystem _transform = default!;
+    [Dependency] private readonly EntityWhitelistSystem _whitelist = default!;
 
     public override void Initialize()
     {
@@ -39,12 +38,10 @@ public sealed class MultihitSystem : EntitySystem
         SubscribeLocalEvent<MultihitUserWhitelistEvent>(WhitelistCheck);
     }
 
-    private void WhitelistCheck(MultihitUserWhitelistEvent ev)
-    {
+    private void WhitelistCheck(MultihitUserWhitelistEvent ev) =>
         ev.Handled = ev.Blacklist
             ? _whitelist.IsBlacklistFail(ev.Whitelist, ev.User)
             : _whitelist.IsWhitelistPass(ev.Whitelist, ev.User);
-    }
 
     private void HereticCheck(MultihitUserHereticEvent args)
     {

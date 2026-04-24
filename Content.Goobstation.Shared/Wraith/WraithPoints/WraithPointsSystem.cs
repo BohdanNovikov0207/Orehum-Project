@@ -12,11 +12,11 @@ namespace Content.Goobstation.Shared.Wraith.WraithPoints;
 /// </summary>
 public sealed class WraithPointsSystem : EntitySystem
 {
-    [Dependency] private readonly IGameTiming _timing = default!;
+    [Dependency] private readonly AlertsSystem _alerts = default!;
+    [Dependency] private readonly MetaDataSystem _meta = default!;
     [Dependency] private readonly MobStateSystem _mobState = default!;
     [Dependency] private readonly SharedPopupSystem _popupSystem = default!;
-    [Dependency] private  readonly AlertsSystem _alerts = default!;
-    [Dependency] private readonly MetaDataSystem _meta = default!;
+    [Dependency] private readonly IGameTiming _timing = default!;
 
     public override void Initialize()
     {
@@ -51,6 +51,12 @@ public sealed class WraithPointsSystem : EntitySystem
                 (uid, comp),
                 nameof(PassiveWraithPointsComponent.WpGenerationAccumulator));
         }
+    }
+
+    private void AdjustWpGeneration(Entity<PassiveWraithPointsComponent> ent)
+    {
+        ent.Comp.CurrentWpGeneration = ent.Comp.WpGeneration * ent.Comp.BaseWpGeneration;
+        Dirty(ent);
     }
 
     #region Events
@@ -97,14 +103,18 @@ public sealed class WraithPointsSystem : EntitySystem
             meta.EntityDescription + ' ' + Loc.GetString("wraith-wp-action-needs", ("wp", ent.Comp.WpConsume)),
             MetaData(ent.Owner));
     }
+
     #endregion
 
     #region Public Methods
+
     /// <summary>
     /// Changes the Wraith Points of an entity to a set amount
     /// </summary>
-    /// <param name="wraithPoints"></param> The wraith points to replace the existing ones with.
-    /// <param name="ent"></param> The entity
+    /// <param name="wraithPoints"></param>
+    /// The wraith points to replace the existing ones with.
+    /// <param name="ent"></param>
+    /// The entity
     public void ChangeWraithPoints(FixedPoint2 wraithPoints, Entity<WraithPointsComponent?> ent)
     {
         if (!Resolve(ent.Owner, ref ent.Comp))
@@ -117,8 +127,10 @@ public sealed class WraithPointsSystem : EntitySystem
     /// <summary>
     /// Increments/Decrements wraith points
     /// </summary>
-    /// <param name="wraithPoints"></param> The wraith points to add to the existing ones.
-    /// <param name="ent"></param> The entity
+    /// <param name="wraithPoints"></param>
+    /// The wraith points to add to the existing ones.
+    /// <param name="ent"></param>
+    /// The entity
     public void AdjustWraithPoints(FixedPoint2 wraithPoints, Entity<WraithPointsComponent?> ent)
     {
         if (!Resolve(ent.Owner, ref ent.Comp))
@@ -131,7 +143,8 @@ public sealed class WraithPointsSystem : EntitySystem
     /// <summary>
     /// Increments/Decrements the generation rate of Wraith Points
     /// </summary>
-    /// <param name="rate"></param> The rate to add to the existing rate
+    /// <param name="rate"></param>
+    /// The rate to add to the existing rate
     /// <param name="ent"></param>
     public void AdjustWpGenerationRate(FixedPoint2 rate, Entity<PassiveWraithPointsComponent?> ent)
     {
@@ -147,8 +160,10 @@ public sealed class WraithPointsSystem : EntitySystem
     /// <summary>
     /// Resets everything related to Wraith Points.
     /// </summary>
-    /// <param name="ent"></param> The entity
-    /// <param name="passiveWp"></param> For resetting the passive WP generation
+    /// <param name="ent"></param>
+    /// The entity
+    /// <param name="passiveWp"></param>
+    /// For resetting the passive WP generation
     public void ResetEverything(Entity<WraithPointsComponent?> ent, PassiveWraithPointsComponent? passiveWp = null)
     {
         if (!Resolve(ent.Owner, ref ent.Comp))
@@ -192,11 +207,6 @@ public sealed class WraithPointsSystem : EntitySystem
 
         return ent.Comp.WraithPoints;
     }
-    #endregion
 
-    private void AdjustWpGeneration(Entity<PassiveWraithPointsComponent> ent)
-    {
-        ent.Comp.CurrentWpGeneration = ent.Comp.WpGeneration * ent.Comp.BaseWpGeneration;
-        Dirty(ent);
-    }
+    #endregion
 }

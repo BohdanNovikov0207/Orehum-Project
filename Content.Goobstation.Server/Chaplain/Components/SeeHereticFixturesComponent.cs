@@ -11,8 +11,8 @@ namespace Content.Goobstation.Server.Chaplain.Components;
 public sealed partial class SeeHereticFixturesComponent : Component
 {
     [DataField]
-    public bool SeeShifts = true;
+    public bool SeeFractures = true;
 
     [DataField]
-    public bool SeeFractures = true;
+    public bool SeeShifts = true;
 }

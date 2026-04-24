@@ -1,9 +1,8 @@
-namespace Content.Goobstation.Shared.NTR.Scan
+namespace Content.Goobstation.Shared.NTR.Scan;
+
+[RegisterComponent]
+public sealed partial class BriefcaseScannerComponent : Component
 {
-    [RegisterComponent]
-    public sealed partial class BriefcaseScannerComponent : Component
-    {
-        [DataField]
-        public float ScanDuration = 10f;
-    }
+    [DataField]
+    public float ScanDuration = 10f;
 }

@@ -6,7 +6,8 @@ namespace Content.Goobstation.Shared.Wraith.Other;
 public sealed class UnableToEatSystem : EntitySystem
 {
     [Dependency] private readonly SharedPopupSystem _popup = default!;
-    /// <inheritdoc/>
+
+    /// <inheritdoc />
     public override void Initialize()
     {
         base.Initialize();

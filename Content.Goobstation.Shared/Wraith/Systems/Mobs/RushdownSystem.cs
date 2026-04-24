@@ -9,15 +9,17 @@ using Robust.Shared.Audio.Systems;
 using Robust.Shared.Physics.Events;
 
 namespace Content.Goobstation.Shared.Wraith.Systems.Mobs;
+
 public sealed class RushdownSystem : EntitySystem
 {
+    [Dependency] private readonly SharedAudioSystem _audio = default!;
     [Dependency] private readonly EntityLookupSystem _lookup = default!;
     [Dependency] private readonly SharedPopupSystem _popup = default!;
-    [Dependency] private readonly SharedStunSystem _stun = default!;
-    [Dependency] private readonly ThrowingSystem _throwing = default!;
-    [Dependency] private readonly SharedAudioSystem _audio = default!;
 
     private readonly HashSet<Entity<StatusEffectsComponent>> _statusEffects = new();
+    [Dependency] private readonly SharedStunSystem _stun = default!;
+    [Dependency] private readonly ThrowingSystem _throwing = default!;
+
     public override void Initialize()
     {
         base.Initialize();
@@ -37,14 +39,15 @@ public sealed class RushdownSystem : EntitySystem
         if (!comp.IsLeaping)
             return;
 
-        if ((HasComp<MobStateComponent>(args.OtherEntity)))
-            _stun.TryKnockdown(args.OtherEntity, comp.CollideKnockdown, true);
+        if (HasComp<MobStateComponent>(args.OtherEntity))
+            _stun.TryKnockdown(args.OtherEntity, comp.CollideKnockdown);
         else
             _stun.TryKnockdown(uid, comp.CollideKnockdown, false);
 
         comp.IsLeaping = false;
         Dirty(ent);
     }
+
     private void OnLand(Entity<RushdownComponent> ent, ref LandEvent args)
     {
         ent.Comp.IsLeaping = false;
@@ -61,7 +64,7 @@ public sealed class RushdownSystem : EntitySystem
             if (target.Owner == ent.Owner) // skip self
                 continue;
 
-            _stun.KnockdownOrStun(target, ent.Comp.CollideKnockdown, true);
+            _stun.KnockdownOrStun(target, ent.Comp.CollideKnockdown);
         }
 
         _audio.PlayPredicted(ent.Comp.ShockwaveSound, ent.Owner, null);
@@ -72,6 +75,7 @@ public sealed class RushdownSystem : EntitySystem
         ent.Comp.IsLeaping = false;
         Dirty(ent);
     }
+
     private void OnRushdown(Entity<RushdownComponent> ent, ref RushdownEvent args)
     {
         _popup.PopupClient(Loc.GetString("wraith-voidhound-rushdown-leap"), ent.Owner, ent.Owner);
@@ -89,5 +93,4 @@ public sealed class RushdownSystem : EntitySystem
 
         args.Handled = true;
     }
-
 }

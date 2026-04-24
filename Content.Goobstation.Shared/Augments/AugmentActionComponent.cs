@@ -9,13 +9,13 @@ namespace Content.Goobstation.Shared.Augments;
 /// If the action uses <c>ToggleActionEvent</c> then it will try to toggle the augment, if it has power etc.
 /// The icon being toggled is then synced with the augment's activated status.
 /// </summary>
-[RegisterComponent, NetworkedComponent, AutoGenerateComponentState]
+[RegisterComponent] [NetworkedComponent] [AutoGenerateComponentState]
 public sealed partial class AugmentActionComponent : Component
 {
     [DataField(required: true)]
     public EntProtoId Action;
 
-    [DataField, AutoNetworkedField]
+    [DataField] [AutoNetworkedField]
     public EntityUid? ActionEntity;
 }
 

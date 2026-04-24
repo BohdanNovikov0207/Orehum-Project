@@ -6,11 +6,13 @@ using Content.Shared.Chemistry.EntitySystems;
 using Content.Shared.Popups;
 
 namespace Content.Goobstation.Shared.Wraith.Systems;
+
 public sealed class DefileSystem : EntitySystem
 {
     [Dependency] private readonly SharedPopupSystem _popup = default!;
     [Dependency] private readonly SharedSolutionContainerSystem _solution = default!;
     [Dependency] private readonly SharedUserInterfaceSystem _ui = default!;
+
     public override void Initialize()
     {
         base.Initialize();
@@ -27,6 +29,7 @@ public sealed class DefileSystem : EntitySystem
             var reagentEntry = new ListViewSelectorEntry(reagent.Key.ToString(), reagent.Key.ToString());
             ent.Comp.ReagentsEntryList.Add(reagentEntry);
         }
+
         Dirty(ent);
     }
 
@@ -61,6 +64,7 @@ public sealed class DefileSystem : EntitySystem
 
 
     #region Helper
+
     private bool TryInjectReagents(EntityUid target, Entity<DefileComponent> ent)
     {
         if (!ent.Comp.ReagentSelected.HasValue)
@@ -86,5 +90,6 @@ public sealed class DefileSystem : EntitySystem
 
         return _solution.TryAddSolution(targetSolution.Value, solution);
     }
+
     #endregion
 }

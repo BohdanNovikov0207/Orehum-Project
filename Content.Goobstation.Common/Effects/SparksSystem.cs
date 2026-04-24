@@ -17,15 +17,14 @@ namespace Content.Goobstation.Common.Effects;
 
 public sealed class SparksSystem : EntitySystem
 {
-    [Dependency] private readonly INetManager _net = default!;
-    [Dependency] private readonly IRobustRandom _random = default!;
-    [Dependency] private readonly SharedTransformSystem _transform = default!;
-    [Dependency] private readonly SharedPhysicsSystem _physics = default!;
-    [Dependency] private readonly SharedAudioSystem _audio = default!;
-
     private static readonly EntProtoId SparkPrototype = "EffectSpark";
 
     private static readonly SoundSpecifier Sound = new SoundCollectionSpecifier("sparks");
+    [Dependency] private readonly SharedAudioSystem _audio = default!;
+    [Dependency] private readonly INetManager _net = default!;
+    [Dependency] private readonly SharedPhysicsSystem _physics = default!;
+    [Dependency] private readonly IRobustRandom _random = default!;
+    [Dependency] private readonly SharedTransformSystem _transform = default!;
 
     public void DoSparks(EntityCoordinates coords,
         int minSparks = 1,

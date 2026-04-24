@@ -13,27 +13,28 @@ namespace Content.Goobstation.Shared.Weapons.Ranged.ProjectileRequiresWhitelist;
 /// </summary>
 [RegisterComponent]
 [Access(typeof(ProjectileRequireWhitelistSystem))]
-[NetworkedComponent, AutoGenerateComponentState]
+[NetworkedComponent] [AutoGenerateComponentState]
 public sealed partial class ProjectileRequireWhitelistComponent : Component
 {
     /// <summary>
-    /// The whitelist for what the projectile can affect.
-    /// </summary>
-    [DataField, AutoNetworkedField]
-    public EntityWhitelist? Whitelist;
-
-    /// <summary>
     /// Should the projectile hit walls?
     /// </summary>
-    [DataField, AutoNetworkedField]
+    [DataField] [AutoNetworkedField]
     public bool CollideWithWalls = true;
 
     /// <summary>
     /// Whether the whitelist should be inverted.
     /// </summary>
     /// <remarks>
-    /// If this is true, and the whitelist is set to clumsy, the projectile will affect anyone that does *not* have the clumsy component.
+    /// If this is true, and the whitelist is set to clumsy, the projectile will affect anyone that does *not* have the clumsy
+    /// component.
     /// </remarks>
-    [DataField, AutoNetworkedField]
+    [DataField] [AutoNetworkedField]
     public bool Invert;
+
+    /// <summary>
+    /// The whitelist for what the projectile can affect.
+    /// </summary>
+    [DataField] [AutoNetworkedField]
+    public EntityWhitelist? Whitelist;
 }

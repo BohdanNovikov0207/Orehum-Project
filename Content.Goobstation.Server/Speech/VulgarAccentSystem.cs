@@ -20,9 +20,9 @@ namespace Content.Goobstation.Server.Speech;
 
 public sealed class VulgarAccentSystem : EntitySystem
 {
-    [Dependency] private readonly IRobustRandom _random = default!;
     [Dependency] private readonly ILocalizationManager _loc = default!;
     [Dependency] private readonly IPrototypeManager _prototypeManager = default!;
+    [Dependency] private readonly IRobustRandom _random = default!;
     [Dependency] private readonly ReplacementAccentSystem _replacement = default!;
 
     public override void Initialize()
@@ -34,9 +34,9 @@ public sealed class VulgarAccentSystem : EntitySystem
 
     public string Accentuate(string message, VulgarAccentComponent component)
     {
-        string[] messageWords = message.Split(" ");
+        var messageWords = message.Split(" ");
 
-        for (int i = 0; i < messageWords.Length; i++)
+        for (var i = 0; i < messageWords.Length; i++)
         {
             //Every word has a percentage chance to be replaced by a random swear word from the component's array.
             if (_random.Prob(component.SwearProb))
@@ -45,7 +45,7 @@ public sealed class VulgarAccentSystem : EntitySystem
                     return message;
 
 
-                string swearWord = _loc.GetString(_random.Pick(messagePack.Values));
+                var swearWord = _loc.GetString(_random.Pick(messagePack.Values));
                 messageWords[i] = swearWord;
             }
         }
@@ -53,8 +53,6 @@ public sealed class VulgarAccentSystem : EntitySystem
         return string.Join(" ", messageWords);
     }
 
-    public void OnAccentGet(EntityUid uid, VulgarAccentComponent component, AccentGetEvent args)
-    {
+    public void OnAccentGet(EntityUid uid, VulgarAccentComponent component, AccentGetEvent args) =>
         args.Message = Accentuate(args.Message, component);
-    }
 }

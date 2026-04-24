@@ -25,26 +25,28 @@ using Timer = Robust.Shared.Timing.Timer;
 namespace Content.Goobstation.Server.PlayerListener;
 
 /// <summary>
-///     Notifies if 2 or more players are near a marker for an extended amount of time
-///     To trigger, all conditions must be true:
-///     0. Mobs in proximity must be humanoid
-///     1. X(>1) amount of humanoids are in a Y distance of tiles away from a marker
-///     2. At least two humanoids are currently players
-///     3. None of the players are dead, crit, AFK or disconnected
+/// Notifies if 2 or more players are near a marker for an extended amount of time
+/// To trigger, all conditions must be true:
+/// 0. Mobs in proximity must be humanoid
+/// 1. X(>1) amount of humanoids are in a Y distance of tiles away from a marker
+/// 2. At least two humanoids are currently players
+/// 3. None of the players are dead, crit, AFK or disconnected
 /// </summary>
 /// <remarks>
-///     Fires faster if at least 1 out of 2 or more players has nothing in their body clothing slot.
-///     This is called "expedited" here.
+/// Fires faster if at least 1 out of 2 or more players has nothing in their body clothing slot.
+/// This is called "expedited" here.
 /// </remarks>
 public sealed class DormNotifier : EntitySystem
 {
-    [Dependency] private readonly IConfigurationManager _cfg = default!;
-    [Dependency] private readonly EntityLookupSystem _lookup = default!;
     [Dependency] private readonly IAfkManager _afk = default!;
-    [Dependency] private readonly ContainerSystem _container = default!;
+    [Dependency] private readonly IConfigurationManager _cfg = default!;
     [Dependency] private readonly ChatSystem _chat = default!;
+    [Dependency] private readonly ContainerSystem _container = default!;
+    [Dependency] private readonly EntityLookupSystem _lookup = default!;
 
-    private HashSet<CancellationTokenSource> _tokens = [];
+    private readonly HashSet<CancellationTokenSource> _tokens = [];
+
+    private int _clock;
 
     private bool _enabled;
     private int _frequency = 10;
@@ -65,7 +67,6 @@ public sealed class DormNotifier : EntitySystem
         SubscribeLocalEvent<RoundRestartCleanupEvent>(OnRestartCleanup);
     }
 
-    private int _clock;
     public override void Update(float frameTime)
     {
         base.Update(frameTime);
@@ -95,16 +96,17 @@ public sealed class DormNotifier : EntitySystem
 
     private void CheckMarker(EntityUid uid, DormNotifierMarkerComponent comp)
     {
-        var ents = _lookup.GetEntitiesInRange<HumanoidAppearanceComponent>(Transform(uid).Coordinates, comp.ProximityRadius);
+        var ents = _lookup.GetEntitiesInRange<HumanoidAppearanceComponent>(Transform(uid).Coordinates,
+            comp.ProximityRadius);
         var found = Validate(uid, ents, out var condemned);
 
         if (found)
-        {
             Condemn(uid, condemned);
-        }
     }
 
-    private bool Validate(EntityUid marker, HashSet<Entity<HumanoidAppearanceComponent>> entities, [NotNullWhen(true)] out HashSet<EntityUid> condemned)
+    private bool Validate(EntityUid marker,
+        HashSet<Entity<HumanoidAppearanceComponent>> entities,
+        [NotNullWhen(true)] out HashSet<EntityUid> condemned)
     {
         // "0. Mobs in proximity must be humanoid" is handled by Entity<HumanoidAppearanceComponent>
         condemned = [];
@@ -180,7 +182,7 @@ public sealed class DormNotifier : EntitySystem
                 .Select(con => new Entity<HumanoidAppearanceComponent>(con, Comp<HumanoidAppearanceComponent>(con)))
                 .ToHashSet();
 
-            bool valid = Validate(condemned.Marker, sinners, out _);
+            var valid = Validate(condemned.Marker, sinners, out _);
 
             if (!valid)
             {

@@ -7,9 +7,21 @@ namespace Content.Goobstation.Shared.Xenobiology.XenobiologyBountyConsole;
 /// <summary>
 /// A data structure for storing historical information about bounties.
 /// </summary>
-[DataDefinition, NetSerializable, Serializable]
+[DataDefinition] [NetSerializable] [Serializable]
 public readonly partial record struct XenobiologyBountyHistoryData
 {
+    public XenobiologyBountyHistoryData(XenobiologyBountyData bounty,
+        CargoBountyHistoryData.BountyResult result,
+        TimeSpan timestamp,
+        string? actorName)
+    {
+        Bounty = bounty.Bounty;
+        Result = result;
+        Id = bounty.Id;
+        ActorName = actorName;
+        Timestamp = timestamp;
+    }
+
     /// <summary>
     /// A unique id used to identify the bounty
     /// </summary>
@@ -39,13 +51,4 @@ public readonly partial record struct XenobiologyBountyHistoryData
     /// </summary>
     [DataField(required: true)]
     public ProtoId<XenobiologyBountyPrototype> Bounty { get; init; } = string.Empty;
-
-    public XenobiologyBountyHistoryData(XenobiologyBountyData bounty, CargoBountyHistoryData.BountyResult result, TimeSpan timestamp, string? actorName)
-    {
-        Bounty = bounty.Bounty;
-        Result = result;
-        Id = bounty.Id;
-        ActorName = actorName;
-        Timestamp = timestamp;
-    }
 }

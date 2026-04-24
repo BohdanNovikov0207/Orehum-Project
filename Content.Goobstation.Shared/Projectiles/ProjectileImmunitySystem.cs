@@ -15,8 +15,8 @@ namespace Content.Goobstation.Shared.Projectiles;
 
 public sealed class ProjectileImmunitySystem : EntitySystem
 {
-    [Dependency] private readonly IGameTiming _timing = default!;
     [Dependency] private readonly SharedStaminaSystem _stamina = default!;
+    [Dependency] private readonly IGameTiming _timing = default!;
 
     public override void Initialize()
     {

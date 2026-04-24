@@ -9,32 +9,41 @@
 
 using System.Collections;
 using System.Diagnostics.Contracts;
-using Content.Goobstation.Shared.Blob.Components;
 using Content.Goobstation.Maths.FixedPoint;
+using Content.Goobstation.Shared.Blob.Components;
 using Robust.Shared.Prototypes;
 
 namespace Content.Goobstation.Shared.Blob;
 
 #region BlobTypedStorage
+
 [DataDefinition]
 public abstract partial class BlobTypedStorage<T> : IEnumerable<KeyValuePair<BlobTileType, T>>
 {
     [DataField]
     public virtual T Core { get; set; } = default!;
+
     [DataField]
-    public virtual T Invalid  { get; set; } = default!;
+    public virtual T Invalid { get; set; } = default!;
+
     [DataField]
-    public virtual T Resource  { get; set; } = default!;
+    public virtual T Resource { get; set; } = default!;
+
     [DataField]
-    public virtual T Factory  { get; set; } = default!;
+    public virtual T Factory { get; set; } = default!;
+
     [DataField]
-    public virtual T Node  { get; set; } = default!;
+    public virtual T Node { get; set; } = default!;
+
     [DataField]
-    public virtual T Reflective  { get; set; } = default!;
+    public virtual T Reflective { get; set; } = default!;
+
     [DataField]
-    public virtual T Strong  { get; set; } = default!;
+    public virtual T Strong { get; set; } = default!;
+
     [DataField]
     public virtual T Normal { get; set; } = default!;
+
     /*
     [DataField]
     public virtual T Storage  { get; set; }
@@ -59,7 +68,7 @@ public abstract partial class BlobTypedStorage<T> : IEnumerable<KeyValuePair<Blo
             BlobTileType.Storage => Storage,
             BlobTileType.Turret => Turret,
             */
-            _ => throw new ArgumentOutOfRangeException(nameof(type), $"Unknown tile type: {type}")
+            _ => throw new ArgumentOutOfRangeException(nameof(type), $"Unknown tile type: {type}"),
         };
         set
         {
@@ -103,11 +112,6 @@ public abstract partial class BlobTypedStorage<T> : IEnumerable<KeyValuePair<Blo
         }
     }
 
-    public void Add(BlobTileType key, T value)
-    {
-        this[key] = value;
-    }
-
     public IEnumerator<KeyValuePair<BlobTileType, T>> GetEnumerator()
     {
         yield return new KeyValuePair<BlobTileType, T>(BlobTileType.Core, Core);
@@ -124,11 +128,11 @@ public abstract partial class BlobTypedStorage<T> : IEnumerable<KeyValuePair<Blo
         */
     }
 
-    IEnumerator IEnumerable.GetEnumerator()
-    {
-        return GetEnumerator();
-    }
+    IEnumerator IEnumerable.GetEnumerator() => GetEnumerator();
+
+    public void Add(BlobTileType key, T value) => this[key] = value;
 }
+
 #endregion
 
 [DataDefinition]

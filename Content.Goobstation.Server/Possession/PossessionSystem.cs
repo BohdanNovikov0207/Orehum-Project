@@ -6,7 +6,6 @@
 
 using Content.Goobstation.Common.Magic;
 using Content.Goobstation.Common.Religion;
-using Content.Goobstation.Shared.Changeling.Components;
 using Content.Goobstation.Shared.Devil;
 using Content.Goobstation.Shared.Possession;
 using Content.Goobstation.Shared.Religion;
@@ -37,25 +36,24 @@ using Robust.Shared.Containers;
 using Robust.Shared.Map;
 using Robust.Shared.Spawners;
 using Robust.Shared.Timing;
-using static Content.Shared.Administration.Notes.AdminMessageEuiState;
 
 namespace Content.Goobstation.Server.Possession;
 
-public sealed partial class PossessionSystem : EntitySystem
+public sealed class PossessionSystem : EntitySystem
 {
-    [Dependency] private readonly IGameTiming _timing = default!;
-    [Dependency] private readonly MobStateSystem _mobState = default!;
-    [Dependency] private readonly SharedPopupSystem _popup = default!;
-    [Dependency] private readonly SharedMindSystem _mind = default!;
-    [Dependency] private readonly SharedAudioSystem _audio = default!;
-    [Dependency] private readonly StunSystem _stun = default!;
-    [Dependency] private readonly SharedTransformSystem _transform = default!;
-    [Dependency] private readonly ContainerSystem _container = default!;
-    [Dependency] private readonly ISharedAdminLogManager _admin = default!;
     [Dependency] private readonly ActionsSystem _action = default!;
-    [Dependency] private readonly PolymorphSystem _polymorph = default!;
-    [Dependency] private readonly TagSystem _tag = default!;
+    [Dependency] private readonly ISharedAdminLogManager _admin = default!;
+    [Dependency] private readonly SharedAudioSystem _audio = default!;
+    [Dependency] private readonly ContainerSystem _container = default!;
     [Dependency] private readonly FollowerSystem _follower = default!;
+    [Dependency] private readonly SharedMindSystem _mind = default!;
+    [Dependency] private readonly MobStateSystem _mobState = default!;
+    [Dependency] private readonly PolymorphSystem _polymorph = default!;
+    [Dependency] private readonly SharedPopupSystem _popup = default!;
+    [Dependency] private readonly StunSystem _stun = default!;
+    [Dependency] private readonly TagSystem _tag = default!;
+    [Dependency] private readonly IGameTiming _timing = default!;
+    [Dependency] private readonly SharedTransformSystem _transform = default!;
 
     public override void Initialize()
     {
@@ -110,6 +108,7 @@ public sealed partial class PossessionSystem : EntitySystem
 
         args.Handled = true;
     }
+
     private void OnComponentRemoved(Entity<PossessedComponent> possessed, ref ComponentRemove args)
     {
         MapCoordinates? coordinates = null;
@@ -133,9 +132,7 @@ public sealed partial class PossessionSystem : EntitySystem
 
         // Transfer followers from possessed entity to possessor's original entity
         if (!TerminatingOrDeleted(possessed.Comp.PossessorOriginalEntity))
-        {
             UpdateFollowersToNewEntity(possessed.Owner, possessed.Comp.PossessorOriginalEntity);
-        }
 
         // Return the possessors mind to their body, and the target to theirs.
         if (!TerminatingOrDeleted(possessed.Comp.PossessorMindId))
@@ -148,7 +145,9 @@ public sealed partial class PossessionSystem : EntitySystem
 
         // Paralyze, so you can't just magdump them.
         _stun.TryUpdateParalyzeDuration(possessed, TimeSpan.FromSeconds(10));
-        _popup.PopupEntity(Loc.GetString("possession-end-popup", ("target", possessed)), possessed, PopupType.LargeCaution);
+        _popup.PopupEntity(Loc.GetString("possession-end-popup", ("target", possessed)),
+            possessed,
+            PopupType.LargeCaution);
 
         // Teleport to the entity, kinda like you're popping out of their head!
         if (!TerminatingOrDeleted(possessed.Comp.PossessorOriginalEntity) && coordinates is not null)
@@ -177,7 +176,15 @@ public sealed partial class PossessionSystem : EntitySystem
     /// <param name="doesMindshieldBlock">Does having a mindshield block being possessed?</param>
     /// <param name="doesChaplainBlock">Is the chaplain immune to this possession?</param>
     /// <param name="HideActions">Should all actions be hidden during?</param>
-    public bool TryPossessTarget(EntityUid possessed, EntityUid possessor, TimeSpan possessionDuration, bool pacifyPossessed, bool doesMindshieldBlock = false, bool doesChaplainBlock = true, bool hideActions = true, bool polymorphPossessor = true, bool doesImmuneBlock = true)
+    public bool TryPossessTarget(EntityUid possessed,
+        EntityUid possessor,
+        TimeSpan possessionDuration,
+        bool pacifyPossessed,
+        bool doesMindshieldBlock = false,
+        bool doesChaplainBlock = true,
+        bool hideActions = true,
+        bool polymorphPossessor = true,
+        bool doesImmuneBlock = true)
     {
         // Possessing a dead guy? What.
         if (_mobState.IsIncapacitated(possessed) || HasComp<ZombieComponent>(possessed))
@@ -249,11 +256,23 @@ public sealed partial class PossessionSystem : EntitySystem
         if (!_mind.TryGetMind(possessor, out var possessorMind, out _))
             return false;
 
-        DoPossess(possessed, possessor, possessionDuration, possessorMind, pacifyPossessed, hideActions, polymorphPossessor);
+        DoPossess(possessed,
+            possessor,
+            possessionDuration,
+            possessorMind,
+            pacifyPossessed,
+            hideActions,
+            polymorphPossessor);
         return true;
     }
 
-    private void DoPossess(EntityUid? possessedNullable, EntityUid possessor, TimeSpan possessionDuration, EntityUid possessorMind, bool pacifyPossessed, bool hideActions, bool polymorphPossessor)
+    private void DoPossess(EntityUid? possessedNullable,
+        EntityUid possessor,
+        TimeSpan possessionDuration,
+        EntityUid possessorMind,
+        bool pacifyPossessed,
+        bool hideActions,
+        bool polymorphPossessor)
     {
         if (possessedNullable is not { } possessed)
             return;
@@ -271,7 +290,7 @@ public sealed partial class PossessionSystem : EntitySystem
 
         possessedComp.PolymorphEntity = polymorphPossessor;
 
-        EntityUid currentFollowedEntity = possessor;
+        var currentFollowedEntity = possessor;
 
         if (polymorphPossessor)
         {
@@ -310,13 +329,16 @@ public sealed partial class PossessionSystem : EntitySystem
 
         // After the mind transfer, ghosts should follow the possessed entity (where the mind now is)
         if (!TerminatingOrDeleted(currentFollowedEntity))
-        {
             UpdateFollowersToNewEntity(currentFollowedEntity, possessed);
-        }
 
         // SFX
-        _popup.PopupEntity(Loc.GetString("possession-popup-self"), possessedMind, possessedMind, PopupType.LargeCaution);
-        _popup.PopupEntity(Loc.GetString("possession-popup-others", ("target", possessed)), possessed, PopupType.MediumCaution);
+        _popup.PopupEntity(Loc.GetString("possession-popup-self"),
+            possessedMind,
+            possessedMind,
+            PopupType.LargeCaution);
+        _popup.PopupEntity(Loc.GetString("possession-popup-others", ("target", possessed)),
+            possessed,
+            PopupType.MediumCaution);
         _audio.PlayPvs(possessedComp.PossessionSoundPath, possessed);
 
         Log.Info($"{ToPrettyString(possessor)} possessed {ToPrettyString(possessed)}");
@@ -342,9 +364,7 @@ public sealed partial class PossessionSystem : EntitySystem
         foreach (var follower in followers)
         {
             if (HasComp<GhostComponent>(follower))
-            {
                 _follower.StartFollowingEntity(follower, newEntity);
-            }
         }
     }
 }

@@ -16,6 +16,20 @@ namespace Content.Goobstation.Shared.Silicon.Bots;
 [Access(typeof(PlantbotSystem))]
 public sealed partial class PlantbotComponent : Component
 {
+    [DataField]
+    public SoundSpecifier EmagSparkSound = new SoundCollectionSpecifier("sparks")
+    {
+        Params = AudioParams.Default.WithVolume(8f),
+    };
+
+    public bool IsEmagged = false;
+
+    /// <summary>
+    /// Sound played after draining a plantHolder.
+    /// </summary>
+    [DataField]
+    public SoundSpecifier RemoveWaterSound = new SoundPathSpecifier("/Audio/Items/drink.ogg");
+
     /// <summary>
     /// Sound played after watering a plantHolder.
     /// </summary>
@@ -27,18 +41,4 @@ public sealed partial class PlantbotComponent : Component
     /// </summary>
     [DataField]
     public SoundSpecifier WeedSound = new SoundPathSpecifier("/Audio/Effects/plant_rustle.ogg");
-
-    /// <summary>
-    /// Sound played after draining a plantHolder.
-    /// </summary>
-    [DataField]
-    public SoundSpecifier RemoveWaterSound = new SoundPathSpecifier("/Audio/Items/drink.ogg");
-
-    [DataField]
-    public SoundSpecifier EmagSparkSound = new SoundCollectionSpecifier("sparks")
-    {
-        Params = AudioParams.Default.WithVolume(8f)
-    };
-
-    public bool IsEmagged = false;
 }

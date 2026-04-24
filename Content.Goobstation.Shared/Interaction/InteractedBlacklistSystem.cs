@@ -13,10 +13,12 @@ public sealed class InteractedBlacklistSystem : EntitySystem
     {
         base.Initialize();
 
-        SubscribeLocalEvent<InteractedBlacklistComponent, GettingInteractedWithAttemptEvent>(OnBlacklistInteractionAttempt);
+        SubscribeLocalEvent<InteractedBlacklistComponent, GettingInteractedWithAttemptEvent>(
+            OnBlacklistInteractionAttempt);
     }
 
-    private void OnBlacklistInteractionAttempt(Entity<InteractedBlacklistComponent> ent, ref GettingInteractedWithAttemptEvent args)
+    private void OnBlacklistInteractionAttempt(Entity<InteractedBlacklistComponent> ent,
+        ref GettingInteractedWithAttemptEvent args)
     {
         if (args.Cancelled || ent.Comp.Blacklist == null)
             return;

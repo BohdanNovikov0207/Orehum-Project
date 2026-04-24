@@ -6,7 +6,7 @@ using Robust.Shared.Prototypes;
 
 namespace Content.Goobstation.Shared.Wraith.Components;
 
-[RegisterComponent, NetworkedComponent]
+[RegisterComponent] [NetworkedComponent]
 [AutoGenerateComponentState]
 public sealed partial class DefileComponent : Component
 {
@@ -17,15 +17,15 @@ public sealed partial class DefileComponent : Component
     [DataField(required: true)]
     public Dictionary<ProtoId<ReagentPrototype>, FixedPoint2> Reagents = new();
 
+    [DataField] [AutoNetworkedField]
+    public EntProtoId? ReagentSelected;
+
+    [DataField] [AutoNetworkedField]
+    public FixedPoint2 ReagentSelectedAmount;
+
     /// <summary>
     /// This is used for the UI to show the reagents
     /// </summary>
-    [ViewVariables, AutoNetworkedField]
+    [ViewVariables] [AutoNetworkedField]
     public List<ListViewSelectorEntry> ReagentsEntryList = new();
-
-    [DataField, AutoNetworkedField]
-    public EntProtoId? ReagentSelected;
-
-    [DataField, AutoNetworkedField]
-    public FixedPoint2 ReagentSelectedAmount;
 }

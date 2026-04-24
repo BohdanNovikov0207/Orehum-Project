@@ -13,32 +13,20 @@ namespace Content.Goobstation.Shared.SlaughterDemon;
 /// <summary>
 /// This is used for marking an entity as able to devour people with blood crawl
 /// </summary>
-[RegisterComponent, NetworkedComponent]
+[RegisterComponent] [NetworkedComponent]
 public sealed partial class SlaughterDevourComponent : Component
 {
+    /// <summary>
+    /// A container that holds the entities instead of outright removing them
+    /// </summary>
+    [DataField]
+    public Container? Container;
+
     /// <summary>
     /// Devouring doafter
     /// </summary>
     [DataField(required: true)]
     public float DoAfterDelay;
-
-    /// <summary>
-    /// Healing done when eating someone
-    /// </summary>
-    [DataField(required: true)]
-    public DamageSpecifier ToHeal;
-
-    /// <summary>
-    /// Healing done when eating a robot
-    /// </summary>
-    [DataField(required: true)]
-    public DamageSpecifier ToHealNonCrew;
-
-    /// <summary>
-    /// Healing done when eating anything else
-    /// </summary>
-    [DataField(required: true)]
-    public DamageSpecifier ToHealAnythingElse;
 
     /// <summary>
     /// The sound that plays once devouring someone
@@ -50,8 +38,20 @@ public sealed partial class SlaughterDevourComponent : Component
     };
 
     /// <summary>
-    /// A container that holds the entities instead of outright removing them
+    /// Healing done when eating someone
     /// </summary>
-    [DataField]
-    public Container? Container;
+    [DataField(required: true)]
+    public DamageSpecifier ToHeal;
+
+    /// <summary>
+    /// Healing done when eating anything else
+    /// </summary>
+    [DataField(required: true)]
+    public DamageSpecifier ToHealAnythingElse;
+
+    /// <summary>
+    /// Healing done when eating a robot
+    /// </summary>
+    [DataField(required: true)]
+    public DamageSpecifier ToHealNonCrew;
 }

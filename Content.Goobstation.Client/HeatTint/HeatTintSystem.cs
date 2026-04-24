@@ -33,7 +33,11 @@ public sealed class HeatTintSystem : SharedHeatTintSystem
         return baseColor;
     }
 
-    private void ApplyHeatColor(HeatTintComponent comp, SpriteComponent sprite, EntityUid uid, int index, Color heatColor)
+    private void ApplyHeatColor(HeatTintComponent comp,
+        SpriteComponent sprite,
+        EntityUid uid,
+        int index,
+        Color heatColor)
     {
         var final = GetBaseColor(comp, sprite, index) * heatColor;
         _sprite.LayerSetColor((uid, sprite), index, final);
@@ -71,8 +75,6 @@ public sealed class HeatTintSystem : SharedHeatTintSystem
             }
         }
         else
-        {
             _sprite.SetColor((uid, args.Sprite), heatColor);
-        }
     }
 }

@@ -15,7 +15,6 @@ namespace Content.Goobstation.Server.TeleportOnStateChange;
 [RegisterComponent]
 public sealed partial class TeleportOnStateChangeComponent : Component
 {
-
     /// <summary>
     /// The co-ordinates to teleport to.
     /// </summary>

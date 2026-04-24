@@ -3,5 +3,5 @@ using Robust.Shared.Serialization;
 
 namespace Content.Goobstation.Shared.SlotMachine;
 
-[Serializable, NetSerializable]
+[Serializable] [NetSerializable]
 public sealed partial class SlotMachineDoAfterEvent : SimpleDoAfterEvent;

@@ -8,5 +8,5 @@ using Robust.Shared.Serialization;
 
 namespace Content.Goobstation.Shared.Keyring;
 
-[Serializable, NetSerializable]
+[Serializable] [NetSerializable]
 public sealed partial class KeyringDoAfterEvent : SimpleDoAfterEvent;

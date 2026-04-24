@@ -18,11 +18,10 @@ namespace Content.Goobstation.Shared.Held;
 [RegisterComponent]
 public sealed partial class HeldGrantComponentComponent : Component
 {
+    [ViewVariables(VVAccess.ReadWrite)]
+    public Dictionary<string, bool> Active = new();
+
     [DataField(required: true)]
     [AlwaysPushInheritance]
     public ComponentRegistry Components { get; private set; } = new();
-
-    [ViewVariables(VVAccess.ReadWrite)]
-    public Dictionary<string, bool> Active = new();
 }
-

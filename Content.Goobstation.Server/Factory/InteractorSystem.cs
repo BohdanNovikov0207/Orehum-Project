@@ -43,7 +43,7 @@ public sealed class InteractorSystem : SharedInteractorSystem
         }
 
         // nothing there
-        if (FindTarget(ent) is not {} target)
+        if (FindTarget(ent) is not { } target)
         {
             Machine.Failed(ent.Owner);
             return;

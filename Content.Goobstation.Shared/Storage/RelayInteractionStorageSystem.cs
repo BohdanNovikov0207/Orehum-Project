@@ -11,8 +11,9 @@ namespace Content.Goobstation.Shared.Storage;
 
 public sealed class RelayInteractionStorageSystem : EntitySystem
 {
-    [Dependency] private readonly EntityWhitelistSystem _whitelist = default!;
     [Dependency] private readonly SharedInteractionSystem _interaction = default!;
+    [Dependency] private readonly EntityWhitelistSystem _whitelist = default!;
+
     public override void Initialize()
     {
         base.Initialize();
@@ -29,6 +30,8 @@ public sealed class RelayInteractionStorageSystem : EntitySystem
             return;
 
         foreach (var item in storage.Container.ContainedEntities)
+        {
             _interaction.InteractDoAfter(args.User, item, args.Target, Transform(args.Target.Value).Coordinates, true);
+        }
     }
 }

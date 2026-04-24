@@ -5,8 +5,48 @@ using Robust.Shared.Configuration;
 namespace Content.Trauma.Common.CCVar;
 
 [CVarDefs]
-public sealed partial class TraumaCVars
+public sealed class TraumaCVars
 {
+    #region AudioMuffle
+
+    /// <summary>
+    /// Is audio muffle pathfinding behavior enabled?
+    /// </summary>
+    public static readonly CVarDef<bool> AudioMufflePathfinding =
+        CVarDef.Create("trauma.audio_muffle_pathfinding", true, CVar.SERVER | CVar.REPLICATED);
+
+    #endregion
+
+    #region Streamer Mode
+
+    /// <summary>
+    /// Client setting to disable music that would cause copyright claims.
+    /// </summary>
+    public static readonly CVarDef<bool> StreamerMode =
+        CVarDef.Create("trauma.streamer_mode", false, CVar.CLIENTONLY | CVar.ARCHIVE);
+
+    #endregion
+
+    #region Gun prediction
+
+    /// <summary>
+    /// Distance used between projectile and lag-compensated target position for gun prediction.
+    /// </summary>
+    public static readonly CVarDef<float> GunLagCompRange =
+        CVarDef.Create("trauma.gun_lag_comp_range", 0.6f, CVar.SERVER);
+
+    #endregion
+
+    #region EndCredits
+
+    /// <summary>
+    /// Whether to play the cool end credits.
+    /// </summary>
+    public static readonly CVarDef<bool> PlayMovieEndCredits =
+        CVarDef.Create("trauma.play_credits", true, CVar.ARCHIVE | CVar.CLIENTONLY);
+
+    #endregion
+
     #region Disabling features
 
     /// <summary>
@@ -37,36 +77,6 @@ public sealed partial class TraumaCVars
     /// </summary>
     public static readonly CVarDef<int> MiningRewardRatio =
         CVarDef.Create("trauma.mining_reward_ratio", 50, CVar.SERVER | CVar.REPLICATED);
-
-    #endregion
-
-    #region AudioMuffle
-
-    /// <summary>
-    /// Is audio muffle pathfinding behavior enabled?
-    /// </summary>
-    public static readonly CVarDef<bool> AudioMufflePathfinding =
-        CVarDef.Create("trauma.audio_muffle_pathfinding", true, CVar.SERVER | CVar.REPLICATED);
-
-    #endregion
-
-    #region Streamer Mode
-
-    /// <summary>
-    /// Client setting to disable music that would cause copyright claims.
-    /// </summary>
-    public static readonly CVarDef<bool> StreamerMode =
-        CVarDef.Create("trauma.streamer_mode", false, CVar.CLIENTONLY | CVar.ARCHIVE);
-
-    #endregion
-
-    #region Gun prediction
-
-    /// <summary>
-    /// Distance used between projectile and lag-compensated target position for gun prediction.
-    /// </summary>
-    public static readonly CVarDef<float> GunLagCompRange =
-        CVarDef.Create("trauma.gun_lag_comp_range", 0.6f, CVar.SERVER);
 
     #endregion
 
@@ -119,16 +129,6 @@ public sealed partial class TraumaCVars
     /// </summary>
     public static readonly CVarDef<double> ErrorWebhookDelay =
         CVarDef.Create("trauma.error_webhook_delay", 0.3, CVar.SERVER);
-
-    #endregion
-
-    #region EndCredits
-
-    /// <summary>
-    /// Whether to play the cool end credits.
-    /// </summary>
-    public static readonly CVarDef<bool> PlayMovieEndCredits =
-        CVarDef.Create("trauma.play_credits", true, CVar.ARCHIVE | CVar.CLIENTONLY);
 
     #endregion
 }

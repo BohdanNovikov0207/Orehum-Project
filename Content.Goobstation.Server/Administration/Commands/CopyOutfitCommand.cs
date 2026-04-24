@@ -10,6 +10,7 @@ namespace Content.Goobstation.Server.Administration.Commands;
 public sealed class CopyOutfitCommand : LocalizedEntityCommands
 {
     [Dependency] private readonly CloningSystem _cloning = default!;
+
     [Dependency] private readonly InventorySystem _inventory = default!;
     // No hands manipulation; rely on cloning system only
 
@@ -42,7 +43,8 @@ public sealed class CopyOutfitCommand : LocalizedEntityCommands
         if (!EntityManager.TryGetComponent<InventoryComponent>(source, out var sourceInv) ||
             !EntityManager.TryGetComponent<InventoryComponent>(target, out var targetInv))
         {
-            shell.WriteError(Loc.GetString("shell-entity-target-lacks-component", ("componentName", nameof(InventoryComponent))));
+            shell.WriteError(Loc.GetString("shell-entity-target-lacks-component",
+                ("componentName", nameof(InventoryComponent))));
             return;
         }
 
@@ -55,7 +57,14 @@ public sealed class CopyOutfitCommand : LocalizedEntityCommands
         var slotEnum = _inventory.GetSlotEnumerator((target.Value, targetInv));
         while (slotEnum.NextItem(out _, out var slot))
         {
-            _inventory.TryUnequip(target.Value, target.Value, slot.Name, out var itemRemoved, true, true, inventory: targetInv, reparent: !delete);
+            _inventory.TryUnequip(target.Value,
+                target.Value,
+                slot.Name,
+                out var itemRemoved,
+                true,
+                true,
+                inventory: targetInv,
+                reparent: !delete);
             if (delete && itemRemoved != null)
                 EntityManager.QueueDeleteEntity(itemRemoved.Value);
         }
@@ -67,9 +76,8 @@ public sealed class CopyOutfitCommand : LocalizedEntityCommands
         // Do not copy items held in hands; only equipment via cloning system
     }
 
-    public override CompletionResult GetCompletion(IConsoleShell shell, string[] args)
-    {
-        return args.Length switch
+    public override CompletionResult GetCompletion(IConsoleShell shell, string[] args) =>
+        args.Length switch
         {
             1 => CompletionResult.FromHintOptions(
                 CompletionHelper.Components<InventoryComponent>(args[0]),
@@ -80,7 +88,6 @@ public sealed class CopyOutfitCommand : LocalizedEntityCommands
             3 => CompletionResult.FromHintOptions(
                 CompletionHelper.Booleans,
                 Loc.GetString("cmd-copyoutfit-delete-hint")),
-            _ => CompletionResult.Empty
+            _ => CompletionResult.Empty,
         };
-    }
 }

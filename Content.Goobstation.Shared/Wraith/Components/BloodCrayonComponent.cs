@@ -2,7 +2,7 @@ using Robust.Shared.GameStates;
 
 namespace Content.Goobstation.Shared.Wraith.Components;
 
-[RegisterComponent, NetworkedComponent]
+[RegisterComponent] [NetworkedComponent]
 public sealed partial class BloodCrayonComponent : Component
 {
     /// <summary>

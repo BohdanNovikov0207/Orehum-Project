@@ -8,8 +8,8 @@ namespace Content.Goobstation.Client.SecondSkin;
 
 public sealed class SecondSkinSystem : SharedSecondSkinSystem
 {
-    [Dependency] private readonly SpriteSystem _sprite = default!;
     [Dependency] private readonly HumanoidAppearanceSystem _humanoid = default!;
+    [Dependency] private readonly SpriteSystem _sprite = default!;
 
     public override void Initialize()
     {
@@ -27,10 +27,8 @@ public sealed class SecondSkinSystem : SharedSecondSkinSystem
         _humanoid.UpdateSprite((ent, ent.Comp, sprite));
     }
 
-    private void OnStartup(Entity<SecondSkinHolderComponent> ent, ref ComponentStartup args)
-    {
+    private void OnStartup(Entity<SecondSkinHolderComponent> ent, ref ComponentStartup args) =>
         ent.Comp.Container = Container.EnsureContainer<ContainerSlot>(ent, ent.Comp.ContainerId);
-    }
 
     private void OnAppearanceChange(Entity<SecondSkinHolderComponent> ent, ref AppearanceChangeEvent args)
     {

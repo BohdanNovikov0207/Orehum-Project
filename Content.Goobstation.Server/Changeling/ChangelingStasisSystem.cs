@@ -9,7 +9,7 @@ using Content.Shared.Polymorph;
 
 namespace Content.Goobstation.Server.Changeling;
 
-public sealed partial class ChangelingStasisSystem : SharedChangelingStasisSystem
+public sealed class ChangelingStasisSystem : SharedChangelingStasisSystem
 {
     [Dependency] private readonly FlammableSystem _flame = default!;
     [Dependency] private readonly PolymorphSystem _polymorph = default!;
@@ -40,6 +40,7 @@ public sealed partial class ChangelingStasisSystem : SharedChangelingStasisSyste
     }
 
     #region Helper Methods
+
     protected override void ResetTemperature(Entity<ChangelingStasisComponent> ent)
     {
         if (!_tempQuery.TryComp(ent, out var tempComp))
@@ -55,5 +56,6 @@ public sealed partial class ChangelingStasisSystem : SharedChangelingStasisSyste
 
         _flame.Extinguish(ent, flameComp);
     }
+
     #endregion
 }

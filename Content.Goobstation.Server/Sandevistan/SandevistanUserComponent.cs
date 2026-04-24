@@ -11,50 +11,23 @@ namespace Content.Goobstation.Server.Sandevistan;
 [RegisterComponent]
 public sealed partial class SandevistanUserComponent : Component
 {
-    [ViewVariables(VVAccess.ReadOnly)]
-    public ActiveSandevistanUserComponent? Active;
-
-    [ViewVariables(VVAccess.ReadOnly)]
-    public TimeSpan? DisableAt;
-
-    [ViewVariables(VVAccess.ReadOnly)]
-    public TimeSpan LastEnabled = TimeSpan.Zero;
-
-    [DataField]
-    public TimeSpan StatusEffectTime = TimeSpan.FromSeconds(5);
-
-    [DataField]
-    public TimeSpan PopupDelay = TimeSpan.FromSeconds(3);
-
-    [ViewVariables(VVAccess.ReadOnly)]
-    public TimeSpan NextPopupTime = TimeSpan.Zero;
-
     [DataField]
     public string ActionProto = "ActionToggleSandevistan";
 
     [ViewVariables(VVAccess.ReadOnly)]
     public EntityUid? ActionUid;
 
+    [ViewVariables(VVAccess.ReadOnly)]
+    public ActiveSandevistanUserComponent? Active;
+
+    [DataField]
+    public float AttackSpeedModifier = 2f;
+
+    [ViewVariables(VVAccess.ReadWrite)]
+    public int ColorAccumulator = 0;
+
     [ViewVariables(VVAccess.ReadWrite)]
     public float CurrentLoad = 0f; // Only updated when enabled
-
-    [DataField]
-    public float LoadPerActiveSecond = 1f;
-
-    [DataField]
-    public float LoadPerInactiveSecond = -0.25f;
-
-    [DataField]
-    public SortedDictionary<SandevistanState, FixedPoint2> Thresholds = new()
-    {
-        { SandevistanState.Warning, 15 },
-        { SandevistanState.Shaking, 30 },
-        { SandevistanState.Damage, 45 },
-        { SandevistanState.Disable, 60 },
-    };
-
-    [DataField]
-    public float StaminaDamage = 5f;
 
     [DataField]
     public DamageSpecifier Damage = new()
@@ -65,30 +38,57 @@ public sealed partial class SandevistanUserComponent : Component
         },
     };
 
+    [ViewVariables(VVAccess.ReadOnly)]
+    public TimeSpan? DisableAt;
+
+    [DataField]
+    public SoundSpecifier? EndSound = new SoundPathSpecifier("/Audio/_Goobstation/Misc/sande_end.ogg");
+
+    [ViewVariables(VVAccess.ReadOnly)]
+    public TimeSpan LastEnabled = TimeSpan.Zero;
+
+    [DataField]
+    public float LoadPerActiveSecond = 1f;
+
+    [DataField]
+    public float LoadPerInactiveSecond = -0.25f;
+
     [DataField]
     public float MovementSpeedModifier = 2f;
 
+    [ViewVariables(VVAccess.ReadOnly)]
+    public TimeSpan NextPopupTime = TimeSpan.Zero;
+
+    [ViewVariables(VVAccess.ReadOnly)]
+    public DogVisionComponent? Overlay;
+
     [DataField]
-    public float AttackSpeedModifier = 2f;
+    public TimeSpan PopupDelay = TimeSpan.FromSeconds(3);
+
+    [ViewVariables(VVAccess.ReadOnly)]
+    public EntityUid? RunningSound;
+
+    [DataField] // So it fits the audio
+    public TimeSpan ShiftDelay = TimeSpan.FromSeconds(1.9);
+
+    [DataField]
+    public float StaminaDamage = 5f;
 
     [DataField]
     public SoundSpecifier? StartSound = new SoundPathSpecifier("/Audio/_Goobstation/Misc/sande_start.ogg");
 
     [DataField]
-    public SoundSpecifier? EndSound = new SoundPathSpecifier("/Audio/_Goobstation/Misc/sande_end.ogg");
+    public TimeSpan StatusEffectTime = TimeSpan.FromSeconds(5);
 
-    [DataField] // So it fits the audio
-    public TimeSpan ShiftDelay = TimeSpan.FromSeconds(1.9);
-
-    [ViewVariables(VVAccess.ReadOnly)]
-    public EntityUid? RunningSound;
-
-    [ViewVariables(VVAccess.ReadOnly)]
-    public DogVisionComponent? Overlay;
+    [DataField]
+    public SortedDictionary<SandevistanState, FixedPoint2> Thresholds = new()
+    {
+        { SandevistanState.Warning, 15 },
+        { SandevistanState.Shaking, 30 },
+        { SandevistanState.Damage, 45 },
+        { SandevistanState.Disable, 60 },
+    };
 
     [ViewVariables(VVAccess.ReadOnly)]
     public TrailComponent? Trail;
-
-    [ViewVariables(VVAccess.ReadWrite)]
-    public int ColorAccumulator = 0;
 }

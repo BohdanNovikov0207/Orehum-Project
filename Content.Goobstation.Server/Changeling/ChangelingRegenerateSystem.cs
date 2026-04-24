@@ -7,10 +7,10 @@ using Content.Shared.Polymorph;
 
 namespace Content.Goobstation.Server.Changeling;
 
-public sealed partial class ChangelingRegenerateSystem : SharedChangelingRegenerateSystem
+public sealed class ChangelingRegenerateSystem : SharedChangelingRegenerateSystem
 {
-    [Dependency] private readonly PolymorphSystem _polymorph = default!;
     [Dependency] private readonly SharedBodySystem _body = default!;
+    [Dependency] private readonly PolymorphSystem _polymorph = default!;
 
     private EntityQuery<ChangelingIdentityComponent> _lingQuery;
 
@@ -33,10 +33,11 @@ public sealed partial class ChangelingRegenerateSystem : SharedChangelingRegener
     }
 
     #region Helper Methods
-    protected override void RegenerateChangelingBody(Entity<ChangelingRegenerateComponent> ent, BodyComponent bodyComp)
-    {
+
+    protected override void
+        RegenerateChangelingBody(Entity<ChangelingRegenerateComponent> ent, BodyComponent bodyComp) =>
         // this has to be done in server otherwise a shitload of warnings get thrown
         _body.RestoreBody((ent, bodyComp));
-    }
+
     #endregion
 }

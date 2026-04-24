@@ -18,16 +18,17 @@ namespace Content.Goobstation.Server.Shadowling.Systems.Abilities.Ascension;
 /// </summary>
 public sealed class ShadowlingLightningStormSystem : EntitySystem
 {
-    [Dependency] private readonly LightningSystem _lightningSystem = default!;
-    [Dependency] private readonly SharedDoAfterSystem _doAfterSystem = default!;
     [Dependency] private readonly SharedActionsSystem _actions = default!;
+    [Dependency] private readonly SharedDoAfterSystem _doAfterSystem = default!;
+    [Dependency] private readonly LightningSystem _lightningSystem = default!;
 
     public override void Initialize()
     {
         base.Initialize();
 
         SubscribeLocalEvent<ShadowlingLightningStormComponent, LightningStormEvent>(OnLightningStorm);
-        SubscribeLocalEvent<ShadowlingLightningStormComponent, LightningStormEventDoAfterEvent>(OnLightningStormDoAfter);
+        SubscribeLocalEvent<ShadowlingLightningStormComponent, LightningStormEventDoAfterEvent>(
+            OnLightningStormDoAfter);
         SubscribeLocalEvent<ShadowlingLightningStormComponent, MapInitEvent>(OnStartup);
         SubscribeLocalEvent<ShadowlingLightningStormComponent, ComponentShutdown>(OnShutdown);
     }
@@ -59,7 +60,9 @@ public sealed class ShadowlingLightningStormSystem : EntitySystem
         args.Handled = true;
     }
 
-    private void OnLightningStormDoAfter(EntityUid uid, ShadowlingLightningStormComponent component, LightningStormEventDoAfterEvent args)
+    private void OnLightningStormDoAfter(EntityUid uid,
+        ShadowlingLightningStormComponent component,
+        LightningStormEventDoAfterEvent args)
     {
         if (args.Cancelled
             || args.Handled)

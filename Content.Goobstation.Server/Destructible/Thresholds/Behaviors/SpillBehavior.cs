@@ -5,21 +5,20 @@ using Content.Server.GameTicking;
 using JetBrains.Annotations;
 using Robust.Shared.Prototypes;
 
-namespace Content.Goobstation.Server.Destructible.Thresholds.Behaviors
+namespace Content.Goobstation.Server.Destructible.Thresholds.Behaviors;
+
+[UsedImplicitly]
+[DataDefinition]
+public sealed partial class AddGameRuleBehavior : IThresholdBehavior
 {
-    [UsedImplicitly]
-    [DataDefinition]
-    public sealed partial class AddGameRuleBehavior : IThresholdBehavior
+    [DataField(required: true)]
+    public EntProtoId Rule;
+
+    public void Execute(EntityUid owner, DestructibleSystem system, EntityUid? cause = null)
     {
-        [DataField(required: true)]
-        public EntProtoId Rule;
+        var ev = new AddGameRuleItemEvent(cause);
+        system.EntityManager.EventBus.RaiseLocalEvent(owner, ref ev);
 
-        public void Execute(EntityUid owner, DestructibleSystem system, EntityUid? cause = null)
-        {
-            var ev = new AddGameRuleItemEvent(cause);
-            system.EntityManager.EventBus.RaiseLocalEvent(owner, ref ev);
-
-            system.EntityManager.System<GameTicker>().StartGameRule(Rule);
-        }
+        system.EntityManager.System<GameTicker>().StartGameRule(Rule);
     }
 }

@@ -5,9 +5,7 @@
 // SPDX-License-Identifier: MPL-2.0
 
 using System.Diagnostics.CodeAnalysis;
-using System.Linq;
 using Content.Shared.Humanoid.Markings;
-using Content.Shared.Humanoid.Prototypes;
 using Content.Shared.Preferences;
 using Content.Shared.Roles;
 using JetBrains.Annotations;
@@ -21,7 +19,7 @@ namespace Content.Goobstation.Shared.MisandryBox.Hair;
 /// Requires the character to have hair color of less saturation than required for this job
 /// </summary>
 [UsedImplicitly]
-[Serializable, NetSerializable]
+[Serializable] [NetSerializable]
 public sealed partial class SaturationRequirement : JobRequirement
 {
     public const string Bald = "HairBald";

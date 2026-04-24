@@ -12,10 +12,11 @@ namespace Content.Goobstation.Shared.Wraith.Banishment;
 /// </summary>
 public sealed class BanishmentSystem : EntitySystem
 {
+    [Dependency] private readonly ISharedAdminLogManager _admin = default!;
     [Dependency] private readonly INetManager _netManager = default!;
     [Dependency] private readonly SharedPopupSystem _popupSystem = default!;
-    [Dependency] private readonly ISharedAdminLogManager _admin = default!;
-    /// <inheritdoc/>
+
+    /// <inheritdoc />
     public override void Initialize()
     {
         base.Initialize();
@@ -47,7 +48,7 @@ public sealed class BanishmentSystem : EntitySystem
         var rej = new RejuvenateEvent();
         RaiseLocalEvent(ent, rej);
 
-        if (ent.Comp.Popup is {} popup)
+        if (ent.Comp.Popup is { } popup)
             _popupSystem.PopupEntity(Loc.GetString(popup), ent.Owner, ent.Owner, PopupType.MediumCaution);
 
         var banishEv = new BanishmentEvent(ent.Comp.Lives);
@@ -57,7 +58,8 @@ public sealed class BanishmentSystem : EntitySystem
         ent.Comp.Lives = Math.Max(ent.Comp.Lives - 1, 0);
         Dirty(ent);
 
-        _admin.Add(LogType.Respawn, LogImpact.High,
+        _admin.Add(LogType.Respawn,
+            LogImpact.High,
             $"{ToPrettyString(ent.Owner)} got revived by Banishment, and now has {ent.Comp.Lives} lives left.");
     }
 }

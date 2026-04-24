@@ -19,10 +19,10 @@ namespace Content.Goobstation.Server.Changeling;
 
 public sealed class ChangelingEggSystem : EntitySystem
 {
-    [Dependency] private readonly IGameTiming _timing = default!;
     [Dependency] private readonly BodySystem _bodySystem = default!;
-    [Dependency] private readonly SharedMindSystem _mind = default!;
     [Dependency] private readonly ChangelingSystem _changeling = default!;
+    [Dependency] private readonly SharedMindSystem _mind = default!;
+    [Dependency] private readonly IGameTiming _timing = default!;
 
     public override void Update(float frameTime)
     {
@@ -42,7 +42,7 @@ public sealed class ChangelingEggSystem : EntitySystem
 
     public void Cycle(EntityUid uid, ChangelingEggComponent comp)
     {
-        if (comp.active == false)
+        if (!comp.active)
         {
             comp.active = true;
             return;

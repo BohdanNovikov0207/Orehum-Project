@@ -18,12 +18,11 @@ namespace Content.Goobstation.Server.Xenobiology.XenobiologyBountyConsole;
 
 public sealed class StationXenobiologyBountyDatabaseSystem : EntitySystem
 {
-    [Dependency] private readonly IPrototypeManager _proto = default!;
-    [Dependency] private readonly NameIdentifierSystem _nameIdentifier = default!;
-    [Dependency] private readonly XenobiologyBountyConsoleSystem _xenoConsole = default!;
-    [Dependency] private readonly IGameTiming _timing = default!;
-
     private static readonly ProtoId<NameIdentifierGroupPrototype> BountyNameIdentifierGroup = "Bounty";
+    [Dependency] private readonly NameIdentifierSystem _nameIdentifier = default!;
+    [Dependency] private readonly IPrototypeManager _proto = default!;
+    [Dependency] private readonly IGameTiming _timing = default!;
+    [Dependency] private readonly XenobiologyBountyConsoleSystem _xenoConsole = default!;
 
     public override void Initialize()
     {
@@ -31,10 +30,8 @@ public sealed class StationXenobiologyBountyDatabaseSystem : EntitySystem
         SubscribeLocalEvent<StationXenobiologyBountyDatabaseComponent, MapInitEvent>(OnMapInit);
     }
 
-    private void OnMapInit(Entity<StationXenobiologyBountyDatabaseComponent> database, ref MapInitEvent args)
-    {
+    private void OnMapInit(Entity<StationXenobiologyBountyDatabaseComponent> database, ref MapInitEvent args) =>
         FillBountyDatabase(database.AsNullable());
-    }
 
     public override void Update(float frametime)
     {
@@ -59,7 +56,9 @@ public sealed class StationXenobiologyBountyDatabaseSystem : EntitySystem
 
         var bounties = _proto.EnumeratePrototypes<XenobiologyBountyPrototype>();
         foreach (var bounty in bounties)
+        {
             TryAddBounty(database, bounty);
+        }
 
         SortBounties(database.Comp);
         _xenoConsole.UpdateBountyConsoles();
@@ -75,12 +74,14 @@ public sealed class StationXenobiologyBountyDatabaseSystem : EntitySystem
     }
 
     [PublicAPI]
-    public bool TryAddBounty(EntityUid uid, string bountyId, StationXenobiologyBountyDatabaseComponent? component = null)
-    {
-        return _proto.TryIndex<XenobiologyBountyPrototype>(bountyId, out var bounty) && TryAddBounty(uid, bounty, component);
-    }
+    public bool TryAddBounty(EntityUid uid,
+        string bountyId,
+        StationXenobiologyBountyDatabaseComponent? component = null) =>
+        _proto.TryIndex<XenobiologyBountyPrototype>(bountyId, out var bounty) && TryAddBounty(uid, bounty, component);
 
-    public bool TryAddBounty(EntityUid uid, XenobiologyBountyPrototype bounty, StationXenobiologyBountyDatabaseComponent? component = null)
+    public bool TryAddBounty(EntityUid uid,
+        XenobiologyBountyPrototype bounty,
+        StationXenobiologyBountyDatabaseComponent? component = null)
     {
         if (!Resolve(uid, ref component))
             return false;
@@ -90,7 +91,8 @@ public sealed class StationXenobiologyBountyDatabaseSystem : EntitySystem
 
         if (component.Bounties.Any(bountyData => bountyData.Id == newBounty.Id))
         {
-            Log.Warning($"Failed to add bounty {newBounty.Id} because another one with the same ID already existed! Retrying.");
+            Log.Warning(
+                $"Failed to add bounty {newBounty.Id} because another one with the same ID already existed! Retrying.");
             return false;
         }
 
@@ -99,13 +101,17 @@ public sealed class StationXenobiologyBountyDatabaseSystem : EntitySystem
     }
 
     [PublicAPI]
-    public bool TryRemoveBounty(Entity<StationXenobiologyBountyDatabaseComponent?> ent, string dataId, bool skipped, EntityUid? actor = null)
-    {
-        return TryGetBountyFromId(ent.Owner, dataId, out var data, ent.Comp) && TryRemoveBounty(ent, data, skipped, actor);
-    }
+    public bool TryRemoveBounty(Entity<StationXenobiologyBountyDatabaseComponent?> ent,
+        string dataId,
+        bool skipped,
+        EntityUid? actor = null) => TryGetBountyFromId(ent.Owner, dataId, out var data, ent.Comp) &&
+                                    TryRemoveBounty(ent, data, skipped, actor);
 
     [PublicAPI]
-    public bool TryRemoveBounty(Entity<StationXenobiologyBountyDatabaseComponent?> ent, XenobiologyBountyData data, bool skipped, EntityUid? actor = null)
+    public bool TryRemoveBounty(Entity<StationXenobiologyBountyDatabaseComponent?> ent,
+        XenobiologyBountyData data,
+        bool skipped,
+        EntityUid? actor = null)
     {
         if (!Resolve(ent, ref ent.Comp))
             return false;
@@ -136,7 +142,10 @@ public sealed class StationXenobiologyBountyDatabaseSystem : EntitySystem
     }
 
     [PublicAPI]
-    public bool TryGetBountyFromId(EntityUid uid, string id, [NotNullWhen(true)] out XenobiologyBountyData? bounty, StationXenobiologyBountyDatabaseComponent? component = null)
+    public bool TryGetBountyFromId(EntityUid uid,
+        string id,
+        [NotNullWhen(true)] out XenobiologyBountyData? bounty,
+        StationXenobiologyBountyDatabaseComponent? component = null)
     {
         bounty = null;
         if (!Resolve(uid, ref component))
@@ -151,8 +160,7 @@ public sealed class StationXenobiologyBountyDatabaseSystem : EntitySystem
         return bounty != null;
     }
 
-    public void SortBounties(StationXenobiologyBountyDatabaseComponent db)
-    {
-        db.Bounties = db.Bounties.OrderBy(bounty => !_proto.TryIndex(bounty.Bounty, out var proto) ? 0 : proto.PointsAwarded).ToList();
-    }
+    public void SortBounties(StationXenobiologyBountyDatabaseComponent db) => db.Bounties =
+        db.Bounties.OrderBy(bounty => !_proto.TryIndex(bounty.Bounty, out var proto) ? 0 : proto.PointsAwarded)
+            .ToList();
 }

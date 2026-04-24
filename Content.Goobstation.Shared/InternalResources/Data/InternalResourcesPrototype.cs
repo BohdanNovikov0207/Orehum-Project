@@ -9,15 +9,6 @@ namespace Content.Goobstation.Shared.InternalResources.Data;
 [Prototype]
 public sealed class InternalResourcesPrototype : IPrototype
 {
-    [IdDataField]
-    public string ID { get; private set; } = default!;
-
-    [DataField(required: true)]
-    public LocId Name;
-
-    [DataField]
-    public LocId? Description;
-
     /// <summary>
     /// The alert prototype to be shown.
     /// </summary>
@@ -25,22 +16,16 @@ public sealed class InternalResourcesPrototype : IPrototype
     public ProtoId<AlertPrototype> AlertPrototype;
 
     /// <summary>
-    /// The thresholds proto used for raising InternalResourcesThresholdMetEvent.
+    /// Base resource maximum amount
     /// </summary>
-    [DataField("thresholds")]
-    public ProtoId<InternalResourcesThresholdsPrototype>? ThresholdsProto;
+    [DataField("maxAmount")]
+    public float BaseMaxAmount = 100f;
 
     /// <summary>
     /// Base resource regeneration amount per update tick
     /// </summary>
     [DataField("regenerationRate")]
     public float BaseRegenerationRate = 1f;
-
-    /// <summary>
-    /// Base resource maximum amount
-    /// </summary>
-    [DataField("maxAmount")]
-    public float BaseMaxAmount = 100f;
 
     /// <summary>
     /// Starting resource amount when added to an entity.
@@ -53,4 +38,19 @@ public sealed class InternalResourcesPrototype : IPrototype
     /// </summary>
     [DataField]
     public LocId DeficitPopup = "internal-resources-action-generic-deficit";
+
+    [DataField]
+    public LocId? Description;
+
+    [DataField(required: true)]
+    public LocId Name;
+
+    /// <summary>
+    /// The thresholds proto used for raising InternalResourcesThresholdMetEvent.
+    /// </summary>
+    [DataField("thresholds")]
+    public ProtoId<InternalResourcesThresholdsPrototype>? ThresholdsProto;
+
+    [IdDataField]
+    public string ID { get; } = default!;
 }

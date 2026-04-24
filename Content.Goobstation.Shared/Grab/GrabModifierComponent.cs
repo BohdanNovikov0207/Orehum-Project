@@ -1,15 +1,11 @@
 using Content.Goobstation.Common.Grab;
-using Content.Goobstation.Common.MartialArts;
 using Robust.Shared.GameStates;
 
 namespace Content.Goobstation.Shared.Grab;
 
-[RegisterComponent, NetworkedComponent]
+[RegisterComponent] [NetworkedComponent]
 public sealed partial class GrabModifierComponent : Component
 {
-    [DataField]
-    public GrabStage StartingGrabStage = GrabStage.Soft;
-
     [DataField]
     public float GrabEscapeModifier;
 
@@ -18,4 +14,7 @@ public sealed partial class GrabModifierComponent : Component
 
     [DataField]
     public float GrabMoveSpeedMultiplier = 1f;
+
+    [DataField]
+    public GrabStage StartingGrabStage = GrabStage.Soft;
 }

@@ -40,10 +40,10 @@
 using Content.Goobstation.Common.Traits;
 using Content.Shared.Movement.Components;
 using Content.Shared.Movement.Systems;
-using Content.Shared.Standing;
-using Content.Shared.Throwing;
 using Content.Shared.Popups;
+using Content.Shared.Standing;
 using Content.Shared.Stunnable;
+using Content.Shared.Throwing;
 
 // Goob note: This is a core system in goobmod. I dont know why. Probably undo this shit.
 // This shit is heavy goob edit god help you, if you are upstreaming take upstream and fix it later.
@@ -52,8 +52,8 @@ namespace Content.Goobstation.Shared.Traits.Systems;
 public sealed class LegsParalyzedSystem : EntitySystem
 {
     [Dependency] private readonly MovementSpeedModifierSystem _movementSpeedModifierSystem = default!;
-    [Dependency] private readonly StandingStateSystem _standingSystem = default!;
     [Dependency] private readonly SharedPopupSystem _popupSystem = default!;
+    [Dependency] private readonly StandingStateSystem _standingSystem = default!;
     [Dependency] private readonly SharedStunSystem _stunSystem = default!;
 
     public override void Initialize()
@@ -82,14 +82,13 @@ public sealed class LegsParalyzedSystem : EntitySystem
 
     private void OnShutdown(EntityUid uid, LegsParalyzedComponent component, ComponentShutdown args)
     {
-
-
         if (!TryComp<KnockedDownComponent>(uid, out var knockedDown))
             return; // if you don't have knockdown and you are in fact 'knocked down' god help you cause this code can't
-                    // That shit should never happen.
+        // That shit should never happen.
 
         RemComp(uid, knockedDown);
-        _standingSystem.Stand(uid, force: true); // force is a bad idea but fuck it. If you get unparalyzed you deserve it.
+        _standingSystem.Stand(uid,
+            force: true); // force is a bad idea but fuck it. If you get unparalyzed you deserve it.
     }
 
     private void UnparalyzeLegsAndThenForceThemToCrawlAnyway(EntityUid uid, LegsParalyzedComponent component)
@@ -98,7 +97,10 @@ public sealed class LegsParalyzedSystem : EntitySystem
         // so it makes sense to reset that if you're now paralyzed instead
         // i.e. going from cane user -> total paralysis
         // total paralysis is still worse cause im disallowing any standing and the crawlspeed should be worse.
-        _movementSpeedModifierSystem.ChangeBaseSpeed(uid, MovementSpeedModifierComponent.DefaultBaseWalkSpeed, MovementSpeedModifierComponent.DefaultBaseSprintSpeed, MovementSpeedModifierComponent.DefaultAcceleration);
+        _movementSpeedModifierSystem.ChangeBaseSpeed(uid,
+            MovementSpeedModifierComponent.DefaultBaseWalkSpeed,
+            MovementSpeedModifierComponent.DefaultBaseSprintSpeed,
+            MovementSpeedModifierComponent.DefaultAcceleration);
         _stunSystem.TryCrawling(uid);
     }
 
@@ -111,8 +113,7 @@ public sealed class LegsParalyzedSystem : EntitySystem
     }
 
     // Goobstation this shit never runs cause of throw code refactor but even if it did i dont understand the logic, but this is core so im leaving it.
-    private void OnThrowPushbackAttempt(EntityUid uid, LegsParalyzedComponent component, ThrowPushbackAttemptEvent args)
-    {
+    private void
+        OnThrowPushbackAttempt(EntityUid uid, LegsParalyzedComponent component, ThrowPushbackAttemptEvent args) =>
         args.Cancel();
-    }
 }

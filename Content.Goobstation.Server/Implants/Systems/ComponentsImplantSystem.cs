@@ -20,21 +20,21 @@ public sealed class ComponentsImplantSystem : EntitySystem
 
     public void OnImplanted(Entity<ComponentsImplantComponent> ent, ref ImplantImplantedEvent args)
     {
-        if (args.Implanted is not {} mob)
+        if (args.Implanted is not { } mob)
             return;
 
-        if (ent.Comp.Added is {} added)
+        if (ent.Comp.Added is { } added)
             EntityManager.AddComponents(mob, added);
-        if (ent.Comp.Removed is {} removed)
+        if (ent.Comp.Removed is { } removed)
             EntityManager.RemoveComponents(mob, removed);
     }
 
     public void OnRemoved(Entity<ComponentsImplantComponent> ent, ref ImplantRemovedEvent args)
     {
         var mob = args.Implanted;
-        if (ent.Comp.Removed is {} removed)
+        if (ent.Comp.Removed is { } removed)
             EntityManager.AddComponents(mob, removed);
-        if (ent.Comp.Added is {} added)
+        if (ent.Comp.Added is { } added)
             EntityManager.RemoveComponents(mob, added);
     }
 }

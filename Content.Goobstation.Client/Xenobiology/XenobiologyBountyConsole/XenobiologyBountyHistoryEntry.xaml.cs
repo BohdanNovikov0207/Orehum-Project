@@ -37,15 +37,14 @@ public sealed partial class XenobiologyBountyHistoryEntry : BoxContainer
             .ToList();
 
         ManifestLabel.SetMarkup(Loc.GetString("bounty-console-manifest-label", ("item", string.Join(", ", items))));
-        RewardLabel.SetMarkup(Loc.GetString("xenobiology-console-reward-label", ("reward", bountyPrototype.PointsAwarded)));
+        RewardLabel.SetMarkup(Loc.GetString("xenobiology-console-reward-label",
+            ("reward", bountyPrototype.PointsAwarded)));
         IdLabel.SetMarkup(Loc.GetString("bounty-console-id-label", ("id", bounty.Id)));
 
         TimestampLabel.SetMarkup(bounty.Timestamp.ToString(@"hh\:mm\:ss"));
 
         if (bounty.Result == CargoBountyHistoryData.BountyResult.Completed)
-        {
             NoticeLabel.SetMarkup(Loc.GetString("bounty-console-history-notice-completed-label"));
-        }
         else
         {
             NoticeLabel.SetMarkup(Loc.GetString("bounty-console-history-notice-skipped-label",

@@ -34,18 +34,11 @@ public sealed class SiloSystem : SharedSiloSystem
         SubscribeLocalEvent<SiloComponent, ComponentShutdown>(OnShutdown);
     }
 
-    private void OnStartup(Entity<SiloComponent> ent, ref ComponentStartup args)
-    {
-        _pvs.AddGlobalOverride(ent);
-    }
+    private void OnStartup(Entity<SiloComponent> ent, ref ComponentStartup args) => _pvs.AddGlobalOverride(ent);
 
-    private void OnShutdown(Entity<SiloComponent> ent, ref ComponentShutdown args)
-    {
-        _pvs.RemoveGlobalOverride(ent);
-    }
+    private void OnShutdown(Entity<SiloComponent> ent, ref ComponentShutdown args) => _pvs.RemoveGlobalOverride(ent);
 
-    private void OnMaterialAmountChanged(Entity<SiloComponent> ent, ref MaterialAmountChangedEvent args)
-    {
+    private void OnMaterialAmountChanged(Entity<SiloComponent> ent, ref MaterialAmountChangedEvent args) =>
         // Spawning a timer because SetUiState in UpdateUserInterfaceState is being networked before
         // silo's MaterialStorageComponent state gets handled.
         // That causes lathe ui recipe list to not update properly.
@@ -64,7 +57,6 @@ public sealed class SiloSystem : SharedSiloSystem
                     }
                 }
             });
-    }
 
     private void OnMapInit(Entity<BecomesStationComponent> ent, ref MapInitEvent args)
     {

@@ -17,13 +17,13 @@ namespace Content.Goobstation.Shared.Slasher.Systems;
 public sealed class SlasherBloodTrailSystem : EntitySystem
 {
     [Dependency] private readonly SharedActionsSystem _actions = default!;
-    [Dependency] private readonly SharedPuddleSystem _puddles = default!;
-    [Dependency] private readonly IGameTiming _timing = default!;
-    [Dependency] private readonly INetManager _net = default!;
     [Dependency] private readonly SharedAudioSystem _audio = default!;
+    [Dependency] private readonly INetManager _net = default!;
 
     // Next time at which we should drop a blood puddle for an entity.
     private readonly Dictionary<EntityUid, TimeSpan> _nextDropAt = new();
+    [Dependency] private readonly SharedPuddleSystem _puddles = default!;
+    [Dependency] private readonly IGameTiming _timing = default!;
 
     public override void Initialize()
     {
@@ -37,10 +37,8 @@ public sealed class SlasherBloodTrailSystem : EntitySystem
         SubscribeLocalEvent<SlasherBloodTrailComponent, MobStateChangedEvent>(OnMobStateChanged);
     }
 
-    private void OnMapInit(Entity<SlasherBloodTrailComponent> ent, ref MapInitEvent args)
-    {
+    private void OnMapInit(Entity<SlasherBloodTrailComponent> ent, ref MapInitEvent args) =>
         _actions.AddAction(ent.Owner, ref ent.Comp.ActionEntity, ent.Comp.ActionId);
-    }
 
     private void OnShutdown(Entity<SlasherBloodTrailComponent> ent, ref ComponentShutdown args)
     {
@@ -130,7 +128,7 @@ public sealed class SlasherBloodTrailSystem : EntitySystem
             var amount = FixedPoint2.Max(FixedPoint2.Zero, comp.VolumePerDrop);
             solution.AddReagent("Blood", amount);
 
-            _puddles.TrySpillAt(uid, solution, out _, sound: false);
+            _puddles.TrySpillAt(uid, solution, out _, false);
         }
     }
 

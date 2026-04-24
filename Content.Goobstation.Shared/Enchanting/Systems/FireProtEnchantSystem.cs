@@ -11,7 +11,7 @@ using Content.Shared.Temperature;
 namespace Content.Goobstation.Shared.Enchanting.Systems;
 
 /// <summary>
-/// Handles fire + temperature events for <see cref="FireProtEnchantComponent"/>.
+/// Handles fire + temperature events for <see cref="FireProtEnchantComponent" />.
 /// </summary>
 public sealed class FireProtEnchantSystem : EntitySystem
 {
@@ -27,15 +27,10 @@ public sealed class FireProtEnchantSystem : EntitySystem
         SubscribeLocalEvent<FireProtEnchantComponent, ModifyChangedTemperatureEvent>(OnTemperatureChangeAttempt);
     }
 
-    private void OnAdded(Entity<FireProtEnchantComponent> ent, ref EnchantAddedEvent args)
-    {
-        Modify(ent, (float) args.Level);
-    }
+    private void OnAdded(Entity<FireProtEnchantComponent> ent, ref EnchantAddedEvent args) => Modify(ent, args.Level);
 
-    private void OnUpgraded(Entity<FireProtEnchantComponent> ent, ref EnchantUpgradedEvent args)
-    {
-        Modify(ent, (float) args.Level / (float) args.OldLevel);
-    }
+    private void OnUpgraded(Entity<FireProtEnchantComponent> ent, ref EnchantUpgradedEvent args) =>
+        Modify(ent, args.Level / (float) args.OldLevel);
 
     private void Modify(Entity<FireProtEnchantComponent> ent, float factor)
     {
@@ -52,7 +47,8 @@ public sealed class FireProtEnchantSystem : EntitySystem
         args.Reduce(ent.Comp.Reduction);
     }
 
-    private void OnTemperatureChangeAttempt(Entity<FireProtEnchantComponent> ent, ref ModifyChangedTemperatureEvent args)
+    private void OnTemperatureChangeAttempt(Entity<FireProtEnchantComponent> ent,
+        ref ModifyChangedTemperatureEvent args)
     {
         // don't care about cooling
         if (args.TemperatureDelta < 0 || Ignored(ent, args.Target))

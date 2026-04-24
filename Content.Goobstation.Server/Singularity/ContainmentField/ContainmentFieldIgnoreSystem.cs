@@ -16,8 +16,6 @@ public sealed class ContainmentFieldIgnoreSystem : EntitySystem
         SubscribeLocalEvent<ContainmentFieldIgnoreComponent, ContainmentFieldThrowEvent>(OnThrow);
     }
 
-    private void OnThrow(Entity<ContainmentFieldIgnoreComponent> ent, ref ContainmentFieldThrowEvent args)
-    {
+    private void OnThrow(Entity<ContainmentFieldIgnoreComponent> ent, ref ContainmentFieldThrowEvent args) =>
         args.Cancelled = true;
-    }
 }

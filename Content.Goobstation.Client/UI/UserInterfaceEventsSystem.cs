@@ -11,8 +11,6 @@ public sealed class UserInterfaceEventsSystem : EntitySystem
         SubscribeLocalEvent<ButtonTagPressedEvent>(OnPressed);
     }
 
-    private void OnPressed(ref ButtonTagPressedEvent ev)
-    {
+    private void OnPressed(ref ButtonTagPressedEvent ev) =>
         RaiseNetworkEvent(new Common.Heretic.ButtonTagPressedEvent(ev.Id, ev.User, ev.Coords));
-    }
 }

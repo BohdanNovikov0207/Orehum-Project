@@ -7,18 +7,16 @@
 
 using Content.Goobstation.Server.StationEvents.Metric.Components;
 using Content.Shared._EinsteinEngines.Silicon.Components;
-using Content.Goobstation.Maths.FixedPoint;
 using Content.Shared.Mind.Components;
 using Content.Shared.Mobs;
 using Content.Shared.Mobs.Components;
 using Content.Shared.Nutrition.Components;
-using Content.Shared.Roles;
 using Prometheus;
 
 namespace Content.Goobstation.Server.StationEvents.Metric;
 
 /// <summary>
-///   Measure crew's hunger, thirst and charge
+/// Measure crew's hunger, thirst and charge
 /// </summary>
 public sealed class FoodMetricSystem : ChaosMetricSystem<FoodMetricComponent>
 {
@@ -50,7 +48,9 @@ public sealed class FoodMetricSystem : ChaosMetricSystem<FoodMetricComponent>
         "Calculated chaos value contributed by silicon charge levels.");
 
 
-    protected override ChaosMetrics CalculateChaos(EntityUid metricUid, FoodMetricComponent component, CalculateChaosEvent args)
+    protected override ChaosMetrics CalculateChaos(EntityUid metricUid,
+        FoodMetricComponent component,
+        CalculateChaosEvent args)
     {
         // Gather hunger and thirst scores
         var query = EntityQueryEnumerator<MindContainerComponent, MobStateComponent>();
@@ -60,7 +60,7 @@ public sealed class FoodMetricSystem : ChaosMetricSystem<FoodMetricComponent>
 
         var hungerCounts = new Dictionary<HungerThreshold, int>();
         var thirstCounts = new Dictionary<ThirstThreshold, int>();
-        var chargeCounts = new Dictionary<string, int>() { {"Critical", 0}, {"Low", 0}, {"Mid", 0} };
+        var chargeCounts = new Dictionary<string, int> { { "Critical", 0 }, { "Low", 0 }, { "Mid", 0 } };
 
         var thirstQ = GetEntityQuery<ThirstComponent>();
         var hungerQ = GetEntityQuery<HungerComponent>();
@@ -80,22 +80,30 @@ public sealed class FoodMetricSystem : ChaosMetricSystem<FoodMetricComponent>
         }
 
         foreach (var threshold in Enum.GetValues<HungerThreshold>())
+        {
             HungerThresholdCount.WithLabels(threshold.ToString()).Set(hungerCounts.GetValueOrDefault(threshold));
+        }
+
         foreach (var threshold in Enum.GetValues<ThirstThreshold>())
+        {
             ThirstThresholdCount.WithLabels(threshold.ToString()).Set(thirstCounts.GetValueOrDefault(threshold));
+        }
+
         foreach (var kvp in chargeCounts)
+        {
             SiliconChargeStateCount.WithLabels(kvp.Key).Set(kvp.Value);
+        }
 
         HungerChaosCalculated.Set(hungerSc);
         ThirstChaosCalculated.Set(thirstSc);
         ChargeChaosCalculated.Set(chargeSc);
 
 
-        var chaos = new ChaosMetrics(new Dictionary<ChaosMetric, double>()
+        var chaos = new ChaosMetrics(new Dictionary<ChaosMetric, double>
         {
-            {ChaosMetric.Hunger, hungerSc},
-            {ChaosMetric.Thirst, thirstSc},
-            {ChaosMetric.Charge, chargeSc},
+            { ChaosMetric.Hunger, hungerSc },
+            { ChaosMetric.Thirst, thirstSc },
+            { ChaosMetric.Charge, chargeSc },
         });
         return chaos;
     }
@@ -116,8 +124,11 @@ public sealed class FoodMetricSystem : ChaosMetricSystem<FoodMetricComponent>
         return chargeSc;
     }
 
-    private static double CalculateHunger(FoodMetricComponent component, EntityQuery<HungerComponent> hungerQ, EntityUid uid,
-        double hungerSc, Dictionary<HungerThreshold, int> hungerCounts)
+    private static double CalculateHunger(FoodMetricComponent component,
+        EntityQuery<HungerComponent> hungerQ,
+        EntityUid uid,
+        double hungerSc,
+        Dictionary<HungerThreshold, int> hungerCounts)
     {
         if (!hungerQ.TryGetComponent(uid, out var hunger))
             return hungerSc;
@@ -129,7 +140,8 @@ public sealed class FoodMetricSystem : ChaosMetricSystem<FoodMetricComponent>
 
     private static double CalculateThirst(FoodMetricComponent component,
         EntityQuery<ThirstComponent> thirstQ,
-        EntityUid uid, double thirstSc,
+        EntityUid uid,
+        double thirstSc,
         Dictionary<ThirstThreshold, int> thirstCounts)
     {
         if (!thirstQ.TryGetComponent(uid, out var thirst))

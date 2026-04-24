@@ -10,5 +10,5 @@ using Robust.Shared.Serialization;
 
 namespace Content.Goobstation.Shared.Skinnable;
 
-[Serializable, NetSerializable]
+[Serializable] [NetSerializable]
 public sealed partial class SkinningDoAfterEvent : SimpleDoAfterEvent;

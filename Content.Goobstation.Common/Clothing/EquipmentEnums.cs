@@ -4,10 +4,12 @@
 // SPDX-License-Identifier: AGPL-3.0-or-later
 
 namespace Content.Goobstation.Common.Clothing;
+
 /// <summary>
-///     Represents the results of a lookup in terms of "equippability" for an entity considering their species, body part availability, and clothing presence.
+/// Represents the results of a lookup in terms of "equippability" for an entity considering their species, body part
+/// availability, and clothing presence.
 /// </summary>
-public enum EquipAbility : int
+public enum EquipAbility
 {
     CannotEquip = 0,
     SlotOccupiedOrEmpty = 1,
@@ -15,4 +17,3 @@ public enum EquipAbility : int
     MissingSlot = 3,
     CanEquip = 4,
 }
-

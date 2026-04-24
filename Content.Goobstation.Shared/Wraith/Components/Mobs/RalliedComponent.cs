@@ -3,15 +3,21 @@ using Robust.Shared.GameStates;
 
 namespace Content.Goobstation.Shared.Wraith.Components.Mobs;
 
-[RegisterComponent, NetworkedComponent]
+[RegisterComponent] [NetworkedComponent]
 [AutoGenerateComponentState]
 public sealed partial class RalliedComponent : Component
 {
     /// <summary>
-    /// Damage multiplier to rallied mob.
+    /// The original attack damage, in order to reset it later
     /// </summary>
-    [DataField]
-    public float RalliedStrength = 1.5f;
+    [DataField] [AutoNetworkedField]
+    public DamageSpecifier? OriginalDamage;
+
+    /// <summary>
+    /// The original attack speed, in order to reset it later
+    /// </summary>
+    [DataField] [AutoNetworkedField]
+    public float OriginalSpeed;
 
     /// <summary>
     /// Attack speed multiplier to rallied mob.
@@ -20,14 +26,8 @@ public sealed partial class RalliedComponent : Component
     public float RalliedAttackSpeed = 1.5f;
 
     /// <summary>
-    /// The original attack damage, in order to reset it later
+    /// Damage multiplier to rallied mob.
     /// </summary>
-    [DataField, AutoNetworkedField]
-    public DamageSpecifier? OriginalDamage;
-
-    /// <summary>
-    /// The original attack speed, in order to reset it later
-    /// </summary>
-    [DataField, AutoNetworkedField]
-    public float OriginalSpeed;
+    [DataField]
+    public float RalliedStrength = 1.5f;
 }

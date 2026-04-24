@@ -1,46 +1,40 @@
+using System.Numerics;
 using Content.Goobstation.Shared.Projectiles;
 using Robust.Client.Graphics;
 using Robust.Shared.Enums;
 using Robust.Shared.Prototypes;
 using Robust.Shared.Random;
 using Robust.Shared.Timing;
-using System.Numerics;
 
 namespace Content.Goobstation.Client.Projectiles;
 
 public sealed class DodgeEffectOverlay : Overlay
 {
+    private const float EffectWorldSize = 1.75f;
     private static readonly ProtoId<ShaderPrototype> ShaderProto = "Dodge";
 
     [Dependency] private readonly IEntityManager _entMan = default!;
     [Dependency] private readonly IPrototypeManager _protoMan = default!;
     [Dependency] private readonly IRobustRandom _random = default!;
-    [Dependency] private readonly IGameTiming _timing = default!;
-
-    private SharedTransformSystem? _xformSystem;
-
-    public override OverlaySpace Space => OverlaySpace.WorldSpace;
 
     private readonly ShaderInstance _shader;
-    private const float EffectWorldSize = 1.75f;
+    [Dependency] private readonly IGameTiming _timing = default!;
 
     public readonly Dictionary<EntityUid, (TimeSpan Time, float Seed)> Effects = new();
 
-    public void AddEffect(EntityUid uid, TimeSpan time)
-    {
-        Effects[uid] = (time, _random.NextFloat() * 1000f);
-    }
-
-    public void RemoveEffect(EntityUid uid)
-    {
-        Effects.Remove(uid);
-    }
+    private SharedTransformSystem? _xformSystem;
 
     public DodgeEffectOverlay()
     {
         IoCManager.InjectDependencies(this);
         _shader = _protoMan.Index(ShaderProto).InstanceUnique();
     }
+
+    public override OverlaySpace Space => OverlaySpace.WorldSpace;
+
+    public void AddEffect(EntityUid uid, TimeSpan time) => Effects[uid] = (time, _random.NextFloat() * 1000f);
+
+    public void RemoveEffect(EntityUid uid) => Effects.Remove(uid);
 
     protected override bool BeforeDraw(in OverlayDrawArgs args)
     {

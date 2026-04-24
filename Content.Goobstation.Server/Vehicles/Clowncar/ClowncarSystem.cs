@@ -13,13 +13,12 @@ using Content.Goobstation.Shared.Vehicles;
 using Content.Goobstation.Shared.Vehicles.Clowncar;
 using Content.Server.Chat.Systems;
 using Content.Shared.ActionBlocker;
+using Content.Shared.Audio.Jukebox;
 using Content.Shared.Buckle;
 using Content.Shared.Chat;
 using Content.Shared.DoAfter;
 using Content.Shared.Examine;
 using Content.Shared.Verbs;
-using Content.Shared.Audio.Jukebox;
-using Robust.Shared.Audio;
 using Robust.Shared.Audio.Systems;
 using Robust.Shared.Containers;
 
@@ -27,16 +26,15 @@ namespace Content.Goobstation.Server.Vehicles.Clowncar;
 
 public sealed class ClowncarSystem : SharedClowncarSystem
 {
-    [Dependency] private readonly ChatSystem _chatSystem = default!;
     [Dependency] private readonly ActionBlockerSystem _actionBlocker = default!;
-    [Dependency] private readonly SharedDoAfterSystem _doAfter = default!;
-    [Dependency] private readonly SharedContainerSystem _container = default!;
-    [Dependency] private readonly SharedBuckleSystem _buckle = default!;
     [Dependency] private readonly SharedAudioSystem _audioSystem = default!;
+    [Dependency] private readonly SharedBuckleSystem _buckle = default!;
+    [Dependency] private readonly ChatSystem _chatSystem = default!;
+    [Dependency] private readonly SharedContainerSystem _container = default!;
+    [Dependency] private readonly SharedDoAfterSystem _doAfter = default!;
     [Dependency] private readonly SharedUserInterfaceSystem _uiSystem = default!;
 
-    /// <inheritdoc/>
-
+    /// <inheritdoc />
     public override void Initialize()
     {
         base.Initialize();
@@ -58,7 +56,10 @@ public sealed class ClowncarSystem : SharedClowncarSystem
 
         if (vehicle.Driver == null)
         {
-            _chatSystem.TrySendInGameICMessage(args.Performer, Loc.GetString("clowncar-thank-no-driver"), InGameICChatType.Speak, false);
+            _chatSystem.TrySendInGameICMessage(args.Performer,
+                Loc.GetString("clowncar-thank-no-driver"),
+                InGameICChatType.Speak,
+                false);
             args.Handled = true;
 
             if (_container.TryGetContainer(uid, component.Container, out var container))
@@ -103,14 +104,13 @@ public sealed class ClowncarSystem : SharedClowncarSystem
     private void EnterDriverSeatVerb(EntityUid uid, EntityUid player, ClowncarComponent component)
     {
         var doAfterEventArgs =
-        new DoAfterArgs(EntityManager, player, 3f, new ClownCarEnterDriverSeatDoAfterEvent(), uid)
-        {
-            NeedHand = true,
-            BreakOnMove = true,
-            BreakOnWeightlessMove = false,
-        };
+            new DoAfterArgs(EntityManager, player, 3f, new ClownCarEnterDriverSeatDoAfterEvent(), uid)
+            {
+                NeedHand = true,
+                BreakOnMove = true,
+                BreakOnWeightlessMove = false,
+            };
         _doAfter.TryStartDoAfter(doAfterEventArgs);
-
     }
 
     private void OnEnterDriverSeat(EntityUid uid, ClowncarComponent component, ClownCarEnterDriverSeatDoAfterEvent args)
@@ -125,18 +125,17 @@ public sealed class ClowncarSystem : SharedClowncarSystem
             return;
 
         _buckle.TryBuckle(args.User, args.User, uid);
-
     }
 
     private void OpenTrunkVerb(EntityUid uid, EntityUid player, ClowncarComponent component)
     {
         var doAfterEventArgs =
-        new DoAfterArgs(EntityManager, player, 5f, new ClownCarOpenTrunkDoAfterEvent(), uid)
-        {
-            NeedHand = true,
-            BreakOnMove = true,
-            BreakOnWeightlessMove = false,
-        };
+            new DoAfterArgs(EntityManager, player, 5f, new ClownCarOpenTrunkDoAfterEvent(), uid)
+            {
+                NeedHand = true,
+                BreakOnMove = true,
+                BreakOnWeightlessMove = false,
+            };
         _doAfter.TryStartDoAfter(doAfterEventArgs);
     }
 
@@ -174,7 +173,10 @@ public sealed class ClowncarSystem : SharedClowncarSystem
     private void OnQuietInTheBack(EntityUid uid, ClowncarComponent component, QuietBackThereActionEvent args)
     {
         component.ThankCounter = 0;
-        _chatSystem.TrySendInGameICMessage(args.Performer, Loc.GetString("clowncar-quiet-in-the-back"), InGameICChatType.Speak, false);
+        _chatSystem.TrySendInGameICMessage(args.Performer,
+            Loc.GetString("clowncar-quiet-in-the-back"),
+            InGameICChatType.Speak,
+            false);
         args.Handled = true;
     }
 

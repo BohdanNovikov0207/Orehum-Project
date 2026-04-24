@@ -11,7 +11,7 @@ namespace Content.Goobstation.Server.IntrinsicVoiceModulator.VoiceMask;
 /// <summary>
 /// This handles...
 /// </summary>
-public sealed partial class VoiceMaskSystemGoob : EntitySystem
+public sealed class VoiceMaskSystemGoob : EntitySystem
 {
     [Dependency] private readonly SharedJobSystem _job = default!;
     [Dependency] private readonly SharedPopupSystem _popupSystem = default!;
@@ -20,11 +20,14 @@ public sealed partial class VoiceMaskSystemGoob : EntitySystem
 
     public override void Initialize()
     {
-        SubscribeLocalEvent<VoiceMaskComponent, VoiceMaskChangeJobIconMessage>(OnChangeJobIcon); // Gaby Station -> Job icons
-        SubscribeLocalEvent<VoiceMaskComponent, InventoryRelayedEvent<TransformSpeakerJobIconEvent>>(OnTransformJobIcon); // GabyStation -> Radio icons
+        SubscribeLocalEvent<VoiceMaskComponent, VoiceMaskChangeJobIconMessage>(
+            OnChangeJobIcon); // Gaby Station -> Job icons
+        SubscribeLocalEvent<VoiceMaskComponent, InventoryRelayedEvent<TransformSpeakerJobIconEvent>>(
+            OnTransformJobIcon); // GabyStation -> Radio icons
     }
 
-    private void OnTransformJobIcon(Entity<VoiceMaskComponent> ent, ref InventoryRelayedEvent<TransformSpeakerJobIconEvent> args)
+    private void OnTransformJobIcon(Entity<VoiceMaskComponent> ent,
+        ref InventoryRelayedEvent<TransformSpeakerJobIconEvent> args)
     {
         if (ent.Comp.JobIconProtoId is { } jobIcon)
             args.Args.JobIcon = jobIcon;

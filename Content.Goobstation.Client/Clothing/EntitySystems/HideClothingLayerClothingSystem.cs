@@ -26,15 +26,11 @@ public sealed class HideClothingLayerClothingSystem : EntitySystem
         SubscribeLocalEvent<HideClothingLayerClothingComponent, GotUnequippedEvent>(OnUnequip);
     }
 
-    private void OnUnequip(Entity<HideClothingLayerClothingComponent> ent, ref GotUnequippedEvent args)
-    {
+    private void OnUnequip(Entity<HideClothingLayerClothingComponent> ent, ref GotUnequippedEvent args) =>
         ResetInventory(args.Equipee, ent.Comp);
-    }
 
-    private void OnEquip(Entity<HideClothingLayerClothingComponent> ent, ref GotEquippedEvent args)
-    {
+    private void OnEquip(Entity<HideClothingLayerClothingComponent> ent, ref GotEquippedEvent args) =>
         ResetInventory(args.Equipee, ent.Comp);
-    }
 
     private void ResetInventory(EntityUid equipee, HideClothingLayerClothingComponent component)
     {

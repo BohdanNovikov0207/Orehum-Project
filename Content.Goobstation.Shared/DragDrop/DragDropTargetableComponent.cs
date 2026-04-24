@@ -9,4 +9,6 @@ namespace Content.Goobstation.Shared.DragDrop;
 /// Allows this entity to be the target of a drag-and-drop interact
 /// </summary>
 [RegisterComponent]
-public sealed partial class DragDropTargetableComponent : Component { }
+public sealed partial class DragDropTargetableComponent : Component
+{
+}

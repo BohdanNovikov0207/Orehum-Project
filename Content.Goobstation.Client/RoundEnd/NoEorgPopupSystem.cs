@@ -1,17 +1,17 @@
+using Content.Goobstation.Common.CCVar;
 using Content.Shared.GameTicking;
 using Robust.Shared.Configuration;
-using Content.Goobstation.Common.CCVar;
 
 namespace Content.Goobstation.Client.RoundEnd;
 
 public sealed class NoEorgPopupSystem : EntitySystem
 {
     [Dependency] private readonly IConfigurationManager _cfg = default!;
+    private bool _eorgPopup;
+    private string _lastShown = "";
+    private int _neededTime;
 
     private NoEorgPopup? _window;
-    private bool _eorgPopup;
-    private int _neededTime;
-    private string _lastShown = "";
 
     public override void Initialize()
     {

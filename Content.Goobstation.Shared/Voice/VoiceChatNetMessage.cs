@@ -11,10 +11,11 @@ namespace Content.Goobstation.Shared.VoiceChat;
 
 public sealed class MsgVoiceChat : NetMessage
 {
-    public override MsgGroups MsgGroup => MsgGroups.Core;
-
     public byte[]? PcmData;
     public NetEntity? SourceEntity;
+    public override MsgGroups MsgGroup => MsgGroups.Core;
+
+    public override NetDeliveryMethod DeliveryMethod => NetDeliveryMethod.UnreliableSequenced;
 
     public override void ReadFromBuffer(NetIncomingMessage buffer, IRobustSerializer serializer)
     {
@@ -26,19 +27,13 @@ public sealed class MsgVoiceChat : NetMessage
             buffer.ReadBytes(PcmData, 0, length);
         }
         else
-        {
             PcmData = null;
-        }
 
         var hasEntity = buffer.ReadBoolean();
         if (hasEntity)
-        {
             SourceEntity = buffer.ReadNetEntity();
-        }
         else
-        {
             SourceEntity = null;
-        }
     }
 
     public override void WriteToBuffer(NetOutgoingMessage buffer, IRobustSerializer serializer)
@@ -52,10 +47,6 @@ public sealed class MsgVoiceChat : NetMessage
 
         buffer.Write(SourceEntity.HasValue);
         if (SourceEntity.HasValue)
-        {
             buffer.Write(SourceEntity.Value);
-        }
     }
-
-    public override NetDeliveryMethod DeliveryMethod => NetDeliveryMethod.UnreliableSequenced;
 }

@@ -18,6 +18,7 @@ using Content.Shared.Interaction;
 using Content.Shared.Inventory;
 using Content.Shared.Mobs.Components;
 using Content.Shared.Popups;
+using Content.Shared.Storage.Components;
 using Content.Shared.Stunnable;
 using Content.Shared.Throwing;
 using Content.Shared.Timing;
@@ -25,29 +26,27 @@ using Content.Shared.Whitelist;
 using Robust.Shared.Audio;
 using Robust.Shared.Audio.Systems;
 using Robust.Shared.Containers;
-using Content.Shared.Storage.Components;
 
 namespace Content.Goobstation.Server.Xenobiology;
 
 /// <summary>
 /// This handles the XenoVacuum and it's interactions.
 /// </summary>
-public sealed partial class XenoVacuumSystem : EntitySystem
+public sealed class XenoVacuumSystem : EntitySystem
 {
-    [Dependency] private readonly InventorySystem _inventorySystem = default!;
-    [Dependency] private readonly ThrowingSystem _throw = default!;
-    [Dependency] private readonly SharedContainerSystem _containerSystem = default!;
-    [Dependency] private readonly SharedPopupSystem _popup = default!;
-    [Dependency] private readonly SharedStunSystem _stun = default!;
-    [Dependency] private readonly SharedAudioSystem _audio = default!;
-    [Dependency] private readonly SharedHandsSystem _hands = default!;
-    [Dependency] private readonly EntityWhitelistSystem _whitelist = default!;
-    [Dependency] private readonly HTNSystem _htn = default!;
-    [Dependency] private readonly UseDelaySystem _useDelay = default!;
-    [Dependency] private readonly EntityStorageSystem _entStorage = default!;
-
     private const string ReleaseDelayId = "release";
     private const string SuctionDelayId = "suction";
+    [Dependency] private readonly SharedAudioSystem _audio = default!;
+    [Dependency] private readonly SharedContainerSystem _containerSystem = default!;
+    [Dependency] private readonly EntityStorageSystem _entStorage = default!;
+    [Dependency] private readonly SharedHandsSystem _hands = default!;
+    [Dependency] private readonly HTNSystem _htn = default!;
+    [Dependency] private readonly InventorySystem _inventorySystem = default!;
+    [Dependency] private readonly SharedPopupSystem _popup = default!;
+    [Dependency] private readonly SharedStunSystem _stun = default!;
+    [Dependency] private readonly ThrowingSystem _throw = default!;
+    [Dependency] private readonly UseDelaySystem _useDelay = default!;
+    [Dependency] private readonly EntityWhitelistSystem _whitelist = default!;
 
     public override void Initialize()
     {
@@ -61,10 +60,8 @@ public sealed partial class XenoVacuumSystem : EntitySystem
         SubscribeLocalEvent<XenoVacuumComponent, AfterInteractEvent>(OnAfterInteract);
     }
 
-    private void OnTankInit(Entity<XenoVacuumTankComponent> ent, ref MapInitEvent args)
-    {
-        ent.Comp.StorageTank = _containerSystem.EnsureContainer<Container>(ent, ent.Comp.TankContainerName);
-    }
+    private void OnTankInit(Entity<XenoVacuumTankComponent> ent, ref MapInitEvent args) => ent.Comp.StorageTank =
+        _containerSystem.EnsureContainer<Container>(ent, ent.Comp.TankContainerName);
 
     private void OnTankExamined(Entity<XenoVacuumTankComponent> ent, ref ExaminedEvent args)
     {
@@ -75,11 +72,9 @@ public sealed partial class XenoVacuumSystem : EntitySystem
         args.PushMarkup(text);
     }
 
-    private void OnDestruction(Entity<XenoVacuumTankComponent> ent, ref DestructionEventArgs args)
-    {
+    private void OnDestruction(Entity<XenoVacuumTankComponent> ent, ref DestructionEventArgs args) =>
         // apparently ContainerManager doesn't automatically release them so
         _containerSystem.EmptyContainer(ent.Comp.StorageTank);
-    }
 
     private void OnEquippedHand(Entity<XenoVacuumComponent> ent, ref GotEquippedHandEvent args)
     {
@@ -110,18 +105,20 @@ public sealed partial class XenoVacuumSystem : EntitySystem
     private void OnAfterInteract(Entity<XenoVacuumComponent> ent, ref AfterInteractEvent args)
     {
         var ud = Comp<UseDelayComponent>(ent);
-        if (CheckDelays(ent)) return;
+        if (CheckDelays(ent))
+            return;
 
         if (args is { Target: { } target, CanReach: true } && HasComp<MobStateComponent>(target))
         {
             TryDoSuction(args.User, target, ent);
-            if (ud != null) _useDelay.TryResetDelay((ent, ud), false, SuctionDelayId);
+            if (ud != null)
+                _useDelay.TryResetDelay((ent, ud), false, SuctionDelayId);
             return;
         }
 
         // release all entities contained
         if (!TryGetTank(args.User, out var tank) || !tank.HasValue
-        || tank!.Value.Comp.StorageTank.ContainedEntities.Count <= 0)
+                                                 || tank!.Value.Comp.StorageTank.ContainedEntities.Count <= 0)
             return;
 
         var tankComp = tank!.Value.Comp;
@@ -136,10 +133,11 @@ public sealed partial class XenoVacuumSystem : EntitySystem
             else
                 _throw.TryThrow(removedEnt, args.ClickLocation);
             _stun.TryUpdateParalyzeDuration(removedEnt, TimeSpan.FromSeconds(2));
-            _htn.SetHTNEnabled(removedEnt, true,2f);
+            _htn.SetHTNEnabled(removedEnt, true, 2f);
         }
 
-        if (ud != null) _useDelay.TryResetDelay((ent, ud), false, ReleaseDelayId);
+        if (ud != null)
+            _useDelay.TryResetDelay((ent, ud), false, ReleaseDelayId);
 
         _audio.PlayEntity(ent.Comp.ClearSound, ent, args.User, AudioParams.Default.WithVolume(-2f));
     }
@@ -148,7 +146,7 @@ public sealed partial class XenoVacuumSystem : EntitySystem
 
     private bool CheckDelays(Entity<XenoVacuumComponent> tank)
         => _useDelay.IsDelayed(tank.Owner, SuctionDelayId)
-        || _useDelay.IsDelayed(tank.Owner, ReleaseDelayId);
+           || _useDelay.IsDelayed(tank.Owner, ReleaseDelayId);
 
     private bool TryGetTank(EntityUid user, out Entity<XenoVacuumTankComponent>? tank)
     {

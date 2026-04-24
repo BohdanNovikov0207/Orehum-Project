@@ -6,5 +6,5 @@ namespace Content.Goobstation.Shared.Surgery.Steps.Parts;
 /// Added to xeno limbs and removed to prevent getting infinite samples from them.
 /// Also used to allow adding xeno organ slots to humanoid limbs.
 /// </summary>
-[RegisterComponent, NetworkedComponent]
+[RegisterComponent] [NetworkedComponent]
 public sealed partial class HasTissueSampleComponent : Component;

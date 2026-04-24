@@ -24,14 +24,14 @@ namespace Content.Goobstation.Server.Devil.Grip;
 
 public sealed class DevilGripSystem : EntitySystem
 {
-    [Dependency] private readonly SharedStaminaSystem _stamina = default!;
-    [Dependency] private readonly SharedStunSystem _stun = default!;
+    [Dependency] private readonly SharedActionsSystem _actions = default!;
     [Dependency] private readonly SharedAudioSystem _audio = default!;
     [Dependency] private readonly ChatSystem _chat = default!;
-    [Dependency] private readonly RatvarianLanguageSystem _language = default!;
-    [Dependency] private readonly EntityWhitelistSystem _whitelist = default!;
-    [Dependency] private readonly SharedActionsSystem _actions = default!;
     [Dependency] private readonly DivineInterventionSystem _divineIntervention = default!;
+    [Dependency] private readonly RatvarianLanguageSystem _language = default!;
+    [Dependency] private readonly SharedStaminaSystem _stamina = default!;
+    [Dependency] private readonly SharedStunSystem _stun = default!;
+    [Dependency] private readonly EntityWhitelistSystem _whitelist = default!;
 
     public override void Initialize()
     {
@@ -61,7 +61,7 @@ public sealed class DevilGripSystem : EntitySystem
 
         if (TryComp(target, out StatusEffectsComponent? status))
         {
-            _stun.KnockdownOrStun(target, ent.Comp.KnockdownTime, true);
+            _stun.KnockdownOrStun(target, ent.Comp.KnockdownTime);
             _stamina.TakeStaminaDamage(target, ent.Comp.StaminaDamage);
             _language.DoRatvarian(target, ent.Comp.SpeechTime, true, status);
         }

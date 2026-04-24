@@ -19,8 +19,9 @@ public sealed class EventHorizonIgnoreSystem : EntitySystem
         SubscribeLocalEvent<EventHorizonIgnoreComponent, EventHorizonAttemptConsumeEntityEvent>(OnAttemptConsume);
     }
 
-    private void OnAttemptConsume(Entity<EventHorizonIgnoreComponent> ent, ref EventHorizonAttemptConsumeEntityEvent args)
-    {
-        args.Cancelled = args.Cancelled || _whitelist.IsBlacklistPassOrNull(ent.Comp.HorizonWhitelist, args.EventHorizonUid);
-    }
+    private void OnAttemptConsume(Entity<EventHorizonIgnoreComponent> ent,
+        ref EventHorizonAttemptConsumeEntityEvent args) => args.Cancelled = args.Cancelled ||
+                                                                            _whitelist.IsBlacklistPassOrNull(
+                                                                                ent.Comp.HorizonWhitelist,
+                                                                                args.EventHorizonUid);
 }

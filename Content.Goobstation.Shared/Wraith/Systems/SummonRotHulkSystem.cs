@@ -7,14 +7,15 @@ using Content.Shared.Tag;
 using Robust.Shared.Network;
 
 namespace Content.Goobstation.Shared.Wraith.Systems;
-public sealed partial class SummonRotHulkSystem : EntitySystem
+
+public sealed class SummonRotHulkSystem : EntitySystem
 {
+    [Dependency] private readonly ISharedAdminLogManager _admin = default!;
+    [Dependency] private readonly EntityLookupSystem _lookup = default!;
+    [Dependency] private readonly INetManager _net = default!;
 
     [Dependency] private readonly SharedPopupSystem _popup = default!;
-    [Dependency] private readonly EntityLookupSystem _lookup = default!;
     [Dependency] private readonly TagSystem _tags = default!;
-    [Dependency] private readonly INetManager _net = default!;
-    [Dependency] private readonly ISharedAdminLogManager _admin = default!;
 
     public override void Initialize()
     {
@@ -53,7 +54,9 @@ public sealed partial class SummonRotHulkSystem : EntitySystem
         //Leaving this for part 2, it's just cosmetic.
 
         foreach (var trash in nearbyTrash)
+        {
             QueueDel(trash);
+        }
 
         // Choose which prototype to spawn
         var isBuff = nearbyTrash.Count >= comp.BuffThreshold;
@@ -67,5 +70,4 @@ public sealed partial class SummonRotHulkSystem : EntitySystem
 
         args.Handled = true;
     }
-
 }

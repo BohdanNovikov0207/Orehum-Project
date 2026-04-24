@@ -1,6 +1,5 @@
 using System.Numerics;
 using Robust.Client.Graphics;
-using Robust.Client.UserInterface;
 using Robust.Client.UserInterface.Controls;
 using Robust.Shared.Input;
 using Robust.Shared.Prototypes;
@@ -9,12 +8,9 @@ namespace Content.Goobstation.UIKit.UserInterface.Controls;
 
 public sealed class ThunderdomeWeaponCard : PanelContainer
 {
-    public event Action<ThunderdomeWeaponCard>? OnSelected;
-
-    public int WeaponIndex { get; }
+    private readonly StyleBoxFlat _styleBox;
 
     private bool _isSelected;
-    private readonly StyleBoxFlat _styleBox;
 
     public ThunderdomeWeaponCard(int weaponIndex, string weaponName, string? spritePrototype, string? tooltip = null)
     {
@@ -119,6 +115,9 @@ public sealed class ThunderdomeWeaponCard : PanelContainer
                 _styleBox.BackgroundColor = ThunderdomeTheme.CardBg;
         };
     }
+
+    public int WeaponIndex { get; }
+    public event Action<ThunderdomeWeaponCard>? OnSelected;
 
     public void SetSelected(bool selected)
     {

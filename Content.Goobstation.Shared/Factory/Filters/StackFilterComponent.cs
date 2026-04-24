@@ -12,14 +12,14 @@ namespace Content.Goobstation.Shared.Factory.Filters;
 /// A filter that requires items to have a minimum stack size.
 /// Non-stackable items will always be blocked.
 /// </summary>
-[RegisterComponent, NetworkedComponent, Access(typeof(AutomationFilterSystem))]
+[RegisterComponent] [NetworkedComponent] [Access(typeof(AutomationFilterSystem))]
 [AutoGenerateComponentState]
 public sealed partial class StackFilterComponent : Component
 {
     /// <summary>
     /// Minimum stack size to require.
     /// </summary>
-    [DataField, AutoNetworkedField]
+    [DataField] [AutoNetworkedField]
     public int Min = 1;
 
     /// <summary>
@@ -27,24 +27,24 @@ public sealed partial class StackFilterComponent : Component
     /// Combining more than stack filter makes it use the highest set chunk size.
     /// If 0 then output is not chunked.
     /// </summary>
-    [DataField, AutoNetworkedField]
+    [DataField] [AutoNetworkedField]
     public int Size;
 }
 
-[Serializable, NetSerializable]
+[Serializable] [NetSerializable]
 public enum StackFilterUiKey : byte
 {
-    Key
+    Key,
 }
 
-[Serializable, NetSerializable]
-public sealed partial class StackFilterSetMinMessage(int min) : BoundUserInterfaceMessage
+[Serializable] [NetSerializable]
+public sealed class StackFilterSetMinMessage(int min) : BoundUserInterfaceMessage
 {
     public readonly int Min = min;
 }
 
-[Serializable, NetSerializable]
-public sealed partial class StackFilterSetSizeMessage(int size) : BoundUserInterfaceMessage
+[Serializable] [NetSerializable]
+public sealed class StackFilterSetSizeMessage(int size) : BoundUserInterfaceMessage
 {
     public readonly int Size = size;
 }

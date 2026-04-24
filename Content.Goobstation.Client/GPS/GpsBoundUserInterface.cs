@@ -31,25 +31,14 @@ public sealed class GpsBoundUserInterface(EntityUid owner, Enum uiKey) : BoundUs
             _window.UpdateState(Owner);
     }
 
-    private void OnTrackedEntitySelected(NetEntity? netEntity)
-    {
+    private void OnTrackedEntitySelected(NetEntity? netEntity) =>
         SendPredictedMessage(new GpsSetTrackedEntityMessage(netEntity));
-    }
 
-    private void OnGpsNameChanged(string newName)
-    {
-        SendPredictedMessage(new GpsSetGpsNameMessage(newName));
-    }
+    private void OnGpsNameChanged(string newName) => SendPredictedMessage(new GpsSetGpsNameMessage(newName));
 
-    private void OnDistressPressed(bool distressed)
-    {
-        SendPredictedMessage(new GpsSetInDistressMessage(distressed));
-    }
+    private void OnDistressPressed(bool distressed) => SendPredictedMessage(new GpsSetInDistressMessage(distressed));
 
-    private void OnEnabledPressed(bool enabled)
-    {
-        SendPredictedMessage(new GpsSetEnabledMessage(enabled));
-    }
+    private void OnEnabledPressed(bool enabled) => SendPredictedMessage(new GpsSetEnabledMessage(enabled));
 
     protected override void Dispose(bool disposing)
     {

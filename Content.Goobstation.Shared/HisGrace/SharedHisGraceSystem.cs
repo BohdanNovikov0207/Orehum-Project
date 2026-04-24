@@ -8,14 +8,13 @@ using Content.Shared.Toggleable;
 
 namespace Content.Goobstation.Shared.HisGrace;
 
-public abstract partial class SharedHisGraceSystem : EntitySystem
+public abstract class SharedHisGraceSystem : EntitySystem
 {
     [Dependency] private readonly SharedAppearanceSystem _appearance = null!;
     [Dependency] private readonly SharedItemSystem _item = null!;
 
     protected virtual void VisualsChanged(Entity<HisGraceComponent> ent, string key)
     {
-
     }
 
     protected void DoAscensionVisuals(Entity<HisGraceComponent> ent, string key)

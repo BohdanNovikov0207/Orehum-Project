@@ -1,20 +1,19 @@
+using System.Numerics;
 using Content.Goobstation.Shared.Tools;
 using Content.Shared.Tools.Components;
 using Robust.Client.Animations;
 using Robust.Client.GameObjects;
 using Robust.Client.Graphics;
 using Robust.Shared.Animations;
-using System.Numerics;
 
 namespace Content.Goobstation.Client.Tools;
 
 public sealed class WeldingSparksAnimationSystem : EntitySystem
 {
+    private const string ANIM_KEY = "WeldAnim";
     [Dependency] private readonly AnimationPlayerSystem _animation = default!;
     [Dependency] private readonly IEyeManager _eyeManager = default!;
     [Dependency] private readonly TransformSystem _transformSystem = default!;
-
-    private const string ANIM_KEY = "WeldAnim";
 
     public override void Initialize()
     {
@@ -26,7 +25,8 @@ public sealed class WeldingSparksAnimationSystem : EntitySystem
     private void OnSpawnedWeldingSparks(SpawnedWeldingSparksEvent ev)
     {
         var targetEnt = GetEntity(ev.TargetEnt);
-        if (!TryComp<WeldableComponent>(targetEnt, out var weldableComp) || !TryComp<WeldingSparksAnimationComponent>(targetEnt, out var sparksAnim))
+        if (!TryComp<WeldableComponent>(targetEnt, out var weldableComp) ||
+            !TryComp<WeldingSparksAnimationComponent>(targetEnt, out var sparksAnim))
             return;
 
         if (!TryGetEntity(ev.SparksEnt, out var sparksEnt))
@@ -39,12 +39,12 @@ public sealed class WeldingSparksAnimationSystem : EntitySystem
 
         var (startOffset, endOffset) = GetOffsets((targetEnt, sparksAnim), weldableComp.IsWelded);
 
-        var animation = new Animation()
+        var animation = new Animation
         {
             Length = ev.Duration,
             AnimationTracks =
             {
-                new AnimationTrackComponentProperty()
+                new AnimationTrackComponentProperty
                 {
                     ComponentType = typeof(SpriteComponent),
                     Property = nameof(SpriteComponent.Offset),
@@ -53,9 +53,9 @@ public sealed class WeldingSparksAnimationSystem : EntitySystem
                     {
                         new AnimationTrackProperty.KeyFrame(startOffset, 0f),
                         new AnimationTrackProperty.KeyFrame(endOffset, (float) ev.Duration.TotalSeconds),
-                    }
-                }
-            }
+                    },
+                },
+            },
         };
 
         _animation.Play(sparksEnt.Value, animation, ANIM_KEY);
@@ -81,19 +81,15 @@ public sealed class WeldingSparksAnimationSystem : EntitySystem
 
             var finalAngle = sprite.NoRotation ? relativeRotation : relativeRotation - cardinalSnapping;
 
-            start = finalAngle.RotateVec(start); // `RotateVec()` contains a `Theta == 0` check, so no need to check for it in here.
+            start = finalAngle
+                .RotateVec(start); // `RotateVec()` contains a `Theta == 0` check, so no need to check for it in here.
             end = finalAngle.RotateVec(end);
         }
 
         // Welding.
         if (!isWelded)
-        {
             return (start, end);
-        }
         // Unwelding. (go backwards)
-        else
-        {
-            return (end, start);
-        }
+        return (end, start);
     }
 }

@@ -8,17 +8,12 @@ using Content.Goobstation.Shared.Devil;
 using Content.Goobstation.Shared.Devil.Condemned;
 using Content.Goobstation.Shared.Religion;
 using Content.Server._Shitmed.StatusEffects;
-using Content.Server.IdentityManagement;
 using Content.Server.Polymorph.Systems;
 using Content.Shared.Examine;
 using Content.Shared.IdentityManagement;
-using Content.Shared.Interaction.Components;
 using Content.Shared.Movement.Events;
-using Content.Shared.Polymorph;
 using Content.Shared.Popups;
-using Robust.Shared.Audio;
 using Robust.Shared.Audio.Systems;
-using Robust.Shared.Prototypes;
 using Robust.Shared.Spawners;
 
 namespace Content.Goobstation.Server.Devil.Condemned;
@@ -29,6 +24,7 @@ public sealed partial class CondemnedSystem : EntitySystem
     [Dependency] private readonly PolymorphSystem _poly = default!;
     [Dependency] private readonly SharedPopupSystem _popup = default!;
     [Dependency] private readonly ScrambleDnaEffectSystem _scramble = default!;
+
     public override void Initialize()
     {
         base.Initialize();
@@ -179,6 +175,7 @@ public sealed partial class CondemnedSystem : EntitySystem
         if (ev.IsEyesProtected)
             return;
 
-        args.PushMarkup(Loc.GetString("condemned-component-examined", ("target", Identity.Entity(condemned, EntityManager) )));
+        args.PushMarkup(Loc.GetString("condemned-component-examined",
+            ("target", Identity.Entity(condemned, EntityManager))));
     }
 }

@@ -22,10 +22,10 @@ namespace Content.Goobstation.Client.Supermatter.Consoles;
 [GenerateTypedNameReferences]
 public sealed partial class SupermatterEntryContainer : BoxContainer
 {
-    public NetEntity NetEntity;
+    private readonly Dictionary<string, EngineBarEntry> _engineDictionary;
 
     private readonly IEntityManager _entManager;
-    private readonly Dictionary<string, EngineBarEntry> _engineDictionary;
+    public NetEntity NetEntity;
 
     public SupermatterEntryContainer(NetEntity uid)
     {
@@ -37,8 +37,10 @@ public sealed partial class SupermatterEntryContainer : BoxContainer
         NetEntity = uid;
 
         // Load fonts
-        var normalFont = new VectorFont(cache.GetResource<FontResource>("/Fonts/NotoSansDisplay/NotoSansDisplay-Regular.ttf"), 11);
-        var monoFont = new VectorFont(cache.GetResource<FontResource>("/EngineFonts/NotoSans/NotoSansMono-Regular.ttf"), 10);
+        var normalFont =
+            new VectorFont(cache.GetResource<FontResource>("/Fonts/NotoSansDisplay/NotoSansDisplay-Regular.ttf"), 11);
+        var monoFont = new VectorFont(cache.GetResource<FontResource>("/EngineFonts/NotoSans/NotoSansMono-Regular.ttf"),
+            10);
 
         // Set fonts
         //SupermatterNameLabel.FontOverride = headerFont;
@@ -70,12 +72,28 @@ public sealed partial class SupermatterEntryContainer : BoxContainer
 
         _engineDictionary = new Dictionary<string, EngineBarEntry>
         {
-            { "integrity",      new EngineBarEntry(IntegrityBarLabel,   IntegrityBar,   IntegrityBarBorder,     0.9f, 0.1f, red,        orange, green) },
-            { "power",          new EngineBarEntry(PowerBarLabel,       PowerBar,       PowerBarBorder,         0.9f, 0.1f, green,      orange, red) },
-            { "radiation",      new EngineBarEntry(RadiationBarLabel,   RadiationBar,   RadiationBarBorder,     0.1f, 0.9f, green,      orange, red) },
-            { "moles",          new EngineBarEntry(MolesBarLabel,       MolesBar,       MolesBarBorder,         0.5f, 0.5f, green,      orange, red) },
-            { "temperature",    new EngineBarEntry(TemperatureBarLabel, TemperatureBar, TemperatureBarBorder,   0.5f, 0.5f, turqoise,   green,  red) },
-            { "waste",          new EngineBarEntry(WasteBarLabel,       WasteBar,       WasteBarBorder,         0.5f, 0.5f, green,      orange, red) }
+            {
+                "integrity",
+                new EngineBarEntry(IntegrityBarLabel, IntegrityBar, IntegrityBarBorder, 0.9f, 0.1f, red, orange, green)
+            },
+            { "power", new EngineBarEntry(PowerBarLabel, PowerBar, PowerBarBorder, 0.9f, 0.1f, green, orange, red) },
+            {
+                "radiation",
+                new EngineBarEntry(RadiationBarLabel, RadiationBar, RadiationBarBorder, 0.1f, 0.9f, green, orange, red)
+            },
+            { "moles", new EngineBarEntry(MolesBarLabel, MolesBar, MolesBarBorder, 0.5f, 0.5f, green, orange, red) },
+            {
+                "temperature",
+                new EngineBarEntry(TemperatureBarLabel,
+                    TemperatureBar,
+                    TemperatureBarBorder,
+                    0.5f,
+                    0.5f,
+                    turqoise,
+                    green,
+                    red)
+            },
+            { "waste", new EngineBarEntry(WasteBarLabel, WasteBar, WasteBarBorder, 0.5f, 0.5f, green, orange, red) },
         };
     }
 
@@ -108,25 +126,37 @@ public sealed partial class SupermatterEntryContainer : BoxContainer
                 var powerBar = _engineDictionary["power"];
                 var powerPrefix = powerBar.Value switch { >= 1000 => "G", >= 1 => "M", _ => "" };
                 var powerMultiplier = powerBar.Value switch { >= 1000 => 0.001, >= 1 => 1, _ => 1000 };
-                powerBar.Label.Text = Loc.GetString("supermatter-console-window-label-power-bar", ("power", (powerBar.Value * powerMultiplier).ToString("0.000")), ("prefix", powerPrefix));
+                powerBar.Label.Text = Loc.GetString("supermatter-console-window-label-power-bar",
+                    ("power", (powerBar.Value * powerMultiplier).ToString("0.000")),
+                    ("prefix", powerPrefix));
 
                 var temperatureLimit = focusData.Value.TemperatureLimit;
                 TemperatureBar.MaxValue = temperatureLimit;
-                TemperatureLimitBarLabel.Text = Loc.GetString("supermatter-console-window-label-temperature-bar", ("temperature", temperatureLimit.ToString("0.00")));
+                TemperatureLimitBarLabel.Text = Loc.GetString("supermatter-console-window-label-temperature-bar",
+                    ("temperature", temperatureLimit.ToString("0.00")));
 
                 var absorptionRatio = focusData.Value.AbsorptionRatio;
-                AbsorptionBarLabel.Text = Loc.GetString("supermatter-console-window-label-absorption-bar", ("absorption", absorptionRatio.ToString("0")));
+                AbsorptionBarLabel.Text = Loc.GetString("supermatter-console-window-label-absorption-bar",
+                    ("absorption", absorptionRatio.ToString("0")));
 
                 // Update engine bars
                 foreach (var bar in _engineDictionary)
                 {
                     var current = bar.Value;
-                    UpdateEngineBar(current.Bar, current.Border, current.Value, current.LeftSize, current.RightSize, current.LeftColor, current.MiddleColor, current.RightColor);
+                    UpdateEngineBar(current.Bar,
+                        current.Border,
+                        current.Value,
+                        current.LeftSize,
+                        current.RightSize,
+                        current.LeftColor,
+                        current.MiddleColor,
+                        current.RightColor);
 
                     if (bar.Key == "power")
                         continue;
 
-                    current.Label.Text = Loc.GetString("supermatter-console-window-label-" + bar.Key + "-bar", (bar.Key, current.Value.ToString("0.00")));
+                    current.Label.Text = Loc.GetString("supermatter-console-window-label-" + bar.Key + "-bar",
+                        (bar.Key, current.Value.ToString("0.00")));
                 }
 
                 // Update gas bars
@@ -156,10 +186,17 @@ public sealed partial class SupermatterEntryContainer : BoxContainer
         if (focusData == null)
             return 0;
 
-        return focusData.Value.GasStorage[(Gas)id];
+        return focusData.Value.GasStorage[(Gas) id];
     }
 
-    private void UpdateEngineBar(ProgressBar bar, PanelContainer border, float value, float leftSize, float rightSize, Color leftColor, Color middleColor, Color rightColor)
+    private void UpdateEngineBar(ProgressBar bar,
+        PanelContainer border,
+        float value,
+        float leftSize,
+        float rightSize,
+        Color leftColor,
+        Color middleColor,
+        Color rightColor)
     {
         var clamped = Math.Clamp(value, bar.MinValue, bar.MaxValue);
 
@@ -193,10 +230,10 @@ public sealed partial class SupermatterEntryContainer : BoxContainer
         bar.ForegroundStyleBoxOverride ??= new StyleBoxFlat();
         border.PanelOverride ??= new StyleBoxFlat();
 
-        var barOverride = (StyleBoxFlat)bar.ForegroundStyleBoxOverride;
+        var barOverride = (StyleBoxFlat) bar.ForegroundStyleBoxOverride;
         barOverride.BackgroundColor = finalColor;
 
-        var panelOverride = (StyleBoxFlat)border.PanelOverride;
+        var panelOverride = (StyleBoxFlat) border.PanelOverride;
         panelOverride.BackgroundColor = finalColor;
 
         bar.Value = clamped;
@@ -224,24 +261,31 @@ public sealed partial class SupermatterEntryContainer : BoxContainer
             return;
         }
 
-        var entryContainer = (SupermatterGasBarContainer)tableChild;
+        var entryContainer = (SupermatterGasBarContainer) tableChild;
 
         entryContainer.UpdateEntry(name, color, value);
     }
 
     private sealed class EngineBarEntry
     {
-        public readonly Label Label;
         public readonly ProgressBar Bar;
         public readonly PanelContainer Border;
-        public float Value;
-        public readonly float LeftSize;
-        public readonly float RightSize;
+        public readonly Label Label;
         public readonly Color LeftColor;
+        public readonly float LeftSize;
         public readonly Color MiddleColor;
         public readonly Color RightColor;
+        public readonly float RightSize;
+        public float Value;
 
-        public EngineBarEntry(Label label, ProgressBar bar, PanelContainer border, float leftSize, float rightSize, Color leftColor, Color middleColor, Color rightColor)
+        public EngineBarEntry(Label label,
+            ProgressBar bar,
+            PanelContainer border,
+            float leftSize,
+            float rightSize,
+            Color leftColor,
+            Color middleColor,
+            Color rightColor)
         {
             Label = label;
             Bar = bar;

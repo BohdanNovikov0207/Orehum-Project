@@ -11,9 +11,18 @@ namespace Content.Goobstation.Client.JoinQueue;
 
 public sealed partial class QueueCritterWalk : LayoutContainer
 {
+    private const float SpriteScale = 3f;
+    private const float SpriteDisplaySize = 32f * SpriteScale;
+    private const float ControlHeight = SpriteDisplaySize + 20f;
+    private const float MinSpeed = 40f;
+    private const float MaxSpeed = 60f;
+    private const float IdleRetargetMinSeconds = 2f;
+    private const float IdleRetargetMaxSeconds = 5f;
+    private const float OffScreenSpawn = -SpriteDisplaySize;
+
     /// <summary>
-    ///     Sprite pool entries. IdleState is shown when standing still, MovingState when walking.
-    ///     If MovingState is null, the same sprite is used for both.
+    /// Sprite pool entries. IdleState is shown when standing still, MovingState when walking.
+    /// If MovingState is null, the same sprite is used for both.
     /// </summary>
     private static readonly (string Path, string IdleState, string? MovingState)[] SpritePool =
     [
@@ -34,15 +43,6 @@ public sealed partial class QueueCritterWalk : LayoutContainer
         ("Mobs/Pets/cat.rsi", "cat2", null),
         ("_Goobstation/Mobs/Bingle/bingle.rsi", "alive", null),
     ];
-
-    private const float SpriteScale = 3f;
-    private const float SpriteDisplaySize = 32f * SpriteScale;
-    private const float ControlHeight = SpriteDisplaySize + 20f;
-    private const float MinSpeed = 40f;
-    private const float MaxSpeed = 60f;
-    private const float IdleRetargetMinSeconds = 2f;
-    private const float IdleRetargetMaxSeconds = 5f;
-    private const float OffScreenSpawn = -SpriteDisplaySize;
 
     private readonly Dictionary<string, Critter> _critters = [];
     private readonly IRobustRandom _random;
@@ -159,28 +159,30 @@ public sealed partial class QueueCritterWalk : LayoutContainer
         var zoneStart = _totalPlayers > 0 ? (float) reversedIndex / _totalPlayers * usableWidth : 0f;
         var zoneEnd = _totalPlayers > 0 ? (float) (reversedIndex + 1) / _totalPlayers * usableWidth : usableWidth;
 
-        var critter = new Critter // I hate making monolithic objects but whatever, this is private and contained so it's not the worst.
-        {
-            Name = name,
-            IsLocalPlayer = isLocalPlayer,
-            XPosition = OffScreenSpawn,
-            TargetX = _random.NextFloat(zoneStart, Math.Max(zoneStart, zoneEnd)),
-            Speed = _random.NextFloat(MinSpeed, MaxSpeed),
-            Leaving = false,
-            IsMoving = true,
-            IdleTimer = _random.NextFloat(IdleRetargetMinSeconds, IdleRetargetMaxSeconds),
-            QueueIndex = queueIndex,
-            ZoneStart = zoneStart,
-            ZoneEnd = zoneEnd,
-            FacingDirection = RsiDirection.East,
-            IdleState = idleState,
-            MovingState = movingState,
-            CurFrame = 0,
-            CurFrameTime = Critter.GetActiveState(idleState, movingState, true).GetDelay(0),
-            SpriteRect = spriteRect,
-            NameLabel = nameLabel,
-            Box = box,
-        };
+        var critter =
+            new
+                Critter // I hate making monolithic objects but whatever, this is private and contained so it's not the worst.
+                {
+                    Name = name,
+                    IsLocalPlayer = isLocalPlayer,
+                    XPosition = OffScreenSpawn,
+                    TargetX = _random.NextFloat(zoneStart, Math.Max(zoneStart, zoneEnd)),
+                    Speed = _random.NextFloat(MinSpeed, MaxSpeed),
+                    Leaving = false,
+                    IsMoving = true,
+                    IdleTimer = _random.NextFloat(IdleRetargetMinSeconds, IdleRetargetMaxSeconds),
+                    QueueIndex = queueIndex,
+                    ZoneStart = zoneStart,
+                    ZoneEnd = zoneEnd,
+                    FacingDirection = RsiDirection.East,
+                    IdleState = idleState,
+                    MovingState = movingState,
+                    CurFrame = 0,
+                    CurFrameTime = Critter.GetActiveState(idleState, movingState, true).GetDelay(0),
+                    SpriteRect = spriteRect,
+                    NameLabel = nameLabel,
+                    Box = box,
+                };
 
         UpdateNameLabelStyle(critter);
         SetPosition(box, new Vector2(OffScreenSpawn, 0));
@@ -203,6 +205,7 @@ public sealed partial class QueueCritterWalk : LayoutContainer
             hash ^= c;
             hash *= 16777619u;
         }
+
         return hash;
     }
 
@@ -247,7 +250,8 @@ public sealed partial class QueueCritterWalk : LayoutContainer
                 critter.IdleTimer -= args.DeltaSeconds;
                 if (critter.IdleTimer <= 0f)
                 {
-                    critter.TargetX = _random.NextFloat(critter.ZoneStart, Math.Max(critter.ZoneStart, critter.ZoneEnd));
+                    critter.TargetX =
+                        _random.NextFloat(critter.ZoneStart, Math.Max(critter.ZoneStart, critter.ZoneEnd));
                     critter.IdleTimer = _random.NextFloat(IdleRetargetMinSeconds, IdleRetargetMaxSeconds);
                 }
             }
@@ -263,7 +267,9 @@ public sealed partial class QueueCritterWalk : LayoutContainer
         }
 
         foreach (var name in toRemove)
+        {
             if (_critters.Remove(name, out var critter))
                 RemoveChild(critter.Box);
+        }
     }
 }

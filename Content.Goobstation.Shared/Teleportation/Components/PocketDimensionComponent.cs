@@ -21,17 +21,26 @@ namespace Content.Goobstation.Shared.Teleportation.Components;
 [Access(typeof(PocketDimensionSystem))]
 public sealed partial class PocketDimensionComponent : Component
 {
-    /// <summary>
-    /// Whether this pocket dimension portal is enabled.
-    /// </summary>
-    [ViewVariables]
-    public bool PortalEnabled = false;
+    [DataField]
+    public SoundSpecifier ClosePortalSound = new SoundPathSpecifier("/Audio/Machines/button.ogg");
 
     /// <summary>
     /// The portal in the pocket dimension. Created when the entry portal is first opened.
     /// </summary>
     [ViewVariables]
     public EntityUid? ExitPortal;
+
+    /// <summary>
+    /// The prototype to spawn for the portal spawned in the pocket dimension.
+    /// </summary>
+    [DataField]
+    public EntProtoId ExitPortalPrototype = "PortalBlue";
+
+    [DataField]
+    public SoundSpecifier OpenPortalSound = new SoundPathSpecifier("/Audio/Machines/high_tech_confirm.ogg")
+    {
+        Params = AudioParams.Default.WithVolume(-2f),
+    };
 
     /// <summary>
     /// The pocket dimension map. Created when the entry portal is first opened.
@@ -43,20 +52,11 @@ public sealed partial class PocketDimensionComponent : Component
     /// Path to the pocket dimension's map file
     /// </summary>
     [DataField]
-    public ResPath PocketDimensionPath = new ResPath("/Maps/_Goobstation/Nonstations/pocket-dimension.yml");
+    public ResPath PocketDimensionPath = new("/Maps/_Goobstation/Nonstations/pocket-dimension.yml");
 
     /// <summary>
-    /// The prototype to spawn for the portal spawned in the pocket dimension.
+    /// Whether this pocket dimension portal is enabled.
     /// </summary>
-    [DataField]
-    public EntProtoId ExitPortalPrototype = "PortalBlue";
-
-    [DataField]
-    public SoundSpecifier OpenPortalSound = new SoundPathSpecifier("/Audio/Machines/high_tech_confirm.ogg")
-    {
-        Params = AudioParams.Default.WithVolume(-2f)
-    };
-
-    [DataField]
-    public SoundSpecifier ClosePortalSound = new SoundPathSpecifier("/Audio/Machines/button.ogg");
+    [ViewVariables]
+    public bool PortalEnabled = false;
 }

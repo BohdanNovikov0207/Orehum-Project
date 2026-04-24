@@ -80,8 +80,8 @@ public sealed class AutoSurgeonSystem : EntitySystem
     private void OnDoAfter(Entity<AutoSurgeonComponent> ent, ref AutoSurgeonDoAfterEvent args)
     {
         if (args.Cancelled
-        || ent.Comp.Used
-        || args.Target == null)
+            || ent.Comp.Used
+            || args.Target == null)
         {
             _audio.Stop(ent.Comp.ActiveSound);
             return;
@@ -92,12 +92,14 @@ public sealed class AutoSurgeonSystem : EntitySystem
         // Handle replacing the part
         if (ent.Comp.NewPartProto != null)
         {
-            var parent = _body.GetBodyChildrenOfType(args.Target.Value, ent.Comp.TargetBodyPart, symmetry: ent.Comp.TargetBodyPartSymmetry)
+            var parent = _body.GetBodyChildrenOfType(args.Target.Value,
+                    ent.Comp.TargetBodyPart,
+                    symmetry: ent.Comp.TargetBodyPartSymmetry)
                 .FirstOrDefault()
                 .Id;
 
             if (!parent.Valid
-            || !TryComp<BodyPartComponent>(parent, out var parentComp))
+                || !TryComp<BodyPartComponent>(parent, out var parentComp))
             {
                 _audio.Stop(ent.Comp.ActiveSound);
                 return;
@@ -108,14 +110,16 @@ public sealed class AutoSurgeonSystem : EntitySystem
             if (isBodyPart)
             {
                 if (!TryComp<BodyPartComponent>(newPart, out var newPartComp)
-                || !parentComp.Children.ContainsKey(_body.GetSlotFromBodyPart(newPartComp))) // why is there no method for this
+                    || !parentComp.Children.ContainsKey(
+                        _body.GetSlotFromBodyPart(newPartComp))) // why is there no method for this
                 {
                     Del(newPart);
                     _audio.Stop(ent.Comp.ActiveSound);
                     return;
                 }
 
-                var oldPart = _body.GetBodyChildrenOfType(args.Target.Value, newPartComp.PartType, symmetry: newPartComp.Symmetry)
+                var oldPart = _body
+                    .GetBodyChildrenOfType(args.Target.Value, newPartComp.PartType, symmetry: newPartComp.Symmetry)
                     .FirstOrDefault()
                     .Id;
 
@@ -127,7 +131,7 @@ public sealed class AutoSurgeonSystem : EntitySystem
             else
             {
                 if (!TryComp<OrganComponent>(newPart, out var newOrganComp)
-                || !_body.CanInsertOrgan(parent, newOrganComp.SlotId))
+                    || !_body.CanInsertOrgan(parent, newOrganComp.SlotId))
                 {
                     Del(newPart);
                     _audio.Stop(ent.Comp.ActiveSound);
@@ -155,7 +159,9 @@ public sealed class AutoSurgeonSystem : EntitySystem
 
         // If we didn't replace it, then we upgrade it.
         var part = isBodyPart
-            ? _body.GetBodyChildrenOfType(args.Target.Value, ent.Comp.TargetBodyPart, symmetry: ent.Comp.TargetBodyPartSymmetry)
+            ? _body.GetBodyChildrenOfType(args.Target.Value,
+                    ent.Comp.TargetBodyPart,
+                    symmetry: ent.Comp.TargetBodyPartSymmetry)
                 .FirstOrDefault()
                 .Id
             : _body.GetBodyOrgans(args.Target)
@@ -168,10 +174,12 @@ public sealed class AutoSurgeonSystem : EntitySystem
             return;
         }
 
-        var addedToPart = AddComponents(part, ent.Comp.ComponentsToPart); // if none were actually added the part is probably already upgraded
+        var addedToPart =
+            AddComponents(part,
+                ent.Comp.ComponentsToPart); // if none were actually added the part is probably already upgraded
 
         if (addedToPart != null // null indicates there were no components to add in the first place, so it's fine
-        && !addedToPart.Any())
+            && !addedToPart.Any())
         {
             _audio.Stop(ent.Comp.ActiveSound);
             return;
@@ -192,7 +200,7 @@ public sealed class AutoSurgeonSystem : EntitySystem
     private void HandleBodyPart(EntityUid user, EntityUid part, ComponentRegistry? comps)
     {
         if (!TryComp<BodyPartComponent>(part, out var partComp)
-        || comps == null)
+            || comps == null)
             return;
 
         var addedToOnAdd = new ComponentRegistry();
@@ -216,13 +224,15 @@ public sealed class AutoSurgeonSystem : EntitySystem
 
         var partEffectComp = EnsureComp<BodyPartEffectComponent>(part);
         foreach (var (name, data) in addedToUser)
+        {
             partEffectComp.Active.TryAdd(name, data);
+        }
     }
 
     private void HandleOrgan(EntityUid user, EntityUid organ, ComponentRegistry? comps)
     {
         if (!TryComp<OrganComponent>(organ, out var organComp)
-        || comps == null)
+            || comps == null)
             return;
 
         var addedToOnAdd = new ComponentRegistry();
@@ -246,11 +256,15 @@ public sealed class AutoSurgeonSystem : EntitySystem
 
         var organEffectComp = EnsureComp<OrganEffectComponent>(organ);
         foreach (var (name, data) in addedToUser)
+        {
             organEffectComp.Active.TryAdd(name, data);
+        }
     }
 
     private void OnExamined(Entity<AutoSurgeonComponent> ent, ref ExaminedEvent args) =>
-        args.PushMarkup(ent.Comp.Used ? Loc.GetString("gun-cartridge-spent") : Loc.GetString("gun-cartridge-unspent")); // Yes gun locale, and?
+        args.PushMarkup(ent.Comp.Used
+            ? Loc.GetString("gun-cartridge-spent")
+            : Loc.GetString("gun-cartridge-unspent")); // Yes gun locale, and?
 
     private void OnActivated(Entity<AutoSurgeonMultipleComponent> ent, ref ItemToggleActivateAttemptEvent args)
     {
@@ -289,8 +303,8 @@ public sealed class AutoSurgeonSystem : EntitySystem
     private void OnDoAfter(Entity<AutoSurgeonMultipleComponent> ent, ref AutoSurgeonDoAfterEvent args)
     {
         if (args.Cancelled
-        || ent.Comp.Used
-        || args.Target == null)
+            || ent.Comp.Used
+            || args.Target == null)
         {
             _audio.Stop(ent.Comp.ActiveSound);
             return;
@@ -303,12 +317,14 @@ public sealed class AutoSurgeonSystem : EntitySystem
             // Handle replacing the part
             if (entry.NewPartProto != null)
             {
-                var parent = _body.GetBodyChildrenOfType(args.Target.Value, entry.TargetBodyPart, symmetry: entry.TargetBodyPartSymmetry)
+                var parent = _body.GetBodyChildrenOfType(args.Target.Value,
+                        entry.TargetBodyPart,
+                        symmetry: entry.TargetBodyPartSymmetry)
                     .FirstOrDefault()
                     .Id;
 
                 if (!parent.Valid
-                || !TryComp<BodyPartComponent>(parent, out var parentComp))
+                    || !TryComp<BodyPartComponent>(parent, out var parentComp))
                 {
                     _audio.Stop(ent.Comp.ActiveSound);
                     return;
@@ -319,13 +335,15 @@ public sealed class AutoSurgeonSystem : EntitySystem
                 if (isBodyPart)
                 {
                     if (!TryComp<BodyPartComponent>(newPart, out var newPartComp)
-                    || !parentComp.Children.ContainsKey(_body.GetSlotFromBodyPart(newPartComp))) // why is there no method for this
+                        || !parentComp.Children.ContainsKey(
+                            _body.GetSlotFromBodyPart(newPartComp))) // why is there no method for this
                     {
                         Del(newPart);
                         continue;
                     }
 
-                    var oldPart = _body.GetBodyChildrenOfType(args.Target.Value, newPartComp.PartType, symmetry: newPartComp.Symmetry)
+                    var oldPart = _body
+                        .GetBodyChildrenOfType(args.Target.Value, newPartComp.PartType, symmetry: newPartComp.Symmetry)
                         .FirstOrDefault()
                         .Id;
 
@@ -337,7 +355,7 @@ public sealed class AutoSurgeonSystem : EntitySystem
                 else
                 {
                     if (!TryComp<OrganComponent>(newPart, out var newOrganComp)
-                    || !_body.CanInsertOrgan(parent, newOrganComp.SlotId))
+                        || !_body.CanInsertOrgan(parent, newOrganComp.SlotId))
                     {
                         Del(newPart);
                         continue;
@@ -359,7 +377,9 @@ public sealed class AutoSurgeonSystem : EntitySystem
 
             // If we didn't replace it, then we upgrade it.
             var part = isBodyPart
-                ? _body.GetBodyChildrenOfType(args.Target.Value, entry.TargetBodyPart, symmetry: entry.TargetBodyPartSymmetry)
+                ? _body.GetBodyChildrenOfType(args.Target.Value,
+                        entry.TargetBodyPart,
+                        symmetry: entry.TargetBodyPartSymmetry)
                     .FirstOrDefault()
                     .Id
                 : _body.GetBodyOrgans(args.Target)
@@ -372,10 +392,12 @@ public sealed class AutoSurgeonSystem : EntitySystem
                 return;
             }
 
-            var addedToPart = AddComponents(part, entry.ComponentsToPart); // if none were actually added the part is probably already upgraded
+            var addedToPart =
+                AddComponents(part,
+                    entry.ComponentsToPart); // if none were actually added the part is probably already upgraded
 
             if (addedToPart != null // null indicates there were no components to add in the first place, so it's fine
-            && !addedToPart.Any())
+                && !addedToPart.Any())
                 continue;
 
             if (entry.TargetOrgan == null)
@@ -391,9 +413,12 @@ public sealed class AutoSurgeonSystem : EntitySystem
     }
 
     private void OnExamined(Entity<AutoSurgeonMultipleComponent> ent, ref ExaminedEvent args) =>
-        args.PushMarkup(ent.Comp.Used ? Loc.GetString("gun-cartridge-spent") : Loc.GetString("gun-cartridge-unspent")); // Yes gun locale, and?
+        args.PushMarkup(ent.Comp.Used
+            ? Loc.GetString("gun-cartridge-spent")
+            : Loc.GetString("gun-cartridge-unspent")); // Yes gun locale, and?
 
-    private ComponentRegistry? AddComponents(EntityUid ent, ComponentRegistry? comps) // Returns actually added components
+    private ComponentRegistry?
+        AddComponents(EntityUid ent, ComponentRegistry? comps) // Returns actually added components
     {
         if (comps == null)
             return null;

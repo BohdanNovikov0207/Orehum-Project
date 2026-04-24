@@ -1,19 +1,17 @@
-using Robust.Client.Audio;
-using Robust.Client.Player;
-using Robust.Shared.Player;
-using Robust.Shared.Timing;
-using Robust.Shared.Configuration;
-using Content.Goobstation.Common.CCVar;
 using Content.Goobstation.Common.Traits;
 using Content.Shared.CCVar;
+using Robust.Client.Audio;
+using Robust.Client.Player;
+using Robust.Shared.Configuration;
+using Robust.Shared.Player;
 
 namespace Content.Goobstation.Client.Traits;
 
 public sealed class DeafnessSystem : EntitySystem
 {
-    [Dependency] private readonly IPlayerManager _player = default!;
     [Dependency] private readonly IAudioManager _audio = default!;
     [Dependency] private readonly IConfigurationManager _cfg = default!;
+    [Dependency] private readonly IPlayerManager _player = default!;
 
     private float _originalVolume;
 

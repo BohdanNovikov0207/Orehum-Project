@@ -41,21 +41,21 @@ namespace Content.Goobstation.Server.HisGrace;
 
 public sealed class HisGraceSystem : SharedHisGraceSystem
 {
-    [Dependency] private readonly DamageableSystem _damageable = null!;
-    [Dependency] private readonly PopupSystem _popup = null!;
-    [Dependency] private readonly IGameTiming _timing = null!;
-    [Dependency] private readonly MobStateSystem _state = null!;
+    [Dependency] private readonly ISharedAdminLogManager _adminLog = null!;
+    [Dependency] private readonly AudioSystem _audio = null!;
+    [Dependency] private readonly ChatSystem _chat = null!;
     [Dependency] private readonly SharedContainerSystem _containerSystem = null!;
+    [Dependency] private readonly DamageableSystem _damageable = null!;
     [Dependency] private readonly EntityLookupSystem _lookup = null!;
     [Dependency] private readonly SharedMeleeWeaponSystem _melee = null!;
-    [Dependency] private readonly TransformSystem _transform = null!;
-    [Dependency] private readonly AudioSystem _audio = null!;
     [Dependency] private readonly MindSystem _mind = null!;
-    [Dependency] private readonly StunSystem _stun = null!;
+    [Dependency] private readonly PopupSystem _popup = null!;
     [Dependency] private readonly MovementSpeedModifierSystem _speedModifier = null!;
-    [Dependency] private readonly ChatSystem _chat = null!;
+    [Dependency] private readonly MobStateSystem _state = null!;
+    [Dependency] private readonly StunSystem _stun = null!;
     [Dependency] private readonly MobThresholdSystem _threshold = null!;
-    [Dependency] private readonly ISharedAdminLogManager _adminLog = null!;
+    [Dependency] private readonly IGameTiming _timing = null!;
+    [Dependency] private readonly TransformSystem _transform = null!;
 
     public override void Initialize()
     {
@@ -124,16 +124,19 @@ public sealed class HisGraceSystem : SharedHisGraceSystem
     private void OnMeleeHit(Entity<HisGraceComponent> hisGrace, ref MeleeHitEvent args)
     {
         foreach (var hitEntity in args.HitEntities)
+        {
             TryDevour(hisGrace, hitEntity);
+        }
     }
 
-    private void OnModifierRefresh(Entity<HisGraceUserComponent> hisGrace, ref RefreshMovementSpeedModifiersEvent args) =>
+    private void OnModifierRefresh(Entity<HisGraceUserComponent> hisGrace,
+        ref RefreshMovementSpeedModifiersEvent args) =>
         args.ModifySpeed(hisGrace.Comp.SpeedMultiplier);
 
     private void UpdateSpeedMultiplier(HisGraceComponent hisGrace, float bonus)
     {
         if (hisGrace.User is not { } user
-        || !TryComp<HisGraceUserComponent>(user, out var userComp))
+            || !TryComp<HisGraceUserComponent>(user, out var userComp))
             return;
 
         userComp.SpeedMultiplier = userComp.BaseSpeedMultiplier + bonus;
@@ -152,7 +155,8 @@ public sealed class HisGraceSystem : SharedHisGraceSystem
         _popup.PopupEntity(popUp, args.User, args.User, PopupType.MediumCaution);
 
         // Log activation with actor and tool format
-        _adminLog.Add(LogType.AdminMessage, LogImpact.Extreme,
+        _adminLog.Add(LogType.AdminMessage,
+            LogImpact.Extreme,
             $"HIS GRACE ACTIVATED: {ToPrettyString(args.User):actor} activated {ToPrettyString(hisGrace):tool} at {Transform(hisGrace).Coordinates}");
 
         ChangeState(hisGrace, HisGraceState.Peckish);
@@ -166,7 +170,8 @@ public sealed class HisGraceSystem : SharedHisGraceSystem
         if (hisGrace.Comp.EntitiesAbsorbed >= hisGrace.Comp.AscensionThreshold)
         {
             var user = hisGrace.Comp.User ?? hisGrace.Owner;
-            _adminLog.Add(LogType.AdminMessage, LogImpact.Extreme,
+            _adminLog.Add(LogType.AdminMessage,
+                LogImpact.Extreme,
                 $"HIS GRACE ASCENSION: {ToPrettyString(user):actor} reached ascension with {ToPrettyString(hisGrace):tool}. " +
                 $"Total entities consumed: {hisGrace.Comp.EntitiesAbsorbed}");
 
@@ -220,7 +225,7 @@ public sealed class HisGraceSystem : SharedHisGraceSystem
         // else, decrease
         // we dont count for ascended since too many popups will clutter it.
         var (messageKey, popupType) = args.NewState > args.OldState
-            && args.NewState != HisGraceState.Ascended
+                                      && args.NewState != HisGraceState.Ascended
             ? ("hisgrace-hunger-increased", PopupType.MediumCaution)
             : ("hisgrace-hunger-decreased", PopupType.Medium);
 
@@ -246,6 +251,7 @@ public sealed class HisGraceSystem : SharedHisGraceSystem
                 break;
         }
     }
+
     private void HandleDormantState(Entity<HisGraceComponent> hisGrace)
     {
         SetUnremovable(hisGrace, false);
@@ -269,7 +275,8 @@ public sealed class HisGraceSystem : SharedHisGraceSystem
             ignoreResistances: true);
 
         // Log the death state activation
-        _adminLog.Add(LogType.AdminMessage, LogImpact.High,
+        _adminLog.Add(LogType.AdminMessage,
+            LogImpact.High,
             $"HIS GRACE DEATH: {ToPrettyString(user):actor} was killed by {ToPrettyString(hisGrace):tool} due to hunger");
 
         var popup = Loc.GetString("hisgrace-death", ("target", Name(user)));
@@ -289,11 +296,14 @@ public sealed class HisGraceSystem : SharedHisGraceSystem
         var query = EntityQueryEnumerator<HisGraceComponent, MeleeWeaponComponent, TransformComponent>();
 
         while (query.MoveNext(out var uid, out var hisGrace, out var melee, out var xform))
+        {
             UpdateHisGrace((uid, hisGrace), melee, xform);
-
+        }
     }
 
-    private void UpdateHisGrace(Entity<HisGraceComponent> hisGrace, MeleeWeaponComponent melee, TransformComponent xform)
+    private void UpdateHisGrace(Entity<HisGraceComponent> hisGrace,
+        MeleeWeaponComponent melee,
+        TransformComponent xform)
     {
         if (hisGrace.Comp.CurrentState is HisGraceState.Dormant or HisGraceState.Death or HisGraceState.Ascended)
             return;
@@ -327,9 +337,7 @@ public sealed class HisGraceSystem : SharedHisGraceSystem
             && TryComp<DamageableComponent>(user, out var damageable)
             && _threshold.CheckVitalDamage(user, damageable) < deadThreshold
             && hisGrace.Comp.IsHeld)
-        {
             _state.ChangeMobState(user, MobState.Critical);
-        }
 
         hisGrace.Comp.NextTick = _timing.CurTime + hisGrace.Comp.TickDelay;
     }
@@ -342,10 +350,15 @@ public sealed class HisGraceSystem : SharedHisGraceSystem
         var popUp = Loc.GetString("hisgrace-too-far");
         _popup.PopupEntity(popUp, user, user, PopupType.LargeCaution);
 
-        _damageable.TryChangeDamage(user, hisGrace.Comp.BaseDamage, targetPart: TargetBodyPart.Chest, ignoreResistances: true);
+        _damageable.TryChangeDamage(user,
+            hisGrace.Comp.BaseDamage,
+            targetPart: TargetBodyPart.Chest,
+            ignoreResistances: true);
     }
 
-    private void HandleGroundAttacks(Entity<HisGraceComponent> hisGrace, MeleeWeaponComponent melee, TransformComponent xform)
+    private void HandleGroundAttacks(Entity<HisGraceComponent> hisGrace,
+        MeleeWeaponComponent melee,
+        TransformComponent xform)
     {
         if (hisGrace.Comp.IsHeld
             && hisGrace.Comp.Holder == hisGrace.Comp.User)
@@ -355,11 +368,12 @@ public sealed class HisGraceSystem : SharedHisGraceSystem
 
         // dont attack if the entity is the user, and dont if the entity is in a container (e.g, already devoured)
         foreach (var entity in nearbyEnts.Where(entity => HasComp<MobStateComponent>(entity)
-            && entity != hisGrace.Comp.User
-            && !_containerSystem.IsEntityOrParentInContainer(entity)))
+                                                          && entity != hisGrace.Comp.User
+                                                          && !_containerSystem.IsEntityOrParentInContainer(entity)))
         {
             // Log ground attack
-            _adminLog.Add(LogType.AdminMessage, LogImpact.Medium,
+            _adminLog.Add(LogType.AdminMessage,
+                LogImpact.Medium,
                 $"HIS GRACE GROUND ATTACK: {ToPrettyString(hisGrace):tool} attacked {ToPrettyString(entity):target} at {Transform(hisGrace).Coordinates}");
 
             // get co-ordinates for animation
@@ -371,7 +385,9 @@ public sealed class HisGraceSystem : SharedHisGraceSystem
             _melee.DoLunge(hisGrace, hisGrace, angle, coordinates.Position, null, angle, false, false);
 
             _audio.PlayPvs(melee.HitSound, hisGrace);
-            _popup.PopupEntity(Loc.GetString("hisgrace-attack-popup", ("target", Name(entity))), hisGrace, PopupType.LargeCaution);
+            _popup.PopupEntity(Loc.GetString("hisgrace-attack-popup", ("target", Name(entity))),
+                hisGrace,
+                PopupType.LargeCaution);
 
             TryDevour(hisGrace, entity);
 
@@ -419,7 +435,8 @@ public sealed class HisGraceSystem : SharedHisGraceSystem
         _popup.PopupEntity(ascensionPopup, user, user, PopupType.Large);
 
         // Log ascension with all relevant details
-        _adminLog.Add(LogType.AdminMessage, LogImpact.Extreme,
+        _adminLog.Add(LogType.AdminMessage,
+            LogImpact.Extreme,
             $"HIS GRACE ASCENSION ACHIEVED: {ToPrettyString(user):actor} achieved ascension with {ToPrettyString(hisGrace):tool} at {Transform(hisGrace).Coordinates}. " +
             $"Total entities consumed: {hisGrace.Comp.EntitiesAbsorbed}");
 
@@ -428,10 +445,16 @@ public sealed class HisGraceSystem : SharedHisGraceSystem
         EnsureComp<PressureImmunityComponent>(user);
         EnsureComp<BreathingImmunityComponent>(user);
 
-        UpdateSpeedMultiplier(hisGrace, hisGrace.Comp.SpeedAddition * hisGrace.Comp.SpeedIncrementMultiplier * hisGrace.Comp.SpeedIncrementMultiplier);
+        UpdateSpeedMultiplier(hisGrace,
+            hisGrace.Comp.SpeedAddition * hisGrace.Comp.SpeedIncrementMultiplier *
+            hisGrace.Comp.SpeedIncrementMultiplier);
 
         // le funny ascension
-        _chat.DispatchGlobalAnnouncement(Loc.GetString("hisgrace-ascension-announcement"), Name(user), true, hisGrace.Comp.AscendSound, Color.PaleGoldenrod);
+        _chat.DispatchGlobalAnnouncement(Loc.GetString("hisgrace-ascension-announcement"),
+            Name(user),
+            true,
+            hisGrace.Comp.AscendSound,
+            Color.PaleGoldenrod);
     }
 
     private void ChangeState(Entity<HisGraceComponent> hisGrace, HisGraceState newState)
@@ -443,24 +466,28 @@ public sealed class HisGraceSystem : SharedHisGraceSystem
         var ev = new HisGraceStateChangedEvent(newState, oldState);
         RaiseLocalEvent(hisGrace, ref ev);
     }
+
     private bool TryDevour(Entity<HisGraceComponent> hisGrace, EntityUid target)
     {
         if (!_state.IsIncapacitated(target))
         {
-            _adminLog.Add(LogType.AdminMessage, LogImpact.Medium,
+            _adminLog.Add(LogType.AdminMessage,
+                LogImpact.Medium,
                 $"HIS GRACE DEVOUR FAILED: {ToPrettyString(hisGrace.Comp.User ?? hisGrace.Owner):actor} failed to devour {ToPrettyString(target):target} with {ToPrettyString(hisGrace):tool} - Target not incapacitated");
             return false;
         }
 
         if (!_containerSystem.Insert(target, hisGrace.Comp.Stomach))
         {
-            _adminLog.Add(LogType.AdminMessage, LogImpact.Medium,
+            _adminLog.Add(LogType.AdminMessage,
+                LogImpact.Medium,
                 $"HIS GRACE DEVOUR FAILED: {ToPrettyString(hisGrace.Comp.User ?? hisGrace.Owner):actor} failed to devour {ToPrettyString(target):target} with {ToPrettyString(hisGrace):tool} - Container insertion failed");
             return false;
         }
 
         // Log successful devour attempt
-        _adminLog.Add(LogType.AdminMessage, LogImpact.High,
+        _adminLog.Add(LogType.AdminMessage,
+            LogImpact.High,
             $"HIS GRACE DEVOUR: {ToPrettyString(hisGrace.Comp.User ?? hisGrace.Owner):actor} devoured {ToPrettyString(target):target} with {ToPrettyString(hisGrace):tool}");
 
         // Hunger gained from eating an entity is 20% of their crit state.
@@ -479,7 +506,8 @@ public sealed class HisGraceSystem : SharedHisGraceSystem
         }
         else
         {
-            _adminLog.Add(LogType.AdminMessage, LogImpact.Low,
+            _adminLog.Add(LogType.AdminMessage,
+                LogImpact.Low,
                 $"HIS GRACE NON-HUMANOID: {ToPrettyString(hisGrace.Comp.User ?? hisGrace.Owner):actor} consumed non-humanoid {ToPrettyString(target):target} with {ToPrettyString(hisGrace):tool}");
         }
 
@@ -493,7 +521,8 @@ public sealed class HisGraceSystem : SharedHisGraceSystem
 
         // hunger value is equal to the mutiplier times the crit threshold.
         // this is 100 for humans, so the hunger returned is 20.
-        return (FixedPoint2)(comp.HungerOnDevourMultiplier * criticalThreshold); // solstice try not to cast challenge (impossible)
+        return (FixedPoint2) (comp.HungerOnDevourMultiplier *
+                              criticalThreshold); // solstice try not to cast challenge (impossible)
     }
 
     private void SetUnremovable(Entity<HisGraceComponent> hisGrace, bool enabled)
@@ -515,9 +544,10 @@ public sealed class HisGraceSystem : SharedHisGraceSystem
         var released = _containerSystem.EmptyContainer(hisGrace.Stomach, true);
 
         foreach (var ent in released)
+        {
             _stun.TryUpdateParalyzeDuration(ent, TimeSpan.FromSeconds(8));
+        }
     }
 
     #endregion
-
 }

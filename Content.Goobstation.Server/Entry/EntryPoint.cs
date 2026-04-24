@@ -1,8 +1,7 @@
-
-using Content.Goobstation.Server.IoC;
-using Content.Goobstation.Server.Voice;
 using Content.Goobstation.Common.JoinQueue;
 using Content.Goobstation.Common.ServerCurrency;
+using Content.Goobstation.Server.IoC;
+using Content.Goobstation.Server.Voice;
 using Robust.Shared.ContentPack;
 using Robust.Shared.Timing;
 
@@ -10,9 +9,9 @@ namespace Content.Goobstation.Server.Entry;
 
 public sealed class EntryPoint : GameServer
 {
-    private IVoiceChatServerManager _voiceManager = default!;
     private ICommonCurrencyManager _curr = default!;
     private IJoinQueueManager _joinQueue = default!;
+    private IVoiceChatServerManager _voiceManager = default!;
 
     public override void Init()
     {

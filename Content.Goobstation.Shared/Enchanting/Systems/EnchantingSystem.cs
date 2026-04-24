@@ -3,6 +3,7 @@
 //
 // SPDX-License-Identifier: AGPL-3.0-or-later
 
+using System.Linq;
 using Content.Goobstation.Shared.Enchanting.Components;
 using Content.Shared.Examine;
 using Content.Shared.Item;
@@ -10,28 +11,27 @@ using Content.Shared.Stacks;
 using Content.Shared.Whitelist;
 using Robust.Shared.Containers;
 using Robust.Shared.Prototypes;
-using System.Linq;
 
 namespace Content.Goobstation.Shared.Enchanting.Systems;
 
 /// <summary>
-/// Provides API for enchanting with <see cref="EnchantComponent"/> and <see cref="EnchantedComponent"/>.
+/// Provides API for enchanting with <see cref="EnchantComponent" /> and <see cref="EnchantedComponent" />.
 /// </summary>
 public sealed class EnchantingSystem : EntitySystem
 {
-    [Dependency] private readonly EntityLookupSystem _lookup = default!;
-    [Dependency] private readonly EntityWhitelistSystem _whitelist = default!;
-    [Dependency] private readonly IPrototypeManager _proto = default!;
     [Dependency] private readonly SharedContainerSystem _container = default!;
-
-    private EntityQuery<EnchantComponent> _query;
+    private readonly HashSet<Entity<EnchantedComponent>> _enchantedItems = new();
+    private readonly HashSet<Entity<EnchanterComponent>> _enchanters = new();
+    private readonly Dictionary<EntProtoId<EnchantComponent>, EnchantComponent> _enchants = new();
+    [Dependency] private readonly EntityLookupSystem _lookup = default!;
+    [Dependency] private readonly IPrototypeManager _proto = default!;
+    private readonly HashSet<Entity<EnchantingTableComponent>> _tables = new();
+    [Dependency] private readonly EntityWhitelistSystem _whitelist = default!;
     private EntityQuery<EnchantedComponent> _enchantedQuery;
     private EntityQuery<ItemComponent> _itemQuery;
+
+    private EntityQuery<EnchantComponent> _query;
     private EntityQuery<StackComponent> _stackQuery;
-    private Dictionary<EntProtoId<EnchantComponent>, EnchantComponent> _enchants = new();
-    private HashSet<Entity<EnchantingTableComponent>> _tables = new();
-    private HashSet<Entity<EnchanterComponent>> _enchanters = new();
-    private HashSet<Entity<EnchantedComponent>> _enchantedItems = new();
 
     public override void Initialize()
     {
@@ -50,10 +50,8 @@ public sealed class EnchantingSystem : EntitySystem
         CacheEnchants();
     }
 
-    private void OnInit(Entity<EnchantedComponent> ent, ref ComponentInit args)
-    {
+    private void OnInit(Entity<EnchantedComponent> ent, ref ComponentInit args) =>
         ent.Comp.Container = _container.EnsureContainer<Container>(ent, ent.Comp.ContainerId);
-    }
 
     private void OnExamined(Entity<EnchantedComponent> ent, ref ExaminedEvent args)
     {
@@ -88,10 +86,21 @@ public sealed class EnchantingSystem : EntitySystem
         }
     }
 
+    private void AddEnchant(EntityUid uid, EntityUid item, int level)
+    {
+        var comp = _query.Comp(uid);
+        comp.Enchanted = item;
+        comp.Level = Math.Min(level, comp.MaxLevel);
+        Dirty(uid, comp);
+
+        var ev = new EnchantAddedEvent(comp, item);
+        RaiseLocalEvent(uid, ref ev);
+    }
+
     #region Public API
 
     /// <summary>
-    /// Get the prototype's <see cref="EnchantComponent"/> for an enchant id.
+    /// Get the prototype's <see cref="EnchantComponent" /> for an enchant id.
     /// </summary>
     public EnchantComponent? GetEnchantData(EntProtoId<EnchantComponent> id)
     {
@@ -115,14 +124,14 @@ public sealed class EnchantingSystem : EntitySystem
             return false;
 
         // invalid enchant id passed
-        if (GetEnchantData(id) is not {} data)
+        if (GetEnchantData(id) is not { } data)
         {
             Log.Error($"Tried to enchant {ToPrettyString(item)} with invalid enchant {id}");
             return false;
         }
 
         // item needs to be whitelisted
-        if (!_whitelist.CheckBoth(item, blacklist: data.Blacklist, whitelist: data.Whitelist))
+        if (!_whitelist.CheckBoth(item, data.Blacklist, data.Whitelist))
             return false;
 
         // if the item isn't enchanted it's good to go
@@ -138,7 +147,7 @@ public sealed class EnchantingSystem : EntitySystem
         }
 
         // enchant is at max level
-        if (FindEnchant(comp, id) is {} enchant)
+        if (FindEnchant(comp, id) is { } enchant)
             return !enchant.Comp.IsMaxed;
 
         // item can't be enchanted further
@@ -152,7 +161,7 @@ public sealed class EnchantingSystem : EntitySystem
     public Entity<EnchantComponent>? FindEnchant(EnchantedComponent comp, EntProtoId<EnchantComponent> id)
     {
         // bad prototype
-        if (_proto.Index(id).Name is not {} name)
+        if (_proto.Index(id).Name is not { } name)
         {
             Log.Error($"Enchant prototype {id} has no name set!");
             return null;
@@ -206,7 +215,7 @@ public sealed class EnchantingSystem : EntitySystem
 
         // first check if there is already an existing enchant to upgrade
         var added = !EnsureComp<EnchantedComponent>(item, out var comp);
-        if (FindEnchant(comp, id) is {} enchant)
+        if (FindEnchant(comp, id) is { } enchant)
         {
             var oldLevel = enchant.Comp.Level;
             enchant.Comp.Level = Math.Min(enchant.Comp.Level + level, enchant.Comp.MaxLevel);
@@ -238,7 +247,7 @@ public sealed class EnchantingSystem : EntitySystem
     {
         var coords = Transform(item).Coordinates;
         _tables.Clear();
-        _lookup.GetEntitiesInRange<EnchantingTableComponent>(coords, range: 0.5f, _tables);
+        _lookup.GetEntitiesInRange<EnchantingTableComponent>(coords, 0.5f, _tables);
         return _tables.Count > 0 ? _tables.First() : null;
     }
 
@@ -250,7 +259,7 @@ public sealed class EnchantingSystem : EntitySystem
     {
         var coords = Transform(item).Coordinates;
         _enchanters.Clear();
-        _lookup.GetEntitiesInRange<EnchanterComponent>(coords, range: 0.5f, _enchanters);
+        _lookup.GetEntitiesInRange<EnchanterComponent>(coords, 0.5f, _enchanters);
         foreach (var ent in _enchanters)
         {
             if (ent.Owner != item)
@@ -268,28 +277,14 @@ public sealed class EnchantingSystem : EntitySystem
     {
         var coords = Transform(table).Coordinates;
         _enchantedItems.Clear();
-        _lookup.GetEntitiesInRange<EnchantedComponent>(coords, range: 0.5f, _enchantedItems);
+        _lookup.GetEntitiesInRange<EnchantedComponent>(coords, 0.5f, _enchantedItems);
         return _enchantedItems;
     }
 
     /// <summary>
     /// Get the entity assigned to an enchant, or null if it has none/is invalid.
     /// </summary>
-    public EntityUid? GetEnchantedItem(EntityUid enchant)
-    {
-        return _query.CompOrNull(enchant)?.Enchanted;
-    }
+    public EntityUid? GetEnchantedItem(EntityUid enchant) => _query.CompOrNull(enchant)?.Enchanted;
 
     #endregion
-
-    private void AddEnchant(EntityUid uid, EntityUid item, int level)
-    {
-        var comp = _query.Comp(uid);
-        comp.Enchanted = item;
-        comp.Level = Math.Min(level, comp.MaxLevel);
-        Dirty(uid, comp);
-
-        var ev = new EnchantAddedEvent(comp, item);
-        RaiseLocalEvent(uid, ref ev);
-    }
 }

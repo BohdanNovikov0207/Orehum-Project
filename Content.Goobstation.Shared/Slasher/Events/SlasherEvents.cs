@@ -3,10 +3,10 @@ using Content.Shared.DoAfter;
 using Robust.Shared.Serialization;
 
 namespace Content.Goobstation.Shared.Slasher.Events;
+
 /// <summary>
 /// A collection of various Slasher Related Events
 /// </summary>
-
 [ByRefEvent]
 public sealed partial class SlasherRegenerateEvent : InstantActionEvent;
 
@@ -43,5 +43,5 @@ public sealed partial class SlasherRelentlessGrabEvent : InstantActionEvent;
 /// <summary>
 /// DoAfter event raised when Soul Steal completes.
 /// </summary>
-[Serializable, NetSerializable]
+[Serializable] [NetSerializable]
 public sealed partial class SlasherSoulStealDoAfterEvent : SimpleDoAfterEvent;

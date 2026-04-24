@@ -6,10 +6,8 @@
 // SPDX-License-Identifier: AGPL-3.0-or-later
 
 using System.Linq;
-using Content.Goobstation.Maths.FixedPoint;
 using Content.Goobstation.Shared.CloneProjector;
 using Content.Goobstation.Shared.CloneProjector.Clone;
-using Content.Server.Emp;
 using Content.Server.Ghost.Roles.Components;
 using Content.Shared._DV.Carrying;
 using Content.Shared._EinsteinEngines.Silicon.IPC;
@@ -19,7 +17,6 @@ using Content.Shared.Containers.ItemSlots;
 using Content.Shared.Damage;
 using Content.Shared.Examine;
 using Content.Shared.Hands.EntitySystems;
-using Content.Shared.Holopad;
 using Content.Shared.Humanoid;
 using Content.Shared.IdentityManagement;
 using Content.Shared.Interaction.Components;
@@ -27,18 +24,15 @@ using Content.Shared.Inventory;
 using Content.Shared.Inventory.Events;
 using Content.Shared.Mind;
 using Content.Shared.Mobs;
-using Content.Shared.Mobs.Components;
 using Content.Shared.Mobs.Systems;
 using Content.Shared.Popups;
 using Content.Shared.Radio.Components;
 using Content.Shared.Storage;
-using Content.Shared.Strip.Components;
 using Content.Shared.Stunnable;
 using Content.Shared.Throwing;
 using Content.Shared.Verbs;
 using Content.Shared.Whitelist;
 using Robust.Shared.Containers;
-using Robust.Shared.Network;
 using Robust.Shared.Physics.Systems;
 using Robust.Shared.Prototypes;
 using Robust.Shared.Timing;
@@ -48,28 +42,29 @@ namespace Content.Goobstation.Server.CloneProjector;
 
 public sealed partial class CloneProjectorSystem : SharedCloneProjectorSystem
 {
-    [Dependency] private readonly IPrototypeManager _protoManager = default!;
-    [Dependency] private readonly SharedHumanoidAppearanceSystem _humanoidAppearance = default!;
-    [Dependency] private readonly DamageableSystem _damageable = default!;
-    [Dependency] private readonly InventorySystem _inventory = default!;
-    [Dependency] private readonly SharedContainerSystem _container = default!;
-    [Dependency] private readonly MobStateSystem _mobState = default!;
-    [Dependency] private readonly MetaDataSystem _meta = default!;
-    [Dependency] private readonly SharedJointSystem _joints = default!;
-    [Dependency] private readonly SharedPopupSystem _popup = default!;
-    [Dependency] private readonly EntityWhitelistSystem _whitelist = default!;
     [Dependency] private readonly SharedActionsSystem _actions = default!;
-    [Dependency] private readonly SharedPhysicsSystem _physics = default!;
-    [Dependency] private readonly SharedMindSystem _mind = default!;
-    [Dependency] private readonly SharedStunSystem _stun = default!;
-    [Dependency] private readonly IGameTiming _timing = default!;
-    [Dependency] private readonly SharedHandsSystem _handsSystem = default!;
     [Dependency] private readonly CarryingSystem _carrying = default!;
-    [Dependency] private readonly ItemSlotsSystem _itemSlots = default!;
-    [Dependency] private readonly MobThresholdSystem _thresholds = default!;
+    [Dependency] private readonly SharedContainerSystem _container = default!;
+    [Dependency] private readonly DamageableSystem _damageable = default!;
     [Dependency] private readonly InternalEncryptionKeySpawner _encryptionKeySpawner = default!;
+    [Dependency] private readonly SharedHandsSystem _handsSystem = default!;
+    [Dependency] private readonly SharedHumanoidAppearanceSystem _humanoidAppearance = default!;
+    [Dependency] private readonly InventorySystem _inventory = default!;
+    [Dependency] private readonly ItemSlotsSystem _itemSlots = default!;
+    [Dependency] private readonly SharedJointSystem _joints = default!;
+    [Dependency] private readonly MetaDataSystem _meta = default!;
+    [Dependency] private readonly SharedMindSystem _mind = default!;
+    [Dependency] private readonly MobStateSystem _mobState = default!;
+    [Dependency] private readonly SharedPhysicsSystem _physics = default!;
+    [Dependency] private readonly SharedPopupSystem _popup = default!;
+    [Dependency] private readonly IPrototypeManager _protoManager = default!;
+    [Dependency] private readonly SharedStunSystem _stun = default!;
+    [Dependency] private readonly MobThresholdSystem _thresholds = default!;
+    [Dependency] private readonly IGameTiming _timing = default!;
+    [Dependency] private readonly EntityWhitelistSystem _whitelist = default!;
 
     private ISawmill _sawmill = default!;
+
     public override void Initialize()
     {
         base.Initialize();
@@ -107,7 +102,8 @@ public sealed partial class CloneProjectorSystem : SharedCloneProjectorSystem
             return;
 
         var remainingHealth = deathThreshold - damageable.TotalDamage;
-        var health = Loc.GetString("clone-projector-examined-health", ("cloneHealth", remainingHealth / deathThreshold * 100 ));
+        var health = Loc.GetString("clone-projector-examined-health",
+            ("cloneHealth", remainingHealth / deathThreshold * 100));
         args.PushMarkup(health);
     }
 
@@ -129,8 +125,8 @@ public sealed partial class CloneProjectorSystem : SharedCloneProjectorSystem
             },
             Text = Loc.GetString("gemini-projector-regenerate-verb"),
             Message = Loc.GetString("gemini-projector-regenerate-verb-text"),
-            Icon = new SpriteSpecifier.Rsi(new("Mobs/Silicon/station_ai.rsi"), "default"),
-            Priority = 2
+            Icon = new SpriteSpecifier.Rsi(new ResPath("Mobs/Silicon/station_ai.rsi"), "default"),
+            Priority = 2,
         };
 
         AlternativeVerb rebootVerb = new()
@@ -142,8 +138,8 @@ public sealed partial class CloneProjectorSystem : SharedCloneProjectorSystem
             },
             Text = Loc.GetString("gemini-projector-reboot-verb"),
             Message = Loc.GetString("gemini-projector-reboot-verb-text"),
-            Icon = new SpriteSpecifier.Rsi(new("_Goobstation/Actions/modsuit.rsi"), "activate"),
-            Priority = 2
+            Icon = new SpriteSpecifier.Rsi(new ResPath("_Goobstation/Actions/modsuit.rsi"), "activate"),
+            Priority = 2,
         };
 
         args.Verbs.Add(regenerateVerb);
@@ -177,7 +173,7 @@ public sealed partial class CloneProjectorSystem : SharedCloneProjectorSystem
         _popup.PopupEntity(popup, args.Equipee, args.Equipee);
 
         if (projector.Comp.DoStun)
-           _stun.TryUpdateParalyzeDuration(args.Equipee, projector.Comp.StunDuration);
+            _stun.TryUpdateParalyzeDuration(args.Equipee, projector.Comp.StunDuration);
 
         RemComp<WearingCloneProjectorComponent>(args.Equipee);
     }
@@ -191,7 +187,8 @@ public sealed partial class CloneProjectorSystem : SharedCloneProjectorSystem
 
         // Does the clone match the current user?
         var cloneMatches = projector.Comp.CurrentHost == args.Performer;
-        var cloneGeneratedPopup = Loc.GetString(projector.Comp.CloneGeneratedMessage, ("user", Identity.Name(args.Performer, EntityManager)));
+        var cloneGeneratedPopup = Loc.GetString(projector.Comp.CloneGeneratedMessage,
+            ("user", Identity.Name(args.Performer, EntityManager)));
 
         if (cloneMatches)
         {
@@ -229,9 +226,12 @@ public sealed partial class CloneProjectorSystem : SharedCloneProjectorSystem
 
         CleanClone(clone, true);
         TryInsertClone(projector);
-
     }
-    private bool TryGenerateClone(Entity<CloneProjectorComponent> projector, EntityUid performer, bool force = false, bool removeMind = false)
+
+    private bool TryGenerateClone(Entity<CloneProjectorComponent> projector,
+        EntityUid performer,
+        bool force = false,
+        bool removeMind = false)
     {
         if (!TryComp<HumanoidAppearanceComponent>(performer, out var appearance))
         {
@@ -283,7 +283,8 @@ public sealed partial class CloneProjectorSystem : SharedCloneProjectorSystem
 
         _damageable.SetDamageModifierSetId(clone, projector.Comp.CloneDamageModifierSet);
 
-        _meta.SetEntityName(clone, Identity.Name(performer, EntityManager) + " " + Loc.GetString(projector.Comp.NameSuffix));
+        _meta.SetEntityName(clone,
+            Identity.Name(performer, EntityManager) + " " + Loc.GetString(projector.Comp.NameSuffix));
         projector.Comp.CloneUid = clone;
 
         if (!TryEquipItems(projector))
@@ -369,7 +370,7 @@ public sealed partial class CloneProjectorSystem : SharedCloneProjectorSystem
                      .Where(item => _inventory.SpawnItemInSlot(clone, item.Value, item.Key, true, true)))
         {
             if (_inventory.TryGetSlotEntity(clone, item.Value, out var spawnedItemNullable)
-                && spawnedItemNullable is { } spawnedItem )
+                && spawnedItemNullable is { } spawnedItem)
             {
                 EnsureComp<UnremoveableComponent>(spawnedItem);
                 if (!TryComp<ItemSlotsComponent>(spawnedItem, out var itemSlots))
@@ -382,7 +383,6 @@ public sealed partial class CloneProjectorSystem : SharedCloneProjectorSystem
                         _itemSlots.SetLock(spawnedItem, slot, true);
                 }
             }
-
         }
 
         // Spawn keys
@@ -411,7 +411,9 @@ public sealed partial class CloneProjectorSystem : SharedCloneProjectorSystem
 
         // Drop held items.
         foreach (var heldItem in _handsSystem.EnumerateHeld(clone))
+        {
             _handsSystem.TryDrop(clone, heldItem);
+        }
 
         // Drop held entities.
         if (TryComp<CarryingComponent>(clone, out var carrying))
@@ -428,7 +430,9 @@ public sealed partial class CloneProjectorSystem : SharedCloneProjectorSystem
                 && TryComp<StorageComponent>(item, out var storageComponent))
             {
                 foreach (var storedItem in _container.EmptyContainer(storageComponent.Container))
+                {
                     _physics.ApplyAngularImpulse(storedItem, ThrowingSystem.ThrowAngularImpulse);
+                }
             }
 
             if (_inventory.TryUnequip(clone, slot.ID, true))
@@ -444,7 +448,6 @@ public sealed partial class CloneProjectorSystem : SharedCloneProjectorSystem
             _container.TryRemoveFromContainer(pocketItem);
             _physics.ApplyAngularImpulse(pocketItem, ThrowingSystem.ThrowAngularImpulse);
         }
-
     }
 
     private void DoCooldown(Entity<CloneProjectorComponent> projector)
@@ -459,8 +462,6 @@ public sealed partial class CloneProjectorSystem : SharedCloneProjectorSystem
         Dirty(actionEntity, actionComp);
     }
 
-    private bool CanUseProjector(Entity<CloneProjectorComponent> projector, EntityUid user)
-    {
-        return _whitelist.IsBlacklistFail(projector.Comp.UserBlacklist, user);
-    }
+    private bool CanUseProjector(Entity<CloneProjectorComponent> projector, EntityUid user) =>
+        _whitelist.IsBlacklistFail(projector.Comp.UserBlacklist, user);
 }

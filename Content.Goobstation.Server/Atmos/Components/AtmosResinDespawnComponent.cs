@@ -10,7 +10,7 @@ namespace Content.Goobstation.Server.Atmos.Components;
 /// <summary>
 /// Assmos - Extinguisher Nozzle
 /// </summary>
-[RegisterComponent, Access(typeof(AtmosResinDespawnSystem))]
+[RegisterComponent] [Access(typeof(AtmosResinDespawnSystem))]
 public sealed partial class AtmosResinDespawnComponent : Component
 {
 }

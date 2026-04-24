@@ -17,12 +17,16 @@ using Content.Shared.StatusIcon.Components;
 using Robust.Client.Graphics;
 using Robust.Shared.Player;
 using Robust.Shared.Prototypes;
+
 //using Content.Shared.Flesh;
 
 namespace Content.Goobstation.Client.Blob;
 
 public sealed class BlobObserverSystem : SharedBlobObserverSystem
 {
+    [ValidatePrototypeId<FactionIconPrototype>]
+    private const string BlobFaction = "BlobFaction";
+
     [Dependency] private readonly ILightManager _lightManager = default!;
     [Dependency] private readonly IPrototypeManager _prototype = default!;
 
@@ -41,26 +45,14 @@ public sealed class BlobObserverSystem : SharedBlobObserverSystem
         SubscribeNetworkEvent<RoundRestartCleanupEvent>(RoundRestartCleanup);
     }
 
-    [ValidatePrototypeId<FactionIconPrototype>]
-    private const string BlobFaction = "BlobFaction";
-
-    private void OnShowBlobIcon<T>(Entity<T> ent, ref GetStatusIconsEvent args) where T : Component
-    {
+    private void OnShowBlobIcon<T>(Entity<T> ent, ref GetStatusIconsEvent args) where T : Component =>
         args.StatusIcons.Add(_prototype.Index<FactionIconPrototype>(BlobFaction));
-    }
 
-    private void OnPlayerAttached(EntityUid uid, BlobObserverComponent component, LocalPlayerAttachedEvent args)
-    {
+    private void OnPlayerAttached(EntityUid uid, BlobObserverComponent component, LocalPlayerAttachedEvent args) =>
         _lightManager.DrawLighting = false;
-    }
 
-    private void OnPlayerDetached(EntityUid uid, BlobObserverComponent component, LocalPlayerDetachedEvent args)
-    {
+    private void OnPlayerDetached(EntityUid uid, BlobObserverComponent component, LocalPlayerDetachedEvent args) =>
         _lightManager.DrawLighting = true;
-    }
 
-    private void RoundRestartCleanup(RoundRestartCleanupEvent ev)
-    {
-        _lightManager.DrawLighting = true;
-    }
+    private void RoundRestartCleanup(RoundRestartCleanupEvent ev) => _lightManager.DrawLighting = true;
 }

@@ -6,21 +6,21 @@ namespace Content.Goobstation.Shared.Shadowling.Components.Abilities.PreAscensio
 /// <summary>
 /// This is used for the Basic Enthrall Ability
 /// </summary>
-[RegisterComponent, NetworkedComponent]
+[RegisterComponent] [NetworkedComponent]
 public sealed partial class ShadowlingEnthrallComponent : Component
 {
-    /// <summary>
-    /// Indicates how long the enthrallment process takes.
-    /// </summary>
     [DataField]
-    public TimeSpan EnthrallTime = TimeSpan.FromSeconds(4);
-
-    [DataField]
-    public EntProtoId EnthrallComponents = "ThrallAbilities";
+    public EntityUid? ActionEnt;
 
     [DataField]
     public EntProtoId ActionId = "ActionEnthrall";
 
     [DataField]
-    public EntityUid? ActionEnt;
+    public EntProtoId EnthrallComponents = "ThrallAbilities";
+
+    /// <summary>
+    /// Indicates how long the enthrallment process takes.
+    /// </summary>
+    [DataField]
+    public TimeSpan EnthrallTime = TimeSpan.FromSeconds(4);
 }

@@ -14,18 +14,17 @@ using Robust.Shared.GameStates;
 
 namespace Content.Goobstation.Shared.Changeling.Components;
 
-[RegisterComponent, NetworkedComponent]
-
+[RegisterComponent] [NetworkedComponent]
 public sealed partial class ChangelingEggComponent : Component
 {
+    public bool active = false;
     public ChangelingIdentityComponent lingComp;
     public EntityUid lingMind;
     public StoreComponent lingStore;
+    public float UpdateCooldown = 120f;
 
     /// <summary>
-    ///     Countdown before spawning monkey.
+    /// Countdown before spawning monkey.
     /// </summary>
     public TimeSpan UpdateTimer = TimeSpan.Zero;
-    public float UpdateCooldown = 120f;
-    public bool active = false;
 }

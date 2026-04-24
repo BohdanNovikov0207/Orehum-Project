@@ -2,7 +2,7 @@ using Robust.Shared.GameStates;
 
 namespace Content.Goobstation.Shared.StationRadio.Components;
 
-[RegisterComponent, NetworkedComponent, AutoGenerateComponentState]
+[RegisterComponent] [NetworkedComponent] [AutoGenerateComponentState]
 public sealed partial class VinylPlayerComponent : Component
 {
     /// <summary>
@@ -14,6 +14,6 @@ public sealed partial class VinylPlayerComponent : Component
     /// <summary>
     /// The sound entity being played
     /// </summary>
-    [DataField, AutoNetworkedField]
+    [DataField] [AutoNetworkedField]
     public EntityUid? SoundEntity;
 }

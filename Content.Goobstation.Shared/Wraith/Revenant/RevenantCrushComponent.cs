@@ -4,34 +4,33 @@ using Robust.Shared.GameStates;
 
 namespace Content.Goobstation.Shared.Wraith.Revenant;
 
-
-[RegisterComponent, NetworkedComponent]
+[RegisterComponent] [NetworkedComponent]
 public sealed partial class RevenantCrushComponent : Component
 {
-    [DataField]
-    public SoundSpecifier? CrushSound = new SoundPathSpecifier("/Audio/_Goobstation/Wraith/revtouch.ogg");
-
     /// <summary>
-    ///  The duration of the doafter
+    /// The duration of the doafter
     /// </summary>
     [DataField(required: true)]
     public TimeSpan AbilityDuration = TimeSpan.FromSeconds(8);
 
+    [DataField]
+    public SoundSpecifier? CrushSound = new SoundPathSpecifier("/Audio/_Goobstation/Wraith/revtouch.ogg");
+
     /// <summary>
-    ///  How much damage to deal to the entity before the doafter starts
+    /// Allowed distance for doafter between user and target
+    /// </summary>
+    [DataField]
+    public float Distance = 15f;
+
+    /// <summary>
+    /// How much damage to deal to the entity before the doafter starts
     /// </summary>
     [DataField]
     public DamageSpecifier? InitialDamage = new();
 
     /// <summary>
-    ///  How long to knockdown the user for
+    /// How long to knockdown the user for
     /// </summary>
     [DataField]
     public TimeSpan KnockdownDuration = TimeSpan.FromSeconds(2f);
-
-    /// <summary>
-    ///  Allowed distance for doafter between user and target
-    /// </summary>
-    [DataField]
-    public float Distance = 15f;
 }

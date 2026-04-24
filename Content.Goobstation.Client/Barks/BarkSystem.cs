@@ -1,4 +1,5 @@
 using Content.Goobstation.Common.Barks;
+using Content.Goobstation.Common.CCVar;
 using Robust.Shared.Audio;
 using Robust.Shared.Audio.Systems;
 using Robust.Shared.Configuration;
@@ -6,22 +7,22 @@ using Robust.Shared.Player;
 using Robust.Shared.Prototypes;
 using Robust.Shared.Random;
 using Robust.Shared.Timing;
-using Content.Goobstation.Common.CCVar;
 
 namespace Content.Goobstation.Client.Barks;
 
 public sealed class BarkSystem : EntitySystem
 {
+    private static readonly char[] Characters =
+        "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ1234567890".ToCharArray();
+
+    private readonly List<ActiveBark> _activeBarks = new();
     [Dependency] private readonly IConfigurationManager _cfg = default!;
-    [Dependency] private readonly IGameTiming _timing = default!;
+
+    private readonly Dictionary<NetEntity, EntityUid> _playingSounds = new();
     [Dependency] private readonly IPrototypeManager _prototypeManager = default!;
     [Dependency] private readonly IRobustRandom _random = default!;
     [Dependency] private readonly SharedAudioSystem _sharedAudio = default!;
-
-    private readonly Dictionary<NetEntity, EntityUid> _playingSounds = new();
-    private static readonly char[] Characters = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ1234567890".ToCharArray();
-
-    private readonly List<ActiveBark> _activeBarks = new();
+    [Dependency] private readonly IGameTiming _timing = default!;
 
     public override void Initialize()
     {
@@ -41,6 +42,7 @@ public sealed class BarkSystem : EntitySystem
         {
             message[i] = _random.Pick(Characters);
         }
+
         PlayBark(null, new string(message), false, proto);
     }
 
@@ -49,7 +51,7 @@ public sealed class BarkSystem : EntitySystem
         var sourceEntity = GetEntity(ev.SourceUid);
         if (!TryComp<SpeechSynthesisComponent>(sourceEntity, out var comp)
             || comp.VoicePrototypeId is null
-            || !_prototypeManager.TryIndex<BarkPrototype>(comp.VoicePrototypeId, out var proto))
+            || !_prototypeManager.TryIndex(comp.VoicePrototypeId, out var proto))
             return;
 
         PlayBark(sourceEntity, ev.Message, ev.Whisper, proto);
@@ -69,8 +71,10 @@ public sealed class BarkSystem : EntitySystem
 
         var upperCount = 0;
         foreach (var c in message)
+        {
             if (char.IsUpper(c))
                 upperCount++;
+        }
 
         if (upperCount > message.Length / 2
             || message.EndsWith("!!"))
@@ -90,7 +94,7 @@ public sealed class BarkSystem : EntitySystem
             Volume = volume,
             TotalSounds = soundCount,
             SoundInterval = soundInterval,
-            NextSound = _timing.CurTime
+            NextSound = _timing.CurTime,
         };
 
         _activeBarks.Add(activeBark);
@@ -152,14 +156,10 @@ public sealed class BarkSystem : EntitySystem
                 audioParams = audioParams.WithPitchScale(predictablePitch);
             }
             else
-            {
                 audioParams = audioParams.WithPitchScale(proto.MinPitch);
-            }
         }
         else
-        {
             audioParams = audioParams.WithPitchScale(_random.NextFloat(proto.MinPitch, proto.MaxPitch));
-        }
 
         audioParams = audioParams.WithVolume(bark.Volume);
 
@@ -193,15 +193,15 @@ public sealed class BarkSystem : EntitySystem
 
     private sealed class ActiveBark
     {
-        public EntityUid? Source;
+        public int CurrentSound;
         public bool IsPreview;
         public string Message = string.Empty;
+        public TimeSpan NextSound;
         public BarkPrototype Prototype = default!;
-        public float Volume;
+        public float SoundInterval;
+        public EntityUid? Source;
 
         public int TotalSounds;
-        public int CurrentSound;
-        public float SoundInterval;
-        public TimeSpan NextSound;
+        public float Volume;
     }
 }

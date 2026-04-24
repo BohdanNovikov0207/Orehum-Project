@@ -6,9 +6,37 @@ namespace Content.Goobstation.Shared.NTR;
 /// <summary>
 /// A data structure for storing historical information about bounties.
 /// </summary>
-[DataDefinition, NetSerializable, Serializable]
+[DataDefinition] [NetSerializable] [Serializable]
 public readonly partial record struct NtrTaskHistoryData
 {
+    /// <summary>
+    /// Covers how a bounty was actually finished.
+    /// </summary>
+    public enum TaskResult
+    {
+        /// <summary>
+        /// Bounty was actually fulfilled and the goods sold
+        /// </summary>
+        Completed = 0,
+
+        /// <summary>
+        /// Bounty was explicitly skipped by some actor
+        /// </summary>
+        Skipped = 1,
+
+        Failed = 2,
+    }
+
+    public NtrTaskHistoryData(NtrTaskData task, TaskResult result, TimeSpan timestamp, string? actorName)
+    {
+        Task = task.Task;
+        Result = result;
+        Id = task.Id;
+        ActorName = actorName;
+        Timestamp = timestamp;
+        CompletionTime = timestamp.TotalSeconds;
+    }
+
     /// <summary>
     /// A unique id used to identify the bounty
     /// </summary>
@@ -41,32 +69,4 @@ public readonly partial record struct NtrTaskHistoryData
     /// </summary>
     [DataField]
     public ProtoId<NtrTaskPrototype> Task { get; init; }
-
-    public NtrTaskHistoryData(NtrTaskData task, TaskResult result, TimeSpan timestamp, string? actorName)
-    {
-        Task = task.Task;
-        Result = result;
-        Id = task.Id;
-        ActorName = actorName;
-        Timestamp = timestamp;
-        CompletionTime = timestamp.TotalSeconds;
-    }
-
-    /// <summary>
-    /// Covers how a bounty was actually finished.
-    /// </summary>
-    public enum TaskResult
-    {
-        /// <summary>
-        /// Bounty was actually fulfilled and the goods sold
-        /// </summary>
-        Completed = 0,
-
-        /// <summary>
-        /// Bounty was explicitly skipped by some actor
-        /// </summary>
-        Skipped = 1,
-
-        Failed = 2,
-    }
 }

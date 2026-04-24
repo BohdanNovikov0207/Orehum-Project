@@ -8,20 +8,20 @@ using Robust.Shared.GameStates;
 
 namespace Content.Goobstation.Shared.Religion.AlternatePrayable;
 
-[RegisterComponent, NetworkedComponent]
+[RegisterComponent] [NetworkedComponent]
 public sealed partial class AlternatePrayableComponent : Component
 {
+    [ViewVariables]
+    public TimeSpan NextPopup;
+
+    [ViewVariables]
+    public TimeSpan PopupDelay = TimeSpan.FromSeconds(3);
+
     /// <summary>
     /// How long does the praying do-after take to complete?
     /// </summary>
     [DataField]
     public TimeSpan PrayDoAfterDuration = TimeSpan.FromSeconds(5);
-
-    [ViewVariables]
-    public TimeSpan PopupDelay = TimeSpan.FromSeconds(3);
-
-    [ViewVariables]
-    public TimeSpan NextPopup;
 
     /// <summary>
     /// Should the prayer be repeated endlessly until cancelled?

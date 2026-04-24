@@ -15,7 +15,6 @@ using Content.Client.Animations;
 using Content.Client.DamageState;
 using Content.Goobstation.Shared.Emoting;
 using Content.Shared._Goobstation.Wizard.SupermatterHalberd;
-using Content.Shared.Chat.Prototypes;
 using Robust.Client.Animations;
 using Robust.Client.GameObjects;
 using Robust.Client.Graphics;
@@ -26,17 +25,16 @@ using Robust.Shared.Timing;
 
 namespace Content.Goobstation.Client.Emoting;
 
-public sealed partial class AnimatedEmotesSystem : SharedAnimatedEmotesSystem
+public sealed class AnimatedEmotesSystem : SharedAnimatedEmotesSystem
 {
+    private const int TweakAnimationDurationMs = 1100; // 11 frames * 100ms per frame
+    private const int FlexAnimationDurationMs = 200 * 7; // 7 frames * 200ms per frame
     [Dependency] private readonly AnimationPlayerSystem _anim = default!;
     [Dependency] private readonly IPrototypeManager _prot = default!;
     [Dependency] private readonly RaysSystem _rays = default!;
+    [Dependency] private readonly SpriteSystem _sprite = default!; // cranberry?
     [Dependency] private readonly IGameTiming _timing = default!;
     [Dependency] private readonly TransformSystem _transform = default!;
-    [Dependency] private readonly SpriteSystem _sprite = default!; // cranberry?
-
-    private const int TweakAnimationDurationMs = 1100; // 11 frames * 100ms per frame
-    private const int FlexAnimationDurationMs = 200 * 7; // 7 frames * 200ms per frame
 
     public override void Initialize()
     {
@@ -55,7 +53,7 @@ public sealed partial class AnimatedEmotesSystem : SharedAnimatedEmotesSystem
 
     public void OnBibleSmite(BibleFartSmiteEvent args)
     {
-        EntityUid uid = GetEntity(args.Bible);
+        var uid = GetEntity(args.Bible);
         if (!_timing.IsFirstTimePredicted || uid == EntityUid.Invalid)
             return;
 
@@ -64,10 +62,10 @@ public sealed partial class AnimatedEmotesSystem : SharedAnimatedEmotesSystem
             Color.AntiqueWhite,
             10,
             15,
-            minMaxRadius: new Vector2(3f, 6f),
-            minMaxEnergy: new Vector2(2f, 4f),
-            proto: "EffectRayCharge",
-            server: false);
+            new Vector2(3f, 6f),
+            new Vector2(2f, 4f),
+            "EffectRayCharge",
+            false);
 
         if (rays == null)
             return;
@@ -87,7 +85,7 @@ public sealed partial class AnimatedEmotesSystem : SharedAnimatedEmotesSystem
     private void OnHandleState(EntityUid uid, AnimatedEmotesComponent component, ref ComponentHandleState args)
     {
         if (args.Current is not AnimatedEmotesComponentState state
-        || !_prot.TryIndex<EmotePrototype>(state.Emote, out var emote))
+            || !_prot.TryIndex(state.Emote, out var emote))
             return;
 
         if (emote.Event != null)
@@ -111,12 +109,13 @@ public sealed partial class AnimatedEmotesSystem : SharedAnimatedEmotesSystem
                         new AnimationTrackProperty.KeyFrame(Angle.Zero, 0f),
                         new AnimationTrackProperty.KeyFrame(Angle.FromDegrees(180), 0.25f),
                         new AnimationTrackProperty.KeyFrame(Angle.FromDegrees(360), 0.25f),
-                    }
-                }
-            }
+                    },
+                },
+            },
         };
         PlayEmote(ent, a);
     }
+
     private void OnSpin(Entity<AnimatedEmotesComponent> ent, ref AnimationSpinEmoteEvent args)
     {
         var a = new Animation
@@ -140,12 +139,13 @@ public sealed partial class AnimatedEmotesSystem : SharedAnimatedEmotesSystem
                         new AnimationTrackProperty.KeyFrame(Angle.FromDegrees(180), 0.075f),
                         new AnimationTrackProperty.KeyFrame(Angle.FromDegrees(270), 0.075f),
                         new AnimationTrackProperty.KeyFrame(Angle.Zero, 0.075f),
-                    }
-                }
-            }
+                    },
+                },
+            },
         };
         PlayEmote(ent, a, "emoteAnimSpin");
     }
+
     private void OnJump(Entity<AnimatedEmotesComponent> ent, ref AnimationJumpEmoteEvent args)
     {
         var a = new Animation
@@ -163,15 +163,16 @@ public sealed partial class AnimatedEmotesSystem : SharedAnimatedEmotesSystem
                         new AnimationTrackProperty.KeyFrame(Vector2.Zero, 0f),
                         new AnimationTrackProperty.KeyFrame(new Vector2(0, .35f), 0.125f),
                         new AnimationTrackProperty.KeyFrame(Vector2.Zero, 0.125f),
-                    }
-                }
-            }
+                    },
+                },
+            },
         };
         PlayEmote(ent, a);
     }
+
     private void OnTweak(Entity<AnimatedEmotesComponent> ent, ref AnimationTweakEmoteEvent args)
     {
-        NetEntity netEntity = EntityManager.GetNetEntity(ent.Owner);
+        var netEntity = EntityManager.GetNetEntity(ent.Owner);
 
         if (!EntityManager.TryGetEntityData(netEntity, out _, out var metaData))
         {
@@ -187,11 +188,9 @@ public sealed partial class AnimatedEmotesSystem : SharedAnimatedEmotesSystem
             return;
         }
 
-        var stateNumber = string.Concat(metaData.EntityPrototype.ID.Where(Char.IsDigit));
+        var stateNumber = string.Concat(metaData.EntityPrototype.ID.Where(char.IsDigit));
         if (string.IsNullOrEmpty(stateNumber))
-        {
             stateNumber = "0";
-        }
 
         var a = new Animation
         {
@@ -203,16 +202,19 @@ public sealed partial class AnimatedEmotesSystem : SharedAnimatedEmotesSystem
                     LayerKey = DamageStateVisualLayers.Base,
                     KeyFrames =
                     {
-                        new AnimationTrackSpriteFlick.KeyFrame(new RSI.StateId($"{metaData.EntityPrototype.SetName}-tweaking-{stateNumber}"), 0f)
-                    }
-                }
-            }
+                        new AnimationTrackSpriteFlick.KeyFrame(
+                            new RSI.StateId($"{metaData.EntityPrototype.SetName}-tweaking-{stateNumber}"),
+                            0f),
+                    },
+                },
+            },
         };
         PlayEmote(ent, a);
     }
+
     private void OnFlex(Entity<AnimatedEmotesComponent> ent, ref AnimationFlexEmoteEvent args)
     {
-        NetEntity netEntity = EntityManager.GetNetEntity(ent.Owner);
+        var netEntity = EntityManager.GetNetEntity(ent.Owner);
 
         if (!EntityManager.TryGetEntityData(netEntity, out _, out var metaData))
         {
@@ -238,9 +240,13 @@ public sealed partial class AnimatedEmotesSystem : SharedAnimatedEmotesSystem
                     LayerKey = DamageStateVisualLayers.Base,
                     KeyFrames =
                     {
-                        new AnimationTrackSpriteFlick.KeyFrame(new RSI.StateId($"{metaData.EntityPrototype.SetName?.ToLower()}_flex"), 0f),
-                        new AnimationTrackSpriteFlick.KeyFrame(new RSI.StateId($"{metaData.EntityPrototype.SetName?.ToLower()}"), FlexAnimationDurationMs / 1000f)
-                    }
+                        new AnimationTrackSpriteFlick.KeyFrame(
+                            new RSI.StateId($"{metaData.EntityPrototype.SetName?.ToLower()}_flex"),
+                            0f),
+                        new AnimationTrackSpriteFlick.KeyFrame(
+                            new RSI.StateId($"{metaData.EntityPrototype.SetName?.ToLower()}"),
+                            FlexAnimationDurationMs / 1000f),
+                    },
                 },
                 // don't display the glow while flexing
                 new AnimationTrackSpriteFlick
@@ -248,11 +254,14 @@ public sealed partial class AnimatedEmotesSystem : SharedAnimatedEmotesSystem
                     LayerKey = DamageStateVisualLayers.BaseUnshaded,
                     KeyFrames =
                     {
-                        new AnimationTrackSpriteFlick.KeyFrame(new RSI.StateId($"{metaData.EntityPrototype.SetName?.ToLower()}_flex_damage"), 0f),
-                        new AnimationTrackSpriteFlick.KeyFrame(new RSI.StateId($"nautdamage"), FlexAnimationDurationMs / 1000f)
-                    }
-                }
-            }
+                        new AnimationTrackSpriteFlick.KeyFrame(
+                            new RSI.StateId($"{metaData.EntityPrototype.SetName?.ToLower()}_flex_damage"),
+                            0f),
+                        new AnimationTrackSpriteFlick.KeyFrame(new RSI.StateId("nautdamage"),
+                            FlexAnimationDurationMs / 1000f),
+                    },
+                },
+            },
         };
         PlayEmote(ent, a);
     }

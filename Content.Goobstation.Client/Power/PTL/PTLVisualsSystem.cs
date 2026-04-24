@@ -9,7 +9,7 @@ using Robust.Shared.Timing;
 
 namespace Content.Goobstation.Client.Power.PTL;
 
-public sealed partial class PTLVisualsSystem : EntitySystem
+public sealed class PTLVisualsSystem : EntitySystem
 {
     [Dependency] private readonly IGameTiming _time = default!;
 
@@ -19,13 +19,15 @@ public sealed partial class PTLVisualsSystem : EntitySystem
 
         var eqe = EntityQueryEnumerator<PTLVisualsComponent>();
         while (eqe.MoveNext(out var uid, out var ptlv))
+        {
             UpdateVisuals((uid, ptlv));
+        }
     }
 
     private void UpdateVisuals(Entity<PTLVisualsComponent> ent)
     {
         if (!TryComp<SpriteComponent>(ent, out var sprite)
-        || !TryComp<PTLComponent>(ent, out var ptl))
+            || !TryComp<PTLComponent>(ent, out var ptl))
             return;
 
         sprite.LayerSetVisible(PTLVisualLayers.Unpowered, ptl.Active);
@@ -36,9 +38,9 @@ public sealed partial class PTLVisualsSystem : EntitySystem
     }
 }
 
-enum PTLVisualLayers : byte
+internal enum PTLVisualLayers : byte
 {
     Base,
     Unpowered,
-    Charge
+    Charge,
 }

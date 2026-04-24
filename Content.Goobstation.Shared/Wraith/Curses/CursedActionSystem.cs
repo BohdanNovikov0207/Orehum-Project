@@ -14,13 +14,13 @@ namespace Content.Goobstation.Shared.Wraith.Curses;
 /// </summary>
 public sealed class CursedActionSystem : EntitySystem
 {
+    private const int MaxCursesBeforeFinal = 4;
     [Dependency] private readonly SharedActionsSystem _actions = default!;
     [Dependency] private readonly SharedAudioSystem _audio = default!;
     [Dependency] private readonly INetManager _netManager = default!;
     [Dependency] private readonly SharedPopupSystem _popup = default!;
 
-    private const int MaxCursesBeforeFinal = 4;
-    /// <inheritdoc/>
+    /// <inheritdoc />
     public override void Initialize()
     {
         base.Initialize();
@@ -83,6 +83,7 @@ public sealed class CursedActionSystem : EntitySystem
     }
 
     #region Cancel Events
+
     private void OnSiliconAttempt(Entity<SiliconComponent> ent, ref AttemptCurseEvent args)
     {
         _popup.PopupClient(Loc.GetString("curse-fail-robot"), args.Curser, args.Curser);
@@ -94,5 +95,6 @@ public sealed class CursedActionSystem : EntitySystem
         _popup.PopupClient(Loc.GetString("curse-immune-fail"), args.Curser, args.Curser);
         args.Cancelled = true;
     }
+
     #endregion
 }

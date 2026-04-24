@@ -41,8 +41,6 @@ public sealed class MartialArtsSystem : SharedMartialArtsSystem
     private void OnPolymorphedMAK(Entity<MartialArtsKnowledgeComponent> ent, ref PolymorphedEvent args)
         => _polymorph.CopyPolymorphComponent<MartialArtsKnowledgeComponent>(ent, args.NewEntity);
 
-    private void OnSleepingCarpSaying(Entity<CanPerformComboComponent> ent, ref SleepingCarpSaying args)
-    {
+    private void OnSleepingCarpSaying(Entity<CanPerformComboComponent> ent, ref SleepingCarpSaying args) =>
         _chat.TrySendInGameICMessage(ent, Loc.GetString(args.Saying), InGameICChatType.Speak, false);
-    }
 }

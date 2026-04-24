@@ -4,27 +4,27 @@
 //
 // SPDX-License-Identifier: AGPL-3.0-or-later
 
-using Content.Shared.Contraband;
-using Content.Shared.Power;
-using Robust.Shared.Timing;
-using Content.Shared.Inventory;
-using Content.Shared.Storage;
-using Content.Shared.Hands.EntitySystems;
-using Content.Shared.Power.EntitySystems;
 using System.Linq;
-using Robust.Shared.Prototypes;
-using Content.Shared.Roles;
 using Content.Shared.Access.Systems;
+using Content.Shared.Contraband;
+using Content.Shared.Hands.EntitySystems;
+using Content.Shared.Inventory;
+using Content.Shared.Power;
+using Content.Shared.Power.EntitySystems;
+using Content.Shared.Roles;
+using Content.Shared.Storage;
+using Robust.Shared.Prototypes;
+using Robust.Shared.Timing;
 
 namespace Content.Goobstation.Shared.Contraband;
 
 public abstract class SharedContrabandDetectorSystem : EntitySystem
 {
     [Dependency] private readonly SharedAppearanceSystem _appearanceSystem = default!;
-    [Dependency] private readonly InventorySystem _inventorySystem = default!;
     [Dependency] private readonly ContrabandSystem _contrabandSystem = default!;
-    [Dependency] private readonly SharedIdCardSystem _idCardSystem = default!;
     [Dependency] private readonly SharedHandsSystem _handsSystem = default!;
+    [Dependency] private readonly SharedIdCardSystem _idCardSystem = default!;
+    [Dependency] private readonly InventorySystem _inventorySystem = default!;
     [Dependency] private readonly SharedPowerReceiverSystem _powerReceiverSystem = default!;
     [Dependency] private readonly IPrototypeManager _prototypeMan = default!;
     [Dependency] private readonly IGameTiming _timing = default!;
@@ -50,7 +50,7 @@ public abstract class SharedContrabandDetectorSystem : EntitySystem
                 Dirty(uid, detector);
             }
 
-            if (detector.Scanned.Count == 0)// go to next if there are no scanned
+            if (detector.Scanned.Count == 0) // go to next if there are no scanned
                 continue;
 
             var keysToRemove = new List<EntityUid>(detector.Scanned.Count);
@@ -59,14 +59,17 @@ public abstract class SharedContrabandDetectorSystem : EntitySystem
                 if (_timing.CurTime > scan.Value)
                     keysToRemove.Add(scan.Key);
             }
+
             foreach (var key in keysToRemove)
             {
                 detector.Scanned.Remove(key);
             }
+
             if (keysToRemove.Count > 0)
                 detector.Scanned.TrimExcess();
         }
     }
+
     public bool IsContraband(EntityUid uid)
     {
         if (HasComp<ContrabandComponent>(uid) && !HasComp<UndetectableContrabandComponent>(uid))
@@ -102,7 +105,7 @@ public abstract class SharedContrabandDetectorSystem : EntitySystem
                     itemsToCheck.AddRange(RecursiveFindInStorage(item.Value));
             }
         }
-        
+
         // Check items in hands
         var handEnumerator = _handsSystem.EnumerateHeld(uid);
         foreach (var handItem in handEnumerator)
@@ -149,10 +152,8 @@ public abstract class SharedContrabandDetectorSystem : EntitySystem
         return listToCheck;
     }
 
-    protected void UpdateVisuals(Entity<ContrabandDetectorComponent> detector)
-    {
+    protected void UpdateVisuals(Entity<ContrabandDetectorComponent> detector) =>
         _appearanceSystem.SetData(detector, ContrabandDetectorVisuals.VisualState, detector.Comp.State);
-    }
 
     private void OnPowerChange(Entity<ContrabandDetectorComponent> detector, ref PowerChangedEvent args)
     {
@@ -189,7 +190,7 @@ public abstract class SharedContrabandDetectorSystem : EntitySystem
     }
 
     /// <summary>
-    /// Checks permission for user to have contraband. 
+    /// Checks permission for user to have contraband.
     /// </summary>
     /// <param name="contraband"></param>
     /// <param name="user"></param>
@@ -208,9 +209,7 @@ public abstract class SharedContrabandDetectorSystem : EntitySystem
         {
             departments = id.Comp.JobDepartments;
             if (id.Comp.LocalizedJobTitle is not null)
-            {
                 job = id.Comp.LocalizedJobTitle;
-            }
         }
 
         if (departments.Intersect(component.AllowedDepartments).Any() || jobs.Contains(job))

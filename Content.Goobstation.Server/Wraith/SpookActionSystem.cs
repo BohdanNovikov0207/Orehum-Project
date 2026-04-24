@@ -1,8 +1,11 @@
+using System.Linq;
 using Content.Goobstation.Shared.Wraith.Components;
 using Content.Goobstation.Shared.Wraith.Events;
 using Content.Goobstation.Shared.Wraith.Spook;
 using Content.Goobstation.Shared.Wraith.WraithPoints;
 using Content.Server.Actions;
+using Content.Server.Atmos.Components;
+using Content.Server.Atmos.EntitySystems;
 using Content.Server.Doors.Systems;
 using Content.Server.Fluids.EntitySystems;
 using Content.Server.Ghost;
@@ -11,46 +14,42 @@ using Content.Server.Light.EntitySystems;
 using Content.Server.Popups;
 using Content.Server.Power.Components;
 using Content.Server.Power.EntitySystems;
-using Content.Server.Storage.Components;
 using Content.Server.Storage.EntitySystems;
 using Content.Shared.Actions.Components;
 using Content.Shared.Doors.Components;
+using Content.Shared.Humanoid;
 using Content.Shared.Popups;
+using Content.Shared.Storage.Components;
 using Robust.Server.GameObjects;
 using Robust.Shared.Map;
 using Robust.Shared.Random;
 using Robust.Shared.Timing;
-using System.Linq;
-using Content.Server.Atmos.Components;
-using Content.Server.Atmos.EntitySystems;
-using Content.Shared.Humanoid;
-using Content.Shared.Storage.Components;
 
 namespace Content.Goobstation.Server.Wraith;
 
 public sealed class SpookActionSystem : EntitySystem
 {
-    [Dependency] private readonly IGameTiming _timing = default!;
-
-    [Dependency] private readonly IRobustRandom _random = default!;
-    [Dependency] private readonly EntityLookupSystem _lookup = default!;
-    [Dependency] private readonly PoweredLightSystem _poweredLight = default!;
-    [Dependency] private readonly FlammableSystem _flammableSystem = default!;
+    [Dependency] private readonly ActionsSystem _actions = default!;
+    [Dependency] private readonly BatterySystem _battery = default!;
     [Dependency] private readonly DoorSystem _door = default!;
     [Dependency] private readonly EntityStorageSystem _entityStorage = default!;
-    [Dependency] private readonly SmokeSystem _smoke = default!;
-    [Dependency] private readonly TransformSystem _transform = default!;
-    [Dependency] private readonly BatterySystem _battery = default!;
-    [Dependency] private readonly ActionsSystem _actions = default!;
+    [Dependency] private readonly FlammableSystem _flammableSystem = default!;
+    [Dependency] private readonly EntityLookupSystem _lookup = default!;
     [Dependency] private readonly PopupSystem _popup = default!;
+    [Dependency] private readonly PoweredLightSystem _poweredLight = default!;
 
-    private EntityQuery<PoweredLightComponent> _poweredLightQuery;
+    [Dependency] private readonly IRobustRandom _random = default!;
+    [Dependency] private readonly SmokeSystem _smoke = default!;
+    [Dependency] private readonly IGameTiming _timing = default!;
+    [Dependency] private readonly TransformSystem _transform = default!;
+    private EntityQuery<ActionComponent> _actionQuery;
+    private EntityQuery<ApcComponent> _apcQuery;
     private EntityQuery<DoorComponent> _doorQuery;
     private EntityQuery<EntityStorageComponent> _entityStorageQuery;
-    private EntityQuery<ApcComponent> _apcQuery;
-    private EntityQuery<ActionComponent> _actionQuery;
     private EntityQuery<FlammableComponent> _flammable;
     private EntityQuery<HumanoidAppearanceComponent> _humanoidAppearanceQuery;
+
+    private EntityQuery<PoweredLightComponent> _poweredLightQuery;
 
     public override void Initialize()
     {
@@ -78,7 +77,7 @@ public sealed class SpookActionSystem : EntitySystem
 
     private void OnSpookEvent(Entity<SpookMarkComponent> ent, ref SpookEvent args)
     {
-        if (ent.Comp.SpookEntity is {} spook)
+        if (ent.Comp.SpookEntity is { } spook)
             QueueDel(spook);
 
         var spookEnt = SpawnAtPosition(ent.Comp.Spook, args.Target);
@@ -230,7 +229,7 @@ public sealed class SpookActionSystem : EntitySystem
         var chargeToRemove = ent.Comp.ChargeToRemove;
 
         if (TryComp<PassiveWraithPointsComponent>(ent.Owner, out var passiveWraithPoints))
-            chargeToRemove *= (float)passiveWraithPoints.WpGeneration;
+            chargeToRemove *= (float) passiveWraithPoints.WpGeneration;
 
         var looup = _lookup.GetEntitiesInRange(ent.Owner, ent.Comp.SearchRange).ToList();
         _random.Shuffle(looup);
@@ -244,6 +243,7 @@ public sealed class SpookActionSystem : EntitySystem
             _popup.PopupEntity(Loc.GetString("spook-apc-sap"), entity, PopupType.MediumCaution);
             break;
         }
+
         args.Handled = true;
     }
 

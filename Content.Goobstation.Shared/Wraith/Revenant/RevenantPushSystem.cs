@@ -9,10 +9,11 @@ namespace Content.Goobstation.Shared.Wraith.Revenant;
 /// </summary>
 public sealed class RevenantPushSystem : EntitySystem
 {
+    [Dependency] private readonly SharedAudioSystem _audio = default!;
     [Dependency] private readonly GrabThrownSystem _grab = default!;
     [Dependency] private readonly SharedTransformSystem _transform = default!;
-    [Dependency] private readonly SharedAudioSystem _audio = default!;
-    /// <inheritdoc/>
+
+    /// <inheritdoc />
     public override void Initialize()
     {
         base.Initialize();

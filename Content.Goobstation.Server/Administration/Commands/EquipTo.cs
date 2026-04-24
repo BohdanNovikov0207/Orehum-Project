@@ -19,7 +19,6 @@ namespace Content.Goobstation.Server.Administration.Commands;
 [AdminCommand(AdminFlags.Spawn)]
 public sealed class EquipTo : LocalizedCommands
 {
-
     public const string CommandName = "equipto";
     public override string Command => CommandName;
 
@@ -41,18 +40,16 @@ public sealed class EquipTo : LocalizedCommands
             shell.WriteLine(Loc.GetString("cmd-equipto-bad-target", ("target", args[0])));
             return;
         }
+
         var target = targetEntity.Value;
 
         EntityUid item;
         if (NetEntity.TryParse(args[1], out var itemNet) &&
             entityManager.TryGetEntity(itemNet, out var itemEntity))
-        {
             item = itemEntity.Value;
-        }
         else if (prototypeManager.TryIndex(args[1], out var prototype))
-        {
-            item = entityManager.SpawnEntity(prototype.ID, entityManager.GetComponent<TransformComponent>(target).Coordinates);
-        }
+            item = entityManager.SpawnEntity(prototype.ID,
+                entityManager.GetComponent<TransformComponent>(target).Coordinates);
         else
         {
             shell.WriteLine(Loc.GetString("cmd-equipto-bad-proto", ("proto", args[1])));
@@ -85,6 +82,7 @@ public sealed class EquipTo : LocalizedCommands
                     ("target", entityManager.ToPrettyString(target)),
                     ("targetSlot", targetSlot)));
             }
+
             return;
         }
 
@@ -108,9 +106,7 @@ public sealed class EquipTo : LocalizedCommands
                 if (slot.Name == "id" &&
                     entityManager.TryGetComponent(item, out PdaComponent? pdaComponent) &&
                     entityManager.TryGetComponent<IdCardComponent>(pdaComponent.ContainedId, out var id))
-                {
                     id.FullName = entityManager.GetComponent<MetaDataComponent>(target).EntityName;
-                }
 
                 shell.WriteLine(Loc.GetString("cmd-equipto-success",
                     ("item", entityManager.ToPrettyString(item)),
@@ -144,4 +140,3 @@ public sealed class EquipTo : LocalizedCommands
         return CompletionResult.FromHintOptions(options, Loc.GetString("cmd-equipto-hint"));
     }
 }
-

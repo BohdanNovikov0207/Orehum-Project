@@ -13,7 +13,7 @@ using Content.Shared.Objectives.Components;
 
 namespace Content.Goobstation.Server.Pirates.Objectives;
 
-public sealed partial class PirateObjectiveSystem : EntitySystem
+public sealed class PirateObjectiveSystem : EntitySystem
 {
     [Dependency] private readonly NumberObjectiveSystem _number = default!;
 
@@ -25,13 +25,14 @@ public sealed partial class PirateObjectiveSystem : EntitySystem
     }
 
     /// <summary>
-    ///     Objective gets updated in <see cref=""/>
+    /// Objective gets updated in <see cref="" />
     /// </summary>
     private void GetPlunderProgress(Entity<ObjectivePlunderComponent> ent, ref ObjectiveGetProgressEvent args)
     {
         var tgt = _number.GetTarget(ent);
         if (tgt != 0)
             args.Progress = MathF.Min(ent.Comp.Plundered / tgt, 1f);
-        else args.Progress = 1f;
+        else
+            args.Progress = 1f;
     }
 }

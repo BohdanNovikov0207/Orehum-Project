@@ -6,7 +6,7 @@ using Robust.Shared.Prototypes;
 namespace Content.Goobstation.Shared.Wraith.Events;
 
 /// <summary>
-///  Marks an action as a CurseAction
+/// Marks an action as a CurseAction
 /// </summary>
 [RegisterComponent]
 public sealed partial class CurseActionComponent : Component;
@@ -29,22 +29,23 @@ public sealed partial class ApplyCurseActionEvent : EntityTargetActionEvent
     public SoundSpecifier? CurseSound;
 
     /// <summary>
-    /// Whether this curse requires all curses in order to activate
-    /// </summary>
-    [DataField]
-    public bool RequireAllCurses;
-
-    /// <summary>
     /// Popup to show to the user once a curse is applied
     /// </summary>
     [DataField]
     public LocId? Popup;
-};
+
+    /// <summary>
+    /// Whether this curse requires all curses in order to activate
+    /// </summary>
+    [DataField]
+    public bool RequireAllCurses;
+}
 
 /// <summary>
 /// Raised before a curse gets applied on an entity
 /// </summary>
-/// <param name="Target"></param> The target trying to apply the curse to
+/// <param name="Target"></param>
+/// The target trying to apply the curse to
 [ByRefEvent]
 public record struct AttemptCurseEvent(EntityUid Curser, bool Cancelled = false);
 

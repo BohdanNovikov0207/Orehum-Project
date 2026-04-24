@@ -8,9 +8,9 @@ using Content.Goobstation.Shared.Shadowling.Components.Abilities.PreAscension;
 using Content.Shared.Actions;
 using Content.Shared.Movement.Systems;
 using Content.Shared.Popups;
+using Content.Shared.Speech.Muting;
 using Content.Shared.StatusEffect;
 using Content.Shared.Stunnable;
-using Content.Shared.Speech.Muting;
 using Robust.Shared.Prototypes;
 using Robust.Shared.Timing;
 
@@ -21,16 +21,15 @@ namespace Content.Goobstation.Shared.Shadowling.Systems.Abilities.PreAscension;
 /// </summary>
 public sealed class ShadowlingGlareSystem : EntitySystem
 {
-    [Dependency] private readonly IGameTiming _timing = default!;
-    [Dependency] private readonly SharedStunSystem _stun = default!;
-    [Dependency] private readonly SharedActionsSystem _actions = default!;
-    [Dependency] private readonly SharedShadowlingSystem _shadowling = default!;
-    [Dependency] private readonly SharedTransformSystem _transform = default!;
-    [Dependency] private readonly StatusEffectsSystem _effects = default!;
-    [Dependency] private readonly SharedPopupSystem _popup = default!;
-    [Dependency] private readonly MovementModStatusSystem _movementMod = default!;
-
     public static readonly EntProtoId SlingGlareSlowEffect = "ShadowlingGlareSlowdownEffect";
+    [Dependency] private readonly SharedActionsSystem _actions = default!;
+    [Dependency] private readonly StatusEffectsSystem _effects = default!;
+    [Dependency] private readonly MovementModStatusSystem _movementMod = default!;
+    [Dependency] private readonly SharedPopupSystem _popup = default!;
+    [Dependency] private readonly SharedShadowlingSystem _shadowling = default!;
+    [Dependency] private readonly SharedStunSystem _stun = default!;
+    [Dependency] private readonly IGameTiming _timing = default!;
+    [Dependency] private readonly SharedTransformSystem _transform = default!;
 
     public override void Initialize()
     {
@@ -98,7 +97,8 @@ public sealed class ShadowlingGlareSystem : EntitySystem
         {
             // Do I know what is going on here? No. But it works so... Thanks for listening!
             comp.GlareStunTime = comp.MaxGlareStunTime * (1 - Math.Clamp(distance / comp.MaxGlareDistance, 0, 1));
-            comp.GlareTimeBeforeEffect = comp.MinGlareDelay + (comp.MaxGlareDelay - comp.MinGlareDelay) * Math.Clamp(distance / comp.MaxGlareDistance, 0, 1);
+            comp.GlareTimeBeforeEffect = comp.MinGlareDelay + (comp.MaxGlareDelay - comp.MinGlareDelay) *
+                Math.Clamp(distance / comp.MaxGlareDistance, 0, 1);
 
             comp.ActivateGlareTimer = true;
         }
@@ -107,7 +107,11 @@ public sealed class ShadowlingGlareSystem : EntitySystem
         if (TryComp<StatusEffectsComponent>(target, out var statComp))
         {
             _effects.TryAddStatusEffect<MutedComponent>(target, "Muted", TimeSpan.FromSeconds(comp.MuteTime), true);
-            _movementMod.TryUpdateMovementSpeedModDuration(target, SlingGlareSlowEffect, TimeSpan.FromSeconds(comp.SlowTime), 0.5f, 0.5f);
+            _movementMod.TryUpdateMovementSpeedModDuration(target,
+                SlingGlareSlowEffect,
+                TimeSpan.FromSeconds(comp.SlowTime),
+                0.5f,
+                0.5f);
         }
 
         var effectEnt = PredictedSpawnAtPosition(comp.EffectGlare, Transform(uid).Coordinates);

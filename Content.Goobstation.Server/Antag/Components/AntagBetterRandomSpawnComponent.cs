@@ -12,16 +12,16 @@ namespace Content.Goobstation.Server.Antag.Components;
 public sealed partial class AntagBetterRandomSpawnComponent : Component
 {
     /// <summary>
-    /// Location that was picked.
-    /// </summary>
-    [DataField]
-    public EntityCoordinates? Coords;
-
-    /// <summary>
     /// Range to check for camera line of sight.
     /// </summary>
     [DataField]
     public float CameraCheckRange = 15f;
+
+    /// <summary>
+    /// Location that was picked.
+    /// </summary>
+    [DataField]
+    public EntityCoordinates? Coords;
 
     /// <summary>
     /// Maximum number of attempts.

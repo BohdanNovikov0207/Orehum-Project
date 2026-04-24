@@ -12,16 +12,10 @@ using Robust.Shared.Prototypes;
 
 namespace Content.Goobstation.Shared.SlaughterDemon;
 
-[RegisterComponent, NetworkedComponent]
+[RegisterComponent] [NetworkedComponent]
 [AutoGenerateComponentState]
 public sealed partial class BloodCrawlComponent : Component
 {
-    /// <summary>
-    /// This is the search range of the blood puddles
-    /// </summary>
-    [DataField]
-    public float SearchRange = 0.1f;
-
     /// <summary>
     /// This is the entity action cooldown of this ability. Prevents spamming it.
     /// </summary>
@@ -35,18 +29,6 @@ public sealed partial class BloodCrawlComponent : Component
     public EntProtoId ActionId = "BloodCrawlAction";
 
     /// <summary>
-    /// This is the polymorph this ability uses.
-    /// </summary>
-    [DataField]
-    public ProtoId<PolymorphPrototype> Jaunt = "BloodCrawlJaunt";
-
-    /// <summary>
-    /// This indicates whether the entity is crawling, or not. Used for toggling the ability.
-    /// </summary>
-    [DataField, AutoNetworkedField]
-    public bool IsCrawling;
-
-    /// <summary>
     /// The reagents to look out for when searching for puddles
     /// </summary>
     [DataField(required: true)]
@@ -56,17 +38,35 @@ public sealed partial class BloodCrawlComponent : Component
     /// The sound to play once entering the jaunt
     /// </summary>
     [DataField]
-    public SoundPathSpecifier? EnterJauntSound = new SoundPathSpecifier("/Audio/_Goobstation/Misc/enter_blood.ogg");
+    public SoundPathSpecifier? EnterJauntSound = new("/Audio/_Goobstation/Misc/enter_blood.ogg");
 
     /// <summary>
     /// The sound to play once exiting the jaunt
     /// </summary>
     [DataField]
-    public SoundPathSpecifier? ExitJauntSound = new SoundPathSpecifier("/Audio/_Goobstation/Misc/exit_blood.ogg");
+    public SoundPathSpecifier? ExitJauntSound = new("/Audio/_Goobstation/Misc/exit_blood.ogg");
 
     /// <summary>
-    ///  The required amount required for a puddle to have in order for the jaunt to activate
+    /// This indicates whether the entity is crawling, or not. Used for toggling the ability.
+    /// </summary>
+    [DataField] [AutoNetworkedField]
+    public bool IsCrawling;
+
+    /// <summary>
+    /// This is the polymorph this ability uses.
+    /// </summary>
+    [DataField]
+    public ProtoId<PolymorphPrototype> Jaunt = "BloodCrawlJaunt";
+
+    /// <summary>
+    /// The required amount required for a puddle to have in order for the jaunt to activate
     /// </summary>
     [DataField]
     public FixedPoint2 RequiredReagentAmount = 0.5;
+
+    /// <summary>
+    /// This is the search range of the blood puddles
+    /// </summary>
+    [DataField]
+    public float SearchRange = 0.1f;
 }

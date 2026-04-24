@@ -35,6 +35,7 @@ public sealed partial class AutomatedPorts : AutomationSlot
         {
             _device.RemoveSinkPort(Owner, port);
         }
+
         foreach (var port in Sources)
         {
             _device.RemoveSourcePort(Owner, port);

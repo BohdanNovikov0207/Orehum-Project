@@ -4,8 +4,8 @@
 //
 // SPDX-License-Identifier: AGPL-3.0-or-later
 
-using Content.Server.Wires;
 using Content.Goobstation.Shared.Contraband;
+using Content.Server.Wires;
 using Content.Shared.Wires;
 
 namespace Content.Goobstation.Server.Contraband;
@@ -42,13 +42,11 @@ public sealed partial class ContrabandDetectorBadChanceWireAction : BaseToggleWi
     public override void ToggleValue(EntityUid owner, bool setting)
     {
         if (EntityManager.TryGetComponent<ContrabandDetectorComponent>(owner, out var component))
-        {
-            _contrabandDetectorSystem.ChangeFalseDetectionChance((owner, component), component.FalseDetectingChanceMultiplier);
-        }
+            _contrabandDetectorSystem.ChangeFalseDetectionChance((owner, component),
+                component.FalseDetectingChanceMultiplier);
     }
 
-    public override bool GetValue(EntityUid owner)
-    {
-        return EntityManager.TryGetComponent<ContrabandDetectorComponent>(owner, out var component) && !component.IsFalseDetectingChanged;
-    }
+    public override bool GetValue(EntityUid owner) =>
+        EntityManager.TryGetComponent<ContrabandDetectorComponent>(owner, out var component) &&
+        !component.IsFalseDetectingChanged;
 }

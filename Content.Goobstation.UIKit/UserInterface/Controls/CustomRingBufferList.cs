@@ -48,28 +48,13 @@ public sealed class CustomRingBufferList<T> : IList<T>
             Array.Clear(_items);
     }
 
-    public bool Contains(T item)
-    {
-        return IndexOf(item) >= 0;
-    }
+    public bool Contains(T item) => IndexOf(item) >= 0;
 
     public void CopyTo(T[] array, int arrayIndex)
     {
         ArgumentOutOfRangeException.ThrowIfNegative(arrayIndex);
 
         CopyTo(array.AsSpan(arrayIndex));
-    }
-
-    private void CopyTo(Span<T> dest)
-    {
-        if (dest.Length < Count)
-            throw new ArgumentException("Not enough elements in destination!");
-
-        var i = 0;
-        foreach (var item in this)
-        {
-            dest[i++] = item;
-        }
     }
 
     public bool Remove(T item)
@@ -110,10 +95,7 @@ public sealed class CustomRingBufferList<T> : IList<T>
         return -1;
     }
 
-    public void Insert(int index, T item)
-    {
-        throw new NotSupportedException();
-    }
+    public void Insert(int index, T item) => throw new NotSupportedException();
 
     public void RemoveAt(int index)
     {
@@ -183,6 +165,28 @@ public sealed class CustomRingBufferList<T> : IList<T>
         }
     }
 
+    public T this[int index]
+    {
+        get => GetSlot(index);
+        set => _items[RealIndex(index)] = value;
+    }
+
+    IEnumerator<T> IEnumerable<T>.GetEnumerator() => GetEnumerator();
+
+    IEnumerator IEnumerable.GetEnumerator() => GetEnumerator();
+
+    private void CopyTo(Span<T> dest)
+    {
+        if (dest.Length < Count)
+            throw new ArgumentException("Not enough elements in destination!");
+
+        var i = 0;
+        foreach (var item in this)
+        {
+            dest[i++] = item;
+        }
+    }
+
     private static T ShiftDown(Span<T> span, T substitution)
     {
         if (span.Length == 0)
@@ -202,16 +206,7 @@ public sealed class CustomRingBufferList<T> : IList<T>
         return _items[RealIndex(index)];
     }
 
-    public T this[int index]
-    {
-        get => GetSlot(index);
-        set => _items[RealIndex(index)] = value;
-    }
-
-    private int RealIndex(int index)
-    {
-        return Wrap(index + _read);
-    }
+    private int RealIndex(int index) => Wrap(index + _read);
 
     private int NextIndex(int index) => Wrap(index + 1);
 
@@ -251,20 +246,7 @@ public sealed class CustomRingBufferList<T> : IList<T>
         _write += prevSize;
     }
 
-    public Enumerator GetEnumerator()
-    {
-        return new Enumerator(this);
-    }
-
-    IEnumerator<T> IEnumerable<T>.GetEnumerator()
-    {
-        return GetEnumerator();
-    }
-
-    IEnumerator IEnumerable.GetEnumerator()
-    {
-        return GetEnumerator();
-    }
+    public Enumerator GetEnumerator() => new(this);
 
     public struct Enumerator : IEnumerator<T>
     {
@@ -283,10 +265,7 @@ public sealed class CustomRingBufferList<T> : IList<T>
             return _readPos != _ringBufferList._write;
         }
 
-        public void Reset()
-        {
-            this = new Enumerator(_ringBufferList);
-        }
+        public void Reset() => this = new Enumerator(_ringBufferList);
 
         public ref T Current => ref _ringBufferList._items[_readPos];
 

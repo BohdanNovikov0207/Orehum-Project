@@ -7,7 +7,6 @@ using Content.Shared.Power.EntitySystems;
 using Content.Shared.Stacks;
 using Robust.Shared.Audio.Systems;
 using Robust.Shared.Network;
-using Robust.Shared.Prototypes;
 using Robust.Shared.Random;
 
 namespace Content.Goobstation.Shared.SlotMachine.CoinFlipper;
@@ -17,15 +16,16 @@ namespace Content.Goobstation.Shared.SlotMachine.CoinFlipper;
 /// </summary>
 public sealed class CoinFlipperMachineSystem : EntitySystem
 {
-    [Dependency] private readonly IRobustRandom _random = default!;
     [Dependency] private readonly SharedAudioSystem _audio = default!;
-    [Dependency] private readonly SharedDoAfterSystem _doAfter = default!;
-    [Dependency] private readonly INetManager _net = default!;
-    [Dependency] private readonly ItemSlotsSystem _itemSlots = default!;
-    [Dependency] private readonly SharedPopupSystem _popupSystem = default!;
     [Dependency] private readonly SharedChatSystem _chatSystem = default!;
+    [Dependency] private readonly SharedDoAfterSystem _doAfter = default!;
+    [Dependency] private readonly ItemSlotsSystem _itemSlots = default!;
+    [Dependency] private readonly INetManager _net = default!;
+    [Dependency] private readonly SharedPopupSystem _popupSystem = default!;
     [Dependency] private readonly SharedPowerReceiverSystem _power = default!;
+    [Dependency] private readonly IRobustRandom _random = default!;
     [Dependency] private readonly SharedStackSystem _stackSystem = default!;
+
     public override void Initialize()
     {
         base.Initialize();
@@ -33,6 +33,7 @@ public sealed class CoinFlipperMachineSystem : EntitySystem
         SubscribeLocalEvent<CoinFliperComponent, ActivateInWorldEvent>(OnInteractHandEvent);
         SubscribeLocalEvent<CoinFliperComponent, CoinFlipperDoAfterEvent>(OnSlotMachineDoAfter);
     }
+
     private void OnInteractHandEvent(EntityUid uid, CoinFliperComponent comp, ActivateInWorldEvent args)
     {
         if (comp.IsSpinning || !_power.IsPowered(uid))
@@ -42,18 +43,18 @@ public sealed class CoinFlipperMachineSystem : EntitySystem
             || slot.Item == null
             || !TryComp<StackComponent>(slot.Item.Value, out var stack))
         {
-            _popupSystem.PopupPredicted(Loc.GetString("slotmachine-no-money"), uid, uid, PopupType.Small); // No Money
+            _popupSystem.PopupPredicted(Loc.GetString("slotmachine-no-money"), uid, uid); // No Money
             return;
         }
 
         comp.PrizeAmount = 0; //Reset prize amount just incase
         var doAfter =
-         new DoAfterArgs(EntityManager, uid, comp.DoAfterTime, new CoinFlipperDoAfterEvent(), uid)
-         {
-             BreakOnMove = false,
-             BreakOnDamage = false,
-             MultiplyDelay = false,
-         };
+            new DoAfterArgs(EntityManager, uid, comp.DoAfterTime, new CoinFlipperDoAfterEvent(), uid)
+            {
+                BreakOnMove = false,
+                BreakOnDamage = false,
+                MultiplyDelay = false,
+            };
         comp.PrizeAmount = _stackSystem.GetCount(stack.Owner);
         _stackSystem.SetCount(stack.Owner, 0, stack);
         Dirty(stack.Owner, stack);
@@ -83,7 +84,7 @@ public sealed class CoinFlipperMachineSystem : EntitySystem
 
         StackComponent? stack = null;
         if (slot.Item != null)
-            TryComp<StackComponent>(slot.Item.Value, out stack);
+            TryComp(slot.Item.Value, out stack);
 
         if (_random.Prob(.5f))
         {
@@ -99,7 +100,12 @@ public sealed class CoinFlipperMachineSystem : EntitySystem
                     Dirty(newStack, newStackComp);
                 }
 
-                _chatSystem.TrySendInGameICMessage(uid, Loc.GetString("coinflipper-win", ("amount", comp.PrizeAmount)), InGameICChatType.Speak, hideChat: false, hideLog: true, checkRadioPrefix: false);
+                _chatSystem.TrySendInGameICMessage(uid,
+                    Loc.GetString("coinflipper-win", ("amount", comp.PrizeAmount)),
+                    InGameICChatType.Speak,
+                    false,
+                    true,
+                    checkRadioPrefix: false);
                 return;
             }
         }

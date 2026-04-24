@@ -14,9 +14,10 @@ namespace Content.Goobstation.Shared.Blob;
 
 public abstract class SharedBlobTileSystem : EntitySystem
 {
-    protected EntityQuery<BlobObserverComponent> ObserverQuery;
     protected EntityQuery<BlobCoreComponent> CoreQuery;
+    protected EntityQuery<BlobObserverComponent> ObserverQuery;
     protected EntityQuery<TransformComponent> TransformQuery;
+
     public override void Initialize()
     {
         base.Initialize();
@@ -28,7 +29,9 @@ public abstract class SharedBlobTileSystem : EntitySystem
         TransformQuery = GetEntityQuery<TransformComponent>();
     }
 
-    protected abstract void TryUpgrade(Entity<BlobTileComponent> target, Entity<BlobCoreComponent> core, EntityUid observer);
+    protected abstract void TryUpgrade(Entity<BlobTileComponent> target,
+        Entity<BlobCoreComponent> core,
+        EntityUid observer);
 
     private void AddUpgradeVerb(EntityUid uid, BlobTileComponent component, GetVerbsEvent<AlternativeVerb> args)
     {
@@ -47,13 +50,13 @@ public abstract class SharedBlobTileSystem : EntitySystem
         {
             BlobTileType.Normal => Loc.GetString("blob-verb-upgrade-to-strong"),
             BlobTileType.Strong => Loc.GetString("blob-verb-upgrade-to-reflective"),
-            _ => Loc.GetString("blob-verb-upgrade")
+            _ => Loc.GetString("blob-verb-upgrade"),
         };
 
         AlternativeVerb verb = new()
         {
             Act = () => TryUpgrade((uid, component), ghostBlobComponent.Core.Value, args.User),
-            Text = verbName
+            Text = verbName,
         };
         args.Verbs.Add(verb);
     }

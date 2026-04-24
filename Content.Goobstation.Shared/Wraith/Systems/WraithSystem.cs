@@ -15,17 +15,18 @@ namespace Content.Goobstation.Shared.Wraith.Systems;
 
 public sealed class WraithSystem : EntitySystem
 {
-    [Dependency] private readonly IPrototypeManager _proto  = default!;
-    [Dependency] private readonly WraithPointsSystem _wraithPoints = default!;
-    [Dependency] private readonly StatusEffectsSystem _statusEffects = default!;
     [Dependency] private readonly SharedActionsSystem _actions = default!;
     [Dependency] private readonly AbsorbCorpseSystem _corpse = default!;
     [Dependency] private readonly INetManager _netManager = default!;
+    [Dependency] private readonly IPrototypeManager _proto = default!;
+    [Dependency] private readonly StatusEffectsSystem _statusEffects = default!;
     [Dependency] private readonly IGameTiming _timing = default!;
+    [Dependency] private readonly WraithPointsSystem _wraithPoints = default!;
+    private EntityQuery<PassiveWraithPointsComponent> _passiveWraithPointsQuery;
 
     private EntityQuery<WraithPointsComponent> _wraithPointsQuery;
-    private EntityQuery<PassiveWraithPointsComponent> _passiveWraithPointsQuery;
-    /// <inheritdoc/>
+
+    /// <inheritdoc />
     public override void Initialize()
     {
         base.Initialize();

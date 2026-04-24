@@ -1,18 +1,18 @@
 using Content.Goobstation.Shared.Religion.Nullrod;
+using Content.Shared.Item.ItemToggle.Components;
+using Content.Shared.Timing;
 using Content.Shared.Toggleable;
 using Robust.Shared.Audio.Systems;
 using Robust.Shared.Timing;
-using Content.Shared.Timing;
-using Content.Shared.Item.ItemToggle.Components;
 
 namespace Content.Goobstation.Server.Religion.OnPray.TimedToggleOnPray;
 
 public sealed class TimedToggleOnPraySystem : EntitySystem
 {
-    [Dependency] private readonly IGameTiming _timing = default!;
-    [Dependency] private readonly SharedAudioSystem _audio = default!;
     [Dependency] private readonly SharedAppearanceSystem _appearance = default!;
+    [Dependency] private readonly SharedAudioSystem _audio = default!;
     [Dependency] private readonly UseDelaySystem _delay = default!;
+    [Dependency] private readonly IGameTiming _timing = default!;
 
     private EntityQuery<TimedToggleOnPrayComponent> _query;
 
@@ -26,17 +26,14 @@ public sealed class TimedToggleOnPraySystem : EntitySystem
         SubscribeLocalEvent<TimedToggleOnPrayComponent, MapInitEvent>(OnMapInit);
     }
 
-    private void OnStartup(Entity<TimedToggleOnPrayComponent> ent, ref ComponentStartup args)
-    {
-        UpdateVisuals(ent);
-    }
+    private void OnStartup(Entity<TimedToggleOnPrayComponent> ent, ref ComponentStartup args) => UpdateVisuals(ent);
 
     private void OnMapInit(Entity<TimedToggleOnPrayComponent> ent, ref MapInitEvent args)
     {
         if (!ent.Comp.Activated)
             return;
 
-        var ev = new ItemToggledEvent(Predicted: ent.Comp.Predictable, Activated: ent.Comp.Activated, User: null);
+        var ev = new ItemToggledEvent(ent.Comp.Predictable, ent.Comp.Activated, null);
         RaiseLocalEvent(ent, ref ev);
     }
 
@@ -45,7 +42,7 @@ public sealed class TimedToggleOnPraySystem : EntitySystem
         if (_delay.IsDelayed(ent.Owner))
             return;
 
-        TryActivate((ent, ent.Comp), args.User, predicted: ent.Comp.Predictable);
+        TryActivate((ent, ent.Comp), args.User, ent.Comp.Predictable);
     }
 
     public bool TryActivate(Entity<TimedToggleOnPrayComponent?> ent, EntityUid? user = null, bool predicted = true)
@@ -83,7 +80,7 @@ public sealed class TimedToggleOnPraySystem : EntitySystem
         comp.TimerRun = true;
         UpdateVisuals((uid, comp));
 
-        var toggleUsed = new ItemToggledEvent(predicted, Activated: true, user);
+        var toggleUsed = new ItemToggledEvent(predicted, true, user);
         RaiseLocalEvent(uid, ref toggleUsed);
     }
 
@@ -94,10 +91,10 @@ public sealed class TimedToggleOnPraySystem : EntitySystem
         var query = EntityQueryEnumerator<TimedToggleOnPrayComponent>();
         while (query.MoveNext(out var ent, out var time))
         {
-            if (time.TimerRun == false)
+            if (!time.TimerRun)
                 continue;
 
-            if (_timing.CurTime >= time.Time == false)
+            if (!(_timing.CurTime >= time.Time))
                 continue;
 
             time.TimerRun = false;
@@ -115,15 +112,13 @@ public sealed class TimedToggleOnPraySystem : EntitySystem
         comp.Activated = false;
         UpdateVisuals((uid, comp));
 
-        var toggleUsed = new ItemToggledEvent(predicted, Activated: false, user);
+        var toggleUsed = new ItemToggledEvent(predicted, false, user);
         RaiseLocalEvent(uid, ref toggleUsed);
     }
 
     private void UpdateVisuals(Entity<TimedToggleOnPrayComponent> ent)
     {
         if (TryComp(ent, out AppearanceComponent? appearance))
-        {
             _appearance.SetData(ent, ToggleableVisuals.Enabled, ent.Comp.Activated, appearance);
-        }
     }
 }

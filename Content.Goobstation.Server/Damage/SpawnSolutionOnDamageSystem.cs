@@ -11,16 +11,15 @@ using Robust.Shared.Random;
 
 namespace Content.Goobstation.Server.Damage;
 
-public sealed partial class SpawnSolutionOnDamageSystem : EntitySystem
+public sealed class SpawnSolutionOnDamageSystem : EntitySystem
 {
     [Dependency] private readonly IRobustRandom _random = null!;
-     public override void Initialize()
-    {
+
+    public override void Initialize() =>
         SubscribeLocalEvent<SpawnSolutionOnDamageComponent, BeforeDamageChangedEvent>(OnTakeDamage);
-    }
+
     private void OnTakeDamage(Entity<SpawnSolutionOnDamageComponent> ent, ref BeforeDamageChangedEvent args)
     {
-
         if (!args.Damage.AnyPositive())
             return;
 
@@ -28,7 +27,7 @@ public sealed partial class SpawnSolutionOnDamageSystem : EntitySystem
             return; //dont trigger on low damage
 
         var probability = Math.Clamp(ent.Comp.Probability, 0f, 1f);
-        if(_random.Prob(probability))
+        if (_random.Prob(probability))
             return;
 
         if (ent.Comp.Solution == "unknown")

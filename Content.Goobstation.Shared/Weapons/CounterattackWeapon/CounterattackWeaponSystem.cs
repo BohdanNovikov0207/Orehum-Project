@@ -22,6 +22,7 @@ public sealed class CounterattackWeaponSystem : EntitySystem
     [Dependency] private readonly SharedMeleeWeaponSystem _melee = default!;
     [Dependency] private readonly SharedItemSwitchSystem _switch = default!;
     [Dependency] private readonly IGameTiming _timing = default!;
+
     public override void Initialize()
     {
         base.Initialize();

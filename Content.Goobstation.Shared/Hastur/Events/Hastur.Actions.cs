@@ -25,6 +25,5 @@ public sealed partial class InsanityAuraEvent : InstantActionEvent;
 [ByRefEvent]
 public sealed partial class OmnipresenceEvent : InstantActionEvent;
 
-
-[Serializable, NetSerializable]
+[Serializable] [NetSerializable]
 public sealed partial class HasturDevourDoAfterEvent : SimpleDoAfterEvent;

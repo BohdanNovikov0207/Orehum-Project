@@ -13,10 +13,10 @@ public sealed class SlasherSummonMacheteSystem : EntitySystem
 {
     [Dependency] private readonly SharedActionsSystem _actions = default!;
     [Dependency] private readonly SharedHandsSystem _hands = default!;
+    [Dependency] private readonly INetManager _net = default!;
+    [Dependency] private readonly SharedPopupSystem _popup = default!;
     [Dependency] private readonly IPrototypeManager _protos = default!;
     [Dependency] private readonly SharedTransformSystem _xform = default!;
-    [Dependency] private readonly SharedPopupSystem _popup = default!;
-    [Dependency] private readonly INetManager _net = default!;
 
     public override void Initialize()
     {
@@ -27,15 +27,11 @@ public sealed class SlasherSummonMacheteSystem : EntitySystem
         SubscribeLocalEvent<SlasherSummonMacheteComponent, SlasherSummonMacheteEvent>(OnSummon);
     }
 
-    private void OnMapInit(Entity<SlasherSummonMacheteComponent> ent, ref MapInitEvent args)
-    {
+    private void OnMapInit(Entity<SlasherSummonMacheteComponent> ent, ref MapInitEvent args) =>
         _actions.AddAction(ent.Owner, ref ent.Comp.ActionEnt, ent.Comp.ActionId);
-    }
 
-    private void OnShutdown(Entity<SlasherSummonMacheteComponent> ent, ref ComponentShutdown args)
-    {
+    private void OnShutdown(Entity<SlasherSummonMacheteComponent> ent, ref ComponentShutdown args) =>
         _actions.RemoveAction(ent.Owner, ent.Comp.ActionEnt);
-    }
 
     /// <summary>
     /// Slasher - Handles summoning the Machete
@@ -54,14 +50,16 @@ public sealed class SlasherSummonMacheteSystem : EntitySystem
 
         // Check if we're already holding the machete.
         if (machete != null && Exists(machete.Value))
+        {
             if (_hands.IsHolding((ent.Owner, hands), machete.Value, out _))
             {
                 _popup.PopupPredicted(Loc.GetString("slasher-machete-already-holding"), ent.Owner, ent.Owner);
                 return;
             }
+        }
 
         // Check if we have a free hand.
-        if (!_hands.TryGetEmptyHand((ent.Owner, hands), out var _))
+        if (!_hands.TryGetEmptyHand((ent.Owner, hands), out _))
         {
             _popup.PopupPredicted(Loc.GetString("slasher-machete-hands-full"), ent.Owner, ent.Owner);
             return;
@@ -71,7 +69,7 @@ public sealed class SlasherSummonMacheteSystem : EntitySystem
         {
             if (machete == null || Deleted(machete))
             {
-                if (!_protos.TryIndex(ent.Comp.MachetePrototype, out EntityPrototype? _))
+                if (!_protos.TryIndex(ent.Comp.MachetePrototype, out var _))
                     return;
 
                 machete = Spawn(ent.Comp.MachetePrototype, _xform.GetMoverCoordinates(ent.Owner));

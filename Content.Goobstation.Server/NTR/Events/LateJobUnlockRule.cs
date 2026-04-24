@@ -16,12 +16,15 @@ namespace Content.Goobstation.Server.NTR.Events;
 
 public sealed class LateJobUnlockRule : StationEventSystem<LateJobUnlockRuleComponent>
 {
-    [Dependency] private readonly StationJobsSystem _stationJobs = default!;
+    [Dependency] private readonly IChatManager _chat = default!;
     [Dependency] private readonly IPrototypeManager _prototype = default!;
     [Dependency] private readonly StationSystem _station = default!;
-    [Dependency] private readonly IChatManager _chat = default!;
+    [Dependency] private readonly StationJobsSystem _stationJobs = default!;
 
-    protected override void Started(EntityUid uid, LateJobUnlockRuleComponent component, GameRuleComponent gameRule, GameRuleStartedEvent args)
+    protected override void Started(EntityUid uid,
+        LateJobUnlockRuleComponent component,
+        GameRuleComponent gameRule,
+        GameRuleStartedEvent args)
     {
         base.Started(uid, component, gameRule, args);
 
@@ -29,7 +32,8 @@ public sealed class LateJobUnlockRule : StationEventSystem<LateJobUnlockRuleComp
         {
             if (!HasComp<StationJobsComponent>(station))
             {
-                _chat.SendAdminAlert($"Station {_station.GetOwningStation(station)} has no jobs component. Skipping job unlocks.");
+                _chat.SendAdminAlert(
+                    $"Station {_station.GetOwningStation(station)} has no jobs component. Skipping job unlocks.");
                 continue;
             }
 
@@ -39,7 +43,8 @@ public sealed class LateJobUnlockRule : StationEventSystem<LateJobUnlockRuleComp
 
                 if (!_prototype.HasIndex(jobProtoId))
                 {
-                    _chat.SendAdminAlert($"Job prototype '{jobId}' not found for station {_station.GetOwningStation(station)}");
+                    _chat.SendAdminAlert(
+                        $"Job prototype '{jobId}' not found for station {_station.GetOwningStation(station)}");
                     continue;
                 }
 

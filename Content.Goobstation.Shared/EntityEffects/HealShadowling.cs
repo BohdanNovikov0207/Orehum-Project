@@ -7,9 +7,9 @@
 using Content.Goobstation.Maths.FixedPoint;
 using Content.Goobstation.Shared.Shadowling.Components;
 using Content.Shared._Shitmed.Damage;
+using Content.Shared._Shitmed.Targeting;
 using Content.Shared.Damage;
 using Content.Shared.EntityEffects;
-using Content.Shared._Shitmed.Targeting;
 using JetBrains.Annotations;
 using Robust.Shared.Prototypes;
 
@@ -29,6 +29,7 @@ public sealed partial class HealShadowling : EntityEffect
 
     [DataField]
     public bool ScaleByQuantity;
+
     protected override string ReagentEffectGuidebookText(IPrototypeManager prototype, IEntitySystemManager entSys) =>
         Loc.GetString("reagent-effect-guidebook-heal-sling", ("chance", Probability));
 
@@ -37,23 +38,19 @@ public sealed partial class HealShadowling : EntityEffect
         // If slings get custom organs, I will remove all of this code tbf
         if (!args.EntityManager.HasComponent<ShadowlingComponent>(args.TargetEntity) &&
             !args.EntityManager.HasComponent<ThrallComponent>(args.TargetEntity))
-        {
             return;
-        }
 
         var scale = FixedPoint2.New(1);
 
         if (args is EntityEffectReagentArgs reagentArgs)
-        {
             scale = ScaleByQuantity ? reagentArgs.Quantity * reagentArgs.Scale : reagentArgs.Scale;
-        }
 
         args.EntityManager.System<DamageableSystem>()
             .TryChangeDamage(
                 args.TargetEntity,
                 Damage * scale,
                 IgnoreResistances,
-                interruptsDoAfters: false,
+                false,
                 targetPart: TargetBodyPart.All,
                 partMultiplier: 0.5f,
                 splitDamage: SplitDamageBehavior.SplitEnsureAll,

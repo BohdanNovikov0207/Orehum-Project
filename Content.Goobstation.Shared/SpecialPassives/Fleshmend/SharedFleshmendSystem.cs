@@ -3,6 +3,7 @@
 //
 // SPDX-License-Identifier: AGPL-3.0-or-later
 
+using System.Linq;
 using Content.Goobstation.Common.Atmos;
 using Content.Goobstation.Maths.FixedPoint;
 using Content.Goobstation.Shared.SpecialPassives.Fleshmend.Components;
@@ -15,27 +16,26 @@ using Content.Shared.Damage;
 using Content.Shared.Damage.Prototypes;
 using Content.Shared.Mobs;
 using Content.Shared.Mobs.Components;
+using Content.Shared.Movement.Systems;
 using Robust.Shared.Audio;
 using Robust.Shared.Audio.Systems;
 using Robust.Shared.Network;
 using Robust.Shared.Prototypes;
 using Robust.Shared.Timing;
 using Robust.Shared.Utility;
-using System.Linq;
-using Content.Shared.Movement.Systems;
 
 namespace Content.Goobstation.Shared.SpecialPassives.Fleshmend;
 
 public sealed class SharedFleshmendSystem : EntitySystem
 {
-    [Dependency] private readonly IGameTiming _timing = default!;
-    [Dependency] private readonly INetManager _netManager = default!;
-    [Dependency] private readonly IPrototypeManager _proto = default!;
     [Dependency] private readonly AlertsSystem _alerts = default!;
     [Dependency] private readonly SharedAudioSystem _audio = default!;
     [Dependency] private readonly SharedBloodstreamSystem _bloodstream = default!;
-    [Dependency] private readonly MovementSpeedModifierSystem _movement = default!;
     [Dependency] private readonly DamageableSystem _dmg = default!;
+    [Dependency] private readonly MovementSpeedModifierSystem _movement = default!;
+    [Dependency] private readonly INetManager _netManager = default!;
+    [Dependency] private readonly IPrototypeManager _proto = default!;
+    [Dependency] private readonly IGameTiming _timing = default!;
     [Dependency] private readonly WoundSystem _wound = default!;
 
     private EntityQuery<DamageableComponent> _damageableQuery;
@@ -55,10 +55,8 @@ public sealed class SharedFleshmendSystem : EntitySystem
         SubscribeLocalEvent<FleshmendComponent, RefreshMovementSpeedModifiersEvent>(OnRefresh);
     }
 
-    private void OnRefresh(EntityUid uid, FleshmendComponent component, RefreshMovementSpeedModifiersEvent args)
-    {
+    private void OnRefresh(EntityUid uid, FleshmendComponent component, RefreshMovementSpeedModifiersEvent args) =>
         args.ModifySpeed(component.MovementSpeedDebuff, component.MovementSpeedDebuff);
-    }
 
     private void OnMapInit(Entity<FleshmendComponent> ent, ref MapInitEvent args)
     {
@@ -79,7 +77,8 @@ public sealed class SharedFleshmendSystem : EntitySystem
             RemoveFleshmendEffects(ent);
 
         if (ent.Comp.AlertId != null)
-            _alerts.ClearAlert(ent, (ProtoId<AlertPrototype>) ent.Comp.AlertId); // incase there was still time left on removal
+            _alerts.ClearAlert(ent,
+                (ProtoId<AlertPrototype>) ent.Comp.AlertId); // incase there was still time left on removal
     }
 
     public override void Update(float frameTime)
@@ -118,10 +117,8 @@ public sealed class SharedFleshmendSystem : EntitySystem
 
     #region Event Handlers
 
-    private void OnMobStateChange(Entity<FleshmendComponent> ent, ref MobStateChangedEvent args)
-    {
+    private void OnMobStateChange(Entity<FleshmendComponent> ent, ref MobStateChangedEvent args) =>
         ent.Comp.Mobstate = args.NewMobState;
-    }
 
     #endregion
 
@@ -142,13 +139,13 @@ public sealed class SharedFleshmendSystem : EntitySystem
 
         var bruteDiv =
             bruteTypes.DamageTypes.Count(type =>
-            damage.Damage.DamageDict.GetValueOrDefault(type)
-            != FixedPoint2.Zero);
+                damage.Damage.DamageDict.GetValueOrDefault(type)
+                != FixedPoint2.Zero);
 
         var burnDiv =
             burnTypes.DamageTypes.Count(type =>
-            damage.Damage.DamageDict.GetValueOrDefault(type)
-            != FixedPoint2.Zero);
+                damage.Damage.DamageDict.GetValueOrDefault(type)
+                != FixedPoint2.Zero);
 
         var bruteHealAmount = ent.Comp.BruteHeal / bruteDiv;
         var burnHealAmount = ent.Comp.BurnHeal / burnDiv;
@@ -156,15 +153,24 @@ public sealed class SharedFleshmendSystem : EntitySystem
         var healSpec = new DamageSpecifier();
 
         foreach (var brute in bruteTypes.DamageTypes)
+        {
             healSpec.DamageDict.Add(brute, bruteHealAmount);
+        }
 
         foreach (var burn in burnTypes.DamageTypes)
+        {
             healSpec.DamageDict.Add(burn, burnHealAmount);
+        }
 
         healSpec.DamageDict.Add("Asphyxiation", ent.Comp.AsphyxHeal);
 
         // heal the damage
-        _dmg.TryChangeDamage(ent, healSpec, true, false, targetPart: TargetBodyPart.All, splitDamage: SplitDamageBehavior.SplitEnsureAllOrganic);
+        _dmg.TryChangeDamage(ent,
+            healSpec,
+            true,
+            false,
+            targetPart: TargetBodyPart.All,
+            splitDamage: SplitDamageBehavior.SplitEnsureAllOrganic);
 
         // heal bleeding and restore blood
         _bloodstream.TryModifyBleedAmount(ent.Owner, ent.Comp.BleedingAdjust);
@@ -229,7 +235,8 @@ public sealed class SharedFleshmendSystem : EntitySystem
             && !ent.Comp.WorkWhileDead)
         {
             RemComp<FleshmendComponent>(ent);
-            return false; // seems unecessary, but this stops the rest of the logic from running and prevents the vfx/sfx from persisting
+            return
+                false; // seems unecessary, but this stops the rest of the logic from running and prevents the vfx/sfx from persisting
         }
 
         return true;

@@ -13,20 +13,20 @@ namespace Content.Goobstation.Shared.Changeling.Components;
 /// Marks an entity as a changeling, and holds generic changeling data.
 /// For the component holding more complex changeling data, see ChangelingIdentityComponent.
 /// </summary>
-[RegisterComponent, NetworkedComponent]
+[RegisterComponent] [NetworkedComponent]
 public sealed partial class ChangelingComponent : Component
 {
-    /// <summary>
-    /// The starting components to be assigned to a changeling.
-    /// </summary>
-    [DataField]
-    public ProtoId<ChangelingStartingEvolutionPrototype> EvolutionsProto = "DefaultChangeling";
-
     /// <summary>
     /// Have the components been assigned?
     /// </summary>
     [DataField]
     public bool EvolutionsAssigned;
+
+    /// <summary>
+    /// The starting components to be assigned to a changeling.
+    /// </summary>
+    [DataField]
+    public ProtoId<ChangelingStartingEvolutionPrototype> EvolutionsProto = "DefaultChangeling";
 
     [DataField]
     public string MindswapText = "changeling"; // only used for mindswap attempts

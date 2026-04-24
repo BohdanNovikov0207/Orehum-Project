@@ -3,7 +3,7 @@ using Robust.Shared.GameStates;
 
 namespace Content.Goobstation.Shared.Wraith.SaltLines;
 
-[RegisterComponent, NetworkedComponent]
+[RegisterComponent] [NetworkedComponent]
 public sealed partial class ConsumeOnSaltLineComponent : Component
 {
     /// <summary>
@@ -17,5 +17,4 @@ public sealed partial class ConsumeOnSaltLineComponent : Component
 /// Raised when attempting to place a salt line
 /// </summary>
 [ByRefEvent]
-public record struct AttemptSaltLineEvent(EntityUid User,bool Cancelled = false);
-
+public record struct AttemptSaltLineEvent(EntityUid User, bool Cancelled = false);

@@ -26,7 +26,10 @@ public sealed class ClowncarSystem : SharedClowncarSystem
 
     private void OnAppearanceChange(EntityUid uid, ClowncarComponent component, ref AppearanceChangeEvent args)
     {
-        if (args.Sprite == null || !AppearanceSystem.TryGetData<bool>(uid, ClowncarVisuals.FireModeEnabled, out var fireModeEnabled, args.Component))
+        if (args.Sprite == null || !AppearanceSystem.TryGetData<bool>(uid,
+                ClowncarVisuals.FireModeEnabled,
+                out var fireModeEnabled,
+                args.Component))
             return;
 
         if (!args.Sprite.LayerMapTryGet(ClowncarLayers.Base, out var baseLayerIdx))
@@ -43,12 +46,16 @@ public sealed class ClowncarSystem : SharedClowncarSystem
         sprite.LayerSetAutoAnimated(ClowncarLayers.Base, true);
     }
 
-    private void PlayAnimation(EntityUid uid, ClowncarLayers layer, string state, string finalState, float animationTime)
+    private void PlayAnimation(EntityUid uid,
+        ClowncarLayers layer,
+        string state,
+        string finalState,
+        float animationTime)
     {
         if (_animationPlayer.HasRunningAnimation(uid, state))
             return;
 
-        var animation = new Animation()
+        var animation = new Animation
         {
             Length = TimeSpan.FromSeconds(animationTime),
             AnimationTracks =
@@ -59,10 +66,10 @@ public sealed class ClowncarSystem : SharedClowncarSystem
                     KeyFrames =
                     {
                         new AnimationTrackSpriteFlick.KeyFrame(state, 0f),
-                        new AnimationTrackSpriteFlick.KeyFrame(finalState, animationTime)
-                    }
-                }
-            }
+                        new AnimationTrackSpriteFlick.KeyFrame(finalState, animationTime),
+                    },
+                },
+            },
         };
 
         _animationPlayer.Play(uid, animation, state);
@@ -71,5 +78,5 @@ public sealed class ClowncarSystem : SharedClowncarSystem
 
 internal enum ClowncarLayers : byte
 {
-   Base
+    Base,
 }

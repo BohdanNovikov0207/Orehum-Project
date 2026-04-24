@@ -5,13 +5,13 @@ using Content.Shared.Polymorph;
 
 namespace Content.Goobstation.Server.Changeling;
 
-public sealed partial class AugmentedEyesightSystem : SharedAugmentedEyesightSystem
+public sealed class AugmentedEyesightSystem : SharedAugmentedEyesightSystem
 {
-    [Dependency] private readonly PolymorphSystem _polymorph = default!;
     [Dependency] private readonly SharedEyeSystem _eye = default!;
+    [Dependency] private readonly PolymorphSystem _polymorph = default!;
+    private EntityQuery<EyeComponent> _eyeQuery;
 
     private EntityQuery<ChangelingIdentityComponent> _lingQuery;
-    private EntityQuery<EyeComponent> _eyeQuery;
 
     public override void Initialize()
     {

@@ -10,18 +10,6 @@ namespace Content.Goobstation.Shared.Disease.Components;
 public sealed partial class ImmunityComponent : Component
 {
     /// <summary>
-    /// How fast this organism increases immune progress on diseases, per second
-    /// </summary>
-    [DataField]
-    public float ImmunityGainRate = 0.002f;
-
-    /// <summary>
-    /// How fast this organism decreases infection progress at full immunity progress
-    /// </summary>
-    [DataField]
-    public float ImmunityStrength = 0.02f;
-
-    /// <summary>
     /// Which disease types can this affect the immunity strength against and gain immunity to
     /// </summary>
     [DataField]
@@ -32,6 +20,18 @@ public sealed partial class ImmunityComponent : Component
     /// </summary>
     [DataField]
     public HashSet<int> ImmuneTo = new();
+
+    /// <summary>
+    /// How fast this organism increases immune progress on diseases, per second
+    /// </summary>
+    [DataField]
+    public float ImmunityGainRate = 0.002f;
+
+    /// <summary>
+    /// How fast this organism decreases infection progress at full immunity progress
+    /// </summary>
+    [DataField]
+    public float ImmunityStrength = 0.02f;
 
     /// <summary>
     /// Whether to still work while dead

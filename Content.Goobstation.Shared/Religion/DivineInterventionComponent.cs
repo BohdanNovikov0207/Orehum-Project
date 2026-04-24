@@ -12,7 +12,7 @@ using Robust.Shared.Prototypes;
 
 namespace Content.Goobstation.Shared.Religion;
 
-[RegisterComponent, NetworkedComponent]
+[RegisterComponent] [NetworkedComponent]
 public sealed partial class DivineInterventionComponent : Component
 {
     /// <summary>
@@ -22,16 +22,16 @@ public sealed partial class DivineInterventionComponent : Component
     public SoundSpecifier DenialSound = new SoundPathSpecifier("/Audio/Effects/hallelujah.ogg");
 
     /// <summary>
-    /// Which effect to display.
-    /// </summary>
-    [DataField]
-    public EntProtoId EffectProto = "EffectSpark";
-
-    /// <summary>
     /// Which loc string to display.
     /// </summary>
     [DataField]
     public LocId DenialString = "nullrod-spelldenial-popup";
+
+    /// <summary>
+    /// Which effect to display.
+    /// </summary>
+    [DataField]
+    public EntProtoId EffectProto = "EffectSpark";
 
     /// <summary>
     /// Valid inventory slots for spell denial when equipped

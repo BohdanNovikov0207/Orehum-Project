@@ -8,7 +8,7 @@ namespace Content.Goobstation.Shared.Disease;
 /// Disease StatusIcons for the med and virology HUDs
 /// </summary>
 [Prototype]
-public sealed partial class DiseaseIconPrototype : StatusIconPrototype, IInheritingPrototype
+public sealed class DiseaseIconPrototype : StatusIconPrototype, IInheritingPrototype
 {
     [ParentDataField(typeof(AbstractPrototypeIdArraySerializer<DiseaseIconPrototype>))]
     public string[]? Parents { get; private set; }

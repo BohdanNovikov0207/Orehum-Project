@@ -21,16 +21,15 @@ namespace Content.Goobstation.Server.Traitor;
 
 public sealed class GoobUplinkSystem : GoobCommonUplinkSystem
 {
-    [Dependency] private readonly IRobustRandom _random = default!;
-    [Dependency] private readonly IGameTiming _timing = default!;
-    [Dependency] private readonly SharedUserInterfaceSystem _ui = default!;
-    [Dependency] private readonly IServerPreferencesManager _prefs = default!;
-    [Dependency] private readonly IPrototypeManager _proto = default!;
-    [Dependency] private readonly EntityWhitelistSystem _whitelistSystem = default!;
-
     private static readonly ProtoId<RoleLoadoutPrototype> AntagTraitorLoadout = "AntagTraitor";
     private static readonly ProtoId<LoadoutGroupPrototype> TraitorUplinkGroup = "TraitorUplink";
     private static readonly ProtoId<UplinkPreferencePrototype> DefaultPreference = "UplinkPda";
+    [Dependency] private readonly IServerPreferencesManager _prefs = default!;
+    [Dependency] private readonly IPrototypeManager _proto = default!;
+    [Dependency] private readonly IRobustRandom _random = default!;
+    [Dependency] private readonly IGameTiming _timing = default!;
+    [Dependency] private readonly SharedUserInterfaceSystem _ui = default!;
+    [Dependency] private readonly EntityWhitelistSystem _whitelistSystem = default!;
 
     private EntityQuery<ContainerManagerComponent> _containerQuery;
 
@@ -149,9 +148,7 @@ public sealed class GoobUplinkSystem : GoobCommonUplinkSystem
         }
 
         if (TryComp<PenSpinUplinkComponent>(ent.Owner, out var uplink))
-        {
             uplink.Code = code;
-        }
 
         ev.Code = code;
     }
@@ -202,9 +199,7 @@ public sealed class GoobUplinkSystem : GoobCommonUplinkSystem
             }
         }
         else
-        {
             ResetCombination(ent.Comp, uplink);
-        }
     }
 
     private void OnReset(Entity<PenComponent> ent, ref PenSpinResetMessage args)
@@ -219,8 +214,6 @@ public sealed class GoobUplinkSystem : GoobCommonUplinkSystem
         uplink.CurrentIndex = 0;
     }
 
-    private static bool IsValidDegree(PenComponent comp, int degree)
-    {
-        return degree >= comp.MinDegree && degree <= comp.MaxDegree;
-    }
+    private static bool IsValidDegree(PenComponent comp, int degree) =>
+        degree >= comp.MinDegree && degree <= comp.MaxDegree;
 }

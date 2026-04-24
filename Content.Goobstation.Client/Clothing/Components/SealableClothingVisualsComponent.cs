@@ -16,8 +16,9 @@ namespace Content.Goobstation.Client.Clothing.Components;
 public sealed partial class SealableClothingVisualsComponent : Component
 {
     [DataField]
-    public string SpriteLayer = "sealed";
+    public Dictionary<string, List<PrototypeLayerData>>
+        ClothingVisuals = new(); //just use ClothingVisuals like anything else
 
     [DataField]
-    public Dictionary<string, List<PrototypeLayerData>> ClothingVisuals = new(); //just use ClothingVisuals like anything else
+    public string SpriteLayer = "sealed";
 }

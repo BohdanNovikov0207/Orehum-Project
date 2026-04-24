@@ -3,5 +3,5 @@ using Robust.Shared.Serialization;
 
 namespace Content.Goobstation.Shared.Exorcism;
 
-[Serializable, NetSerializable]
+[Serializable] [NetSerializable]
 public sealed partial class ExorcismDoAfterEvent : SimpleDoAfterEvent;

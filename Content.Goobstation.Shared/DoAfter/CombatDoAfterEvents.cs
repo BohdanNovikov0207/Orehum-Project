@@ -10,7 +10,7 @@ using Robust.Shared.Serialization;
 
 namespace Content.Goobstation.Shared.DoAfter;
 
-[Serializable, NetSerializable]
+[Serializable] [NetSerializable]
 public sealed partial class CombatDoAfterEvent : SimpleDoAfterEvent;
 
 [ImplicitDataDefinitionForInheritors]
@@ -19,9 +19,8 @@ public abstract partial class BaseCombatDoAfterSuccessEvent : EntityEventArgs;
 [Virtual]
 public partial class CombatDoAfterMeleeHitEvent : BaseCombatDoAfterSuccessEvent
 {
-    public IReadOnlyList<EntityUid> Targets;
-
     public DamageSpecifier BonusDamage = new();
+    public IReadOnlyList<EntityUid> Targets;
 }
 
 [Virtual]

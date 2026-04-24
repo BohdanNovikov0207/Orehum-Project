@@ -8,15 +8,15 @@ namespace Content.Goobstation.Shared.Shadowling.Components;
 /// <summary>
 /// This is used for marking Thralls and storing their icons
 /// </summary>
-[RegisterComponent, NetworkedComponent]
+[RegisterComponent] [NetworkedComponent]
 public sealed partial class ThrallComponent : Component
 {
     [ViewVariables]
     public EntityUid? Converter;
 
     [DataField]
-    public ProtoId<FactionIconPrototype> StatusIcon { get; set; } = "ThrallFaction";
+    public SoundSpecifier? ThrallConverted = new SoundPathSpecifier("/Audio/_EinsteinEngines/Shadowling/thrall.ogg");
 
     [DataField]
-    public SoundSpecifier? ThrallConverted = new SoundPathSpecifier("/Audio/_EinsteinEngines/Shadowling/thrall.ogg");
+    public ProtoId<FactionIconPrototype> StatusIcon { get; set; } = "ThrallFaction";
 }

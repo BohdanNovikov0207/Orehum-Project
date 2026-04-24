@@ -16,9 +16,6 @@ namespace Content.Goobstation.Client.Chemistry.UI;
 [GenerateTypedNameReferences]
 public sealed partial class EnergyReagentCardControl : Control
 {
-    public string ReagentId { get; }
-    public float PowerCostPerUnit { get; }
-    public bool IsDisabled => MainButton.Disabled;
     public Action<string>? OnPressed;
 
     public EnergyReagentCardControl(EnergyReagentInventoryItem item)
@@ -33,6 +30,11 @@ public sealed partial class EnergyReagentCardControl : Control
 
         MainButton.OnPressed += args => OnPressed?.Invoke(ReagentId);
     }
+
+    public string ReagentId { get; }
+    public float PowerCostPerUnit { get; }
+    public bool IsDisabled => MainButton.Disabled;
+
     public void SetDisabled(bool disabled, string tooltip = "")
     {
         if (disabled)

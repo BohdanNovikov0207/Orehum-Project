@@ -11,13 +11,13 @@ namespace Content.Goobstation.Shared.SpecialAnimation;
 /// Raised on some client to play a spell card animation.
 /// </summary>
 [ImplicitDataDefinitionForInheritors]
-[Serializable, NetSerializable]
+[Serializable] [NetSerializable]
 public sealed partial class SpecialAnimationEvent : EntityEventArgs
 {
+    public SpecialAnimationData AnimationData;
+
     public SpecialAnimationEvent(SpecialAnimationData animationData)
     {
         AnimationData = animationData;
     }
-
-    public SpecialAnimationData AnimationData;
 }

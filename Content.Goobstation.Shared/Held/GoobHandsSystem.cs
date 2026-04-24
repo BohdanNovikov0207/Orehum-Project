@@ -3,7 +3,6 @@ using Content.Goobstation.Shared.Grab;
 using Content.Shared.Hands;
 using Content.Shared.Hands.Components;
 using Content.Shared.Hands.EntitySystems;
-using Content.Shared.Movement.Pulling.Events;
 
 namespace Content.Goobstation.Shared.Held;
 
@@ -20,10 +19,8 @@ public sealed class GoobHandsSystem : EntitySystem
         SubscribeLocalEvent<HandsComponent, GrabModifierEvent>(RefRelayEvent);
     }
 
-    private void RelayEvent<T>(Entity<HandsComponent> entity, ref T args) where T : EntityEventArgs
-    {
+    private void RelayEvent<T>(Entity<HandsComponent> entity, ref T args) where T : EntityEventArgs =>
         CoreRelayEvent(entity, ref args);
-    }
 
     private void RefRelayEvent<T>(Entity<HandsComponent> entity, ref T args)
     {

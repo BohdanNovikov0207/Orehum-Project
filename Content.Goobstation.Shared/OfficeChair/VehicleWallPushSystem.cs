@@ -2,12 +2,12 @@
 //
 // SPDX-License-Identifier: AGPL-3.0-or-later
 
+using System.Numerics;
 using Content.Goobstation.Common.CCVar;
 using Content.Goobstation.Shared.Vehicles;
 using Content.Shared._EinsteinEngines.Contests;
 using Content.Shared.Actions;
 using Content.Shared.Buckle.Components;
-using Content.Shared.Item;
 using Content.Shared.Throwing;
 using Robust.Shared.Audio.Systems;
 using Robust.Shared.Configuration;
@@ -17,21 +17,20 @@ using Robust.Shared.Physics.Components;
 using Robust.Shared.Physics.Systems;
 using Robust.Shared.Timing;
 using Robust.Shared.Utility;
-using System.Numerics;
 
 namespace Content.Goobstation.Shared.OfficeChair;
 
-public sealed partial class VehicleWallPushSystem : EntitySystem
+public sealed class VehicleWallPushSystem : EntitySystem
 {
     [Dependency] private readonly SharedActionsSystem _actions = default!;
-    [Dependency] private readonly SharedTransformSystem _xform = default!;
+    [Dependency] private readonly SharedAudioSystem _audio = default!;
+    [Dependency] private readonly INetConfigurationManager _config = default!;
+    [Dependency] private readonly ContestsSystem _contests = default!;
+    [Dependency] private readonly INetManager _net = default!;
     [Dependency] private readonly SharedPhysicsSystem _physics = default!;
     [Dependency] private readonly ThrowingSystem _throwing = default!;
-    [Dependency] private readonly ContestsSystem _contests = default!;
-    [Dependency] private readonly INetConfigurationManager _config = default!;
-    [Dependency] private readonly SharedAudioSystem _audio = default!;
     [Dependency] private readonly IGameTiming _timing = default!;
-    [Dependency] private readonly INetManager _net = default!;
+    [Dependency] private readonly SharedTransformSystem _xform = default!;
 
     public override void Initialize()
     {
@@ -83,7 +82,8 @@ public sealed partial class VehicleWallPushSystem : EntitySystem
         var dir = aim / aimLen;
         var ray = new CollisionRay(from.Position, dir, VehicleWallPushComponent.KickMask);
 
-        if (_physics.IntersectRayWithPredicate(to.MapId, ray, comp.MaxDistance, x => x == vehicle.Driver || x == uid).FirstOrNull() is not { HitEntity: { } blocker })
+        if (_physics.IntersectRayWithPredicate(to.MapId, ray, comp.MaxDistance, x => x == vehicle.Driver || x == uid)
+                .FirstOrNull() is not { HitEntity: { } blocker })
             return;
 
         _audio.PlayPredicted(comp.RollSound, args.Performer, args.Performer);
@@ -102,7 +102,12 @@ public sealed partial class VehicleWallPushSystem : EntitySystem
             {
                 var force = shoveRange * _contests.MassContest(args.Performer, blocker, rangeFactor: shoveMass);
                 var pushVec = Vector2.Normalize(delta) * force;
-                _throwing.TryThrow(blocker, pushVec, force * shoveSpeed, args.Performer, animated: true, playSound: false);
+                _throwing.TryThrow(blocker,
+                    pushVec,
+                    force * shoveSpeed,
+                    args.Performer,
+                    animated: true,
+                    playSound: false);
             }
         }
 
@@ -110,5 +115,4 @@ public sealed partial class VehicleWallPushSystem : EntitySystem
         _physics.SetLinearVelocity(uid, physics.LinearVelocity + addVel);
         args.Handled = true;
     }
-
 }

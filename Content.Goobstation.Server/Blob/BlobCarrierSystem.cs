@@ -15,30 +15,36 @@ using Content.Goobstation.Common.Blob;
 using Content.Goobstation.Shared.Blob;
 using Content.Goobstation.Shared.Blob.Components;
 using Content.Goobstation.Shared.Blob.Events;
+using Content.Server._EinsteinEngines.Language;
 using Content.Server.Actions;
 using Content.Server.Body.Systems;
 using Content.Server.Ghost.Roles;
 using Content.Server.Ghost.Roles.Components;
 using Content.Server.Mind;
+using Content.Shared._EinsteinEngines.Language;
+using Content.Shared._EinsteinEngines.Language.Events;
 using Content.Shared.Mind.Components;
 using Content.Shared.Mobs;
 using Robust.Shared.Map.Components;
 using Robust.Shared.Player;
 using Robust.Shared.Prototypes;
-using Content.Server._EinsteinEngines.Language;
-using Content.Shared._EinsteinEngines.Language;
-using Content.Shared._EinsteinEngines.Language.Events;
 
 namespace Content.Goobstation.Server.Blob;
 
 public sealed class BlobCarrierSystem : SharedBlobCarrierSystem
 {
-    [Dependency] private readonly BlobCoreSystem _blobCoreSystem = default!;
-    [Dependency] private readonly MindSystem _mind = default!;
-    [Dependency] private readonly GhostRoleSystem _ghost = default!;
-    [Dependency] private readonly BodySystem _bodySystem = default!;
+    [ValidatePrototypeId<EntityPrototype>]
+    private const string ActionTransformToBlob = "ActionTransformToBlob";
+
+    [ValidatePrototypeId<LanguagePrototype>]
+    private const string BlobLang = "Blob";
+
     [Dependency] private readonly ActionsSystem _action = default!;
+    [Dependency] private readonly BlobCoreSystem _blobCoreSystem = default!;
+    [Dependency] private readonly BodySystem _bodySystem = default!;
+    [Dependency] private readonly GhostRoleSystem _ghost = default!;
     [Dependency] private readonly LanguageSystem _language = default!;
+    [Dependency] private readonly MindSystem _mind = default!;
 
     public override void Initialize()
     {
@@ -55,31 +61,29 @@ public sealed class BlobCarrierSystem : SharedBlobCarrierSystem
         SubscribeLocalEvent<BlobCarrierComponent, MindRemovedMessage>(OnMindRemove);
     }
 
-    [ValidatePrototypeId<EntityPrototype>]
-    private const string ActionTransformToBlob = "ActionTransformToBlob";
-
-    [ValidatePrototypeId<LanguagePrototype>]
-    private const string BlobLang = "Blob";
-
     private void OnApplyLang(Entity<BlobCarrierComponent> ent, ref DetermineEntityLanguagesEvent args)
     {
-        if(ent.Comp.LifeStage is
-           ComponentLifeStage.Removing
-           or ComponentLifeStage.Stopping
-           or ComponentLifeStage.Stopped)
+        if (ent.Comp.LifeStage is
+            ComponentLifeStage.Removing
+            or ComponentLifeStage.Stopping
+            or ComponentLifeStage.Stopped)
             return;
 
         args.SpokenLanguages.Add(BlobLang);
         args.UnderstoodLanguages.Add(BlobLang);
     }
 
-    private void OnRemove(Entity<BlobCarrierComponent> ent, ref ComponentRemove args) => _language.UpdateEntityLanguages(ent.Owner);
+    private void OnRemove(Entity<BlobCarrierComponent> ent, ref ComponentRemove args) =>
+        _language.UpdateEntityLanguages(ent.Owner);
 
-    private void OnMindAdded(EntityUid uid, BlobCarrierComponent component, MindAddedMessage args) => component.HasMind = true;
+    private void OnMindAdded(EntityUid uid, BlobCarrierComponent component, MindAddedMessage args) =>
+        component.HasMind = true;
 
-    private void OnMindRemove(EntityUid uid, BlobCarrierComponent component, MindRemovedMessage args) => component.HasMind = false;
+    private void OnMindRemove(EntityUid uid, BlobCarrierComponent component, MindRemovedMessage args) =>
+        component.HasMind = false;
 
-    private void OnTransformToBlobChanged(Entity<BlobCarrierComponent> uid, ref TransformToBlobActionEvent args) => TransformToBlob(uid);
+    private void OnTransformToBlobChanged(Entity<BlobCarrierComponent> uid, ref TransformToBlobActionEvent args) =>
+        TransformToBlob(uid);
 
     private void OnStartup(EntityUid uid, BlobCarrierComponent component, MapInitEvent args)
     {
@@ -100,9 +104,7 @@ public sealed class BlobCarrierSystem : SharedBlobCarrierSystem
     private void OnMobStateChanged(Entity<BlobCarrierComponent> uid, ref MobStateChangedEvent args)
     {
         if (args.NewMobState == MobState.Dead)
-        {
             TransformToBlob(uid);
-        }
     }
 
     protected override void TransformToBlob(Entity<BlobCarrierComponent> ent)
@@ -125,9 +127,7 @@ public sealed class BlobCarrierSystem : SharedBlobCarrierSystem
             _blobCoreSystem.CreateBlobObserver(core, mind.UserId.Value, blobCoreComponent);
         }
         else
-        {
             Spawn(ent.Comp.CoreBlobPrototype, xform.Coordinates);
-        }
 
         _bodySystem.GibBody(ent);
     }

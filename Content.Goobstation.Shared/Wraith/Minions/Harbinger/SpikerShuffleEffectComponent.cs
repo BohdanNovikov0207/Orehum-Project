@@ -3,10 +3,10 @@ using Robust.Shared.Serialization;
 
 namespace Content.Goobstation.Shared.Wraith.Minions.Harbinger;
 
-[RegisterComponent, NetworkedComponent]
+[RegisterComponent] [NetworkedComponent]
 public sealed partial class SpikerShuffleEffectComponent : Component;
 
-[NetSerializable, Serializable]
+[NetSerializable] [Serializable]
 public enum ShuffleVisuals : byte
 {
     Shuffling,

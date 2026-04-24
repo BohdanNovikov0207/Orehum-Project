@@ -23,10 +23,16 @@ public sealed partial class PickBlobPodZombifyTargetOperator : HTNOperator
 {
     [Dependency] private readonly IEntityManager _entManager = default!;
     private NpcFactionSystem _factions = default!;
-    private MobStateSystem _mobSystem = default!;
 
     private EntityLookupSystem _lookup = default!;
+    private MobStateSystem _mobSystem = default!;
     private PathfindingSystem _pathfinding = default!;
+
+    /// <summary>
+    /// Where the pathfinding result will be stored (if applicable). This gets removed after execution.
+    /// </summary>
+    [DataField("pathfindKey")]
+    public string PathfindKey = NPCBlackboard.PathfindKey;
 
     [DataField("rangeKey", required: true)]
     public string RangeKey = string.Empty;
@@ -36,12 +42,6 @@ public sealed partial class PickBlobPodZombifyTargetOperator : HTNOperator
 
     [DataField("zombifyKey")]
     public string ZombifyKey = string.Empty;
-
-    /// <summary>
-    /// Where the pathfinding result will be stored (if applicable). This gets removed after execution.
-    /// </summary>
-    [DataField("pathfindKey")]
-    public string PathfindKey = NPCBlackboard.PathfindKey;
 
     public override void Initialize(IEntitySystemManager sysManager)
     {
@@ -84,15 +84,13 @@ public sealed partial class PickBlobPodZombifyTargetOperator : HTNOperator
             var targetCoords = xform.Coordinates;
             var path = await _pathfinding.GetPath(owner, target, range, cancelToken);
             if (path.Result != PathResult.Path)
-            {
                 continue;
-            }
 
-            return (true, new Dictionary<string, object>()
+            return (true, new Dictionary<string, object>
             {
                 { TargetKey, targetCoords },
                 { ZombifyKey, target },
-                { PathfindKey, path}
+                { PathfindKey, path },
             });
         }
 

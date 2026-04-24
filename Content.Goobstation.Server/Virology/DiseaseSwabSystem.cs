@@ -1,9 +1,9 @@
 using Content.Goobstation.Shared.Disease.Components;
 using Content.Goobstation.Shared.Disease.Systems;
 using Content.Goobstation.Shared.Virology;
+using Content.Server.Popups;
 using Content.Shared.Examine;
 using Content.Shared.Interaction;
-using Content.Server.Popups;
 using Robust.Shared.Random;
 
 namespace Content.Goobstation.Server.Virology;
@@ -35,12 +35,14 @@ public sealed class DiseaseSwabSystem : EntitySystem
         }
 
         _popup.PopupEntity(Loc.GetString("disease-swab-swabbed",
-            ("target", args.Target == args.User ? Loc.GetString("disease-swab-yourself") : args.Target )),
+                ("target", args.Target == args.User ? Loc.GetString("disease-swab-yourself") : args.Target)),
             args.User,
             args.User);
 
-        if(args.Target != args.User)
-            _popup.PopupEntity(Loc.GetString("disease-swab-swabbed-by", ("user", args.User)), args.Target.Value, args.Target.Value);
+        if (args.Target != args.User)
+            _popup.PopupEntity(Loc.GetString("disease-swab-swabbed-by", ("user", args.User)),
+                args.Target.Value,
+                args.Target.Value);
 
         if (carrier.Diseases.Count == 0)
             return;

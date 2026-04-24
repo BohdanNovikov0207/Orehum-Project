@@ -12,5 +12,5 @@ namespace Content.Goobstation.Server.Religion.OnPray.ReloadOnPray;
 public sealed partial class ReloadOnPrayComponent : Component
 {
     [DataField]
-    public SoundPathSpecifier ReloadSoundPath = new ("/Audio/Weapons/Guns/MagIn/shotgun_insert.ogg");
+    public SoundPathSpecifier ReloadSoundPath = new("/Audio/Weapons/Guns/MagIn/shotgun_insert.ogg");
 }

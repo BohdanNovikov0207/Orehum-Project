@@ -6,9 +6,15 @@ namespace Content.Goobstation.Shared.Shadowling.Components.Abilities.Ascension;
 /// <summary>
 /// This is used for Plane Shift ability.
 /// </summary>
-[RegisterComponent, NetworkedComponent]
+[RegisterComponent] [NetworkedComponent]
 public sealed partial class ShadowlingPlaneShiftComponent : Component
 {
+    [DataField]
+    public EntityUid? ActionEnt;
+
+    [DataField]
+    public EntProtoId ActionId = "ActionPlaneShift";
+
     /// <summary>
     /// Indicates whether the ability is active, or not.
     /// </summary>
@@ -16,20 +22,14 @@ public sealed partial class ShadowlingPlaneShiftComponent : Component
     public bool IsActive;
 
     /// <summary>
-    /// Indicates the new walking speed of the ability user.
-    /// </summary>
-    [DataField]
-    public float WalkSpeedModifier = 1.25f;
-
-    /// <summary>
     /// Indicates the new running speed of the ability user.
     /// </summary>
     [DataField]
     public float RunSpeedModifier = 1.5f;
 
+    /// <summary>
+    /// Indicates the new walking speed of the ability user.
+    /// </summary>
     [DataField]
-    public EntProtoId ActionId = "ActionPlaneShift";
-
-    [DataField]
-    public EntityUid? ActionEnt;
+    public float WalkSpeedModifier = 1.25f;
 }

@@ -22,7 +22,11 @@ namespace Content.Goobstation.Client.Research.UI;
 [GenerateTypedNameReferences]
 public sealed partial class MiniRecipeCardControl : Control
 {
-    public MiniRecipeCardControl(TechnologyPrototype technology, LatheRecipePrototype proto, IPrototypeManager prototypeManager, SpriteSystem sprite, LatheSystem lathe)
+    public MiniRecipeCardControl(TechnologyPrototype technology,
+        LatheRecipePrototype proto,
+        IPrototypeManager prototypeManager,
+        SpriteSystem sprite,
+        LatheSystem lathe)
     {
         RobustXamlLoader.Load(this);
 

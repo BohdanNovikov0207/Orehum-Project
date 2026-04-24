@@ -11,13 +11,13 @@ namespace Content.Goobstation.Shared.ItemToggle;
 public sealed partial class ItemToggleVisualsComponent : Component
 {
     [DataField]
-    public string? HeldPrefixOn = "on";
+    public string? HeldPrefixOff = "off";
 
     [DataField]
-    public string? HeldPrefixOff = "off";
+    public string? HeldPrefixOn = "on";
 }
 
-[Serializable, NetSerializable]
+[Serializable] [NetSerializable]
 public enum ItemToggleVisuals
 {
     State,

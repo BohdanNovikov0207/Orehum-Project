@@ -1,7 +1,8 @@
 using Content.Shared.StatusEffectNew;
 
 namespace Content.Goobstation.Server.ComponentsRegistry;
-public sealed partial class GrantComponentsStatusEffectSystem : EntitySystem
+
+public sealed class GrantComponentsStatusEffectSystem : EntitySystem
 {
     // please don't use it for anything more complicated than adding immunity to stuff.
     // even so this could potentially break so much shit.
@@ -16,13 +17,9 @@ public sealed partial class GrantComponentsStatusEffectSystem : EntitySystem
         SubscribeLocalEvent<GrantComponentsStatusEffectComponent, StatusEffectRemovedEvent>(OnStatusEffectRemove);
     }
 
-    private void OnStatusEffectApply(Entity<GrantComponentsStatusEffectComponent> ent, ref StatusEffectAppliedEvent args)
-    {
-        EntityManager.AddComponents(args.Target, ent.Comp.Components);
-    }
+    private void OnStatusEffectApply(Entity<GrantComponentsStatusEffectComponent> ent,
+        ref StatusEffectAppliedEvent args) => EntityManager.AddComponents(args.Target, ent.Comp.Components);
 
-    private void OnStatusEffectRemove(Entity<GrantComponentsStatusEffectComponent> ent, ref StatusEffectRemovedEvent args)
-    {
-        EntityManager.RemoveComponents(args.Target, ent.Comp.Components);
-    }
+    private void OnStatusEffectRemove(Entity<GrantComponentsStatusEffectComponent> ent,
+        ref StatusEffectRemovedEvent args) => EntityManager.RemoveComponents(args.Target, ent.Comp.Components);
 }

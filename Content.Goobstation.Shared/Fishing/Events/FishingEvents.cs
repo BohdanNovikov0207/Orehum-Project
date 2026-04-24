@@ -13,15 +13,18 @@ public sealed partial class ThrowFishingLureActionEvent : WorldTargetActionEvent
 
 public sealed partial class PullFishingLureActionEvent : InstantActionEvent;
 
-[Serializable, NetSerializable]
+[Serializable] [NetSerializable]
 public sealed class ActiveFishingSpotComponentState : ComponentState
 {
     public readonly float FishDifficulty;
-    public bool IsActive;
-    public TimeSpan? FishingStartTime;
     public NetEntity? AttachedFishingLure;
+    public TimeSpan? FishingStartTime;
+    public bool IsActive;
 
-    public ActiveFishingSpotComponentState(float fishDifficulty, bool isActive, TimeSpan? fishingStartTime, NetEntity? attachedFishingLure)
+    public ActiveFishingSpotComponentState(float fishDifficulty,
+        bool isActive,
+        TimeSpan? fishingStartTime,
+        NetEntity? attachedFishingLure)
     {
         FishDifficulty = fishDifficulty;
         IsActive = isActive;

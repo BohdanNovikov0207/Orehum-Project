@@ -18,17 +18,19 @@ namespace Content.Goobstation.Server.Speech;
 
 public sealed class GlorpAccentSystem : EntitySystem
 {
-    [Dependency] private readonly ReplacementAccentSystem _replacement = default!;
     private static readonly string[] StartingLetters = { "н", "к", "з", "в", "г" };
     private static readonly string[] Suffixes = { "нарп", "лорп", "либ", "орп", "орпл", "ип", "оп", "игл" };
     private static readonly string[] RandomInserts = { "глорпито", "глорп" };
+
     private static readonly HashSet<string> WhitelistedWords = new(StringComparer.OrdinalIgnoreCase)
     {
         "дискриминация", "неполноценный", "операция", "зондирование", "неандерталец", "животное",
         "инструмент", "сердце", "инструменты", "объект", "орган", "навык", "проблема", "удали", "вырежи", "глаза",
-        "спи", "лысый"
+        "спи", "лысый",
     };
+
     private static readonly Regex WordRegex = new(@"\b\w+\b", RegexOptions.IgnoreCase);
+    [Dependency] private readonly ReplacementAccentSystem _replacement = default!;
 
     public override void Initialize()
     {
@@ -74,9 +76,7 @@ public sealed class GlorpAccentSystem : EntitySystem
     {
         // whitelist plus plurality
         if (IsWhitelisted(originalWord))
-        {
-            return $"\"{AdjustCapitalization(originalWord, allCaps)}\"";  // apply quotes and caps
-        }
+            return $"\"{AdjustCapitalization(originalWord, allCaps)}\""; // apply quotes and caps
 
         // if note whitelisted replace with some real glorp shit
         var alienWord = GenerateRandomAlienWord();
@@ -97,13 +97,12 @@ public sealed class GlorpAccentSystem : EntitySystem
             if (IsWhitelisted(previousWord) && IsWhitelisted(currentWord))
             {
                 // combine under single quotes
-                var combined = $"{AdjustCapitalization(previousWord, allCaps)} {AdjustCapitalization(currentWord, allCaps)}";
+                var combined =
+                    $"{AdjustCapitalization(previousWord, allCaps)} {AdjustCapitalization(currentWord, allCaps)}";
                 words[words.Count - 1] = $"\"{combined}\"";
             }
             else
-            {
                 words.Add(processedWord);
-            }
 
             previousWord = currentWord;
         }
@@ -143,11 +142,10 @@ public sealed class GlorpAccentSystem : EntitySystem
                     return false;
             }
         }
+
         return hasLetters;
     }
 
-    private void OnAccentGet(EntityUid uid, GlorpAccentComponent component, AccentGetEvent args)
-    {
+    private void OnAccentGet(EntityUid uid, GlorpAccentComponent component, AccentGetEvent args) =>
         args.Message = Accentuate(args.Message, component);
-    }
 }

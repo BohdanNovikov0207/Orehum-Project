@@ -20,10 +20,10 @@ namespace Content.Goobstation.Shared.Boomerang;
 
 public sealed class BoomerangSystem : EntitySystem
 {
-    [Dependency] private readonly ThrowingSystem _throwingSystem = default!;
     [Dependency] private readonly SharedHandsSystem _handsSystem = default!;
+    [Dependency] private readonly ThrowingSystem _throwingSystem = default!;
 
-    private List<(EntityUid, EntityCoordinates, float, EntityUid?)> _toThrow = new();
+    private readonly List<(EntityUid, EntityCoordinates, float, EntityUid?)> _toThrow = new();
 
     public override void Initialize()
     {
@@ -39,7 +39,7 @@ public sealed class BoomerangSystem : EntitySystem
         foreach (var (uid, coords, speed, thrower) in _toThrow)
         {
             if (!TerminatingOrDeleted(uid) && (thrower == null || !TerminatingOrDeleted(thrower)))
-                _throwingSystem.TryThrow(uid, coords, speed, user: thrower, recoil: false, playSound: false);
+                _throwingSystem.TryThrow(uid, coords, speed, thrower, recoil: false, playSound: false);
         }
 
         _toThrow.Clear();

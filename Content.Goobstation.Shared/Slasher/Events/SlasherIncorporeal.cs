@@ -4,7 +4,7 @@ using Robust.Shared.Serialization;
 
 namespace Content.Goobstation.Shared.Slasher.Events;
 
-[Serializable, NetSerializable]
+[Serializable] [NetSerializable]
 public sealed partial class SlasherIncorporealizeDoAfterEvent : SimpleDoAfterEvent;
 
 [ByRefEvent]
@@ -19,7 +19,7 @@ public sealed class SlasherIncorporealEnteredEvent : EntityEventArgs;
 /// <summary>
 /// Event raised to check if any players can see the slasher.
 /// </summary>
-[Serializable, NetSerializable]
+[Serializable] [NetSerializable]
 public sealed class SlasherIncorporealObserverCheckEvent(NetEntity slasher, float range) : EntityEventArgs
 {
     /// <summary>
@@ -59,4 +59,3 @@ public sealed class SlasherIncorporealCameraCheckEvent(NetEntity slasher, float 
     /// </summary>
     public bool Cancelled { get; set; }
 }
-

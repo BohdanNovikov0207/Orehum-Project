@@ -12,24 +12,27 @@
 using Content.Server.Chat.Managers;
 using Content.Server.Mind;
 using Content.Server.StationEvents.Events;
+using Content.Shared._Starlight.CollectiveMind;
 using Content.Shared.Chat;
 using Content.Shared.GameTicking.Components;
+using Content.Shared.Mind;
 using Content.Shared.Mind.Components;
 using Content.Shared.Roles.Jobs;
-using Content.Shared._Starlight.CollectiveMind;
 using Robust.Shared.Player;
-using Content.Shared.Mind;
 
 namespace Content.Goobstation.Server.StationEvents;
 
 public sealed class JobAddCollectiveMindRule : StationEventSystem<JobAddCollectiveMindRuleComponent>
 {
     [Dependency] private readonly IChatManager _chat = default!;
-    [Dependency] private readonly MindSystem _mind = default!;
     [Dependency] private readonly SharedJobSystem _job = default!;
+    [Dependency] private readonly MindSystem _mind = default!;
     [Dependency] private readonly ISharedPlayerManager _player = default!;
 
-    protected override void Started(EntityUid uid, JobAddCollectiveMindRuleComponent component, GameRuleComponent gameRule, GameRuleStartedEvent args)
+    protected override void Started(EntityUid uid,
+        JobAddCollectiveMindRuleComponent component,
+        GameRuleComponent gameRule,
+        GameRuleStartedEvent args)
     {
         var query = EntityQueryEnumerator<MindContainerComponent>();
         while (query.MoveNext(out var target, out var mindContainer))
@@ -46,9 +49,16 @@ public sealed class JobAddCollectiveMindRule : StationEventSystem<JobAddCollecti
                         TryComp<MindComponent>(mindContainer.Mind, out var mind) &&
                         _player.TryGetSessionById(mind.UserId, out var session))
                     {
-                        var message = Loc.GetString("chat-manager-server-wrap-message", ("message", Loc.GetString(component.Message)));
-                        _chat.ChatMessageToOne(ChatChannel.Local, message, message, EntityUid.Invalid, false, session.Channel);
+                        var message = Loc.GetString("chat-manager-server-wrap-message",
+                            ("message", Loc.GetString(component.Message)));
+                        _chat.ChatMessageToOne(ChatChannel.Local,
+                            message,
+                            message,
+                            EntityUid.Invalid,
+                            false,
+                            session.Channel);
                     }
+
                     break;
                 }
             }

@@ -22,9 +22,16 @@ public sealed class SharedGoobHumanoidAppearanceSystem : EntitySystem
         switch (humanoid.Sex)
         {
             case Sex.Unsexed:
-            default: break;
-            case Sex.Male: newGender = Gender.Female; newSex = Sex.Female; break;
-            case Sex.Female: newGender = Gender.Male; newSex = Sex.Male; break;
+            default:
+                break;
+            case Sex.Male:
+                newGender = Gender.Female;
+                newSex = Sex.Female;
+                break;
+            case Sex.Female:
+                newGender = Gender.Male;
+                newSex = Sex.Male;
+                break;
         }
 
         _humanoidAppearanceSystem.SetSex(uid, newSex);

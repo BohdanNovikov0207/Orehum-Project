@@ -9,28 +9,31 @@
 //
 // SPDX-License-Identifier: AGPL-3.0-or-later
 
-using Robust.Shared.Prototypes;
 using Robust.Shared.GameStates;
+using Robust.Shared.Prototypes;
 using Robust.Shared.Serialization;
 
 namespace Content.Goobstation.Shared.Bingle;
 
-[RegisterComponent, NetworkedComponent]
+[RegisterComponent] [NetworkedComponent]
 public sealed partial class BingleComponent : Component
 {
     [DataField]
-    public bool Upgraded = false;
+    public EntityUid? MyPit;
+
     [DataField]
     public bool Prime = false;
+
     [DataField]
-    public EntityUid? MyPit;
+    public bool Upgraded = false;
+
     [DataField]
     public EntProtoId? UpgradedID;
 }
 
-[Serializable, NetSerializable]
+[Serializable] [NetSerializable]
 public enum BingleVisual : byte
 {
     Upgraded,
-    Combat
+    Combat,
 }

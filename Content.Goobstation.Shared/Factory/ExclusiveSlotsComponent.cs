@@ -13,7 +13,7 @@ public partial interface IExclusiveSlotComponent : IComponent
     string PortId { get; }
 
     /// <summary>
-    /// Machine linked to <see cref="Port"/>.
+    /// Machine linked to <see cref="Port" />.
     /// </summary>
     EntityUid? LinkedMachine { get; set; }
 
@@ -38,18 +38,19 @@ public partial interface IExclusiveSlotComponent : IComponent
 /// Maintains exclusive linkage to an input port.
 /// Only 1 machine can be linked to it, and non-automation slots are forbidden from being linked.
 /// </summary>
-[RegisterComponent, NetworkedComponent, Access(typeof(ExclusiveSlotsSystem))]
+[RegisterComponent] [NetworkedComponent] [Access(typeof(ExclusiveSlotsSystem))]
 [AutoGenerateComponentState(true)]
 public sealed partial class ExclusiveInputSlotComponent : Component, IExclusiveSlotComponent
 {
     [DataField(required: true)]
     public ProtoId<SinkPortPrototype> Port;
+
     public string PortId => Port;
 
-    [DataField, AutoNetworkedField]
+    [DataField] [AutoNetworkedField]
     public EntityUid? LinkedMachine { get; set; }
 
-    [DataField, AutoNetworkedField]
+    [DataField] [AutoNetworkedField]
     public string? LinkedPort { get; set; }
 
     [ViewVariables]
@@ -62,18 +63,19 @@ public sealed partial class ExclusiveInputSlotComponent : Component, IExclusiveS
 /// Maintains exclusive linkage to an output port.
 /// Only 1 machine can be linked to it, and non-automation slots are forbidden from being linked.
 /// </summary>
-[RegisterComponent, NetworkedComponent, Access(typeof(ExclusiveSlotsSystem))]
+[RegisterComponent] [NetworkedComponent] [Access(typeof(ExclusiveSlotsSystem))]
 [AutoGenerateComponentState(true)]
 public sealed partial class ExclusiveOutputSlotComponent : Component, IExclusiveSlotComponent
 {
     [DataField(required: true)]
     public ProtoId<SourcePortPrototype> Port;
+
     public string PortId => Port;
 
-    [DataField, AutoNetworkedField]
+    [DataField] [AutoNetworkedField]
     public EntityUid? LinkedMachine { get; set; }
 
-    [DataField, AutoNetworkedField]
+    [DataField] [AutoNetworkedField]
     public string? LinkedPort { get; set; }
 
     [ViewVariables]

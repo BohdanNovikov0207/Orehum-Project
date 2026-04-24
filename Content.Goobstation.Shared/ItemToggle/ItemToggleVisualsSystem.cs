@@ -12,6 +12,7 @@ public sealed class ItemToggleVisualsSystem : EntitySystem
 {
     [Dependency] private readonly SharedAppearanceSystem _appearance = default!;
     [Dependency] private readonly SharedItemSystem _item = default!;
+
     public override void Initialize()
     {
         base.Initialize();

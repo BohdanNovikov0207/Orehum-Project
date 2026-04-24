@@ -12,22 +12,15 @@ namespace Content.Goobstation.Shared.Enchanting.Components;
 /// <summary>
 /// Added to items after being enchanted.
 /// </summary>
-[RegisterComponent, NetworkedComponent, Access(typeof(EnchantingSystem))]
+[RegisterComponent] [NetworkedComponent] [Access(typeof(EnchantingSystem))]
 [AutoGenerateComponentState(true)]
 public sealed partial class EnchantedComponent : Component
 {
     /// <summary>
-    /// The number of enchants this item can support.
-    /// Can be increased by killing player-controlled mobs on an altar with this on the same tile.
+    /// The container that stores enchant entities.
     /// </summary>
-    [DataField, AutoNetworkedField]
-    public int Tier = 1;
-
-    /// <summary>
-    /// Players can be sacrificed up to this tier.
-    /// </summary>
-    [DataField]
-    public int MaxTier = 3;
+    [ViewVariables]
+    public Container Container = default!;
 
     /// <summary>
     /// The ID of the container to add.
@@ -36,10 +29,17 @@ public sealed partial class EnchantedComponent : Component
     public string ContainerId = "_goob_enchants";
 
     /// <summary>
-    /// The container that stores enchant entities.
+    /// Players can be sacrificed up to this tier.
     /// </summary>
-    [ViewVariables]
-    public Container Container = default!;
+    [DataField]
+    public int MaxTier = 3;
+
+    /// <summary>
+    /// The number of enchants this item can support.
+    /// Can be increased by killing player-controlled mobs on an altar with this on the same tile.
+    /// </summary>
+    [DataField] [AutoNetworkedField]
+    public int Tier = 1;
 
     /// <summary>
     /// The enchants this item has.

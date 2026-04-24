@@ -13,4 +13,7 @@ namespace Content.Goobstation.Shared.Fax;
 /// Set Handled to true to cancel normal fax behavior.
 /// </summary>
 [ByRefEvent]
-public record struct GettingFaxedSentEvent(ref readonly Entity<FaxMachineComponent> Fax, ref readonly FaxSendMessage Args, bool Handled = false);
+public record struct GettingFaxedSentEvent(
+    ref readonly Entity<FaxMachineComponent> Fax,
+    ref readonly FaxSendMessage Args,
+    bool Handled = false);

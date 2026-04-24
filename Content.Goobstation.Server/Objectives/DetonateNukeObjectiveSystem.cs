@@ -19,7 +19,7 @@ public sealed class DetonateNukeObjectiveSystem : EntitySystem
 
         SubscribeLocalEvent<RoundRestartCleanupEvent>(OnRestart);
 
-        SubscribeLocalEvent<NukeExplodedEvent>(OnNuke, before: [typeof(XenomorphsRuleSystem), typeof(NukeopsRuleSystem)]);
+        SubscribeLocalEvent<NukeExplodedEvent>(OnNuke, [typeof(XenomorphsRuleSystem), typeof(NukeopsRuleSystem)]);
     }
 
     private void OnNuke(NukeExplodedEvent ev)
@@ -28,13 +28,8 @@ public sealed class DetonateNukeObjectiveSystem : EntitySystem
             _stationNuked = true;
     }
 
-    private void OnRestart(RoundRestartCleanupEvent ev)
-    {
-        _stationNuked = false;
-    }
+    private void OnRestart(RoundRestartCleanupEvent ev) => _stationNuked = false;
 
-    private void OnGetProgress(Entity<DetonateNukeConditionComponent> ent, ref ObjectiveGetProgressEvent args)
-    {
+    private void OnGetProgress(Entity<DetonateNukeConditionComponent> ent, ref ObjectiveGetProgressEvent args) =>
         args.Progress = _stationNuked ? 1f : 0f;
-    }
 }

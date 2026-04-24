@@ -21,7 +21,7 @@ public sealed class ExplodeOnMeleeHitSystem : EntitySystem
     {
         base.Initialize();
 
-        SubscribeLocalEvent<ExplodeOnMeleeHitComponent, MeleeHitEvent>(OnHit, before: [typeof(ItemSwitchSystem)]);
+        SubscribeLocalEvent<ExplodeOnMeleeHitComponent, MeleeHitEvent>(OnHit, [typeof(ItemSwitchSystem)]);
     }
 
     private void OnHit(Entity<ExplodeOnMeleeHitComponent> ent, ref MeleeHitEvent args)

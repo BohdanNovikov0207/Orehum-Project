@@ -8,22 +8,22 @@ using Robust.Shared.Serialization.TypeSerializers.Implementations.Custom;
 
 namespace Content.Goobstation.Shared.Projectiles;
 
-[RegisterComponent, NetworkedComponent, AutoGenerateComponentState, AutoGenerateComponentPause]
+[RegisterComponent] [NetworkedComponent] [AutoGenerateComponentState] [AutoGenerateComponentPause]
 public sealed partial class ProjectileImmunityComponent : Component
 {
-    [DataField(customTypeSerializer: typeof(TimeOffsetSerializer)), AutoNetworkedField, AutoPausedField]
-    public TimeSpan? ExpireTime;
-
-    [DataField, AutoNetworkedField]
-    public EntProtoId? DodgeEffect;
-
-    [DataField, AutoNetworkedField]
-    public float StaminaCostPerDodge;
-
-    [DataField, AutoNetworkedField]
+    [DataField] [AutoNetworkedField]
     public float BatteryCostPerDodge;
 
     public HashSet<EntityUid> DodgedEntities = new();
+
+    [DataField] [AutoNetworkedField]
+    public EntProtoId? DodgeEffect;
+
+    [DataField(customTypeSerializer: typeof(TimeOffsetSerializer))] [AutoNetworkedField] [AutoPausedField]
+    public TimeSpan? ExpireTime;
+
+    [DataField] [AutoNetworkedField]
+    public float StaminaCostPerDodge;
 }
 
 [ByRefEvent]

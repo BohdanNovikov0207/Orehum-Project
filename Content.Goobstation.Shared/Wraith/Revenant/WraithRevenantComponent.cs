@@ -4,16 +4,16 @@ using Robust.Shared.Prototypes;
 
 namespace Content.Goobstation.Shared.Wraith.Revenant;
 
-[RegisterComponent, NetworkedComponent]
+[RegisterComponent] [NetworkedComponent]
 [AutoGenerateComponentState]
 public sealed partial class WraithRevenantComponent : Component
 {
-    [ViewVariables]
-    public EntProtoId RevenantAbilities = "RevenantAbilities";
+    [ViewVariables] [AutoNetworkedField]
+    public bool HadPassive;
 
-    [ViewVariables, AutoNetworkedField]
+    [ViewVariables] [AutoNetworkedField]
     public DamageSpecifier? OldDamageSpecifier;
 
-    [ViewVariables, AutoNetworkedField]
-    public bool HadPassive;
+    [ViewVariables]
+    public EntProtoId RevenantAbilities = "RevenantAbilities";
 }

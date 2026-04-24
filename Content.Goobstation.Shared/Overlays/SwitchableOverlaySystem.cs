@@ -6,7 +6,6 @@
 //
 // SPDX-License-Identifier: AGPL-3.0-or-later
 
-using Content.Goobstation.Shared.Flashbang;
 using Content.Shared.Actions;
 using Content.Shared.Flash;
 using Content.Shared.Inventory;
@@ -18,14 +17,16 @@ using Robust.Shared.Timing;
 
 namespace Content.Goobstation.Shared.Overlays;
 
-public abstract class SwitchableOverlaySystem<TComp, TEvent> : EntitySystem // this should get move to a white module if we ever do anything with forks..
+public abstract class
+    SwitchableOverlaySystem<TComp,
+        TEvent> : EntitySystem // this should get move to a white module if we ever do anything with forks..
     where TComp : SwitchableVisionOverlayComponent
     where TEvent : InstantActionEvent
 {
-    [Dependency] private readonly SharedAudioSystem _audio = default!;
     [Dependency] private readonly SharedActionsSystem _actions = default!;
-    [Dependency] private readonly IGameTiming _timing = default!;
+    [Dependency] private readonly SharedAudioSystem _audio = default!;
     [Dependency] private readonly INetManager _net = default!;
+    [Dependency] private readonly IGameTiming _timing = default!;
 
     public override void Initialize()
     {
@@ -163,7 +164,8 @@ public abstract class SwitchableOverlaySystem<TComp, TEvent> : EntitySystem // t
 
     private void OnGetItemActions(Entity<TComp> ent, ref GetItemActionsEvent args)
     {
-        if (ent.Comp.IsEquipment && ent.Comp.ToggleAction != null && args.SlotFlags is not SlotFlags.POCKET and not null)
+        if (ent.Comp.IsEquipment && ent.Comp.ToggleAction != null &&
+            args.SlotFlags is not SlotFlags.POCKET and not null)
             args.AddAction(ref ent.Comp.ToggleActionEntity, ent.Comp.ToggleAction);
     }
 
@@ -173,10 +175,8 @@ public abstract class SwitchableOverlaySystem<TComp, TEvent> : EntitySystem // t
             _actions.RemoveAction(uid, component.ToggleActionEntity);
     }
 
-    private void OnInit(EntityUid uid, TComp component, ComponentInit args)
-    {
+    private void OnInit(EntityUid uid, TComp component, ComponentInit args) =>
         component.PulseAccumulator = component.PulseTime;
-    }
 
     private void OnMapInit(EntityUid uid, TComp component, MapInitEvent args)
     {

@@ -10,8 +10,7 @@
 //
 // SPDX-License-Identifier: AGPL-3.0-or-later
 
-using System.Linq;
-using Content.Goobstation.Common.Grab;
+using Content.Goobstation.Maths.FixedPoint;
 using Content.Goobstation.Shared.GrabIntent;
 using Content.Shared._EinsteinEngines.Contests;
 using Content.Shared._Shitmed.Targeting;
@@ -20,7 +19,6 @@ using Content.Shared.Climbing.Components;
 using Content.Shared.Coordinates;
 using Content.Shared.Damage;
 using Content.Shared.Damage.Systems;
-using Content.Goobstation.Maths.FixedPoint;
 using Content.Shared.Movement.Pulling.Components;
 using Content.Shared.Movement.Pulling.Systems;
 using Content.Shared.Random.Helpers;
@@ -39,15 +37,15 @@ namespace Content.Goobstation.Shared.TableSlam;
 /// </summary>
 public sealed class TableSlamSystem : EntitySystem
 {
-    [Dependency] private readonly PullingSystem _pullingSystem = default!;
-    [Dependency] private readonly SharedTransformSystem _transformSystem = default!;
-    [Dependency] private readonly StandingStateSystem _standing = default!;
-    [Dependency] private readonly ThrowingSystem _throwingSystem = default!;
-    [Dependency] private readonly DamageableSystem _damageableSystem = default!;
-    [Dependency] private readonly SharedStaminaSystem _staminaSystem = default!;
-    [Dependency] private readonly SharedStunSystem _stunSystem = default!;
-    [Dependency] private readonly IGameTiming _gameTiming = default!;
     [Dependency] private readonly ContestsSystem _contestsSystem = default!;
+    [Dependency] private readonly DamageableSystem _damageableSystem = default!;
+    [Dependency] private readonly IGameTiming _gameTiming = default!;
+    [Dependency] private readonly PullingSystem _pullingSystem = default!;
+    [Dependency] private readonly SharedStaminaSystem _staminaSystem = default!;
+    [Dependency] private readonly StandingStateSystem _standing = default!;
+    [Dependency] private readonly SharedStunSystem _stunSystem = default!;
+    [Dependency] private readonly ThrowingSystem _throwingSystem = default!;
+    [Dependency] private readonly SharedTransformSystem _transformSystem = default!;
 
     public override void Initialize()
     {
@@ -69,7 +67,8 @@ public sealed class TableSlamSystem : EntitySystem
 
     private void OnDisarmAttempt(Entity<PostTabledComponent> ent, ref DisarmAttemptEvent args)
     {
-        var rand = new Random(SharedRandomExtensions.HashCodeCombine(new List<int> { (int) _gameTiming.CurTick.Value, GetNetEntity(ent).Id }));
+        var rand = new Random(SharedRandomExtensions.HashCodeCombine(new List<int>
+            { (int) _gameTiming.CurTick.Value, GetNetEntity(ent).Id }));
         if (!rand.Prob(ent.Comp.ParalyzeChance) || !TryComp<GrabbableComponent>(ent, out var grabbable))
             return;
 
@@ -89,9 +88,10 @@ public sealed class TableSlamSystem : EntitySystem
             || !HasComp<BonkableComponent>(target))
             return;
 
-        var massRatio = _contestsSystem.MassContest(ent.Owner, puller.Pulling.Value, bypassClamp: true);
+        var massRatio = _contestsSystem.MassContest(ent.Owner, puller.Pulling.Value, true);
         var chance = Math.Clamp(massRatio, 0f, 1f);
-        var rand = new Random(SharedRandomExtensions.HashCodeCombine(new List<int> { (int) _gameTiming.CurTick.Value, GetNetEntity(ent).Id }));
+        var rand = new Random(SharedRandomExtensions.HashCodeCombine(new List<int>
+            { (int) _gameTiming.CurTick.Value, GetNetEntity(ent).Id }));
         if (rand.Prob(chance))
             TryTableSlam(puller.Pulling.Value, ent.Owner, target);
     }
@@ -103,12 +103,18 @@ public sealed class TableSlamSystem : EntitySystem
     {
         if (!Resolve(pullable, ref pullable.Comp1, ref pullable.Comp2)
             || !Resolve(puller, ref puller.Comp1, ref puller.Comp2)
-            || !_transformSystem.InRange(pullable.Owner.ToCoordinates(), table.ToCoordinates(), puller.Comp2.TableSlamRange))
+            || !_transformSystem.InRange(pullable.Owner.ToCoordinates(),
+                table.ToCoordinates(),
+                puller.Comp2.TableSlamRange))
             return;
 
         _standing.Down(pullable.Owner);
-        _pullingSystem.TryStopPull(pullable.Owner, pullable.Comp1, puller.Owner, ignoreGrab: true);
-        _throwingSystem.TryThrow(pullable.Owner, table.ToCoordinates(), pullable.Comp2.BasedTabledForceSpeed, animated: false, doSpin: false);
+        _pullingSystem.TryStopPull(pullable.Owner, pullable.Comp1, puller.Owner, true);
+        _throwingSystem.TryThrow(pullable.Owner,
+            table.ToCoordinates(),
+            pullable.Comp2.BasedTabledForceSpeed,
+            animated: false,
+            doSpin: false);
 
         puller.Comp2.NextStageChange = _gameTiming.CurTime + TimeSpan.FromSeconds(puller.Comp2.TableSlamCooldown);
         pullable.Comp2.BeingTabled = true;
@@ -125,13 +131,17 @@ public sealed class TableSlamSystem : EntitySystem
 
         if (TryComp<GlassTableComponent>(args.OtherEntity, out var glass))
         {
-            _damageableSystem.TryChangeDamage(args.OtherEntity, glass.TableDamage, origin: ent, targetPart: TargetBodyPart.Chest);
+            _damageableSystem.TryChangeDamage(args.OtherEntity,
+                glass.TableDamage,
+                origin: ent,
+                targetPart: TargetBodyPart.Chest);
             _damageableSystem.TryChangeDamage(args.OtherEntity, glass.ClimberDamage, origin: ent);
             stunDuration *= 2;
         }
         else
         {
-            var bluntDamage = new DamageSpecifier { DamageDict = new() { { "Blunt", ent.Comp.TabledDamage } } };
+            var bluntDamage = new DamageSpecifier
+                { DamageDict = new Dictionary<string, FixedPoint2> { { "Blunt", ent.Comp.TabledDamage } } };
             _damageableSystem.TryChangeDamage(ent.Owner, bluntDamage, targetPart: TargetBodyPart.Chest);
             _damageableSystem.TryChangeDamage(ent.Owner, bluntDamage);
         }

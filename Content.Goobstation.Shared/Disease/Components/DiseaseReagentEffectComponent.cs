@@ -1,7 +1,4 @@
-﻿using Content.Shared.Chemistry;
-using Content.Shared.EntityEffects;
-using Robust.Shared.GameObjects;
-using Robust.Shared.Serialization.Manager.Attributes;
+﻿using Content.Shared.EntityEffects;
 
 namespace Content.Goobstation.Shared.Disease.Components;
 

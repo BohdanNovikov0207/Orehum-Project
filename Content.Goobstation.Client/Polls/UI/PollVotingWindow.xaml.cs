@@ -70,19 +70,19 @@ public sealed partial class PollVotingWindow : FancyWindow
             StatusLabel.Text = Loc.GetString("poll-voting-window-polls-count", ("count", polls.Count));
 
         var sortedPolls = polls.OrderBy(p =>
-        {
-            var now = DateTime.UtcNow;
+            {
+                var now = DateTime.UtcNow;
 
-            if (!p.Active || p.EndTime < now)
-                return 3;
+                if (!p.Active || p.EndTime < now)
+                    return 3;
 
-            if (!p.EndTime.HasValue)
-                return 2;
+                if (!p.EndTime.HasValue)
+                    return 2;
 
-            return 1;
-        })
-        .ThenBy(p => p.EndTime ?? DateTime.MaxValue)
-        .ThenBy(p => p.PollId);
+                return 1;
+            })
+            .ThenBy(p => p.EndTime ?? DateTime.MaxValue)
+            .ThenBy(p => p.PollId);
         foreach (var poll in sortedPolls)
         {
             _pollManager.RequestPollDetails(poll.PollId);
@@ -147,14 +147,12 @@ public sealed partial class PollVotingWindow : FancyWindow
 
 public sealed class PollControl : BoxContainer
 {
-    private readonly PollManager _pollManager;
-    private PollData _poll;
-    private List<PollVoteData> _playerVotes = [];
-    private readonly Dictionary<int, CheckBox> _optionCheckBoxes = [];
     private readonly Dictionary<int, Button> _optionButtons = [];
+    private readonly Dictionary<int, CheckBox> _optionCheckBoxes = [];
+    private readonly PollManager _pollManager;
     private bool _isVoting;
-
-    public int PollId => _poll.PollId;
+    private List<PollVoteData> _playerVotes = [];
+    private PollData _poll;
 
     public PollControl(PollData poll, PollManager pollManager)
     {
@@ -168,12 +166,14 @@ public sealed class PollControl : BoxContainer
         BuildUI();
     }
 
+    public int PollId => _poll.PollId;
+
     private void BuildUI()
     {
         var panel = new PanelContainer
         {
             StyleClasses = { "AngleRect" },
-            MinHeight = 120
+            MinHeight = 120,
         };
 
         AddChild(panel);
@@ -182,14 +182,14 @@ public sealed class PollControl : BoxContainer
         {
             Orientation = LayoutOrientation.Vertical,
             Margin = new Thickness(16),
-            SeparationOverride = 12
+            SeparationOverride = 12,
         };
         panel.AddChild(container);
 
         var headerBox = new BoxContainer
         {
             Orientation = LayoutOrientation.Horizontal,
-            SeparationOverride = 8
+            SeparationOverride = 8,
         };
         container.AddChild(headerBox);
 
@@ -198,7 +198,7 @@ public sealed class PollControl : BoxContainer
             Text = _poll.Title,
             StyleClasses = { "LabelHeading" },
             HorizontalExpand = true,
-            FontColorOverride = new Color(0.95f, 0.95f, 1.0f)
+            FontColorOverride = new Color(0.95f, 0.95f, 1.0f),
         };
         headerBox.AddChild(titleLabel);
 
@@ -210,7 +210,7 @@ public sealed class PollControl : BoxContainer
             Text = isClosed ? "[CLOSED]" : "[ACTIVE]",
             StyleClasses = { "LabelSubText" },
             FontColorOverride = isClosed ? new Color(1.0f, 0.4f, 0.4f) : new Color(0.5f, 1.0f, 0.5f),
-            Margin = new Thickness(8, 0, 0, 0)
+            Margin = new Thickness(8, 0, 0, 0),
         };
         headerBox.AddChild(statusLabel);
 
@@ -219,15 +219,15 @@ public sealed class PollControl : BoxContainer
             Text = _poll.Description,
             FontColorOverride = new Color(0.85f, 0.85f, 0.9f),
             MaxWidth = 600,
-            HorizontalAlignment = Control.HAlignment.Left,
-            StyleClasses = { "LabelSubText" }
+            HorizontalAlignment = HAlignment.Left,
+            StyleClasses = { "LabelSubText" },
         };
         container.AddChild(descLabel);
 
         var metaBox = new BoxContainer
         {
             Orientation = LayoutOrientation.Horizontal,
-            SeparationOverride = 12
+            SeparationOverride = 12,
         };
         container.AddChild(metaBox);
 
@@ -237,7 +237,7 @@ public sealed class PollControl : BoxContainer
             {
                 Text = "By: " + _poll.CreatedByName,
                 FontColorOverride = new Color(0.6f, 0.7f, 0.9f),
-                StyleClasses = { "LabelSubText" }
+                StyleClasses = { "LabelSubText" },
             };
             metaBox.AddChild(creatorLabel);
         }
@@ -254,15 +254,14 @@ public sealed class PollControl : BoxContainer
                     : Loc.GetString("poll-control-ends-in-hours", ("hours", Math.Max(1, (int) timeLeft.TotalHours)));
             }
             else
-            {
                 timeText = Loc.GetString("poll-control-ended");
-            }
 
             var timeLabel = new Label
             {
                 Text = timeText,
-                FontColorOverride = timeLeft.TotalSeconds > 0 ? new Color(1.0f, 0.9f, 0.3f) : new Color(0.5f, 0.5f, 0.5f),
-                StyleClasses = { "LabelSubText" }
+                FontColorOverride =
+                    timeLeft.TotalSeconds > 0 ? new Color(1.0f, 0.9f, 0.3f) : new Color(0.5f, 0.5f, 0.5f),
+                StyleClasses = { "LabelSubText" },
             };
             metaBox.AddChild(timeLabel);
         }
@@ -273,7 +272,7 @@ public sealed class PollControl : BoxContainer
             {
                 Text = "Multiple Choice",
                 FontColorOverride = new Color(0.5f, 0.8f, 1.0f),
-                StyleClasses = { "LabelSubText" }
+                StyleClasses = { "LabelSubText" },
             };
             metaBox.AddChild(multiLabel);
         }
@@ -282,13 +281,13 @@ public sealed class PollControl : BoxContainer
         {
             Orientation = LayoutOrientation.Horizontal,
             MinHeight = 2,
-            Margin = new Thickness(0, 4, 0, 4)
+            Margin = new Thickness(0, 4, 0, 4),
         };
         separator.AddChild(new PanelContainer
         {
             HorizontalExpand = true,
             MinHeight = 1,
-            PanelOverride = new StyleBoxFlat { BackgroundColor = Color.Gray.WithAlpha(0.3f) }
+            PanelOverride = new StyleBoxFlat { BackgroundColor = Color.Gray.WithAlpha(0.3f) },
         });
         container.AddChild(separator);
 
@@ -296,7 +295,7 @@ public sealed class PollControl : BoxContainer
         var optionsContainer = new BoxContainer
         {
             Orientation = LayoutOrientation.Vertical,
-            SeparationOverride = 8
+            SeparationOverride = 8,
         };
         container.AddChild(optionsContainer);
 
@@ -320,23 +319,26 @@ public sealed class PollControl : BoxContainer
         }
     }
 
-    private PanelContainer CreateOptionControl(PollOptionData option, int totalVotes, bool isMultiChoice, ButtonGroup? buttonGroup = null)
+    private PanelContainer CreateOptionControl(PollOptionData option,
+        int totalVotes,
+        bool isMultiChoice,
+        ButtonGroup? buttonGroup = null)
     {
         var hasVoted = _playerVotes.Any(v => v.OptionId == option.OptionId);
-        var percentage = totalVotes > 0 ? (option.VoteCount * 100.0f / totalVotes) : 0;
+        var percentage = totalVotes > 0 ? option.VoteCount * 100.0f / totalVotes : 0;
 
         var optionPanel = new PanelContainer
         {
             StyleClasses = { "AngleRect" },
             MinHeight = 56,
-            Modulate = hasVoted ? new Color(0.3f, 0.5f, 0.35f) : new Color(0.9f, 0.9f, 0.95f)
+            Modulate = hasVoted ? new Color(0.3f, 0.5f, 0.35f) : new Color(0.9f, 0.9f, 0.95f),
         };
 
         var optionContainer = new BoxContainer
         {
             Orientation = LayoutOrientation.Horizontal,
             Margin = new Thickness(12, 10),
-            SeparationOverride = 12
+            SeparationOverride = 12,
         };
         optionPanel.AddChild(optionContainer);
 
@@ -351,7 +353,7 @@ public sealed class PollControl : BoxContainer
                 var checkbox = new CheckBox
                 {
                     Pressed = hasVoted,
-                    VerticalAlignment = Control.VAlignment.Center
+                    VerticalAlignment = VAlignment.Center,
                 };
 
                 var optionId = option.OptionId;
@@ -396,7 +398,7 @@ public sealed class PollControl : BoxContainer
                     Pressed = hasVoted,
                     Group = buttonGroup,
                     MinWidth = 60,
-                    VerticalAlignment = VAlignment.Center
+                    VerticalAlignment = VAlignment.Center,
                 };
 
                 var optionId = option.OptionId;
@@ -431,6 +433,7 @@ public sealed class PollControl : BoxContainer
                 _optionButtons[option.OptionId] = button;
                 voteControl = button;
             }
+
             optionContainer.AddChild(voteControl);
         }
 
@@ -438,15 +441,15 @@ public sealed class PollControl : BoxContainer
         {
             Orientation = LayoutOrientation.Vertical,
             HorizontalExpand = true,
-            VerticalAlignment = Control.VAlignment.Center,
-            SeparationOverride = 2
+            VerticalAlignment = VAlignment.Center,
+            SeparationOverride = 2,
         };
         optionContainer.AddChild(infoBox);
 
         var textBox = new BoxContainer
         {
             Orientation = LayoutOrientation.Horizontal,
-            SeparationOverride = 8
+            SeparationOverride = 8,
         };
         infoBox.AddChild(textBox);
 
@@ -454,7 +457,7 @@ public sealed class PollControl : BoxContainer
         {
             Text = option.OptionText,
             HorizontalExpand = true,
-            FontColorOverride = hasVoted ? new Color(0.6f, 1.0f, 0.7f) : new Color(0.95f, 0.95f, 0.98f)
+            FontColorOverride = hasVoted ? new Color(0.6f, 1.0f, 0.7f) : new Color(0.95f, 0.95f, 0.98f),
         };
         textBox.AddChild(optionLabel);
 
@@ -462,7 +465,7 @@ public sealed class PollControl : BoxContainer
         {
             Text = $"{option.VoteCount} votes ({percentage:F1}%)",
             FontColorOverride = hasVoted ? new Color(0.5f, 0.9f, 0.6f) : new Color(0.6f, 0.6f, 0.7f),
-            StyleClasses = { "LabelSubText" }
+            StyleClasses = { "LabelSubText" },
         };
         textBox.AddChild(voteLabel);
 
@@ -471,7 +474,7 @@ public sealed class PollControl : BoxContainer
             MinValue = 0,
             MaxValue = 100,
             Value = percentage,
-            MinHeight = 8
+            MinHeight = 8,
         };
 
         if (hasVoted)
@@ -520,19 +523,27 @@ public sealed class PollControl : BoxContainer
     {
         _isVoting = false;
         foreach (var checkbox in _optionCheckBoxes.Values)
+        {
             checkbox.Disabled = false;
+        }
 
         foreach (var button in _optionButtons.Values)
+        {
             button.Disabled = false;
+        }
     }
 
     private void DisableAllControls()
     {
         foreach (var checkbox in _optionCheckBoxes.Values)
+        {
             checkbox.Disabled = true;
+        }
 
         foreach (var button in _optionButtons.Values)
+        {
             button.Disabled = true;
+        }
     }
 
     private void RebuildUIOptimistically()

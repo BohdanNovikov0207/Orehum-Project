@@ -12,9 +12,9 @@ namespace Content.Goobstation.Client.CriminalRecords;
 
 public sealed class WantedMenuBoundUserInterface : BoundUserInterface
 {
-    [Dependency] private readonly IRobustRandom _random = default!;
-    [Dependency] private readonly IPlayerManager _proto = default!;
     private readonly AccessReaderSystem _accessReader;
+    [Dependency] private readonly IPlayerManager _proto = default!;
+    [Dependency] private readonly IRobustRandom _random = default!;
 
     private WantedMenu? _window;
 
@@ -22,11 +22,12 @@ public sealed class WantedMenuBoundUserInterface : BoundUserInterface
     {
         _accessReader = EntMan.System<AccessReaderSystem>();
     }
+
     protected override void Open()
     {
         base.Open();
 
-        _window = new(Owner, _random, _accessReader, _proto);
+        _window = new WantedMenu(Owner, _random, _accessReader, _proto);
 
         _window.OnStatusSelected += status =>
             SendMessage(new CriminalRecordChangeStatus(status, null));
@@ -37,6 +38,7 @@ public sealed class WantedMenuBoundUserInterface : BoundUserInterface
 
         _window.OpenCentered();
     }
+
     protected override void UpdateState(BoundUserInterfaceState state)
     {
         base.UpdateState(state);
@@ -46,6 +48,7 @@ public sealed class WantedMenuBoundUserInterface : BoundUserInterface
 
         _window?.UpdateState(cast);
     }
+
     protected override void Dispose(bool disposing)
     {
         base.Dispose(disposing);

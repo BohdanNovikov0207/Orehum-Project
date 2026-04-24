@@ -10,12 +10,6 @@ namespace Content.Goobstation.Server.Slasher.Components;
 [RegisterComponent]
 public sealed partial class AntagLockerSpawnComponent : Component
 {
-    /// <summary>
-    /// When true, only lockers tagged MaintenanceCloset are eligible.
-    /// </summary>
-    [DataField]
-    public bool MaintenanceOnly = true;
-
     [DataField]
     public EntityUid? ChosenLocker;
 
@@ -24,6 +18,12 @@ public sealed partial class AntagLockerSpawnComponent : Component
     /// </summary>
     [DataField]
     public EntityCoordinates? FallbackCoords;
+
+    /// <summary>
+    /// When true, only lockers tagged MaintenanceCloset are eligible.
+    /// </summary>
+    [DataField]
+    public bool MaintenanceOnly = true;
 
     [DataField]
     public bool Placed;

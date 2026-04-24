@@ -10,13 +10,13 @@ namespace Content.Goobstation.Server.Wraith.SaltLines;
 
 public sealed class SaltLineSystem : EntitySystem
 {
+    [Dependency] private readonly IAdminLogManager _adminLogger = default!;
     [Dependency] private readonly SharedAppearanceSystem _appearance = default!;
     [Dependency] private readonly SharedMapSystem _map = default!;
-    [Dependency] private readonly SharedTransformSystem _transform = default!;
-    [Dependency] private readonly IAdminLogManager _adminLogger = default!;
-    [Dependency] private readonly SharedSolutionContainerSystem _solution = default!;
     [Dependency] private readonly PopupSystem _popupSystem = default!;
-    
+    [Dependency] private readonly SharedSolutionContainerSystem _solution = default!;
+    [Dependency] private readonly SharedTransformSystem _transform = default!;
+
     public override void Initialize()
     {
         base.Initialize();
@@ -67,32 +67,38 @@ public sealed class SaltLineSystem : EntitySystem
             return;
 
         var newSaltLine = Spawn(ent.Comp.SaltLine, _map.GridTileToLocal(gridUid, grid, snapPos));
-        _adminLogger.Add(LogType.Action, LogImpact.Low,
+        _adminLogger.Add(LogType.Action,
+            LogImpact.Low,
             $"{ToPrettyString(args.User)} placed {ToPrettyString(newSaltLine):saltline} at {Transform(newSaltLine).Coordinates}");
         args.Handled = true;
     }
 
     private void OnAttemptSaltLine(Entity<ConsumeOnSaltLineComponent> ent, ref AttemptSaltLineEvent args)
     {
-        if (!_solution.TryGetSolution(ent.Owner, "food", out var sol, false))
+        if (!_solution.TryGetSolution(ent.Owner, "food", out var sol))
         {
             args.Cancelled = true;
             return;
         }
+
         var reagentsalt = "TableSalt";
         var solution = sol.Value;
         var saltAmount = solution.Comp.Solution.GetTotalPrototypeQuantity(reagentsalt);
-        
+
         if (saltAmount < ent.Comp.Amount)
         {
-            _popupSystem.PopupEntity(Loc.GetString("consume-on-salt-line-component-not-enough-salt-message"), ent.Owner, args.User);
+            _popupSystem.PopupEntity(Loc.GetString("consume-on-salt-line-component-not-enough-salt-message"),
+                ent.Owner,
+                args.User);
             args.Cancelled = true;
             return;
         }
+
         _solution.RemoveReagent(solution, reagentsalt, ent.Comp.Amount);
     }
 
     #region Helpers
+
     private void UpdateAppearance(Entity<SaltLineComponent> ent)
     {
         var transform = Transform(ent.Owner);
@@ -107,7 +113,7 @@ public sealed class SaltLineSystem : EntitySystem
             (new Vector2i(0, 1), SaltLineVisDirFlags.North),
             (new Vector2i(0, -1), SaltLineVisDirFlags.South),
             (new Vector2i(1, 0), SaltLineVisDirFlags.East),
-            (new Vector2i(-1, 0), SaltLineVisDirFlags.West)
+            (new Vector2i(-1, 0), SaltLineVisDirFlags.West),
         };
 
         foreach (var (offset, flag) in directions)
@@ -151,5 +157,6 @@ public sealed class SaltLineSystem : EntitySystem
             }
         }
     }
+
     #endregion
 }

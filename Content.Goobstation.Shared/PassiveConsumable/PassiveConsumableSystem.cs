@@ -18,13 +18,13 @@ namespace Content.Goobstation.Shared.PassiveConsumable;
 
 public sealed class PassiveConsumableSystem : EntitySystem
 {
-    [Dependency] private readonly SharedPopupSystem _popup = default!;
-    [Dependency] private readonly IngestionSystem _ingestion = default!;
-    [Dependency] private readonly SharedSolutionContainerSystem _solution = default!;
-    [Dependency] private readonly StomachSystem _stomach = default!;
-    [Dependency] private readonly ReactiveSystem _reactive = default!;
     [Dependency] private readonly SharedBodySystem _body = default!;
     [Dependency] private readonly FlavorProfileSystem _flavor = default!;
+    [Dependency] private readonly IngestionSystem _ingestion = default!;
+    [Dependency] private readonly SharedPopupSystem _popup = default!;
+    [Dependency] private readonly ReactiveSystem _reactive = default!;
+    [Dependency] private readonly SharedSolutionContainerSystem _solution = default!;
+    [Dependency] private readonly StomachSystem _stomach = default!;
     [Dependency] private readonly IGameTiming _timing = default!;
 
     public override void Initialize()
@@ -48,7 +48,9 @@ public sealed class PassiveConsumableSystem : EntitySystem
             return;
 
         var flavors = _flavor.GetLocalizedFlavorsMessage(args.Wearer, solution);
-        _popup.PopupEntity(Loc.GetString("edible-nom", ("food", ent.Owner), ("flavors", flavors)), args.Wearer, args.Wearer);
+        _popup.PopupEntity(Loc.GetString("edible-nom", ("food", ent.Owner), ("flavors", flavors)),
+            args.Wearer,
+            args.Wearer);
     }
 
     private void OnUnequipped(Entity<PassiveConsumableComponent> ent, ref ClothingGotUnequippedEvent args)
@@ -115,7 +117,10 @@ public sealed class PassiveConsumableSystem : EntitySystem
         foreach (var organ in stomachs)
         {
             if (!_stomach.CanTransferSolution(organ.Owner, split, organ.Comp1)
-                || !_solution.ResolveSolution(organ.Owner, StomachSystem.DefaultSolutionName, ref organ.Comp1.Solution, out var stomachSol)
+                || !_solution.ResolveSolution(organ.Owner,
+                    StomachSystem.DefaultSolutionName,
+                    ref organ.Comp1.Solution,
+                    out var stomachSol)
                 || stomachSol.AvailableVolume <= highestAvailable)
                 continue;
 

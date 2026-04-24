@@ -17,14 +17,14 @@ public record struct ItemMinerCheckEvent(bool Cancelled = false);
 public sealed class ItemMinedEvent : EntityEventArgs
 {
     /// <summary>
-    /// The entity we have modified or created
-    /// </summary>
-    public readonly EntityUid Mined;
-
-    /// <summary>
     /// How much has been actually spawned or added to the stack, can be 0
     /// </summary>
     public readonly int Count;
+
+    /// <summary>
+    /// The entity we have modified or created
+    /// </summary>
+    public readonly EntityUid Mined;
 
     public ItemMinedEvent(EntityUid mined, int count)
     {

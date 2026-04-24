@@ -13,23 +13,18 @@ namespace Content.Goobstation.Client.Administration.TimeTransferPanel;
 
 public sealed class TimeTransferPanelEui : BaseEui
 {
-    public TimeTransferPanel TimeTransferPanel { get; }
-
     public TimeTransferPanelEui()
     {
         TimeTransferPanel = new TimeTransferPanel();
-        TimeTransferPanel.OnTransferMessageSend += args => SendMessage(new TimeTransferEuiMessage(args.playerId, args.transferList, args.overwrite));
+        TimeTransferPanel.OnTransferMessageSend += args =>
+            SendMessage(new TimeTransferEuiMessage(args.playerId, args.transferList, args.overwrite));
     }
 
-    public override void Opened()
-    {
-        TimeTransferPanel.OpenCentered();
-    }
+    public TimeTransferPanel TimeTransferPanel { get; }
 
-    public override void Closed()
-    {
-        TimeTransferPanel.Close();
-    }
+    public override void Opened() => TimeTransferPanel.OpenCentered();
+
+    public override void Closed() => TimeTransferPanel.Close();
 
     public override void HandleState(EuiStateBase state)
     {

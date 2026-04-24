@@ -1,33 +1,29 @@
-using Content.Goobstation.Shared.Silicon;
-using Content.Goobstation.Shared.Silicon.Components;
-using Linguini.Bundle.Errors;
-
-using Content.Server.Chat.Systems;
-using Robust.Shared.Player;
-using Content.Server.EUI;
-using Robust.Shared.Network;
-using Content.Server.Station.Components;
 using Content.Goobstation.Server.Silicons;
-using Content.Server.Station.Systems;
+using Content.Goobstation.Shared.Silicon;
+using Content.Server.Chat.Systems;
+using Content.Server.EUI;
+using Content.Server.Radio.Components;
 using Content.Server.Radio.EntitySystems;
-using Robust.Shared.Prototypes;
+using Content.Server.Station.Components;
+using Content.Server.Station.Systems;
+using Content.Shared.Ghost;
 using Content.Shared.Radio;
 using Content.Shared.Radio.Components;
-using Content.Server.Radio.Components;
 using Content.Shared.Silicons.StationAi;
-using Content.Shared.Ghost;
+using Robust.Shared.Network;
+using Robust.Shared.Player;
+using Robust.Shared.Prototypes;
 
 public sealed class StationAiEarlyLeaveSystem : SharedStationAiEarlyLeaveSystem
 {
+    private readonly string _alertChannelName = "Command";
     [Dependency] private readonly ChatSystem _chat = default!;
-    [Dependency] private readonly ISharedPlayerManager _player = default!;
     [Dependency] private readonly EuiManager _euiManager = default!;
     [Dependency] private readonly StationJobsSystem _jobs = default!;
-    [Dependency] private readonly StationSystem _station = default!;
-    [Dependency] private readonly RadioSystem _radio = default!;
+    [Dependency] private readonly ISharedPlayerManager _player = default!;
     [Dependency] private readonly IPrototypeManager _prototypeManager = default!;
-
-    private readonly string _alertChannelName = "Command";
+    [Dependency] private readonly RadioSystem _radio = default!;
+    [Dependency] private readonly StationSystem _station = default!;
 
     protected override void RequestEarlyLeave(Entity<StationAiCoreComponent> aiCore, EntityUid insertedAi)
     {
@@ -61,7 +57,7 @@ public sealed class StationAiEarlyLeaveSystem : SharedStationAiEarlyLeaveSystem
             _jobs.TryRemovePlayerJobs(uniqueStation, userId, stationJobs);
         }
 
-        if (station is not { })
+        if (station is null)
             return;
 
         var channel = _prototypeManager.Index<RadioChannelPrototype>(_alertChannelName);
@@ -75,9 +71,9 @@ public sealed class StationAiEarlyLeaveSystem : SharedStationAiEarlyLeaveSystem
         {
             if (!radio.ReceiveAllChannels)
             {
-                if (!radio.Channels.Contains(channel.ID) 
-                || (TryComp<IntercomComponent>(receiver, out var intercom)
-                && !intercom.SupportedChannels.Contains(channel.ID)))
+                if (!radio.Channels.Contains(channel.ID)
+                    || TryComp<IntercomComponent>(receiver, out var intercom)
+                    && !intercom.SupportedChannels.Contains(channel.ID))
                     continue;
             }
 
@@ -86,14 +82,13 @@ public sealed class StationAiEarlyLeaveSystem : SharedStationAiEarlyLeaveSystem
             if (TryComp(parent, out ActorComponent? actor))
                 filter.AddPlayer(actor.PlayerSession);
         }
+
         // also add ghosts its probably fine
         var ghostQuery = EntityQueryEnumerator<GhostComponent>();
-        while (ghostQuery.MoveNext(out var ghost, out var _))
+        while (ghostQuery.MoveNext(out var ghost, out _))
         {
             if (TryComp<ActorComponent>(ghost, out var actor))
-            {
                 filter.AddPlayer(actor.PlayerSession);
-            }
         }
 
         // filtered announcement cuz just not good to announce that ai is offline to literally everyone IC
@@ -102,7 +97,9 @@ public sealed class StationAiEarlyLeaveSystem : SharedStationAiEarlyLeaveSystem
                 "station-ai-earlyleave-announcement",
                 ("character", Name(insertedAi)),
                 ("entity", insertedAi)
-            ), insertedAi, Loc.GetString("station-ai-earlyleave-announcement-sender")
+            ),
+            insertedAi,
+            Loc.GetString("station-ai-earlyleave-announcement-sender")
         );
 
         QueueDel(insertedAi);

@@ -1,6 +1,5 @@
 using Content.Goobstation.Common.SecondSkin;
 using Content.Goobstation.Shared.SecondSkin;
-using Content.Server.EntityEffects;
 using Content.Shared._EinsteinEngines.Silicon.Components;
 using Content.Shared.Alert;
 using Content.Shared.Damage.Components;
@@ -14,9 +13,9 @@ namespace Content.Goobstation.Server.SecondSkin;
 
 public sealed class DisgustSystem : EntitySystem
 {
-    [Dependency] private readonly IRobustRandom _random = default!;
     [Dependency] private readonly AlertsSystem _alets = default!;
     [Dependency] private readonly SharedEntityEffectSystem _effect = default!;
+    [Dependency] private readonly IRobustRandom _random = default!;
 
     public override void Initialize()
     {
@@ -26,10 +25,7 @@ public sealed class DisgustSystem : EntitySystem
         SubscribeLocalEvent<DisgustComponent, ModifyDisgustEvent>(OnModify);
     }
 
-    private void OnModify(Entity<DisgustComponent> ent, ref ModifyDisgustEvent args)
-    {
-        UpdateLevel(ent, args.Delta);
-    }
+    private void OnModify(Entity<DisgustComponent> ent, ref ModifyDisgustEvent args) => UpdateLevel(ent, args.Delta);
 
     private void OnRejuvenate(Entity<DisgustComponent> ent, ref RejuvenateEvent args)
     {

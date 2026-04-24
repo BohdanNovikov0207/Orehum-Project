@@ -11,38 +11,17 @@
 
 using Content.Shared.Damage;
 using Robust.Shared.GameStates;
-using Robust.Shared.Serialization.TypeSerializers.Implementations.Custom;
 
 namespace Content.Goobstation.Shared.Religion;
 
-[RegisterComponent, NetworkedComponent, AutoGenerateComponentState]
+[RegisterComponent] [NetworkedComponent] [AutoGenerateComponentState]
 public sealed partial class WeakToHolyComponent : Component
 {
-    public override bool SessionSpecific => true;
-
     /// <summary>
     /// Should this entity take holy damage no matter what?
     /// </summary>
-    [DataField, AutoNetworkedField]
+    [DataField] [AutoNetworkedField]
     public bool AlwaysTakeHoly;
-
-    /// <summary>
-    /// Is the entity currently standing on a rune?
-    /// </summary>
-    [ViewVariables]
-    public bool IsColliding;
-
-    /// <summary>
-    /// Duration between each heal tick.
-    /// </summary>
-    [DataField]
-    public TimeSpan HealTickDelay = TimeSpan.FromSeconds(2);
-
-    /// <summary>
-    /// Used for passive healing.
-    /// </summary>
-    [ViewVariables]
-    public TimeSpan NextPassiveHealTick;
 
 
     /// <summary>
@@ -58,6 +37,24 @@ public sealed partial class WeakToHolyComponent : Component
     };
 
     /// <summary>
+    /// Duration between each heal tick.
+    /// </summary>
+    [DataField]
+    public TimeSpan HealTickDelay = TimeSpan.FromSeconds(2);
+
+    /// <summary>
+    /// Is the entity currently standing on a rune?
+    /// </summary>
+    [ViewVariables]
+    public bool IsColliding;
+
+    /// <summary>
+    /// Used for passive healing.
+    /// </summary>
+    [ViewVariables]
+    public TimeSpan NextPassiveHealTick;
+
+    /// <summary>
     /// How much the entity is healed passively by each tick.
     /// </summary>
     [DataField]
@@ -68,4 +65,6 @@ public sealed partial class WeakToHolyComponent : Component
             ["Holy"] = -0.5, // if its less it dont work du to limb damage
         },
     };
+
+    public override bool SessionSpecific => true;
 }

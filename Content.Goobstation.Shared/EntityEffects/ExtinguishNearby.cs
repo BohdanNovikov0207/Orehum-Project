@@ -11,11 +11,10 @@ using Robust.Shared.Prototypes;
 namespace Content.Goobstation.Shared.EntityEffects;
 
 /// <summary>
-///     Extinguishes nearby entities.
+/// Extinguishes nearby entities.
 /// </summary>
 public sealed partial class ExtinguishNearby : EventEntityEffect<ExtinguishNearby>
 {
-
     [DataField]
     public float Range = 12;
 
@@ -26,10 +25,10 @@ public sealed partial class ExtinguishNearby : EventEntityEffect<ExtinguishNearb
 
     public override bool ShouldLog => true;
 
+    public override LogImpact LogImpact => LogImpact.Medium;
+
     protected override string? ReagentEffectGuidebookText(IPrototypeManager prototype, IEntitySystemManager entSys)
         => Loc.GetString("reagent-effect-guidebook-ignite", ("chance", Probability));
-
-    public override LogImpact LogImpact => LogImpact.Medium;
 
     public override void Effect(EntityEffectBaseArgs args)
     {

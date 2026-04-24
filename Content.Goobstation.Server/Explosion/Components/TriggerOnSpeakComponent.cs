@@ -12,9 +12,8 @@ namespace Content.Goobstation.Server.Explosion.Components;
 public sealed partial class TriggerOnSpeakComponent : Component
 {
     /// <summary>
-    ///     The range at which it listens for keywords.
+    /// The range at which it listens for keywords.
     /// </summary>
     [DataField]
     public int ListenRange { get; private set; } = 4;
 }
-

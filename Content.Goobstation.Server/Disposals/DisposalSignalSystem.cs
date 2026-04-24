@@ -3,23 +3,22 @@
 //
 // SPDX-License-Identifier: AGPL-3.0-or-later
 
-using Content.Shared.DeviceLinking.Events;
+using Content.Server.Disposal.Unit;
 using Content.Server.Power.EntitySystems;
 using Content.Shared.DeviceLinking;
-using Robust.Shared.Prototypes;
+using Content.Shared.DeviceLinking.Events;
 using Content.Shared.Disposal.Components;
-using Content.Server.Disposal.Unit;
+using Robust.Shared.Prototypes;
 
 namespace Content.Goobstation.Server.Disposals;
 
 public sealed class DisposalSignalSystem : EntitySystem
 {
-    [Dependency] private readonly DisposalUnitSystem _disposal = default!;
-    [Dependency] private readonly PowerReceiverSystem _power = default!;
-
     public static readonly ProtoId<SinkPortPrototype> FlushPort = "DisposalFlush";
     public static readonly ProtoId<SinkPortPrototype> EjectPort = "DisposalEject";
     public static readonly ProtoId<SinkPortPrototype> TogglePort = "Toggle";
+    [Dependency] private readonly DisposalUnitSystem _disposal = default!;
+    [Dependency] private readonly PowerReceiverSystem _power = default!;
 
     public override void Initialize()
     {

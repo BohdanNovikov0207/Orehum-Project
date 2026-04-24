@@ -9,9 +9,6 @@ namespace Content.Goobstation.Client.JoinQueue;
 [GenerateTypedNameReferences]
 public sealed partial class QueueGui : Control
 {
-    public event Action? QuitPressed;
-
-
     public QueueGui()
     {
         RobustXamlLoader.Load(this);
@@ -20,6 +17,8 @@ public sealed partial class QueueGui : Control
 
         QuitButton.OnPressed += _ => QuitPressed?.Invoke();
     }
+
+    public event Action? QuitPressed;
 
 
     public void UpdateInfo(QueueUpdateMessage msg)
@@ -30,15 +29,13 @@ public sealed partial class QueueGui : Control
 
         if (msg.EstimatedWaitSeconds >= 0)
         {
-            var minutes = (int)(msg.EstimatedWaitSeconds / 60);
+            var minutes = (int) (msg.EstimatedWaitSeconds / 60);
             EstimatedWait.Text = minutes < 1
                 ? Loc.GetString("queue-estimated-wait-soon")
                 : Loc.GetString("queue-estimated-wait", ("minutes", minutes));
         }
         else
-        {
             EstimatedWait.Text = Loc.GetString("queue-estimated-wait-unknown");
-        }
 
         ServerInfo.Text = Loc.GetString("queue-server-info",
             ("map", msg.MapName),

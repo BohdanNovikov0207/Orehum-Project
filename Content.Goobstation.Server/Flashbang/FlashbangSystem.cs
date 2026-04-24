@@ -48,16 +48,12 @@ public sealed class FlashbangSystem : EntitySystem
         args.PushMarkup(message);
     }
 
-    private void OnFlashbanged(Entity<FlashSoundSuppressionComponent> ent, ref GetFlashbangedEvent args)
-    {
+    private void OnFlashbanged(Entity<FlashSoundSuppressionComponent> ent, ref GetFlashbangedEvent args) =>
         args.ProtectionRange = MathF.Min(args.ProtectionRange, ent.Comp.ProtectionRange);
-    }
 
     private void OnInventoryFlashbanged(Entity<FlashSoundSuppressionComponent> ent,
-        ref InventoryRelayedEvent<GetFlashbangedEvent> args)
-    {
+        ref InventoryRelayedEvent<GetFlashbangedEvent> args) =>
         args.Args.ProtectionRange = MathF.Min(args.Args.ProtectionRange, ent.Comp.ProtectionRange);
-    }
 
     private void OnFlash(Entity<FlashbangComponent> ent, ref AreaFlashEvent args)
     {
@@ -91,7 +87,7 @@ public sealed class FlashbangSystem : EntitySystem
 
         var knockdownTime = float.Lerp(comp.KnockdownTime, 0f, ratio);
         if (knockdownTime > 0f)
-            _stun.TryKnockdown(args.Target, TimeSpan.FromSeconds(knockdownTime), true);
+            _stun.TryKnockdown(args.Target, TimeSpan.FromSeconds(knockdownTime));
 
         var stunTime = float.Lerp(comp.StunTime, 0f, ratio);
         if (stunTime > 0f)

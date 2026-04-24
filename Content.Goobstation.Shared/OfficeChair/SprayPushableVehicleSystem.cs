@@ -2,14 +2,14 @@
 //
 // SPDX-License-Identifier: AGPL-3.0-or-later
 
-using Robust.Shared.Physics.Components;
-using Robust.Shared.Physics.Systems;
 using System.Numerics;
 using Content.Shared.Buckle.Components;
+using Robust.Shared.Physics.Components;
+using Robust.Shared.Physics.Systems;
 
 namespace Content.Goobstation.Shared.OfficeChair;
 
-public sealed partial class SprayPushableVehicleSystem : EntitySystem
+public sealed class SprayPushableVehicleSystem : EntitySystem
 {
     // This file is terrible code to make the velocity change feel somewhat smooth, this exists due to SpraySystem being server only.
     // I really do not care enough to make it any better. I tried doing velocity change entirely in SpraySystem and it felt like getting teleported.
@@ -32,7 +32,8 @@ public sealed partial class SprayPushableVehicleSystem : EntitySystem
 
             var secsLeft = comp.PendingImpulseTimeLeft.TotalSeconds;
             var factor = secsLeft > 0 ? (float) (frameTime / secsLeft) : 1f;
-            if (factor > 1f) factor = 1f;
+            if (factor > 1f)
+                factor = 1f;
 
             var dv = comp.PendingImpulseRemaining * factor;
             _physics.SetLinearVelocity(uid, body.LinearVelocity + dv);

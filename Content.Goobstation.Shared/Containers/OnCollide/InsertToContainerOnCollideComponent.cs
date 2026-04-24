@@ -14,10 +14,16 @@ namespace Content.Goobstation.Shared.Containers.OnCollide;
 /// <summary>
 /// When this component is added, we insert to a given container any entity we collide with
 /// </summary>
-[RegisterComponent, NetworkedComponent]
+[RegisterComponent] [NetworkedComponent]
 [Access(typeof(InsertToContainerOnCollideSystem))]
 public sealed partial class InsertToContainerOnCollideComponent : Component
 {
+    /// <summary>
+    /// Entities which we should never insert on collide
+    /// </summary>
+    [DataField("blacklistedEntities")]
+    public EntityWhitelist? BlacklistedEntities;
+
     /// <summary>
     /// ID of the target container
     /// </summary>
@@ -35,10 +41,4 @@ public sealed partial class InsertToContainerOnCollideComponent : Component
     [DataField("requiredVelocity")]
     [ViewVariables(VVAccess.ReadWrite)]
     public float RequiredVelocity;
-
-    /// <summary>
-    /// Entities which we should never insert on collide
-    /// </summary>
-    [DataField("blacklistedEntities")]
-    public EntityWhitelist? BlacklistedEntities;
 }

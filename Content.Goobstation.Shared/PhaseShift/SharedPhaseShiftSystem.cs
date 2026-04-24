@@ -1,24 +1,24 @@
 using System.Linq;
-using Content.Shared.Interaction.Events;
-using Content.Shared.Movement.Pulling.Components;
-using Content.Shared.Movement.Pulling.Systems;
-using Content.Shared.Movement.Systems;
-using Content.Shared.Stealth;
-using Content.Shared.Stealth.Components;
-using Robust.Shared.Audio.Systems;
-using Robust.Shared.Physics;
-using Robust.Shared.Physics.Systems;
+using Content.Goobstation.Common.Footprints;
 using Content.Shared.Damage;
 using Content.Shared.Damage.Events;
 using Content.Shared.Electrocution;
 using Content.Shared.Emoting;
 using Content.Shared.Flash;
+using Content.Shared.Interaction.Events;
 using Content.Shared.InteractionVerbs.Events;
+using Content.Shared.Movement.Pulling.Components;
+using Content.Shared.Movement.Pulling.Systems;
+using Content.Shared.Movement.Systems;
 using Content.Shared.Pointing;
 using Content.Shared.ProximityDetection;
 using Content.Shared.Standing;
+using Content.Shared.Stealth;
+using Content.Shared.Stealth.Components;
 using Content.Shared.StepTrigger.Systems;
-using Content.Goobstation.Common.Footprints;
+using Robust.Shared.Audio.Systems;
+using Robust.Shared.Physics;
+using Robust.Shared.Physics.Systems;
 
 namespace Content.Goobstation.Shared.PhaseShift;
 
@@ -27,9 +27,9 @@ public abstract class SharedPhaseShiftSystem : EntitySystem
     [Dependency] private readonly SharedAudioSystem _audio = default!;
     [Dependency] private readonly MovementSpeedModifierSystem _movement = default!;
     [Dependency] private readonly SharedPhysicsSystem _physics = default!;
+    [Dependency] private readonly PullingSystem _pulling = default!;
     [Dependency] private readonly SharedStealthSystem _stealth = default!;
     [Dependency] private readonly SharedTransformSystem _transform = default!;
-    [Dependency] private readonly PullingSystem _pulling = default!;
 
     public override void Initialize()
     {
@@ -87,85 +87,51 @@ public abstract class SharedPhaseShiftSystem : EntitySystem
     private void OnRefresh(Entity<PhaseShiftedComponent> ent, ref RefreshMovementSpeedModifiersEvent args) =>
         args.ModifySpeed(ent.Comp.MovementSpeedBuff, ent.Comp.MovementSpeedBuff);
 
-    private void OnAttackAttempt(Entity<PhaseShiftedComponent> ent, ref AttackAttemptEvent args)
-    {
+    private void OnAttackAttempt(Entity<PhaseShiftedComponent> ent, ref AttackAttemptEvent args) =>
         RemComp<PhaseShiftedComponent>(ent);
-    }
 
-    private void OnAttempt(EntityUid uid, PhaseShiftedComponent comp, CancellableEntityEventArgs args)
-    {
-        args.Cancel();
-    }
+    private void OnAttempt(EntityUid uid, PhaseShiftedComponent comp, CancellableEntityEventArgs args) => args.Cancel();
 
-    private void OnUseAttempt(EntityUid uid, PhaseShiftedComponent comp, UseAttemptEvent args)
-    {
-        args.Cancel();
-    }
+    private void OnUseAttempt(EntityUid uid, PhaseShiftedComponent comp, UseAttemptEvent args) => args.Cancel();
 
-    private void OnGettingAttackedAttempt(EntityUid uid, PhaseShiftedComponent comp, ref GettingAttackedAttemptEvent args)
-    {
+    private void OnGettingAttackedAttempt(EntityUid uid,
+        PhaseShiftedComponent comp,
+        ref GettingAttackedAttemptEvent args) => args.Cancelled = true;
+
+    private void OnBeforeDamage(EntityUid uid, PhaseShiftedComponent comp, ref BeforeDamageChangedEvent args) =>
         args.Cancelled = true;
-    }
 
-    private void OnBeforeDamage(EntityUid uid, PhaseShiftedComponent comp, ref BeforeDamageChangedEvent args)
-    {
+    private void OnBeforeStaminaDamage(EntityUid uid, PhaseShiftedComponent comp, ref BeforeStaminaDamageEvent args) =>
         args.Cancelled = true;
-    }
 
-    private void OnBeforeStaminaDamage(EntityUid uid, PhaseShiftedComponent comp, ref BeforeStaminaDamageEvent args)
-    {
+    private void OnElectrocutionAttempt(EntityUid uid, PhaseShiftedComponent comp, ElectrocutionAttemptEvent args) =>
+        args.Cancel();
+
+    private void OnDownAttempt(EntityUid uid, PhaseShiftedComponent comp, DownAttemptEvent args) => args.Cancel();
+
+    private void OnFlashAttempt(EntityUid uid, PhaseShiftedComponent comp, ref FlashAttemptEvent args) =>
         args.Cancelled = true;
-    }
 
-    private void OnElectrocutionAttempt(EntityUid uid, PhaseShiftedComponent comp, ElectrocutionAttemptEvent args)
-    {
+    private void OnBeforeEmote(EntityUid uid, PhaseShiftedComponent comp, ref BeforeEmoteEvent args) => args.Cancel();
+
+    private void OnEmoteAttempt(EntityUid uid, PhaseShiftedComponent comp, ref EmoteAttemptEvent args) => args.Cancel();
+
+    private void OnPointAttempt(EntityUid uid, PhaseShiftedComponent comp, PointAttemptEvent args) => args.Cancel();
+
+    private void
+        OnFootprintLeaveAttempt(EntityUid uid, PhaseShiftedComponent comp, ref FootprintLeaveAttemptEvent args) =>
         args.Cancel();
-    }
 
-    private void OnDownAttempt(EntityUid uid, PhaseShiftedComponent comp, DownAttemptEvent args)
-    {
-        args.Cancel();
-    }
-
-    private void OnFlashAttempt(EntityUid uid, PhaseShiftedComponent comp, ref FlashAttemptEvent args)
-    {
+    private void OnStepTriggerAttempt(EntityUid uid, PhaseShiftedComponent comp, ref StepTriggerAttemptEvent args) =>
         args.Cancelled = true;
-    }
 
-    private void OnBeforeEmote(EntityUid uid, PhaseShiftedComponent comp, ref BeforeEmoteEvent args)
-    {
-        args.Cancel();
-    }
+    private void OnProximityDetectionAttempt(EntityUid uid,
+        PhaseShiftedComponent comp,
+        ref ProximityDetectionAttemptEvent args) => args.Cancelled = true;
 
-    private void OnEmoteAttempt(EntityUid uid, PhaseShiftedComponent comp, ref EmoteAttemptEvent args)
-    {
-        args.Cancel();
-    }
-
-    private void OnPointAttempt(EntityUid uid, PhaseShiftedComponent comp, PointAttemptEvent args)
-    {
-        args.Cancel();
-    }
-
-    private void OnFootprintLeaveAttempt(EntityUid uid, PhaseShiftedComponent comp, ref FootprintLeaveAttemptEvent args)
-    {
-        args.Cancel();
-    }
-
-    private void OnStepTriggerAttempt(EntityUid uid, PhaseShiftedComponent comp, ref StepTriggerAttemptEvent args)
-    {
-        args.Cancelled = true;
-    }
-
-    private void OnProximityDetectionAttempt(EntityUid uid, PhaseShiftedComponent comp, ref ProximityDetectionAttemptEvent args)
-    {
-        args.Cancelled = true;
-    }
-
-    private void OnGettingInteractedWithAttempt(EntityUid uid, PhaseShiftedComponent comp, ref GettingInteractedWithAttemptEvent args)
-    {
-        args.Cancelled = true;
-    }
+    private void OnGettingInteractedWithAttempt(EntityUid uid,
+        PhaseShiftedComponent comp,
+        ref GettingInteractedWithAttemptEvent args) => args.Cancelled = true;
 
     protected virtual void OnComponentShutdown(Entity<PhaseShiftedComponent> ent, ref ComponentShutdown args)
     {

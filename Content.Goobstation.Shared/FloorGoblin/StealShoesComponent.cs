@@ -11,23 +11,23 @@ using Robust.Shared.Serialization;
 
 namespace Content.Goobstation.Shared.FloorGoblin;
 
-[RegisterComponent, NetworkedComponent, AutoGenerateComponentState]
+[RegisterComponent] [NetworkedComponent] [AutoGenerateComponentState]
 public sealed partial class StealShoesComponent : Component
 {
-    [DataField, AutoNetworkedField]
+    [DataField] [AutoNetworkedField]
     public EntProtoId? ActionProto;
 
-    [DataField, AutoNetworkedField]
-    public EntityUid? StealAction;
+    [DataField]
+    public SoundSpecifier? ChompSound = new SoundPathSpecifier("/Audio/_Goobstation/FloorGoblin/laugh.ogg");
 
     [DataField]
     public string ContainerId = "floorgoblin-shoes";
 
-    [DataField]
-    public SoundSpecifier? ChompSound = new SoundPathSpecifier("/Audio/_Goobstation/FloorGoblin/laugh.ogg");
+    [DataField] [AutoNetworkedField]
+    public EntityUid? StealAction;
 }
 
 public sealed partial class StealShoesEvent : EntityTargetActionEvent;
 
-[Serializable, NetSerializable]
+[Serializable] [NetSerializable]
 public sealed partial class StealShoesDoAfterEvent : SimpleDoAfterEvent;

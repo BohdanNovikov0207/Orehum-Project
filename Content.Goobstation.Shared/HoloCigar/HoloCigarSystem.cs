@@ -36,20 +36,20 @@ namespace Content.Goobstation.Shared.HoloCigar;
 /// </summary>
 public sealed class HoloCigarSystem : EntitySystem
 {
-    [Dependency] private readonly SharedAppearanceSystem _appearance = default!;
-    [Dependency] private readonly ClothingSystem _clothing = default!;
-    [Dependency] private readonly SharedItemSystem _items = default!;
-    [Dependency] private readonly SharedGunSystem _gun = default!;
-    [Dependency] private readonly IGameTiming _gameTiming = default!;
-    [Dependency] private readonly SharedAudioSystem _audio = default!;
-    [Dependency] private readonly INetManager _net = default!;
-    [Dependency] private readonly InventorySystem _inventory = default!;
-
     private const string LitPrefix = "lit";
     private const string UnlitPrefix = "unlit";
     private const string MaskSlot = "mask";
+    [Dependency] private readonly SharedAppearanceSystem _appearance = default!;
+    [Dependency] private readonly SharedAudioSystem _audio = default!;
+    [Dependency] private readonly ClothingSystem _clothing = default!;
+    [Dependency] private readonly IGameTiming _gameTiming = default!;
+    [Dependency] private readonly SharedGunSystem _gun = default!;
+    [Dependency] private readonly InventorySystem _inventory = default!;
+    [Dependency] private readonly SharedItemSystem _items = default!;
+    [Dependency] private readonly INetManager _net = default!;
 
-    /// <inheritdoc/>o
+    /// <inheritdoc />
+    /// o
     public override void Initialize()
     {
         SubscribeLocalEvent<HoloCigarComponent, GetVerbsEvent<AlternativeVerb>>(OnAddInteractVerb);
@@ -83,6 +83,37 @@ public sealed class HoloCigarSystem : EntitySystem
 
         args.Verbs.Add(verb);
     }
+
+    #region Helper Methods
+
+    private void RestoreGun(EntityUid gun,
+        HoloCigarAffectedGunComponent? cigarAffectedGunComponent = null,
+        MultishotComponent? multiShotComp = null)
+    {
+        if (!Resolve(gun, ref cigarAffectedGunComponent, ref multiShotComp))
+            return;
+
+        switch (cigarAffectedGunComponent.WasOriginallyMultishot)
+        {
+            case false:
+                RemComp<MultishotComponent>(gun);
+                break;
+            case true:
+            {
+                multiShotComp.MissChance = cigarAffectedGunComponent.OriginalMissChance;
+                multiShotComp.SpreadMultiplier = cigarAffectedGunComponent.OriginalSpreadModifier;
+                multiShotComp.SpreadAddition = cigarAffectedGunComponent.OriginalSpreadAddition;
+                multiShotComp.HandDamageAmount = cigarAffectedGunComponent.OriginalHandDamageAmount;
+                multiShotComp.StaminaDamage = cigarAffectedGunComponent.OriginalStaminaDamage;
+                break;
+            }
+        }
+
+        RemComp<HoloCigarAffectedGunComponent>(gun);
+        _gun.RefreshModifiers(gun);
+    }
+
+    #endregion
 
     #region Event Methods
 
@@ -132,16 +163,14 @@ public sealed class HoloCigarSystem : EntitySystem
             ent.Comp.AddedNoWieldNeeded = true;
             AddComp<NoWieldNeededComponent>(ent);
         }
+
         if (!_inventory.TryGetSlotEntity(ent, MaskSlot, out var cigarEntity) ||
             !HasComp<HoloCigarComponent>(cigarEntity))
             return;
         ent.Comp.HoloCigarEntity = cigarEntity;
     }
 
-    private void OnDroppedEvent(Entity<HoloCigarAffectedGunComponent> ent, ref DroppedEvent args)
-    {
-        RestoreGun(ent);
-    }
+    private void OnDroppedEvent(Entity<HoloCigarAffectedGunComponent> ent, ref DroppedEvent args) => RestoreGun(ent);
 
     private void OnPickupAttempt(Entity<TheManWhoSoldTheWorldComponent> ent, ref PickupAttemptEvent args)
     {
@@ -189,7 +218,7 @@ public sealed class HoloCigarSystem : EntitySystem
         if (!_net.IsServer) // mary copium right here
             return;
 
-        if (ent.Comp.Lit == false)
+        if (!ent.Comp.Lit)
         {
             var audio = _audio.PlayPvs(ent.Comp.Music, ent);
 
@@ -212,37 +241,6 @@ public sealed class HoloCigarSystem : EntitySystem
 
         ent.Comp.Lit = state.Lit;
         HandleToggle(ent);
-    }
-
-    #endregion
-
-    #region Helper Methods
-
-    private void RestoreGun(EntityUid gun,
-        HoloCigarAffectedGunComponent? cigarAffectedGunComponent = null,
-        MultishotComponent? multiShotComp = null)
-    {
-        if (!Resolve(gun, ref cigarAffectedGunComponent, ref multiShotComp))
-            return;
-
-        switch (cigarAffectedGunComponent.WasOriginallyMultishot)
-        {
-            case false:
-                RemComp<MultishotComponent>(gun);
-                break;
-            case true:
-            {
-                multiShotComp.MissChance = cigarAffectedGunComponent.OriginalMissChance;
-                multiShotComp.SpreadMultiplier = cigarAffectedGunComponent.OriginalSpreadModifier;
-                multiShotComp.SpreadAddition = cigarAffectedGunComponent.OriginalSpreadAddition;
-                multiShotComp.HandDamageAmount = cigarAffectedGunComponent.OriginalHandDamageAmount;
-                multiShotComp.StaminaDamage = cigarAffectedGunComponent.OriginalStaminaDamage;
-                break;
-            }
-        }
-
-        RemComp<HoloCigarAffectedGunComponent>(gun);
-        _gun.RefreshModifiers(gun);
     }
 
     #endregion

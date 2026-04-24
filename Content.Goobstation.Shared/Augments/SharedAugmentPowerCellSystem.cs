@@ -1,14 +1,16 @@
+using Content.Shared._Shitmed.Body.Organ;
 using Content.Shared.Body.Systems;
 using Content.Shared.PowerCell;
-using Content.Shared._Shitmed.Body.Organ;
 
 namespace Content.Goobstation.Shared.Augments;
 
 public abstract class SharedAugmentPowerCellSystem : EntitySystem
 {
-    [Dependency] protected readonly AugmentSystem Augment = default!;
     [Dependency] private readonly SharedBodySystem _body = default!;
     [Dependency] protected readonly SharedPowerCellSystem _powerCell = default!;
+    [Dependency] protected readonly AugmentSystem Augment = default!;
+
+    private EntityQuery<PowerCellDrawComponent> _drawQuery;
 
     public override void Initialize()
     {
@@ -20,8 +22,6 @@ public abstract class SharedAugmentPowerCellSystem : EntitySystem
         SubscribeLocalEvent<AugmentPowerCellSlotComponent, PowerCellSlotEmptyEvent>(OnCellEmpty);
     }
 
-    private EntityQuery<PowerCellDrawComponent> _drawQuery;
-
     private void OnEnableChanged(Entity<AugmentPowerCellSlotComponent> ent, ref OrganEnableChangedEvent args)
     {
         if (!_drawQuery.TryComp(ent, out var draw))
@@ -30,7 +30,7 @@ public abstract class SharedAugmentPowerCellSystem : EntitySystem
         UpdateDrawRate((ent, draw));
 
         _powerCell.SetDrawEnabled(ent.Owner, args.Enabled);
-        if (Augment.GetBody(ent) is not {} body)
+        if (Augment.GetBody(ent) is not { } body)
             return;
 
         if (args.Enabled && _powerCell.HasDrawCharge(ent.Owner, draw))
@@ -47,7 +47,7 @@ public abstract class SharedAugmentPowerCellSystem : EntitySystem
 
     private void OnCellEmpty(Entity<AugmentPowerCellSlotComponent> ent, ref PowerCellSlotEmptyEvent args)
     {
-        if (Augment.GetBody(ent) is not {} body)
+        if (Augment.GetBody(ent) is not { } body)
             return;
 
         var ev = new AugmentLostPowerEvent(body);
@@ -72,7 +72,7 @@ public abstract class SharedAugmentPowerCellSystem : EntitySystem
         if (!_drawQuery.Resolve(ent, ref ent.Comp))
             return;
 
-        var rate = Augment.GetBody(ent) is {} body
+        var rate = Augment.GetBody(ent) is { } body
             ? GetBodyDraw(body)
             : 0f;
         if (ent.Comp.DrawRate == rate)

@@ -6,14 +6,14 @@ namespace Content.Goobstation.Shared.Shadowling.Components.Abilities.CollectiveM
 /// <summary>
 /// This is used for the Nox Imperii ability.
 /// </summary>
-[RegisterComponent, NetworkedComponent]
+[RegisterComponent] [NetworkedComponent]
 public sealed partial class ShadowlingNoxImperiiComponent : Component
 {
     [DataField]
-    public EntProtoId ActionId = "ActionNoxImperii";
+    public EntityUid? ActionEnt;
 
     [DataField]
-    public EntityUid? ActionEnt;
+    public EntProtoId ActionId = "ActionNoxImperii";
 
     /// <summary>
     /// The seconds it takes for the ability to activate.

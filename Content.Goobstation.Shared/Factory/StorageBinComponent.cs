@@ -12,7 +12,7 @@ namespace Content.Goobstation.Shared.Factory;
 /// <summary>
 /// Makes a storage check filter slot and invoke signals.
 /// </summary>
-[RegisterComponent, NetworkedComponent, Access(typeof(StorageBinSystem))]
+[RegisterComponent] [NetworkedComponent] [Access(typeof(StorageBinSystem))]
 public sealed partial class StorageBinComponent : Component
 {
     /// <summary>
@@ -28,8 +28,8 @@ public sealed partial class StorageBinComponent : Component
     public ProtoId<SourcePortPrototype> RemovedPort = "StorageRemoved";
 }
 
-[Serializable, NetSerializable]
+[Serializable] [NetSerializable]
 public enum StorageBinLayers : byte
 {
-    Powered
+    Powered,
 }

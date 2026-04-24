@@ -17,20 +17,20 @@ namespace Content.Goobstation.Server.Shadowling.Systems.Abilities.PreAscension;
 /// </summary>
 public sealed class ShadowlingVeilSystem : EntitySystem
 {
-    [Dependency] private readonly EntityLookupSystem _lookup = default!;
-    [Dependency] private readonly SharedTransformSystem _transform = default!;
-    [Dependency] private readonly PoweredLightSystem _light = default!;
-    [Dependency] private readonly SharedHandheldLightSystem _handheld = default!;
-    [Dependency] private readonly UnpoweredFlashlightSystem _unpowered = default!;
     [Dependency] private readonly SharedActionsSystem _actions = default!;
+    [Dependency] private readonly SharedHandheldLightSystem _handheld = default!;
+    [Dependency] private readonly PoweredLightSystem _light = default!;
+    [Dependency] private readonly EntityLookupSystem _lookup = default!;
     [Dependency] private readonly TagSystem _tag = default!;
+    [Dependency] private readonly SharedTransformSystem _transform = default!;
+    [Dependency] private readonly UnpoweredFlashlightSystem _unpowered = default!;
+    private EntityQuery<ExpendableLightComponent> _expendableLightQuery;
+    private EntityQuery<HandheldLightComponent> _handheldLightQuery;
 
     private EntityQuery<PointLightComponent> _pointLightQuery;
     private EntityQuery<PoweredLightComponent> _poweredLightQuery;
-    private EntityQuery<HandheldLightComponent> _handheldLightQuery;
-    private EntityQuery<UnpoweredFlashlightComponent> _unpoweredFlashlightQuery;
-    private EntityQuery<ExpendableLightComponent> _expendableLightQuery;
     private EntityQuery<TimedDespawnComponent> _timedDespawnQuery;
+    private EntityQuery<UnpoweredFlashlightComponent> _unpoweredFlashlightQuery;
 
     public override void Initialize()
     {

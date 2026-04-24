@@ -8,8 +8,8 @@ namespace Content.Goobstation.Client.Silicon;
 
 public sealed class StationAiEarlyLeaveMenu : DefaultWindow
 {
-    public readonly Button DenyButton;
     public readonly Button ConfirmButton;
+    public readonly Button DenyButton;
 
     public StationAiEarlyLeaveMenu()
     {
@@ -24,10 +24,10 @@ public sealed class StationAiEarlyLeaveMenu : DefaultWindow
                     Orientation = LayoutOrientation.Vertical,
                     Children =
                     {
-                        (new Label()
+                        new Label
                         {
-                            Text = Loc.GetString("station-ai-earlyleave-menu-text")
-                        }),
+                            Text = Loc.GetString("station-ai-earlyleave-menu-text"),
+                        },
                         new BoxContainer
                         {
                             Orientation = LayoutOrientation.Horizontal,
@@ -36,23 +36,23 @@ public sealed class StationAiEarlyLeaveMenu : DefaultWindow
                             {
                                 (ConfirmButton = new Button
                                 {
-                                    Text = Loc.GetString("station-ai-earlyleave-menu-confirm")
+                                    Text = Loc.GetString("station-ai-earlyleave-menu-confirm"),
                                 }),
 
-                                (new Control()
+                                new Control
                                 {
-                                    MinSize = new Vector2(20, 0)
-                                }),
+                                    MinSize = new Vector2(20, 0),
+                                },
 
                                 (DenyButton = new Button
                                 {
-                                    Text = Loc.GetString("station-ai-earlyleave-menu-deny")
-                                })
-                            }
-                        }
-                    }
-                }
-            }
+                                    Text = Loc.GetString("station-ai-earlyleave-menu-deny"),
+                                }),
+                            },
+                        },
+                    },
+                },
+            },
         });
     }
 }

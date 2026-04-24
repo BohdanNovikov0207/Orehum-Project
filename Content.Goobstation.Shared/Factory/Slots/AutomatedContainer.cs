@@ -8,10 +8,14 @@ using Robust.Shared.Containers;
 namespace Content.Goobstation.Shared.Factory.Slots;
 
 /// <summary>
-/// Abstraction over a <see cref="BaseContainer"/> on the machine.
+/// Abstraction over a <see cref="BaseContainer" /> on the machine.
 /// </summary>
 public sealed partial class AutomatedContainer : AutomationSlot
 {
+    private SharedContainerSystem _container;
+
+    public BaseContainer Container;
+
     /// <summary>
     /// The ID of the container to use.
     /// </summary>
@@ -20,10 +24,6 @@ public sealed partial class AutomatedContainer : AutomationSlot
 
     [DataField(required: true)]
     public int MaxItems;
-
-    private SharedContainerSystem _container;
-
-    public BaseContainer Container;
 
     public override void Initialize()
     {
@@ -34,17 +34,12 @@ public sealed partial class AutomatedContainer : AutomationSlot
         Container = _container.GetContainer(Owner, ContainerId);
     }
 
-    public override bool Insert(EntityUid item)
-    {
-        return base.Insert(item) && _container.Insert(item, Container);
-    }
+    public override bool Insert(EntityUid item) => base.Insert(item) && _container.Insert(item, Container);
 
-    public override bool CanInsert(EntityUid item)
-    {
-        return base.CanInsert(item)
-            && Container.Count < MaxItems
-            && _container.CanInsert(item, Container);
-    }
+    public override bool CanInsert(EntityUid item) =>
+        base.CanInsert(item)
+        && Container.Count < MaxItems
+        && _container.CanInsert(item, Container);
 
     public override EntityUid? GetItem(EntityUid? filter)
     {

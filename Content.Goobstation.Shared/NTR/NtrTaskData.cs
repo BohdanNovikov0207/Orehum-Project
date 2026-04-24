@@ -18,29 +18,17 @@ namespace Content.Goobstation.Shared.NTR;
 /// <summary>
 /// A data structure for storing currently available bounties.
 /// </summary>
-[DataDefinition, NetSerializable, Serializable]
+[DataDefinition] [NetSerializable] [Serializable]
 public partial record struct NtrTaskData
 {
-    /// <summary>
-    /// A unique id used to identify the bounty
-    /// </summary>
     [DataField]
-    public string Id { get; init; } = string.Empty;
-
-    /// <summary>
-    /// The prototype containing information about the bounty.
-    /// </summary>
-    [DataField(required: true)]
-    public ProtoId<NtrTaskPrototype> Task { get; init; } = string.Empty;
-
-    [DataField]
-    public bool IsActive = false;
+    public TimeSpan ActiveTime;
 
     [DataField]
     public bool IsAccepted = false;
 
     [DataField]
-    public TimeSpan ActiveTime;
+    public bool IsActive = false;
 
     [DataField]
     public bool IsCompleted = false;
@@ -53,8 +41,18 @@ public partial record struct NtrTaskData
         IsAccepted = false;
         ActiveTime = TimeSpan.Zero;
     }
-    public NtrTaskData AsActive(TimeSpan time)
-    {
-        return this with { IsActive = true, ActiveTime = time };
-    }
+
+    /// <summary>
+    /// A unique id used to identify the bounty
+    /// </summary>
+    [DataField]
+    public string Id { get; init; } = string.Empty;
+
+    /// <summary>
+    /// The prototype containing information about the bounty.
+    /// </summary>
+    [DataField(required: true)]
+    public ProtoId<NtrTaskPrototype> Task { get; init; } = string.Empty;
+
+    public NtrTaskData AsActive(TimeSpan time) => this with { IsActive = true, ActiveTime = time };
 }

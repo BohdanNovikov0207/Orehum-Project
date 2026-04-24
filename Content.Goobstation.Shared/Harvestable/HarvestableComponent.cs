@@ -8,11 +8,11 @@ namespace Content.Goobstation.Shared.Harvestable;
 [RegisterComponent]
 public sealed partial class HarvestableComponent : Component
 {
-    // Harvest loot.
-    [DataField(required: true)]
-    public EntProtoId? Loot;
-
     // Harvest doAfter delay.
     [DataField]
     public float Delay = 1f;
+
+    // Harvest loot.
+    [DataField(required: true)]
+    public EntProtoId? Loot;
 }

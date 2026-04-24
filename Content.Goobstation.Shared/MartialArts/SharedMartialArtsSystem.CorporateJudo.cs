@@ -14,6 +14,7 @@
 
 using Content.Goobstation.Common.Grab;
 using Content.Goobstation.Common.MartialArts;
+using Content.Goobstation.Maths.FixedPoint;
 using Content.Goobstation.Shared.GrabIntent;
 using Content.Goobstation.Shared.MartialArts.Components;
 using Content.Goobstation.Shared.MartialArts.Events;
@@ -21,12 +22,10 @@ using Content.Shared.Clothing;
 using Content.Shared.Damage;
 using Content.Shared.Damage.Events;
 using Content.Shared.Eye.Blinding.Components;
-using Content.Goobstation.Maths.FixedPoint;
 using Content.Shared.Movement.Pulling.Components;
 using Content.Shared.Movement.Pulling.Events;
 using Content.Shared.Standing;
 using Content.Shared.StatusEffect;
-using Content.Shared.Stunnable;
 using Content.Shared.Weapons.Melee;
 using Robust.Shared.Audio;
 
@@ -221,7 +220,7 @@ public partial class SharedMartialArtsSystem
     private void OnJudoGoldenBlast(Entity<CanPerformComboComponent> ent, ref JudoGoldenBlastPerformedEvent args)
     {
         if (!_proto.TryIndex(ent.Comp.BeingPerformed, out var proto)
-            || !TryUseMartialArt(ent, proto, out var target, out var _)
+            || !TryUseMartialArt(ent, proto, out var target, out _)
             || !TryComp(target, out StatusEffectsComponent? status)
             || !TryComp<PullableComponent>(target, out var pullable))
             return;

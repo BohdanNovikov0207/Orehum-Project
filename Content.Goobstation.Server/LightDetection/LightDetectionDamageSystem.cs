@@ -1,7 +1,6 @@
 using Content.Goobstation.Shared.LightDetection.Components;
 using Content.Goobstation.Shared.LightDetection.Systems;
 using Content.Shared._Shitmed.Damage;
-using Content.Shared._Shitmed.Medical.Surgery.Pain.Systems;
 using Content.Shared._Shitmed.Medical.Surgery.Wounds.Systems;
 using Content.Shared._Shitmed.Targeting;
 using Content.Shared.Damage;
@@ -17,11 +16,11 @@ namespace Content.Goobstation.Server.LightDetection;
 /// </summary>
 public sealed class LightDetectionDamageSystem : SharedLightDetectionDamageSystem
 {
-    [Dependency] private readonly IGameTiming _timing = default!;
-    [Dependency] private readonly DamageableSystem _damageable = default!;
-    [Dependency] private readonly WoundSystem _woundSystem = default!;
-    [Dependency] private readonly MobStateSystem _mobState = default!;
     [Dependency] private readonly SharedAudioSystem _audio = default!;
+    [Dependency] private readonly DamageableSystem _damageable = default!;
+    [Dependency] private readonly MobStateSystem _mobState = default!;
+    [Dependency] private readonly IGameTiming _timing = default!;
+    [Dependency] private readonly WoundSystem _woundSystem = default!;
 
     public override void Update(float frameTime)
     {
@@ -40,7 +39,9 @@ public sealed class LightDetectionDamageSystem : SharedLightDetectionDamageSyste
 
             if (comp.DetectionValue <= 0 && comp.TakeDamageOnLight && !_mobState.IsDead(uid))
             {
-                _damageable.TryChangeDamage(uid, comp.DamageToDeal * comp.ResistanceModifier, splitDamage: SplitDamageBehavior.SplitEnsureAll);
+                _damageable.TryChangeDamage(uid,
+                    comp.DamageToDeal * comp.ResistanceModifier,
+                    splitDamage: SplitDamageBehavior.SplitEnsureAll);
                 _audio.PlayPvs(comp.SoundOnDamage, uid, AudioParams.Default.WithVolume(-2f));
                 return;
             }
@@ -48,7 +49,13 @@ public sealed class LightDetectionDamageSystem : SharedLightDetectionDamageSyste
             if (comp.DetectionValue > 0 && comp.HealOnShadows && !_mobState.IsDead(uid))
             {
                 _woundSystem.TryHealWoundsOnOwner(uid, comp.DamageToHeal, true);
-                _damageable.TryChangeDamage(uid, comp.DamageToHeal, true, false, targetPart: TargetBodyPart.All, splitDamage: SplitDamageBehavior.SplitEnsureAllOrganic, canMiss: false);
+                _damageable.TryChangeDamage(uid,
+                    comp.DamageToHeal,
+                    true,
+                    false,
+                    targetPart: TargetBodyPart.All,
+                    splitDamage: SplitDamageBehavior.SplitEnsureAllOrganic,
+                    canMiss: false);
                 return;
             }
         }

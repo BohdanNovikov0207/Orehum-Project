@@ -5,7 +5,7 @@ using Content.Shared.StepTrigger.Systems;
 namespace Content.Goobstation.Shared.Enchanting.Systems;
 
 /// <summary>
-/// Cancels step triggering for <see cref="LavaImmunityEnchantComponent"/>.
+/// Cancels step triggering for <see cref="LavaImmunityEnchantComponent" />.
 /// </summary>
 public sealed class LavaImmunityEnchantSystem : EntitySystem
 {

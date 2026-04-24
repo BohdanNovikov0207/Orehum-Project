@@ -19,14 +19,14 @@ namespace Content.Goobstation.Shared.Wraith.Revenant;
 /// </summary>
 public sealed class RevenantCrushSystem : EntitySystem
 {
-    [Dependency] private readonly SharedStunSystem _stunSystem = default!;
-    [Dependency] private readonly DamageableSystem _damageableSystem = default!;
+    [Dependency] private readonly ISharedAdminLogManager _admin = default!;
+    [Dependency] private readonly SharedAudioSystem _audio = default!;
     [Dependency] private readonly SharedBodySystem _body = default!;
+    [Dependency] private readonly DamageableSystem _damageableSystem = default!;
     [Dependency] private readonly SharedDoAfterSystem _doAfter = default!;
     [Dependency] private readonly INetManager _netManager = default!;
-    [Dependency] private readonly SharedAudioSystem _audio = default!;
     [Dependency] private readonly SharedPopupSystem _popup = default!;
-    [Dependency] private readonly ISharedAdminLogManager _admin = default!;
+    [Dependency] private readonly SharedStunSystem _stunSystem = default!;
 
     public override void Initialize()
     {
@@ -65,7 +65,7 @@ public sealed class RevenantCrushSystem : EntitySystem
         _doAfter.TryStartDoAfter(doAftersArgs);
         _audio.PlayPredicted(ent.Comp.CrushSound, args.Target, args.Target);
 
-        _stunSystem.KnockdownOrStun(args.Target, ent.Comp.KnockdownDuration, true);
+        _stunSystem.KnockdownOrStun(args.Target, ent.Comp.KnockdownDuration);
         _damageableSystem.TryChangeDamage(args.Target, ent.Comp.InitialDamage, true);
 
         args.Handled = true;

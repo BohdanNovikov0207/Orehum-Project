@@ -17,13 +17,9 @@ public sealed class ShadowlingHatchingSystem : EntitySystem
         SubscribeLocalEvent<HatchingEggComponent, StorageCloseAttemptEvent>(OnEggCloseAttempt);
     }
 
-    private void OnEggOpenAttempt(EntityUid uid, HatchingEggComponent component, ref StorageOpenAttemptEvent args)
-    {
+    private void OnEggOpenAttempt(EntityUid uid, HatchingEggComponent component, ref StorageOpenAttemptEvent args) =>
         args.Cancelled = true;
-    }
 
-    private void OnEggCloseAttempt(EntityUid uid, HatchingEggComponent component, ref StorageCloseAttemptEvent args)
-    {
+    private void OnEggCloseAttempt(EntityUid uid, HatchingEggComponent component, ref StorageCloseAttemptEvent args) =>
         args.Cancelled = true;
-    }
 }

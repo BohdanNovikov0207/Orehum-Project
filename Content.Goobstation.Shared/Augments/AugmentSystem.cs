@@ -39,7 +39,7 @@ public sealed class AugmentSystem : EntitySystem
 
     private void OnAccessibleOverride(Entity<InstalledAugmentsComponent> ent, ref AccessibleOverrideEvent args)
     {
-        if (GetBody(args.Target) is not {} body || body != args.User)
+        if (GetBody(args.Target) is not { } body || body != args.User)
             return;
 
         // let the user interact with their installed augments
@@ -58,7 +58,7 @@ public sealed class AugmentSystem : EntitySystem
     /// <summary>
     /// Relays an event to all installed augments.
     /// </summary>
-    public void RelayEvent<T>(EntityUid body, ref T ev) where T: notnull
+    public void RelayEvent<T>(EntityUid body, ref T ev) where T : notnull
     {
         if (_installedQuery.TryComp(body, out var comp))
             RelayEvent((body, comp), ref ev);
@@ -67,7 +67,7 @@ public sealed class AugmentSystem : EntitySystem
     /// <summary>
     /// Relay an event in the form usable for a subscription.
     /// </summary>
-    public void RelayEvent<T>(Entity<InstalledAugmentsComponent> ent, ref T ev) where T: notnull
+    public void RelayEvent<T>(Entity<InstalledAugmentsComponent> ent, ref T ev) where T : notnull
     {
         foreach (var netEnt in ent.Comp.InstalledAugments)
         {

@@ -20,7 +20,6 @@ using Content.Shared.Mobs.Components;
 using Content.Shared.Movement.Pulling.Components;
 using Content.Shared.Speech.Muting;
 using Content.Shared.StatusEffect;
-using Content.Shared.Stunnable;
 using Content.Shared.Throwing;
 using Content.Shared.Weapons.Melee;
 using Content.Shared.Weapons.Melee.Events;
@@ -51,10 +50,8 @@ public abstract partial class SharedMartialArtsSystem
         SubscribeLocalEvent<NinjutsuSneakAttackComponent, StatusEffectEndedEvent>(OnAlertEffectEnded);
     }
 
-    private void OnBeforeGunShot(Entity<NinjutsuSneakAttackComponent> ent, ref SelfBeforeGunShotEvent args)
-    {
+    private void OnBeforeGunShot(Entity<NinjutsuSneakAttackComponent> ent, ref SelfBeforeGunShotEvent args) =>
         ResetDebuff(ent);
-    }
 
     private void OnAlertEffectEnded(Entity<NinjutsuSneakAttackComponent> ent, ref StatusEffectEndedEvent args)
     {
@@ -70,10 +67,8 @@ public abstract partial class SharedMartialArtsSystem
         _alerts.ClearAlertCategory(ent, NinjutsuAlertCategory);
     }
 
-    private void OnSneakAttackInit(Entity<NinjutsuSneakAttackComponent> ent, ref ComponentInit args)
-    {
+    private void OnSneakAttackInit(Entity<NinjutsuSneakAttackComponent> ent, ref ComponentInit args) =>
         _alerts.ShowAlert(ent, ent.Comp.Alert);
-    }
 
     private void OnMobStateChanged(MobStateChangedEvent ev)
     {
@@ -122,7 +117,11 @@ public abstract partial class SharedMartialArtsSystem
         }
 
         var modifier = sneakAttack.TakedownSpeedModifier;
-        _movementMod.TryUpdateMovementSpeedModDuration(target, MartsGenericSlow, TimeSpan.FromSeconds(slowdownTime), modifier, modifier);
+        _movementMod.TryUpdateMovementSpeedModDuration(target,
+            MartsGenericSlow,
+            TimeSpan.FromSeconds(slowdownTime),
+            modifier,
+            modifier);
         _status.TryAddStatusEffect<MutedComponent>(target, "Muted", TimeSpan.FromSeconds(muteTime), true);
 
         _audio.PlayPvs(sneakAttack.AssassinateSoundUnarmed, target);

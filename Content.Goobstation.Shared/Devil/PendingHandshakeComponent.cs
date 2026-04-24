@@ -10,8 +10,8 @@ namespace Content.Goobstation.Shared.Devil;
 public sealed partial class PendingHandshakeComponent : Component
 {
     [DataField]
-    public EntityUid? Offerer;
+    public TimeSpan ExpiryTime;
 
     [DataField]
-    public TimeSpan ExpiryTime;
+    public EntityUid? Offerer;
 }

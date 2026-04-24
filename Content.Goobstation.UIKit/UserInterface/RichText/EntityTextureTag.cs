@@ -22,9 +22,7 @@ public sealed class EntityTextureTag : BaseTextureTag, IMarkupTagHandler
             return false;
 
         if (!node.Attributes.TryGetValue("size", out var size) || !size.TryGetLong(out var sizeValue))
-        {
             sizeValue = 32;
-        }
 
         if (!TryDrawIconEntity(new NetEntity((int) id), sizeValue.Value, out var texture))
             return false;

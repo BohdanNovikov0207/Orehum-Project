@@ -5,7 +5,7 @@ namespace Content.Goobstation.Shared.Shadowling.Components;
 /// <summary>
 /// This is used after you get anti-mind controlled. It takes a little longer to get thralled again.
 /// </summary>
-[RegisterComponent, NetworkedComponent]
+[RegisterComponent] [NetworkedComponent]
 public sealed partial class EnthrallResistanceComponent : Component
 {
     /// <summary>

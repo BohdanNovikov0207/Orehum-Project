@@ -9,24 +9,24 @@ using Robust.Shared.GameStates;
 
 namespace Content.Goobstation.Shared.Xenobiology.Components;
 
-[RegisterComponent, NetworkedComponent]
+[RegisterComponent] [NetworkedComponent]
 public sealed partial class SlimeExtractComponent : Component
 {
     /// <summary>
-    ///     Was this extract already used?
-    ///     Ideally this should come as a replacement to ReactiveComponent checks in the not so far future.
+    /// Major effect that should happen when a luminescent slimeperson presses the funny action button.
     /// </summary>
-    [DataField] public bool Used = false;
+    [DataField] public List<EntityEffect>? LiminescentMajorEffect = new();
 
     /// <summary>
-    ///     Minor effect that should happen when a luminescent slimeperson presses the funny action button.
+    /// Minor effect that should happen when a luminescent slimeperson presses the funny action button.
     /// </summary>
     [DataField] public List<EntityEffect>? LuminescentMinorEffect = new();
 
     /// <summary>
-    ///     Major effect that should happen when a luminescent slimeperson presses the funny action button.
+    /// Was this extract already used?
+    /// Ideally this should come as a replacement to ReactiveComponent checks in the not so far future.
     /// </summary>
-    [DataField] public List<EntityEffect>? LiminescentMajorEffect = new();
+    [DataField] public bool Used = false;
 
     // todo add crossbreeding here (feeding extracts to slimes) (not gonna happen xoon:tm:)
 }

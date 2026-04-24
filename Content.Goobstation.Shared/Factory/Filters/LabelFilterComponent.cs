@@ -13,31 +13,31 @@ namespace Content.Goobstation.Shared.Factory.Filters;
 /// Items without a label will always fail it.
 /// Set labels using a hand labeler.
 /// </summary>
-[RegisterComponent, NetworkedComponent, Access(typeof(AutomationFilterSystem))]
+[RegisterComponent] [NetworkedComponent] [Access(typeof(AutomationFilterSystem))]
 [AutoGenerateComponentState]
 public sealed partial class LabelFilterComponent : Component
 {
     /// <summary>
     /// The label to require.
     /// </summary>
-    [DataField, AutoNetworkedField]
+    [DataField] [AutoNetworkedField]
     public string Label = string.Empty;
 
     /// <summary>
-    /// Max length for <see cref="Label"/>.
+    /// Max length for <see cref="Label" />.
     /// </summary>
     [DataField]
     public int MaxLength = 50;
 }
 
-[Serializable, NetSerializable]
+[Serializable] [NetSerializable]
 public enum LabelFilterUiKey : byte
 {
-    Key
+    Key,
 }
 
-[Serializable, NetSerializable]
-public sealed partial class LabelFilterSetLabelMessage(string label) : BoundUserInterfaceMessage
+[Serializable] [NetSerializable]
+public sealed class LabelFilterSetLabelMessage(string label) : BoundUserInterfaceMessage
 {
     public readonly string Label = label;
 }

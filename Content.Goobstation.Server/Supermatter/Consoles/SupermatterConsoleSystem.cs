@@ -3,27 +3,23 @@
 //
 // SPDX-License-Identifier: AGPL-3.0-or-later
 
-using Content.Server.Pinpointer;
+using System.Linq;
 using Content.Goobstation.Shared.Supermatter.Components;
 using Content.Goobstation.Shared.Supermatter.Consoles;
 using Content.Goobstation.Shared.Supermatter.Monitor;
+using Content.Server.Pinpointer;
 using Content.Shared.Atmos;
-using Content.Shared.Pinpointer;
 using Content.Shared.Radiation.Components;
 using Robust.Server.GameObjects;
-using Robust.Shared.Map.Components;
-using System.Diagnostics.CodeAnalysis;
-using System.Linq;
 
 namespace Content.Goobstation.Server.Supermatter.Console.Systems;
 
 public sealed class SupermatterConsoleSystem : SharedSupermatterConsoleSystem
 {
-    [Dependency] private readonly UserInterfaceSystem _userInterfaceSystem = default!;
+    private const float UpdateTime = 1.0f;
     [Dependency] private readonly SharedAppearanceSystem _appearance = default!;
     [Dependency] private readonly NavMapSystem _navMapSystem = default!;
-
-    private const float UpdateTime = 1.0f;
+    [Dependency] private readonly UserInterfaceSystem _userInterfaceSystem = default!;
 
     // Note: this data does not need to be saved
     private float _updateTimer = 1.0f;
@@ -40,39 +36,6 @@ public sealed class SupermatterConsoleSystem : SharedSupermatterConsoleSystem
         // Grid events
         SubscribeLocalEvent<GridSplitEvent>(OnGridSplit);
     }
-
-    #region Event handling
-
-    private void OnConsoleInit(EntityUid uid, SupermatterConsoleComponent component, ComponentInit args) =>
-        InitalizeConsole(uid, component);
-
-    private void OnConsoleParentChanged(EntityUid uid, SupermatterConsoleComponent component, EntParentChangedMessage args) =>
-        InitalizeConsole(uid, component);
-
-    private void OnFocusChangedMessage(EntityUid uid, SupermatterConsoleComponent component, SupermatterConsoleFocusChangeMessage args) =>
-        component.FocusSupermatter = args.FocusSupermatter;
-
-    private void OnGridSplit(ref GridSplitEvent args)
-    {
-        // Collect grids
-        var allGrids = args.NewGrids.ToList();
-
-        if (!allGrids.Contains(args.Grid))
-            allGrids.Add(args.Grid);
-
-        // Update supermatter monitoring consoles that stand upon an updated grid
-        var query = AllEntityQuery<SupermatterConsoleComponent, TransformComponent>();
-        while (query.MoveNext(out var ent, out var entConsole, out var entXform))
-        {
-            if (entXform.GridUid == null
-                || !allGrids.Contains(entXform.GridUid.Value))
-                continue;
-
-            InitalizeConsole(ent, entConsole);
-        }
-    }
-
-    #endregion
 
     public override void Update(float frameTime)
     {
@@ -107,15 +70,17 @@ public sealed class SupermatterConsoleSystem : SharedSupermatterConsoleSystem
 
             // Update the appearance of the console based on the highest recorded level of alert
             if (TryComp<AppearanceComponent>(ent, out var entAppearance))
-                _appearance.SetData(ent, SupermatterConsoleVisuals.ComputerLayerScreen, (int)highestStatus, entAppearance);
+                _appearance.SetData(ent,
+                    SupermatterConsoleVisuals.ComputerLayerScreen,
+                    (int) highestStatus,
+                    entAppearance);
 
             // If the console UI is open, send UI data to each subscribed session
             UpdateUIState(ent, supermatterEntries, entConsole, entXform);
         }
     }
 
-    public void UpdateUIState
-        (EntityUid uid,
+    public void UpdateUIState(EntityUid uid,
         SupermatterConsoleEntry[] supermatterStateData,
         SupermatterConsoleComponent component,
         TransformComponent xform)
@@ -129,7 +94,8 @@ public sealed class SupermatterConsoleSystem : SharedSupermatterConsoleSystem
         var focusSupermatterData = GetFocusSupermatterData(uid, GetEntity(component.FocusSupermatter), gridUid);
 
         // Set the UI state
-        _userInterfaceSystem.SetUiState(uid, SupermatterConsoleUiKey.Key,
+        _userInterfaceSystem.SetUiState(uid,
+            SupermatterConsoleUiKey.Key,
             new SupermatterConsoleBoundInterfaceState(supermatterStateData, focusSupermatterData));
     }
 
@@ -147,8 +113,7 @@ public sealed class SupermatterConsoleSystem : SharedSupermatterConsoleSystem
             // Create entry
             var netEnt = GetNetEntity(ent);
 
-            var entry = new SupermatterConsoleEntry
-                (netEnt,
+            var entry = new SupermatterConsoleEntry(netEnt,
                 MetaData(ent).EntityName,
                 entSupermatter.Status);
 
@@ -190,7 +155,7 @@ public sealed class SupermatterConsoleSystem : SharedSupermatterConsoleSystem
     public float GetIntegrity(SupermatterComponent sm)
     {
         var integrity = sm.Damage / sm.DelaminationPoint;
-        integrity = (float)Math.Round(100 - integrity * 100, 2);
+        integrity = (float) Math.Round(100 - integrity * 100, 2);
         integrity = integrity < 0 ? 0 : integrity;
         return integrity;
     }
@@ -204,4 +169,41 @@ public sealed class SupermatterConsoleSystem : SharedSupermatterConsoleSystem
 
         Dirty(uid, component);
     }
+
+    #region Event handling
+
+    private void OnConsoleInit(EntityUid uid, SupermatterConsoleComponent component, ComponentInit args) =>
+        InitalizeConsole(uid, component);
+
+    private void OnConsoleParentChanged(EntityUid uid,
+        SupermatterConsoleComponent component,
+        EntParentChangedMessage args) =>
+        InitalizeConsole(uid, component);
+
+    private void OnFocusChangedMessage(EntityUid uid,
+        SupermatterConsoleComponent component,
+        SupermatterConsoleFocusChangeMessage args) =>
+        component.FocusSupermatter = args.FocusSupermatter;
+
+    private void OnGridSplit(ref GridSplitEvent args)
+    {
+        // Collect grids
+        var allGrids = args.NewGrids.ToList();
+
+        if (!allGrids.Contains(args.Grid))
+            allGrids.Add(args.Grid);
+
+        // Update supermatter monitoring consoles that stand upon an updated grid
+        var query = AllEntityQuery<SupermatterConsoleComponent, TransformComponent>();
+        while (query.MoveNext(out var ent, out var entConsole, out var entXform))
+        {
+            if (entXform.GridUid == null
+                || !allGrids.Contains(entXform.GridUid.Value))
+                continue;
+
+            InitalizeConsole(ent, entConsole);
+        }
+    }
+
+    #endregion
 }

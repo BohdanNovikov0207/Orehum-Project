@@ -8,8 +8,8 @@ namespace Content.Goobstation.Shared.MomentumSteering;
 
 public sealed class MomentumSteeringSystem : CommonMomentumSteeringSystem
 {
-    [Dependency] private readonly IGameTiming _timing = default!;
     [Dependency] private readonly SharedJitteringSystem _jittering = default!;
+    [Dependency] private readonly IGameTiming _timing = default!;
 
     private EntityQuery<JetpackUserComponent> _jetpackUserQuery;
 
@@ -48,7 +48,8 @@ public sealed class MomentumSteeringSystem : CommonMomentumSteeringSystem
 
         var speedFactor = MathHelper.Clamp(
             (speed - comp.JitterSpeedThreshold) / (comp.MaxSpeed - comp.JitterSpeedThreshold),
-            0f, 1f);
+            0f,
+            1f);
         var amplitude = comp.JitterAmplitude * speedFactor;
 
         _jittering.DoJitter(uid, TimeSpan.FromSeconds(0.6), true, amplitude, comp.JitterFrequency);

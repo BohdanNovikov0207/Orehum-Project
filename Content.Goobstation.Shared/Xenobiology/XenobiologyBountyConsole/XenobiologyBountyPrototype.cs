@@ -1,7 +1,6 @@
 using Content.Shared.Whitelist;
 using Robust.Shared.Prototypes;
 using Robust.Shared.Serialization;
-using Robust.Shared.Utility;
 
 namespace Content.Goobstation.Shared.Xenobiology.XenobiologyBountyConsole;
 
@@ -10,19 +9,9 @@ namespace Content.Goobstation.Shared.Xenobiology.XenobiologyBountyConsole;
 /// from an alien creature (Currently, Just slime extracts)
 /// that can be exchanged for research points.
 /// </summary>
-[Prototype, Serializable, NetSerializable]
-public sealed partial class XenobiologyBountyPrototype : IPrototype
+[Prototype] [Serializable] [NetSerializable]
+public sealed class XenobiologyBountyPrototype : IPrototype
 {
-    /// <inheritdoc/>
-    [IdDataField]
-    public string ID { get; private set; } = default!;
-
-    /// <summary>
-    /// The points awarded after multipliers.
-    /// </summary>
-    [DataField(required: true)]
-    public float PointsAwarded;
-
     /// <summary>
     /// The entries that must be satisfied for the bounty to be complete.
     /// </summary>
@@ -34,9 +23,19 @@ public sealed partial class XenobiologyBountyPrototype : IPrototype
     /// </summary>
     [DataField]
     public string IdPrefix = "NT";
+
+    /// <summary>
+    /// The points awarded after multipliers.
+    /// </summary>
+    [DataField(required: true)]
+    public float PointsAwarded;
+
+    /// <inheritdoc />
+    [IdDataField]
+    public string ID { get; private set; } = default!;
 }
 
-[DataDefinition, Serializable, NetSerializable]
+[DataDefinition] [Serializable] [NetSerializable]
 public readonly partial record struct XenobiologyBountyItemEntry()
 {
     /// <summary>

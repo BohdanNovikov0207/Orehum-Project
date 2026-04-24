@@ -24,23 +24,18 @@ namespace Content.Goobstation.Client.IntrinsicVoiceModulator;
 [GenerateTypedNameReferences]
 public sealed partial class IntrinsicVoiceModulatorWindow : DefaultWindow
 {
-    [Dependency] private readonly IPrototypeManager _protoManager = default!;
+    private const int JobIconColumnCount = 10;
     [Dependency] private readonly IEntitySystemManager _entitySystem = default!;
+    private readonly ButtonGroup? _jobIconButtonGroup = new();
+    private readonly Dictionary<ProtoId<JobIconPrototype>, Button> _jobIconButtons = new();
+    [Dependency] private readonly IPrototypeManager _protoManager = default!;
 
     private readonly SpriteSystem _spriteSystem;
 
-    public event Action<string>? OnNameChanged;
-    public event Action<ProtoId<JobIconPrototype>>? OnJobIconChanged;
-    public event Action<ProtoId<SpeechVerbPrototype>?>? OnVerbChange;
-
-    private const int JobIconColumnCount = 10;
+    private readonly List<(string, string)> _verbs = new();
+    private ProtoId<JobIconPrototype>? _currentJobIconId = new();
 
     private List<ProtoId<JobIconPrototype>> _jobIcons = new();
-    private ProtoId<JobIconPrototype>? _currentJobIconId = new();
-    private Dictionary<ProtoId<JobIconPrototype>, Button> _jobIconButtons = new();
-    private ButtonGroup? _jobIconButtonGroup = new();
-
-    private List<(string, string)> _verbs = new();
     private string? _verb;
 
     public IntrinsicVoiceModulatorWindow()
@@ -59,6 +54,10 @@ public sealed partial class IntrinsicVoiceModulatorWindow : DefaultWindow
             SpeechVerbSelector.SelectId(args.Id);
         };
     }
+
+    public event Action<string>? OnNameChanged;
+    public event Action<ProtoId<JobIconPrototype>>? OnJobIconChanged;
+    public event Action<ProtoId<SpeechVerbPrototype>?>? OnVerbChange;
 
     public void ReloadJobIcons()
     {
@@ -94,7 +93,7 @@ public sealed partial class IntrinsicVoiceModulatorWindow : DefaultWindow
                 MaxSize = new Vector2(42, 28),
                 Group = _jobIconButtonGroup,
                 Pressed = jobIcon.ID == _currentJobIconId,
-                ToolTip = jobIcon.LocalizedJobName
+                ToolTip = jobIcon.LocalizedJobName,
             };
 
             var jobIconTexture = new TextureRect
@@ -123,6 +122,7 @@ public sealed partial class IntrinsicVoiceModulatorWindow : DefaultWindow
         {
             _verbs.Add((Loc.GetString(verb.Name), verb.ID));
         }
+
         _verbs.Sort((a, b) => string.Compare(a.Item1, b.Item1, StringComparison.Ordinal));
     }
 
@@ -148,16 +148,13 @@ public sealed partial class IntrinsicVoiceModulatorWindow : DefaultWindow
             SpeechVerbSelector.SelectId(id);
     }
 
-    public void SetCurrentName(string name)
-    {
-        NameLineEdit.Text = name;
-    }
+    public void SetCurrentName(string name) => NameLineEdit.Text = name;
 
     public void SetCurrentSpeechVerb(ProtoId<SpeechVerbPrototype>? speechVerbProtoId)
     {
         _verb = speechVerbProtoId;
 
-        for (int id = 0; id < SpeechVerbSelector.ItemCount; id++)
+        for (var id = 0; id < SpeechVerbSelector.ItemCount; id++)
         {
             if (Equals(speechVerbProtoId, SpeechVerbSelector.GetItemMetadata(id)))
             {

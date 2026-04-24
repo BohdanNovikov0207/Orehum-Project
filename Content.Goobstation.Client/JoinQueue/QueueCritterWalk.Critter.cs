@@ -10,33 +10,31 @@ public sealed partial class QueueCritterWalk
 {
     private sealed class Critter
     {
-        public string Name = string.Empty;
-        public bool IsLocalPlayer;
-        public float XPosition;
-        public float TargetX;
-        public float Speed;
-        public bool Leaving;
-        public bool IsMoving;
-        public float IdleTimer;
-        public int QueueIndex;
-        public RsiDirection FacingDirection = RsiDirection.South;
-
-        public float ZoneStart;
-        public float ZoneEnd;
-
-        public IRsiStateLike IdleState = default!;
-        public IRsiStateLike? MovingState;
+        public BoxContainer Box = default!;
         public int CurFrame;
         public float CurFrameTime;
+        public RsiDirection FacingDirection = RsiDirection.South;
+
+        public IRsiStateLike IdleState = default!;
+        public float IdleTimer;
+        public bool IsLocalPlayer;
+        public bool IsMoving;
+        public bool Leaving;
+        public IRsiStateLike? MovingState;
+        public string Name = string.Empty;
+        public Label NameLabel = default!;
+        public int QueueIndex;
+        public float Speed;
 
         public TextureRect SpriteRect = default!;
-        public Label NameLabel = default!;
-        public BoxContainer Box = default!;
+        public float TargetX;
+        public float XPosition;
+        public float ZoneEnd;
 
-        public static IRsiStateLike GetActiveState(IRsiStateLike idle, IRsiStateLike? moving, bool isMoving)
-        {
-            return isMoving && moving != null ? moving : idle;
-        }
+        public float ZoneStart;
+
+        public static IRsiStateLike GetActiveState(IRsiStateLike idle, IRsiStateLike? moving, bool isMoving) =>
+            isMoving && moving != null ? moving : idle;
 
         public static RsiDirection GetRsiDirection(int moveSign, IRsiStateLike state)
         {

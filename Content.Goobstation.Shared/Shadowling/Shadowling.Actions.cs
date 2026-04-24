@@ -1,5 +1,4 @@
 using Content.Shared.Actions;
-using Robust.Shared.GameStates;
 
 namespace Content.Goobstation.Shared.Shadowling;
 
@@ -42,6 +41,7 @@ public sealed partial class BlackRecuperationEvent : EntityTargetActionEvent;
 public sealed partial class EmpoweredEnthrallEvent : EntityTargetActionEvent;
 
 public sealed partial class NoxImperiiEvent : InstantActionEvent;
+
 #endregion
 
 #region Events - Ascension

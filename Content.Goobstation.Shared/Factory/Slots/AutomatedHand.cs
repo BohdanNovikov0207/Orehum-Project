@@ -15,15 +15,15 @@ namespace Content.Goobstation.Shared.Factory.Slots;
 /// </summary>
 public sealed partial class AutomatedHand : AutomationSlot
 {
+    private Hand? _hand;
+
+    private SharedHandsSystem _hands;
+
     /// <summary>
     /// The name of the hand to use
     /// </summary>
     [DataField(required: true)]
     public string HandName = string.Empty;
-
-    private SharedHandsSystem _hands;
-
-    private Hand? _hand;
 
     [ViewVariables]
     public Hand? Hand
@@ -45,17 +45,13 @@ public sealed partial class AutomatedHand : AutomationSlot
         _hands = EntMan.System<SharedHandsSystem>();
     }
 
-    public override bool Insert(EntityUid item)
-    {
-        return base.Insert(item)
-            && _hands.TryPickup(Owner, item, HandName);
-    }
+    public override bool Insert(EntityUid item) =>
+        base.Insert(item)
+        && _hands.TryPickup(Owner, item, HandName);
 
-    public override bool CanInsert(EntityUid item)
-    {
-        return base.CanInsert(item)
-            && _hands.CanPickupToHand(Owner, item, HandName);
-    }
+    public override bool CanInsert(EntityUid item) =>
+        base.CanInsert(item)
+        && _hands.CanPickupToHand(Owner, item, HandName);
 
     public override EntityUid? GetItem(EntityUid? filter)
     {

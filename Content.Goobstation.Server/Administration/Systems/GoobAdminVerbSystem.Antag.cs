@@ -27,8 +27,8 @@ namespace Content.Goobstation.Server.Administration.Systems;
 
 public sealed partial class GoobAdminVerbSystem
 {
-    [Dependency] private readonly AntagSelectionSystem _antag = default!;
     [Dependency] private readonly IAdminManager _admin = default!;
+    [Dependency] private readonly AntagSelectionSystem _antag = default!;
 
     private void AddAntagVerbs(GetVerbsEvent<Verb> args)
     {
@@ -40,7 +40,8 @@ public sealed partial class GoobAdminVerbSystem
         {
             Text = Loc.GetString("admin-verb-text-make-changeling"),
             Category = VerbCategory.Antag,
-            Icon = new SpriteSpecifier.Rsi(new ResPath("/Textures/_Goobstation/Changeling/changeling_abilities.rsi"), "transform"),
+            Icon = new SpriteSpecifier.Rsi(new ResPath("/Textures/_Goobstation/Changeling/changeling_abilities.rsi"),
+                "transform"),
             Act = () =>
             {
                 if (!HasComp<SiliconComponent>(args.Target))
@@ -57,7 +58,7 @@ public sealed partial class GoobAdminVerbSystem
         {
             Text = Loc.GetString("admin-verb-text-make-blob"),
             Category = VerbCategory.Antag,
-            Icon = new SpriteSpecifier.Rsi(new("/Textures/_Goobstation/Blob/Actions/blob.rsi"), "blobFactory"),
+            Icon = new SpriteSpecifier.Rsi(new ResPath("/Textures/_Goobstation/Blob/Actions/blob.rsi"), "blobFactory"),
             Act = () =>
             {
                 EnsureComp<BlobCarrierComponent>(args.Target).HasMind = HasComp<ActorComponent>(args.Target);
@@ -73,7 +74,7 @@ public sealed partial class GoobAdminVerbSystem
         {
             Text = Loc.GetString("admin-verb-text-make-devil"),
             Category = VerbCategory.Antag,
-            Icon = new SpriteSpecifier.Rsi(new("_Goobstation/Actions/devil.rsi"), "summon-contract"),
+            Icon = new SpriteSpecifier.Rsi(new ResPath("_Goobstation/Actions/devil.rsi"), "summon-contract"),
             Act = () =>
             {
                 _antag.ForceMakeAntag<DevilRuleComponent>(targetPlayer, "Devil");
@@ -89,7 +90,7 @@ public sealed partial class GoobAdminVerbSystem
             Text = Loc.GetString("admin-verb-text-make-shadowling"),
             Category = VerbCategory.Antag,
             Icon = new SpriteSpecifier.Rsi(
-                new("/Textures/_EinsteinEngines/Shadowling/shadowling_abilities.rsi"),
+                new ResPath("/Textures/_EinsteinEngines/Shadowling/shadowling_abilities.rsi"),
                 "engage_hatch"),
             Act = () =>
             {

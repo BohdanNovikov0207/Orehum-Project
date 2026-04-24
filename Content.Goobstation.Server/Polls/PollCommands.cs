@@ -13,13 +13,16 @@ public sealed class CreatePollCommand : LocalizedEntityCommands
 
     public override string Command => "createpoll";
     public override string Description => "Creates a new poll that players can vote on.";
-    public override string Help => "Usage: createpoll <title> <description> <days> [allowMultiple] <option1> <option2> [option3...]";
+
+    public override string Help =>
+        "Usage: createpoll <title> <description> <days> [allowMultiple] <option1> <option2> [option3...]";
 
     public override async void Execute(IConsoleShell shell, string argStr, string[] args)
     {
         if (args.Length < 5)
         {
-            shell.WriteError("Not enough arguments. Need at least: title, description, days, allowMultiple (true/false), and 2 options.");
+            shell.WriteError(
+                "Not enough arguments. Need at least: title, description, days, allowMultiple (true/false), and 2 options.");
             return;
         }
 
@@ -58,22 +61,18 @@ public sealed class CreatePollCommand : LocalizedEntityCommands
             shell.WriteLine($"Ends: {(endTime.HasValue ? endTime.Value.ToString("yyyy-MM-dd HH:mm") : "Never")}");
         }
         else
-        {
             shell.WriteError("Failed to create poll.");
-        }
     }
 
-    public override CompletionResult GetCompletion(IConsoleShell shell, string[] args)
-    {
-        return args.Length switch
+    public override CompletionResult GetCompletion(IConsoleShell shell, string[] args) =>
+        args.Length switch
         {
             1 => CompletionResult.FromHint("Poll title"),
             2 => CompletionResult.FromHint("Poll description"),
             3 => CompletionResult.FromHint("Duration in days (0 for no end)"),
             4 => CompletionResult.FromHintOptions(["true", "false"], "Allow multiple choices"),
-            _ => CompletionResult.FromHint($"Option {args.Length - 3}")
+            _ => CompletionResult.FromHint($"Option {args.Length - 3}"),
         };
-    }
 }
 
 [AdminCommand(AdminFlags.Admin)]
@@ -142,8 +141,10 @@ public sealed class ListPollsCommand : LocalizedEntityCommands
         {
             shell.WriteLine($"[{poll.PollId}] {poll.Title}");
             shell.WriteLine($"  Description: {poll.Description}");
-            shell.WriteLine($"  Options: {string.Join(", ", poll.Options.Select(o => $"{o.OptionText} ({o.VoteCount} votes)"))}");
-            shell.WriteLine($"  Ends: {(poll.EndTime.HasValue ? poll.EndTime.Value.ToString("yyyy-MM-dd HH:mm") : "Never")}");
+            shell.WriteLine(
+                $"  Options: {string.Join(", ", poll.Options.Select(o => $"{o.OptionText} ({o.VoteCount} votes)"))}");
+            shell.WriteLine(
+                $"  Ends: {(poll.EndTime.HasValue ? poll.EndTime.Value.ToString("yyyy-MM-dd HH:mm") : "Never")}");
             shell.WriteLine($"  Multiple Choice: {poll.AllowMultipleChoices}");
             shell.WriteLine("");
         }
@@ -193,8 +194,9 @@ public sealed class PollInfoCommand : LocalizedEntityCommands
         var totalVotes = poll.Options.Sum(o => o.VoteCount);
         foreach (var option in poll.Options.OrderBy(o => o.DisplayOrder))
         {
-            var percentage = totalVotes > 0 ? (option.VoteCount * 100.0 / totalVotes) : 0;
-            shell.WriteLine($"  {option.DisplayOrder + 1}. {option.OptionText}: {option.VoteCount} votes ({percentage:F1}%)");
+            var percentage = totalVotes > 0 ? option.VoteCount * 100.0 / totalVotes : 0;
+            shell.WriteLine(
+                $"  {option.DisplayOrder + 1}. {option.OptionText}: {option.VoteCount} votes ({percentage:F1}%)");
         }
 
         shell.WriteLine($"\nTotal Votes: {totalVotes}");

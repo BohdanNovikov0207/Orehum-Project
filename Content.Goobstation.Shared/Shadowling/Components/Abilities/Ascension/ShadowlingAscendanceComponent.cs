@@ -6,9 +6,15 @@ namespace Content.Goobstation.Shared.Shadowling.Components.Abilities.Ascension;
 /// <summary>
 /// This is used for Ascendance ability.
 /// </summary>
-[RegisterComponent, NetworkedComponent]
+[RegisterComponent] [NetworkedComponent]
 public sealed partial class ShadowlingAscendanceComponent : Component
 {
+    [DataField]
+    public EntityUid? ActionEnt;
+
+    [DataField]
+    public EntProtoId ActionId = "ActionAscendance";
+
     /// <summary>
     /// Indicates how long the ability takes to complete.
     /// </summary>
@@ -20,10 +26,4 @@ public sealed partial class ShadowlingAscendanceComponent : Component
     /// </summary>
     [DataField]
     public EntProtoId EggProto = "SlingEggAscension";
-
-    [DataField]
-    public EntProtoId ActionId = "ActionAscendance";
-
-    [DataField]
-    public EntityUid? ActionEnt;
 }

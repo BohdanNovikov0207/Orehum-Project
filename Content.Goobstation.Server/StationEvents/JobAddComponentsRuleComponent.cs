@@ -11,14 +11,11 @@ using Robust.Shared.Prototypes;
 
 namespace Content.Goobstation.Server.StationEvents;
 
-[RegisterComponent, Access(typeof(JobAddComponentsRule))]
+[RegisterComponent] [Access(typeof(JobAddComponentsRule))]
 public sealed partial class JobAddComponentsRuleComponent : Component
 {
     [DataField(required: true)]
     public List<ProtoId<JobPrototype>> Affected = default!;
-
-    [DataField]
-    public bool RemoveExisting = true;
 
     [DataField(required: true)]
     public ComponentRegistry Components = new();
@@ -28,4 +25,7 @@ public sealed partial class JobAddComponentsRuleComponent : Component
     /// </summary>
     [DataField]
     public LocId? Message;
+
+    [DataField]
+    public bool RemoveExisting = true;
 }

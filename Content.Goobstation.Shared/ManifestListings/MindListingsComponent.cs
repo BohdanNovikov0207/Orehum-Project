@@ -4,12 +4,12 @@ using Robust.Shared.Utility;
 
 namespace Content.Goobstation.Shared.ManifestListings;
 
-[RegisterComponent, NetworkedComponent]
+[RegisterComponent] [NetworkedComponent]
 public sealed partial class MindListingsComponent : Component
 {
     [DataField]
-    public Dictionary<int, List<ListingData>> Listings = new();
+    public SpriteSpecifier.Texture DefaultTexture = new(new ResPath("/Textures/Interface/Actions/shop.png"));
 
     [DataField]
-    public SpriteSpecifier.Texture DefaultTexture = new(new ResPath("/Textures/Interface/Actions/shop.png"));
+    public Dictionary<int, List<ListingData>> Listings = new();
 }

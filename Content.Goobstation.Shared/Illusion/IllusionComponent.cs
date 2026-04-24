@@ -2,7 +2,7 @@ using Robust.Shared.GameStates;
 
 namespace Content.Goobstation.Shared.Illusion;
 
-[RegisterComponent, NetworkedComponent]
+[RegisterComponent] [NetworkedComponent]
 public sealed partial class IllusionComponent : Component
 {
     [DataField]

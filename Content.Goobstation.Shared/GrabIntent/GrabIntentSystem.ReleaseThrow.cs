@@ -6,7 +6,6 @@ using Content.Shared.Movement.Pulling.Components;
 using Content.Shared.Popups;
 using Content.Shared.Random.Helpers;
 using Content.Shared.Speech;
-using Content.Shared.Throwing;
 using Robust.Shared.Random;
 
 namespace Content.Goobstation.Shared.GrabIntent;
@@ -42,15 +41,14 @@ public sealed partial class GrabIntentSystem
         if (rand.Prob(pullable.Comp.GrabEscapeChance))
             return GrabResistResult.Succeeded;
 
-        pullable.Comp.NextEscapeAttempt = _timing.CurTime.Add(TimeSpan.FromSeconds(pullable.Comp.EscapeAttemptCooldown));
+        pullable.Comp.NextEscapeAttempt =
+            _timing.CurTime.Add(TimeSpan.FromSeconds(pullable.Comp.EscapeAttemptCooldown));
         Dirty(pullable.Owner, pullable.Comp);
         return GrabResistResult.Failed;
     }
 
-    private void OnGrabReleaseAttempt(Entity<GrabbableComponent> ent, ref GrabAttemptReleaseEvent args)
-    {
+    private void OnGrabReleaseAttempt(Entity<GrabbableComponent> ent, ref GrabAttemptReleaseEvent args) =>
         args.Released = TryGrabRelease(ent.Owner, args.user, args.puller);
-    }
 
     private bool TryGrabRelease(EntityUid pullableUid, EntityUid? user, EntityUid pullerUid)
     {

@@ -12,14 +12,14 @@ using Robust.Shared.Timing;
 
 namespace Content.Goobstation.Shared.OfficeChair;
 
-public sealed partial class VehicleHitAndRunSystem : EntitySystem
+public sealed class VehicleHitAndRunSystem : EntitySystem
 {
-    [Dependency] private readonly SharedTransformSystem _xform = default!;
-    [Dependency] private readonly IGameTiming _timing = default!;
-    [Dependency] private readonly INetManager _net = default!;
     [Dependency] private readonly SharedAudioSystem _audio = default!;
-    [Dependency] private readonly ThrowingSystem _throwing = default!;
     [Dependency] private readonly EntityLookupSystem _lookup = default!;
+    [Dependency] private readonly INetManager _net = default!;
+    [Dependency] private readonly ThrowingSystem _throwing = default!;
+    [Dependency] private readonly IGameTiming _timing = default!;
+    [Dependency] private readonly SharedTransformSystem _xform = default!;
 
     public override void Update(float frameTime)
     {
@@ -40,7 +40,9 @@ public sealed partial class VehicleHitAndRunSystem : EntitySystem
                 continue;
 
             var pos = _xform.GetMapCoordinates(uid);
-            var fwd = physics.LinearVelocity.LengthSquared() > 0.0001f ? Vector2.Normalize(physics.LinearVelocity) : Vector2.Normalize(Vector2.UnitX);
+            var fwd = physics.LinearVelocity.LengthSquared() > 0.0001f
+                ? Vector2.Normalize(physics.LinearVelocity)
+                : Vector2.Normalize(Vector2.UnitX);
             var threwAny = false;
 
             EntityUid? ignore = null;
@@ -58,10 +60,11 @@ public sealed partial class VehicleHitAndRunSystem : EntitySystem
                 if (!TryComp<PhysicsComponent>(other, out var otherPhys))
                     continue;
 
-                if (!TryComp<BodyComponent>(other, out var _))
+                if (!TryComp<BodyComponent>(other, out _))
                     continue;
 
-                if (comp.LastLaunched.TryGetValue(other, out var last) && (now - last) < TimeSpan.FromSeconds(comp.ThrowCooldown))
+                if (comp.LastLaunched.TryGetValue(other, out var last) &&
+                    now - last < TimeSpan.FromSeconds(comp.ThrowCooldown))
                     continue;
 
                 var otherPos = _xform.GetMapCoordinates(other);

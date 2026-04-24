@@ -12,5 +12,4 @@ namespace Content.Goobstation.Shared.Hailer;
 
 public sealed partial class HailerActionEvent : InstantActionEvent
 {
-
 };

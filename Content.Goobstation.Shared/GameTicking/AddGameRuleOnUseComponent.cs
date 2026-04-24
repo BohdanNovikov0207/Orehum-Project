@@ -11,6 +11,12 @@ namespace Content.Goobstation.Shared.GameTicking;
 public sealed partial class AddGameRuleOnUseComponent : Component
 {
     /// <summary>
+    /// If set to true, allows you to spam gamerules.
+    /// </summary>
+    [DataField]
+    public bool AllowMultipleUses;
+
+    /// <summary>
     /// The rule to add.
     /// </summary>
     [DataField(required: true)]
@@ -21,12 +27,6 @@ public sealed partial class AddGameRuleOnUseComponent : Component
     /// </summary>
     [DataField]
     public bool Used;
-
-    /// <summary>
-    /// If set to true, allows you to spam gamerules.
-    /// </summary>
-    [DataField]
-    public bool AllowMultipleUses;
 }
 
 /// <summary>

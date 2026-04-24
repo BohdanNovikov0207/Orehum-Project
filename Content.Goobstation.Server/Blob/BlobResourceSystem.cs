@@ -20,8 +20,8 @@ public sealed class BlobResourceSystem : EntitySystem
 {
     [Dependency] private readonly BlobCoreSystem _blobCoreSystem = default!;
     [Dependency] private readonly SharedPopupSystem _popup = default!;
-    private EntityQuery<BlobTileComponent> _blobTile;
     private EntityQuery<BlobCoreComponent> _blobCore;
+    private EntityQuery<BlobTileComponent> _blobTile;
 
     public override void Initialize()
     {
@@ -51,9 +51,7 @@ public sealed class BlobResourceSystem : EntitySystem
         var points = component.PointsPerPulsed;
 
         if (blobCoreComponent.CurrentChem == BlobChemType.RegenerativeMateria)
-        {
             points += 1;
-        }
 
         if (_blobCoreSystem.ChangeBlobPoint(blobTileComponent.Core.Value, points))
         {
@@ -63,6 +61,7 @@ public sealed class BlobResourceSystem : EntitySystem
                 PopupType.Large);
         }
     }
+
     /// <summary>
     /// On round end makes all the blobs resource nodes generate 100 points each pulse.
     /// </summary>
@@ -70,7 +69,9 @@ public sealed class BlobResourceSystem : EntitySystem
     private void OnRoundEnd(RoundEndTextAppendEvent args)
     {
         var query = EntityQueryEnumerator<BlobResourceComponent>();
-        while(query.MoveNext(out var resource))
+        while (query.MoveNext(out var resource))
+        {
             resource.PointsPerPulsed = 100;
+        }
     }
 }

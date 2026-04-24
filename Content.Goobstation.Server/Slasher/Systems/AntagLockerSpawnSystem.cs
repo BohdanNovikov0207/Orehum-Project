@@ -24,9 +24,9 @@ public sealed class AntagLockerSpawnSystem : GameRuleSystem<AntagLockerSpawnComp
 
     [Dependency] private readonly AntagBetterRandomSpawnSystem _betterSpawn = default!;
     [Dependency] private readonly EntityStorageSystem _entityStorage = default!;
+    [Dependency] private readonly StationSystem _stationSystem = default!;
     [Dependency] private readonly TagSystem _tag = default!;
     [Dependency] private readonly SharedTransformSystem _transform = default!;
-    [Dependency] private readonly StationSystem _stationSystem = default!;
 
     public override void Initialize()
     {
@@ -63,7 +63,10 @@ public sealed class AntagLockerSpawnSystem : GameRuleSystem<AntagLockerSpawnComp
         _entityStorage.Insert(args.EntityUid, locker, storage);
     }
 
-    protected override void ActiveTick(EntityUid uid, AntagLockerSpawnComponent comp, GameRuleComponent gameRule, float frameTime)
+    protected override void ActiveTick(EntityUid uid,
+        AntagLockerSpawnComponent comp,
+        GameRuleComponent gameRule,
+        float frameTime)
     {
         base.ActiveTick(uid, comp, gameRule, frameTime);
 
@@ -124,5 +127,4 @@ public sealed class AntagLockerSpawnSystem : GameRuleSystem<AntagLockerSpawnComp
         comp.ChosenLocker = locker;
         comp.Placed = true;
     }
-
 }

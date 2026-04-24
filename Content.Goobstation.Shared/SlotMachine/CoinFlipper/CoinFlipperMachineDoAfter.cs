@@ -3,5 +3,5 @@ using Robust.Shared.Serialization;
 
 namespace Content.Goobstation.Shared.SlotMachine.CoinFlipper;
 
-[Serializable, NetSerializable]
+[Serializable] [NetSerializable]
 public sealed partial class CoinFlipperDoAfterEvent : SimpleDoAfterEvent;

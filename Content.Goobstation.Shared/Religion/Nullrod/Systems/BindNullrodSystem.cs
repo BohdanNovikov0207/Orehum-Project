@@ -5,7 +5,7 @@ using Content.Shared.Verbs;
 
 namespace Content.Goobstation.Shared.Religion.Nullrod.Systems;
 
-public sealed partial class BindNullrodSystem : EntitySystem
+public sealed class BindNullrodSystem : EntitySystem
 {
     [Dependency] private readonly SharedPopupSystem _popup = default!;
 
@@ -15,6 +15,7 @@ public sealed partial class BindNullrodSystem : EntitySystem
 
         SubscribeLocalEvent<NullrodComponent, GetVerbsEvent<ActivationVerb>>(OnGetVerb);
     }
+
     private void OnGetVerb(Entity<NullrodComponent> ent, ref GetVerbsEvent<ActivationVerb> args)
     {
         if (!args.CanAccess || !args.CanInteract)
@@ -36,8 +37,10 @@ public sealed partial class BindNullrodSystem : EntitySystem
                 bibleUser.NullRod = ent.Owner;
                 Dirty(user, bibleUser);
 
-                _popup.PopupClient(Loc.GetString("nullrod-recall-verb-bind-done", ("nullrod", bibleUser.NullRod)), user, user);
-            }
+                _popup.PopupClient(Loc.GetString("nullrod-recall-verb-bind-done", ("nullrod", bibleUser.NullRod)),
+                    user,
+                    user);
+            },
         };
 
         args.Verbs.Add(verb);

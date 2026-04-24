@@ -6,7 +6,7 @@ using Content.Shared.Polymorph;
 
 namespace Content.Goobstation.Server.Changeling;
 
-public sealed partial class ChangelingBiomassSystem : SharedChangelingBiomassSystem
+public sealed class ChangelingBiomassSystem : SharedChangelingBiomassSystem
 {
     [Dependency] private readonly ChatSystem _chat = default!;
     [Dependency] private readonly PolymorphSystem _polymorph = default!;
@@ -48,8 +48,6 @@ public sealed partial class ChangelingBiomassSystem : SharedChangelingBiomassSys
         newData.InternalResourcesType = oldData.InternalResourcesType;
     }
 
-    protected override void DoCough(Entity<ChangelingBiomassComponent> ent)
-    {
+    protected override void DoCough(Entity<ChangelingBiomassComponent> ent) =>
         _chat.TryEmoteWithChat(ent, ent.Comp.CoughEmote, ignoreActionBlocker: true, forceEmote: true);
-    }
 }

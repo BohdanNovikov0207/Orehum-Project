@@ -8,11 +8,11 @@ namespace Content.Goobstation.Shared.Wraith.Curses;
 [Prototype]
 public sealed class CursePrototype : IPrototype
 {
-    [IdDataField]
-    public string ID { get; } = default!;
-
-    [DataField]
-    public string Name { get; } = string.Empty;
+    /// <summary>
+    /// Components added to the entity when this curse gets added
+    /// </summary>
+    [DataField(serverOnly: true)]
+    public ComponentRegistry? Components = new();
 
     /// <summary>
     /// A dictionary that holds the random value that determines which list of entity effects will happen on the user.
@@ -22,11 +22,8 @@ public sealed class CursePrototype : IPrototype
     [DataField(required: true, serverOnly: true)]
     public Dictionary<float, List<EntityEffect>> Effects = new();
 
-    /// <summary>
-    /// Components added to the entity when this curse gets added
-    /// </summary>
-    [DataField(serverOnly: true)]
-    public ComponentRegistry? Components = new();
+    [DataField]
+    public ProtoId<CurseStatusIconPrototype>? StatusIcon;
 
     /// <summary>
     /// How often to update the curse in seconds
@@ -35,11 +32,14 @@ public sealed class CursePrototype : IPrototype
     public float Update;
 
     [DataField]
-    public ProtoId<CurseStatusIconPrototype>? StatusIcon;
+    public string Name { get; } = string.Empty;
+
+    [IdDataField]
+    public string ID { get; } = default!;
 }
 
 [Prototype]
-public sealed partial class CurseStatusIconPrototype : StatusIconPrototype, IInheritingPrototype
+public sealed class CurseStatusIconPrototype : StatusIconPrototype, IInheritingPrototype
 {
     /// <inheritdoc />
     [ParentDataField(typeof(AbstractPrototypeIdArraySerializer<CurseStatusIconPrototype>))]

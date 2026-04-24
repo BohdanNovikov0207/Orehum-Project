@@ -18,7 +18,7 @@ namespace Content.Goobstation.Shared.HoloCigar;
 /// <summary>
 /// This is used for...
 /// </summary>
-[RegisterComponent, NetworkedComponent]
+[RegisterComponent] [NetworkedComponent]
 public sealed partial class HoloCigarComponent : Component
 {
     [ViewVariables]
@@ -34,7 +34,7 @@ public sealed partial class HoloCigarComponent : Component
     public EntityUid? MusicEntity;
 }
 
-[Serializable, NetSerializable]
+[Serializable] [NetSerializable]
 public sealed class HoloCigarComponentState(bool lit) : ComponentState
 {
     public bool Lit = lit;

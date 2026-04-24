@@ -9,7 +9,7 @@ namespace Content.Goobstation.Server.NPC;
 /// Entities with this component will retaliate against those who physically attack them.
 /// It has an optional "memory" specification wherein it will only attack those entities for a specified length of time.
 /// </summary>
-[RegisterComponent, Access(typeof(GroupRetaliationSystem))]
+[RegisterComponent] [Access(typeof(GroupRetaliationSystem))]
 public sealed partial class GroupRetaliationComponent : Component
 {
     /// <summary>

@@ -17,13 +17,14 @@ namespace Content.Goobstation.Common.TheManWhoSoldTheWorld;
 [RegisterComponent]
 public sealed partial class TheManWhoSoldTheWorldComponent : Component
 {
-    [ViewVariables]
-    public EntityUid? HoloCigarEntity = null;
+    [DataField]
+    public bool AddedNoWieldNeeded;
 
     [DataField("deathAudio")]
     [ViewVariables]
-    public SoundSpecifier DeathAudio = new SoundPathSpecifier("/Audio/_Goobstation/Items/TheManWhoSoldTheWorld/ouchies.ogg");
+    public SoundSpecifier DeathAudio =
+        new SoundPathSpecifier("/Audio/_Goobstation/Items/TheManWhoSoldTheWorld/ouchies.ogg");
 
-    [DataField]
-    public bool AddedNoWieldNeeded;
+    [ViewVariables]
+    public EntityUid? HoloCigarEntity = null;
 }

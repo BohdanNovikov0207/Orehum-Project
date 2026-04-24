@@ -15,9 +15,6 @@ public sealed partial class NameFilterWindow : FancyWindow
 {
     [Dependency] private readonly EntityManager _entMan = default!;
 
-    public event Action<string>? OnSetName;
-    public event Action<NameFilterMode>? OnSetMode;
-
     public NameFilterWindow()
     {
         IoCManager.InjectDependencies(this);
@@ -36,6 +33,9 @@ public sealed partial class NameFilterWindow : FancyWindow
 
         NameEdit.OnTextChanged += _ => OnSetName?.Invoke(NameEdit.Text);
     }
+
+    public event Action<string>? OnSetName;
+    public event Action<NameFilterMode>? OnSetMode;
 
     public void SetEntity(EntityUid uid)
     {

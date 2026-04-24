@@ -11,13 +11,17 @@
 // SPDX-License-Identifier: AGPL-3.0-or-later
 
 using System.Numerics;
+using Content.Goobstation.Maths.FixedPoint;
 using Content.Shared._vg.TileMovement;
 using Content.Shared.Access.Components;
-using Content.Shared.Access.Systems;
 using Content.Shared.Actions;
+using Content.Shared.Actions.Components;
 using Content.Shared.Audio;
 using Content.Shared.Buckle;
 using Content.Shared.Buckle.Components;
+using Content.Shared.Containers.ItemSlots;
+using Content.Shared.Damage;
+using Content.Shared.Destructible;
 using Content.Shared.Hands;
 using Content.Shared.Inventory.VirtualItem;
 using Content.Shared.Movement.Components;
@@ -25,27 +29,21 @@ using Content.Shared.Movement.Systems;
 using Robust.Shared.Audio.Systems;
 using Robust.Shared.Containers;
 using Robust.Shared.Prototypes;
-using Content.Shared.Containers.ItemSlots;
-using Content.Shared.Destructible;
-using Content.Goobstation.Maths.FixedPoint;
-using Content.Shared.Damage;
-using Content.Shared.Actions.Components;
 
 namespace Content.Goobstation.Shared.Vehicles;
 
-public abstract partial class SharedVehicleSystem : EntitySystem
+public abstract class SharedVehicleSystem : EntitySystem
 {
+    private static readonly EntProtoId HornActionId = "ActionHorn";
+    private static readonly EntProtoId SirenActionId = "ActionSiren";
     [Dependency] private readonly SharedActionsSystem _actions = default!;
     [Dependency] private readonly SharedAmbientSoundSystem _ambientSound = default!;
     [Dependency] private readonly SharedAppearanceSystem _appearance = default!;
     [Dependency] private readonly SharedAudioSystem _audio = default!;
     [Dependency] private readonly SharedBuckleSystem _buckle = default!;
     [Dependency] private readonly SharedMoverController _mover = default!;
-    [Dependency] private readonly SharedVirtualItemSystem _virtualItem = default!;
     [Dependency] private readonly SharedTransformSystem _transform = default!;
-
-    private static readonly EntProtoId HornActionId = "ActionHorn";
-    private static readonly EntProtoId SirenActionId = "ActionSiren";
+    [Dependency] private readonly SharedVirtualItemSystem _virtualItem = default!;
 
     public override void Initialize()
     {
@@ -119,8 +117,8 @@ public abstract partial class SharedVehicleSystem : EntitySystem
     private void OnHorn(EntityUid uid, VehicleComponent component, InstantActionEvent args)
     {
         if (args.Handled
-        || component.Driver != args.Performer
-        || component.HornSound == null)
+            || component.Driver != args.Performer
+            || component.HornSound == null)
             return;
 
         _audio.PlayPvs(component.HornSound, uid);
@@ -130,11 +128,13 @@ public abstract partial class SharedVehicleSystem : EntitySystem
     private void OnSiren(EntityUid uid, VehicleComponent component, InstantActionEvent args)
     {
         if (args.Handled
-        || component.Driver != args.Performer
-        || component.SirenSound == null)
+            || component.Driver != args.Performer
+            || component.SirenSound == null)
             return;
 
-        component.SirenStream = component.SirenEnabled ? _audio.Stop(component.SirenStream) : _audio.PlayPvs(component.SirenSound, uid)?.Entity;
+        component.SirenStream = component.SirenEnabled
+            ? _audio.Stop(component.SirenStream)
+            : _audio.PlayPvs(component.SirenSound, uid)?.Entity;
         component.SirenEnabled = !component.SirenEnabled;
         args.Handled = true;
     }
@@ -162,7 +162,7 @@ public abstract partial class SharedVehicleSystem : EntitySystem
 
         for (var hands = 0; hands < ent.Comp.RequiredHands; hands++)
         {
-            if (_virtualItem.TrySpawnVirtualItemInHand(ent.Owner, driver, false))
+            if (_virtualItem.TrySpawnVirtualItemInHand(ent.Owner, driver))
                 continue;
             args.Cancelled = true;
             _virtualItem.DeleteInHandsMatching(driver, ent.Owner);
@@ -251,6 +251,7 @@ public abstract partial class SharedVehicleSystem : EntitySystem
             EntityManager.QueueDeleteEntity(vehicleComp.ActiveOverlay.Value);
             vehicleComp.ActiveOverlay = null;
         }
+
         RemComp<RelayInputMoverComponent>(driver);
 
         if (vehicleComp.HornAction != null)

@@ -4,10 +4,14 @@
 
 using Content.Shared._DV.Abilities;
 using Content.Shared._Starlight.VentCrawling;
+using Content.Shared.Actions;
 using Content.Shared.Climbing.Components;
 using Content.Shared.Climbing.Events;
+using Content.Shared.Conveyor;
+using Content.Shared.Doors.Components;
 using Content.Shared.Interaction.Events;
 using Content.Shared.Maps;
+using Content.Shared.Mobs.Components;
 using Content.Shared.Physics;
 using Content.Shared.Popups;
 using Content.Shared.Stealth;
@@ -18,34 +22,27 @@ using Robust.Shared.Map;
 using Robust.Shared.Map.Components;
 using Robust.Shared.Network;
 using Robust.Shared.Physics;
+using Robust.Shared.Physics.Events;
 using Robust.Shared.Physics.Systems;
 using Robust.Shared.Player;
 using Robust.Shared.Random;
-using Content.Shared.Actions;
-using Content.Shared.Mobs.Components;
-using Content.Shared.Doors.Components;
-using Content.Shared.Conveyor;
-using Robust.Shared.Physics.Events;
-using Robust.Shared.Physics;
-using Robust.Shared.Physics.Components;
-using Robust.Shared.Physics.Systems;
 
 namespace Content.Goobstation.Shared.FloorGoblin;
 
 public abstract class SharedCrawlUnderFloorSystem : EntitySystem
 {
-    [Dependency] private readonly SharedPopupSystem _popup = default!;
-    [Dependency] private readonly SharedTransformSystem _transform = default!;
-    [Dependency] private readonly SharedMapSystem _map = default!;
-    [Dependency] private readonly ITileDefinitionManager _tileManager = default!;
-    [Dependency] private readonly TurfSystem _turf = default!;
-    [Dependency] private readonly SharedPhysicsSystem _physics = default!;
-    [Dependency] private readonly INetManager _net = default!;
     [Dependency] private readonly SharedActionsSystem _actionsSystem = default!;
     [Dependency] private readonly SharedAudioSystem _audio = default!;
+    [Dependency] private readonly SharedMapSystem _map = default!;
+    [Dependency] private readonly INetManager _net = default!;
+    [Dependency] private readonly SharedPhysicsSystem _physics = default!;
+    [Dependency] private readonly SharedPopupSystem _popup = default!;
     [Dependency] private readonly IRobustRandom _random = default!;
-    [Dependency] private readonly TileSystem _tile = default!;
     [Dependency] private readonly SharedStealthSystem _stealth = default!;
+    [Dependency] private readonly TileSystem _tile = default!;
+    [Dependency] private readonly ITileDefinitionManager _tileManager = default!;
+    [Dependency] private readonly SharedTransformSystem _transform = default!;
+    [Dependency] private readonly TurfSystem _turf = default!;
 
     public override void Initialize()
     {
@@ -69,7 +66,9 @@ public abstract class SharedCrawlUnderFloorSystem : EntitySystem
         if (!_net.IsClient)
         {
             EnableSneakMode(uid, component);
-            SetStealth(uid, !IsOnSubfloor(uid)); // We use stealth component for allowing medhuds and such to be hidden, terrible solution, couldn't think of anything better.
+            SetStealth(uid,
+                !IsOnSubfloor(
+                    uid)); // We use stealth component for allowing medhuds and such to be hidden, terrible solution, couldn't think of anything better.
         }
     }
 
@@ -109,7 +108,11 @@ public abstract class SharedCrawlUnderFloorSystem : EntitySystem
         var othersKey = enabling ? "crawl-under-floor-toggle-on" : "crawl-under-floor-toggle-off";
 
         _popup.PopupEntity(Loc.GetString(selfKey), uid, uid);
-        _popup.PopupEntity(Loc.GetString(othersKey, ("name", Name(uid))), uid, Filter.PvsExcept(uid), true, PopupType.Medium);
+        _popup.PopupEntity(Loc.GetString(othersKey, ("name", Name(uid))),
+            uid,
+            Filter.PvsExcept(uid),
+            true,
+            PopupType.Medium);
 
         args.Handled = result;
     }
@@ -133,11 +136,9 @@ public abstract class SharedCrawlUnderFloorSystem : EntitySystem
         }
     }
 
-    private void OnMove(EntityUid uid, CrawlUnderFloorComponent comp, ref MoveEvent args)
-    {
+    private void OnMove(EntityUid uid, CrawlUnderFloorComponent comp, ref MoveEvent args) =>
         // Just update the crawl state based on whether we're enabled
         ProcessCrawlStateChange(uid, comp, comp.Enabled);
-    }
 
 
     private void OnAttemptAttack(EntityUid uid, CrawlUnderFloorComponent comp, AttackAttemptEvent args)
@@ -172,25 +173,20 @@ public abstract class SharedCrawlUnderFloorSystem : EntitySystem
 
         // Handle conveyor belts - allow phasing in stealth mode
         if (HasComp<ConveyorComponent>(otherUid) && component.Enabled)
-        {
             args.Cancelled = true;
-            return;
-        }
     }
 
     protected void PlayDuendeSound(EntityUid uid, float probability = 0.3f)
     {
         if (_random.Prob(probability))
-        {
             _audio.PlayPvs(new SoundCollectionSpecifier("DuendeSounds"), uid);
-        }
     }
 
     protected bool EnableSneakMode(EntityUid uid, CrawlUnderFloorComponent component)
     {
         if (TryComp<VentCrawlerComponent>(uid, out var vent) && vent.InTube)
             return false;
-        if (component.Enabled || (TryComp<ClimbingComponent>(uid, out var climbing) && climbing.IsClimbing))
+        if (component.Enabled || TryComp<ClimbingComponent>(uid, out var climbing) && climbing.IsClimbing)
             return false;
         component.Enabled = true;
         Dirty(uid, component);
@@ -201,19 +197,26 @@ public abstract class SharedCrawlUnderFloorSystem : EntitySystem
     {
         if (TryComp<VentCrawlerComponent>(uid, out var vent) && vent.InTube)
             return false;
-        if (!component.Enabled || IsOnCollidingTile(uid) || (TryComp<ClimbingComponent>(uid, out var climbing) && climbing.IsClimbing))
+        if (!component.Enabled || IsOnCollidingTile(uid) ||
+            TryComp<ClimbingComponent>(uid, out var climbing) && climbing.IsClimbing)
             return false;
         component.Enabled = false;
         Dirty(uid, component);
         if (TryComp(uid, out FixturesComponent? fixtureComponent))
         {
             foreach (var (key, originalMask) in component.ChangedFixtures)
+            {
                 if (fixtureComponent.Fixtures.TryGetValue(key, out var fixture))
                     _physics.SetCollisionMask(uid, key, fixture, originalMask, fixtureComponent);
+            }
+
             foreach (var (key, originalLayer) in component.ChangedFixtureLayers)
+            {
                 if (fixtureComponent.Fixtures.TryGetValue(key, out var fixture))
                     _physics.SetCollisionLayer(uid, key, fixture, originalLayer, fixtureComponent);
+            }
         }
+
         component.ChangedFixtures.Clear();
         component.ChangedFixtureLayers.Clear();
         return true;
@@ -226,9 +229,7 @@ public abstract class SharedCrawlUnderFloorSystem : EntitySystem
         if (TryComp<CrawlUnderFloorComponent>(uid, out var crawlComp) &&
             crawlComp.Enabled &&
             !IsOnSubfloor(uid))
-        {
             return false;
-        }
 
         // Standard collision check for tiles
         if (!TryGetCurrentTile(uid, out var tileRef, out _) || tileRef.Tile.IsEmpty)
@@ -257,7 +258,11 @@ public abstract class SharedCrawlUnderFloorSystem : EntitySystem
     public bool IsHidden(EntityUid uid, CrawlUnderFloorComponent comp)
         => comp.Enabled; // No longer check for subfloor, just check if crawling is enabled
 
-    private void HandleCrawlTransition(EntityUid uid, bool wasOnSubfloor, bool isOnSubfloor, CrawlUnderFloorComponent comp, bool causedByTileChange)
+    private void HandleCrawlTransition(EntityUid uid,
+        bool wasOnSubfloor,
+        bool isOnSubfloor,
+        CrawlUnderFloorComponent comp,
+        bool causedByTileChange)
     {
         if (!_net.IsServer)
             return;
@@ -314,8 +319,8 @@ public abstract class SharedCrawlUnderFloorSystem : EntitySystem
             // while still allowing phasing through most objects
             foreach (var (id, fixture) in fixtures.Fixtures)
             {
-                _physics.SetCollisionMask(uid, id, fixture, (int)CollisionGroup.SmallMobMask, fixtures);
-                _physics.SetCollisionLayer(uid, id, fixture, (int)CollisionGroup.SmallMobLayer, fixtures);
+                _physics.SetCollisionMask(uid, id, fixture, (int) CollisionGroup.SmallMobMask, fixtures);
+                _physics.SetCollisionLayer(uid, id, fixture, (int) CollisionGroup.SmallMobLayer, fixtures);
             }
         }
         else
@@ -323,8 +328,8 @@ public abstract class SharedCrawlUnderFloorSystem : EntitySystem
             // In normal mode, use standard mob collision
             foreach (var (id, fixture) in fixtures.Fixtures)
             {
-                _physics.SetCollisionMask(uid, id, fixture, (int)CollisionGroup.MobMask, fixtures);
-                _physics.SetCollisionLayer(uid, id, fixture, (int)CollisionGroup.MobLayer, fixtures);
+                _physics.SetCollisionMask(uid, id, fixture, (int) CollisionGroup.MobMask, fixtures);
+                _physics.SetCollisionLayer(uid, id, fixture, (int) CollisionGroup.MobLayer, fixtures);
             }
         }
 
@@ -355,7 +360,6 @@ public abstract class SharedCrawlUnderFloorSystem : EntitySystem
             }
         }
     }
-
 
 
     private void RefreshCrawlSubfloorState(EntityUid uid, CrawlUnderFloorComponent comp, bool causedByTileChange)

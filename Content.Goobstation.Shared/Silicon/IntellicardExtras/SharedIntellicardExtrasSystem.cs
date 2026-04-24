@@ -10,31 +10,28 @@ using Content.Shared.NameModifier.EntitySystems;
 using Content.Shared.Popups;
 using Content.Shared.Silicons.StationAi;
 using Robust.Shared.Audio.Systems;
-using Robust.Shared.Containers;
 using Robust.Shared.Network;
 using Robust.Shared.Prototypes;
 using Robust.Shared.Serialization;
-using static Content.Shared.Movement.Systems.SharedContentEyeSystem;
 
 namespace Content.Goobstation.Shared.Silicon;
 
-[Serializable, NetSerializable]
+[Serializable] [NetSerializable]
 public sealed partial class IntellicardDoAfterEvent : SimpleDoAfterEvent;
 
-public abstract partial class SharedIntellicardExtrasSystem : EntitySystem
+public abstract class SharedIntellicardExtrasSystem : EntitySystem
 {
+    private static readonly EntProtoId DefaultAi = "StationAiBrain";
+    [Dependency] private readonly SharedAudioSystem _audio = default!;
+    [Dependency] private readonly SharedDoAfterSystem _doAfter = default!;
+    private readonly ProtoId<ChatNotificationPrototype> _downloadChatNotificationPrototype = "IntellicardDownload";
+    [Dependency] private readonly SharedEyeSystem _eye = default!;
+    [Dependency] private readonly MetaDataSystem _metaData = default!;
+    [Dependency] private readonly SharedMindSystem _mind = default!;
+    [Dependency] private readonly NameModifierSystem _nameMod = default!;
+    [Dependency] private readonly INetManager _net = default!;
     [Dependency] private readonly SharedPopupSystem _popup = default!;
     [Dependency] private readonly ItemSlotsSystem _slots = default!;
-    [Dependency] private readonly SharedMindSystem _mind = default!;
-    [Dependency] private readonly MetaDataSystem _metaData = default!;
-    [Dependency] private readonly SharedDoAfterSystem _doAfter = default!;
-    [Dependency] private readonly NameModifierSystem _nameMod = default!;
-    [Dependency] private readonly SharedAudioSystem _audio = default!;
-    [Dependency] private readonly INetManager _net = default!;
-    [Dependency] private readonly SharedEyeSystem _eye = default!;
-
-    private static readonly EntProtoId DefaultAi = "StationAiBrain";
-    private readonly ProtoId<ChatNotificationPrototype> _downloadChatNotificationPrototype = "IntellicardDownload";
 
     public override void Initialize()
     {
@@ -62,28 +59,38 @@ public abstract partial class SharedIntellicardExtrasSystem : EntitySystem
 
         // because of the stupid ai holder thing, need to remove the brain if the ai mind is destroyed due to suicide or something
         // otherwise a braindead ai clogs the card without any clear indicator.
-        EntityUid? cardBrain = _slots.GetItemOrNull(ent.Owner, "station_ai_mind_slot");
-        if (TryComp<MindContainerComponent>(cardBrain, out MindContainerComponent? cardMindContainer)
+        var cardBrain = _slots.GetItemOrNull(ent.Owner, "station_ai_mind_slot");
+        if (TryComp(cardBrain, out MindContainerComponent? cardMindContainer)
             && cardMindContainer.Mind is null)
         {
-            _popup.PopupClient(Loc.GetString("intellicard-extras-contained-missing"), args.User, args.User, PopupType.MediumCaution);
+            _popup.PopupClient(Loc.GetString("intellicard-extras-contained-missing"),
+                args.User,
+                args.User,
+                PopupType.MediumCaution);
             QueueDel(cardBrain);
             args.Handled = true;
             return;
         }
 
         var cardHasAi = _slots.CanEject(ent.Owner, args.User, cardAiHolder.Slot);
-        var brainHasAi = targetMindContainer!.Mind is { };
+        var brainHasAi = targetMindContainer!.Mind is not null;
 
         if (cardHasAi && brainHasAi)
         {
-            _popup.PopupClient(Loc.GetString("intellicard-extras-target-occupied"), args.User, args.User, PopupType.Medium);
+            _popup.PopupClient(Loc.GetString("intellicard-extras-target-occupied"),
+                args.User,
+                args.User,
+                PopupType.Medium);
             args.Handled = true;
             return;
         }
+
         if (!cardHasAi && !brainHasAi)
         {
-            _popup.PopupClient(Loc.GetString("intellicard-extras-target-empty"), args.User, args.User, PopupType.Medium);
+            _popup.PopupClient(Loc.GetString("intellicard-extras-target-empty"),
+                args.User,
+                args.User,
+                PopupType.Medium);
             args.Handled = true;
             return;
         }
@@ -91,7 +98,9 @@ public abstract partial class SharedIntellicardExtrasSystem : EntitySystem
         var doAfterArgs = new DoAfterArgs(
             EntityManager,
             args.User,
-            cardHasAi ? ent.Comp.UploadTime * intellicardableMind.UploadTimeFactor : ent.Comp.DownloadTime * intellicardableMind.DownloadTimeFactor,
+            cardHasAi
+                ? ent.Comp.UploadTime * intellicardableMind.UploadTimeFactor
+                : ent.Comp.DownloadTime * intellicardableMind.DownloadTimeFactor,
             new IntellicardDoAfterEvent(),
             args.Target,
             ent.Owner)
@@ -100,7 +109,7 @@ public abstract partial class SharedIntellicardExtrasSystem : EntitySystem
             BreakOnMove = true,
             NeedHand = true,
             BreakOnDropItem = true,
-            MultiplyDelay = false
+            MultiplyDelay = false,
         };
 
         _doAfter.TryStartDoAfter(doAfterArgs);
@@ -112,15 +121,15 @@ public abstract partial class SharedIntellicardExtrasSystem : EntitySystem
         if (args.Cancelled || args.Handled || args.Target is null || _net.IsClient)
             return;
 
-        EntityUid targetUid = ent.Owner;
-        EntityUid cardUid = args.Target.Value;
+        var targetUid = ent.Owner;
+        var cardUid = args.Target.Value;
 
         if (!TryComp(cardUid, out StationAiHolderComponent? targetHolder))
             return;
 
-        EntityUid? cardBrain = _slots.GetItemOrNull(cardUid, "station_ai_mind_slot");
+        var cardBrain = _slots.GetItemOrNull(cardUid, "station_ai_mind_slot");
 
-        TryComp<MindContainerComponent>(cardBrain, out MindContainerComponent? cardMindContainer);
+        TryComp(cardBrain, out MindContainerComponent? cardMindContainer);
 
         if (!TryComp(cardUid, out StationAiHolderComponent? cardAiHolder))
             return;
@@ -129,8 +138,9 @@ public abstract partial class SharedIntellicardExtrasSystem : EntitySystem
             return;
 
         // get mind status of both
-        var cardHasAi = _slots.CanEject(cardUid, args.User, cardAiHolder.Slot) && cardMindContainer is { } && cardMindContainer.Mind is { };
-        var targetHasAi = targetMindContainer.Mind is { };
+        var cardHasAi = _slots.CanEject(cardUid, args.User, cardAiHolder.Slot) && cardMindContainer is not null &&
+                        cardMindContainer.Mind is not null;
+        var targetHasAi = targetMindContainer.Mind is not null;
 
         // Card -> Brain
         // upload the mind from the positronic brain inside the card's StationAiHolder into the target brain
@@ -141,7 +151,7 @@ public abstract partial class SharedIntellicardExtrasSystem : EntitySystem
 
             _metaData.SetEntityName(targetUid, _nameMod.GetBaseName(cardBrain!.Value));
 
-            _mind.TransferTo(cardMind, targetUid, ghostCheckOverride: true);
+            _mind.TransferTo(cardMind, targetUid, true);
             _mind.UnVisit(cardMind);
 
             QueueDel(cardBrain); // free up the empty brain
@@ -161,7 +171,7 @@ public abstract partial class SharedIntellicardExtrasSystem : EntitySystem
             var newCardBrain = SpawnInContainerOrDrop(DefaultAi, cardUid, StationAiCoreComponent.Container);
             _metaData.SetEntityName(newCardBrain, _nameMod.GetBaseName(targetUid));
 
-            _mind.TransferTo(targetMind, newCardBrain, ghostCheckOverride: true);
+            _mind.TransferTo(targetMind, newCardBrain, true);
             _mind.UnVisit(targetMind);
 
             _audio.PlayPvs(cardAiHolder.Slot.InsertSound, cardUid);
@@ -170,7 +180,6 @@ public abstract partial class SharedIntellicardExtrasSystem : EntitySystem
             _eye.SetDrawFov(newCardBrain, true);
 
             args.Handled = true;
-            return;
         }
     }
 }

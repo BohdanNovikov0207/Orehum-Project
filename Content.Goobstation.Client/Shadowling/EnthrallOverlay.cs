@@ -14,22 +14,22 @@ namespace Content.Goobstation.Client.Shadowling;
 
 public sealed class EnthrallOverlay : Overlay
 {
-    [Dependency] private readonly IPrototypeManager _prototypeManager = default!;
-    [Dependency] private readonly IGameTiming _gameTiming = default!;
     [Dependency] private readonly IEntityManager _entityManager = default!;
+    [Dependency] private readonly IGameTiming _gameTiming = default!;
     [Dependency] private readonly IPlayerManager _playerManager = default!;
-
-    public override OverlaySpace Space => OverlaySpace.WorldSpace;
-    public override bool RequestScreenTexture => true;
+    [Dependency] private readonly IPrototypeManager _prototypeManager = default!;
     private readonly ShaderInstance _shader;
-    private double _startTime = -1;
     private double _lastsFor = 1;
+    private double _startTime = -1;
 
     public EnthrallOverlay()
     {
         IoCManager.InjectDependencies(this);
         _shader = _prototypeManager.Index<ShaderPrototype>("EnthrallEffect").Instance().Duplicate();
     }
+
+    public override OverlaySpace Space => OverlaySpace.WorldSpace;
+    public override bool RequestScreenTexture => true;
 
     public void ReceiveEnthrall(double duration)
     {

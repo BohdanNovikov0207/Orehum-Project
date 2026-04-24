@@ -11,26 +11,14 @@ using Content.Shared.Damage;
 using Robust.Shared.GameStates;
 
 namespace Content.Goobstation.Shared.Penalties.Components;
+
 /// <summary>
 /// This will apply a movespeed multiplier and damage on an entity when outerlayer item is equipped
 /// Additionally, length of the doafters for equipping and unequipping these will be increased
 /// </summary>
-
-[RegisterComponent, NetworkedComponent]
+[RegisterComponent] [NetworkedComponent]
 public sealed partial class OuterSlotPenaltyComponent : Component
 {
-    /// <summary>
-    /// Movement speed multiplier, applied when worn only to prevent slowdown while in hand
-    /// </summary>
-    [DataField(required: true)]
-    public float EquippedSpeedMultiplier = 1.0f;
-
-    /// <summary>
-    /// Current state of outerlayer inventory slot
-    /// </summary>
-    [DataField]
-    public bool OuterLayerEquipped = false;
-
     /// <summary>
     /// Damage dealt to owner on successful outerlayer equip attempt
     /// </summary>
@@ -44,6 +32,18 @@ public sealed partial class OuterSlotPenaltyComponent : Component
     [DataField]
     [ViewVariables(VVAccess.ReadWrite)]
     public float EquipDelay = 2f;
+
+    /// <summary>
+    /// Movement speed multiplier, applied when worn only to prevent slowdown while in hand
+    /// </summary>
+    [DataField(required: true)]
+    public float EquippedSpeedMultiplier = 1.0f;
+
+    /// <summary>
+    /// Current state of outerlayer inventory slot
+    /// </summary>
+    [DataField]
+    public bool OuterLayerEquipped = false;
 
     /// <summary>
     /// Unequip delay applied to outerlayer cloth when owner has it in inventory/equipped

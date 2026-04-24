@@ -11,33 +11,32 @@ using Content.Shared.Damage;
 using Robust.Shared.GameStates;
 using Robust.Shared.Serialization.TypeSerializers.Implementations;
 
-namespace Content.Goobstation.Shared.Clothing.Components
+namespace Content.Goobstation.Shared.Clothing.Components;
+
+[RegisterComponent] [NetworkedComponent] [AutoGenerateComponentState] [AutoGenerateComponentPause]
+public sealed partial class DamageOverTimeComponent : Component
 {
-    [RegisterComponent, NetworkedComponent, AutoGenerateComponentState, AutoGenerateComponentPause]
-    public sealed partial class DamageOverTimeComponent : Component
-    {
-        [DataField(required: true), AutoNetworkedField]
-        public DamageSpecifier Damage { get; set; } = new();
+    [DataField(customTypeSerializer: typeof(TimespanSerializer))] [AutoNetworkedField]
+    public TimeSpan Interval = TimeSpan.FromSeconds(1);
 
-        [DataField(customTypeSerializer: typeof(TimespanSerializer)), AutoNetworkedField]
-        public TimeSpan Interval = TimeSpan.FromSeconds(1);
+    [DataField] [AutoNetworkedField]
+    public float Multiplier = 1f;
 
-        [DataField, AutoNetworkedField]
-        public bool IgnoreResistances { get; set; }
+    [DataField] [AutoNetworkedField]
+    public float MultiplierIncrease;
 
-        [DataField, AutoNetworkedField]
-        public float Multiplier = 1f;
+    [DataField] [AutoPausedField]
+    public TimeSpan NextTickTime = TimeSpan.Zero;
 
-        [DataField, AutoNetworkedField]
-        public float MultiplierIncrease;
+    [DataField] [AutoNetworkedField]
+    public SplitDamageBehavior Split = SplitDamageBehavior.Split;
 
-        [DataField, AutoNetworkedField]
-        public TargetBodyPart? TargetBodyPart;
+    [DataField] [AutoNetworkedField]
+    public TargetBodyPart? TargetBodyPart;
 
-        [DataField, AutoNetworkedField]
-        public SplitDamageBehavior Split = SplitDamageBehavior.Split;
+    [DataField(required: true)] [AutoNetworkedField]
+    public DamageSpecifier Damage { get; set; } = new();
 
-        [DataField, AutoPausedField]
-        public TimeSpan NextTickTime = TimeSpan.Zero;
-    }
+    [DataField] [AutoNetworkedField]
+    public bool IgnoreResistances { get; set; }
 }

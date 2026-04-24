@@ -9,7 +9,7 @@ using Robust.Shared.Serialization;
 
 namespace Content.Goobstation.Shared.IntrinsicVoiceModulator.VoiceMask;
 
-[Serializable, NetSerializable]
+[Serializable] [NetSerializable]
 public sealed class VoiceMaskChangeJobIconMessage(ProtoId<JobIconPrototype> jobIconProtoId) : BoundUserInterfaceMessage
 {
     public ProtoId<JobIconPrototype> JobIconProtoId { get; } = jobIconProtoId;

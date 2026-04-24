@@ -8,11 +8,12 @@ namespace Content.Goobstation.Server.StationEvents.GameDirector;
 
 public sealed partial class GameDirectorSystem
 {
-
     /// <summary>
-    ///   Build a list of events to use for the entire story
+    /// Build a list of events to use for the entire story
     /// </summary>
-    private void SetupEvents(GameDirectorComponent scheduler, PlayerCount count, SelectedGameRulesComponent? selectedRules = null)
+    private void SetupEvents(GameDirectorComponent scheduler,
+        PlayerCount count,
+        SelectedGameRulesComponent? selectedRules = null)
     {
         scheduler.PossibleEvents.Clear();
 
@@ -28,7 +29,8 @@ public sealed partial class GameDirectorSystem
     {
         foreach (var proto in GameTicker.GetAllGameRulePrototypes())
         {
-            if (!proto.TryGetComponent<StationEventComponent>(out var stationEvent, _factory) || !stationEvent.IsSelectable)
+            if (!proto.TryGetComponent<StationEventComponent>(out var stationEvent, _factory) ||
+                !stationEvent.IsSelectable)
                 continue;
 
             // Gate here on players, but not on round runtime. The story will probably last long enough for the
@@ -45,7 +47,9 @@ public sealed partial class GameDirectorSystem
         if (selectedRules == null)
             return;
 
-        if(!_event.TryBuildLimitedEvents(selectedRules.ScheduledGameRules, _event.AvailableEvents(), out var possibleEvents))
+        if (!_event.TryBuildLimitedEvents(selectedRules.ScheduledGameRules,
+                _event.AvailableEvents(),
+                out var possibleEvents))
             return;
 
         foreach (var (proto, stationEvent) in possibleEvents)
@@ -56,8 +60,8 @@ public sealed partial class GameDirectorSystem
     }
 
     /// <summary>
-    ///   Sorts the possible events and then picks semi-randomly.
-    ///   when maxRandom is 1 it's always the "best" event picked. Higher values allow more events to be randomly selected.
+    /// Sorts the possible events and then picks semi-randomly.
+    /// when maxRandom is 1 it's always the "best" event picked. Higher values allow more events to be randomly selected.
     /// </summary>
     private RankedEvent SelectBest(List<RankedEvent> bestEvents, int maxRandom)
     {
@@ -77,8 +81,8 @@ public sealed partial class GameDirectorSystem
     }
 
     /// <summary>
-    ///   Returns the StoryBeat that should be currently used to select events.
-    ///   Advances the current story and picks new stories when the current beat is complete.
+    /// Returns the StoryBeat that should be currently used to select events.
+    /// Advances the current story and picks new stories when the current beat is complete.
     /// </summary>
     private StoryBeatPrototype DetermineNextBeat(GameDirectorComponent scheduler, ChaosMetrics chaos, PlayerCount count)
     {
@@ -192,12 +196,10 @@ public sealed partial class GameDirectorSystem
     /// <summary>
     /// Checks if a story is valid for the current player count
     /// </summary>
-    private static bool IsStoryValid(StoryPrototype story, PlayerCount count)
-    {
-        return story.Beats != null
-               && story.MinPlayers <= count.Players
-               && story.MaxPlayers >= count.Players;
-    }
+    private static bool IsStoryValid(StoryPrototype story, PlayerCount count) =>
+        story.Beats != null
+        && story.MinPlayers <= count.Players
+        && story.MaxPlayers >= count.Players;
 
     /// <summary>
     /// Gets the fallback beat when no stories are available
@@ -208,16 +210,17 @@ public sealed partial class GameDirectorSystem
         return _prototypeManager.Index(scheduler.FallbackBeatName);
     }
 
-    private static float RankChaosDelta(ChaosMetrics chaos)
-    {
+    private static float RankChaosDelta(ChaosMetrics chaos) =>
         // Just a sum of squares (trying to get close to 0 on every score)
         //   Lower is better
         // Note:  if the chaos value is above 655.36 then its square is above maxint (inside FixedPoint2) and it wraps
         //        around. We need a full float range to handle the square.
-        return chaos.ChaosDict.Values.Sum(v => (float) v * (float) v);
-    }
+        chaos.ChaosDict.Values.Sum(v => (float) v * (float) v);
 
-    private List<RankedEvent> ChooseEvents(GameDirectorComponent scheduler, StoryBeatPrototype beat, ChaosMetrics chaos, PlayerCount count)
+    private List<RankedEvent> ChooseEvents(GameDirectorComponent scheduler,
+        StoryBeatPrototype beat,
+        ChaosMetrics chaos,
+        PlayerCount count)
     {
         // TODO : Potentially filter Chaos here using CriticalLevels & DangerLevels which force us to focus on
         //        big problems (lots of hostiles, spacing) prior to smaller ones (food & drink)
@@ -228,16 +231,20 @@ public sealed partial class GameDirectorSystem
         // Fall back to improving all scores (not just the ones the beat is focused on)
         //   Generally this means reducing chaos (unspecified scores are desired to be 0).
         var allDesiredChange = beat.Goal - chaos;
-        result = FilterAndScore(scheduler, chaos, allDesiredChange, count, inclNoChaos:true);
+        result = FilterAndScore(scheduler, chaos, allDesiredChange, count, true);
 
         return result;
     }
 
     /// <summary>
-    ///   Filter only to events which improve the chaos score in alignment with desiredChange.
-    ///   Score them (lower is better) in how well they do this.
+    /// Filter only to events which improve the chaos score in alignment with desiredChange.
+    /// Score them (lower is better) in how well they do this.
     /// </summary>
-    private List<RankedEvent> FilterAndScore(GameDirectorComponent scheduler, ChaosMetrics chaos, ChaosMetrics desiredChange, PlayerCount count, bool inclNoChaos = false)
+    private List<RankedEvent> FilterAndScore(GameDirectorComponent scheduler,
+        ChaosMetrics chaos,
+        ChaosMetrics desiredChange,
+        PlayerCount count,
+        bool inclNoChaos = false)
     {
         var noEvent = RankChaosDelta(desiredChange);
         var result = new List<RankedEvent>();

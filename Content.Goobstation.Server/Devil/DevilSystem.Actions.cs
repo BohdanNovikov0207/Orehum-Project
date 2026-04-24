@@ -4,7 +4,6 @@
 //
 // SPDX-License-Identifier: AGPL-3.0-or-later
 
-using Content.Goobstation.Server.Devil.Contract;
 using Content.Goobstation.Server.Devil.Contract.Revival;
 using Content.Goobstation.Server.Devil.Grip;
 using Content.Goobstation.Shared.Devil;
@@ -112,10 +111,14 @@ public sealed partial class DevilSystem
             return;
 
         if (devil.Comp.PowerLevel != DevilPowerLevel.None)
-            devil.Comp.PossessionDuration *= (int)devil.Comp.PowerLevel;
+            devil.Comp.PossessionDuration *= (int) devil.Comp.PowerLevel;
 
         // Only mark as handled if possession succeeds to avoid wasting the cooldown.
-        if (!_possession.TryPossessTarget(args.Target, args.Performer, devil.Comp.PossessionDuration, true, polymorphPossessor: true))
+        if (!_possession.TryPossessTarget(args.Target,
+                args.Performer,
+                devil.Comp.PossessionDuration,
+                true,
+                polymorphPossessor: true))
             return;
 
         Spawn(devil.Comp.JauntAnimationProto, Transform(args.Target).Coordinates);

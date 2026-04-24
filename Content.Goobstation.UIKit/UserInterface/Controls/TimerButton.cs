@@ -5,11 +5,10 @@ namespace Content.Goobstation.UIKit.UserInterface.Controls;
 
 public sealed class TimerButton : Button
 {
-    [Dependency] private readonly IGameTiming _timing = default!;
-
     private readonly string _label;
-    private readonly TimeSpan _timeSpan;
     private readonly TimeSpan _startTime;
+    private readonly TimeSpan _timeSpan;
+    [Dependency] private readonly IGameTiming _timing = default!;
 
     public TimerButton(string label, TimeSpan time)
     {

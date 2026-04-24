@@ -10,18 +10,18 @@ namespace Content.Goobstation.Shared.MobCall;
 [RegisterComponent]
 public sealed partial class MobCallSourceComponent : Component
 {
-    /// <summary>
-    /// Whitelist of entities to work on.
-    /// </summary>
-    [DataField(required: true)]
-    public EntityWhitelist Whitelist = new();
-
     [DataField]
-    public float Range = 20f;
+    public ProtoId<EmotePrototype> Emote = "Scream";
 
     [DataField]
     public string Key = "CallTarget";
 
     [DataField]
-    public ProtoId<EmotePrototype> Emote = "Scream";
+    public float Range = 20f;
+
+    /// <summary>
+    /// Whitelist of entities to work on.
+    /// </summary>
+    [DataField(required: true)]
+    public EntityWhitelist Whitelist = new();
 }

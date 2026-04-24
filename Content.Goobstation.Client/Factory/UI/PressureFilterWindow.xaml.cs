@@ -14,9 +14,6 @@ public sealed partial class PressureFilterWindow : FancyWindow
 {
     [Dependency] private readonly EntityManager _entMan = default!;
 
-    public event Action<float>? OnSetMin;
-    public event Action<float>? OnSetMax;
-
     private float _min, _max;
 
     public PressureFilterWindow()
@@ -40,9 +37,20 @@ public sealed partial class PressureFilterWindow : FancyWindow
                 OnSetMax?.Invoke(max);
         };
 
-        OnSetMin += min => { _min = min; UpdateButtons(); };
-        OnSetMax += max => { _max = max; UpdateButtons(); };
+        OnSetMin += min =>
+        {
+            _min = min;
+            UpdateButtons();
+        };
+        OnSetMax += max =>
+        {
+            _max = max;
+            UpdateButtons();
+        };
     }
+
+    public event Action<float>? OnSetMin;
+    public event Action<float>? OnSetMax;
 
     public void SetEntity(EntityUid uid)
     {

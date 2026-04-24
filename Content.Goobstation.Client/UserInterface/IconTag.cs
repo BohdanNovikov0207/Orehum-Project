@@ -11,8 +11,8 @@ namespace Content.Goobstation.Client.UserInterface;
 
 public sealed class IconTag : IMarkupTag
 {
-    [Dependency] private readonly IPrototypeManager _prototype = default!;
     [Dependency] private readonly IEntitySystemManager _entitySystem = default!;
+    [Dependency] private readonly IPrototypeManager _prototype = default!;
     private SpriteSystem? _spriteSystem;
 
     public string Name => "icon";

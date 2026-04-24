@@ -5,7 +5,6 @@
 //
 // SPDX-License-Identifier: AGPL-3.0-or-later
 
-using System.Diagnostics;
 using Content.Client.DamageState;
 using Content.Goobstation.Shared.Xenobiology;
 using Content.Goobstation.Shared.Xenobiology.Components;
@@ -25,11 +24,15 @@ public sealed class XenoSlimeVisualizerSystem : VisualizerSystem<SlimeComponent>
 
     protected override void OnAppearanceChange(EntityUid uid, SlimeComponent component, ref AppearanceChangeEvent args)
     {
-        if (args.Sprite == null || !AppearanceSystem.TryGetData<Color>(uid, XenoSlimeVisuals.Color, out var color, args.Component) || !TryComp<SpriteComponent>(uid, out var spriteComponent))
+        if (args.Sprite == null ||
+            !AppearanceSystem.TryGetData<Color>(uid, XenoSlimeVisuals.Color, out var color, args.Component) ||
+            !TryComp<SpriteComponent>(uid, out var spriteComponent))
             return;
 
         foreach (var layer in args.Sprite.AllLayers)
+        {
             layer.Color = color.WithAlpha(layer.Color.A);
+        }
 
         if (!AppearanceSystem.TryGetData<string>(uid, XenoSlimeVisuals.Shader, out var shader, args.Component))
             return;

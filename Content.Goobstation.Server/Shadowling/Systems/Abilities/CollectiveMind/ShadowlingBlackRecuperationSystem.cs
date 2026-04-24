@@ -28,7 +28,8 @@ namespace Content.Goobstation.Server.Shadowling.Systems.Abilities.CollectiveMind
 
 /// <summary>
 /// This handles the Black Recuperation logic.
-/// Black Rec. either turns back a dead Thrall to life, OR turns a living Thrall into a Lesser Shadowling by empowering them
+/// Black Rec. either turns back a dead Thrall to life, OR turns a living Thrall into a Lesser Shadowling by empowering
+/// them
 /// Reduces your light resistance forever. Less for thralls, more for lesser shadowlings.
 /// </summary>
 public sealed class ShadowlingBlackRecuperationSystem : EntitySystem
@@ -36,16 +37,16 @@ public sealed class ShadowlingBlackRecuperationSystem : EntitySystem
     [Dependency] private readonly SharedActionsSystem _actions = default!;
     [Dependency] private readonly SharedAudioSystem _audio = default!;
     [Dependency] private readonly SharedDoAfterSystem _doAfter = default!;
+    [Dependency] private readonly EuiManager _euiManager = default!;
     [Dependency] private readonly SharedHumanoidAppearanceSystem _humanoidAppearance = default!;
     [Dependency] private readonly LightDetectionDamageSystem _light = default!;
     [Dependency] private readonly SharedMindSystem _mind = default!;
     [Dependency] private readonly MobStateSystem _mobStateSystem = default!;
+    [Dependency] private readonly ISharedPlayerManager _playerMan = default!;
     [Dependency] private readonly PolymorphSystem _polymorph = default!;
     [Dependency] private readonly SharedPopupSystem _popup = default!;
-    [Dependency] private readonly RejuvenateSystem _rejuvenate = default!;
-    [Dependency] private readonly ISharedPlayerManager _playerMan = default!;
     [Dependency] private readonly IPrototypeManager _protoMan = default!;
-    [Dependency] private readonly EuiManager _euiManager = default!;
+    [Dependency] private readonly RejuvenateSystem _rejuvenate = default!;
 
     public override void Initialize()
     {
@@ -91,7 +92,9 @@ public sealed class ShadowlingBlackRecuperationSystem : EntitySystem
         args.Handled = true;
     }
 
-    private void OnBlackRecDoAfter(EntityUid uid, ShadowlingBlackRecuperationComponent component, BlackRecuperationDoAfterEvent args)
+    private void OnBlackRecDoAfter(EntityUid uid,
+        ShadowlingBlackRecuperationComponent component,
+        BlackRecuperationDoAfterEvent args)
     {
         if (args.Cancelled
             || args.Handled

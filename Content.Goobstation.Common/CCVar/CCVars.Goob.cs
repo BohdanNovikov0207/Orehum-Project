@@ -3,71 +3,80 @@ using Robust.Shared.Configuration;
 namespace Content.Goobstation.Common.CCVar;
 
 [CVarDefs]
-public sealed partial class GoobCVars
+public sealed class GoobCVars
 {
     /// <summary>
-    ///     Whether pipes will unanchor on ANY conflicting connection. May break maps.
-    ///     If false, allows you to stack pipes as long as new directions are added (i.e. in a new pipe rotation, layer or multi-Z link), otherwise unanchoring them.
+    /// Whether pipes will unanchor on ANY conflicting connection. May break maps.
+    /// If false, allows you to stack pipes as long as new directions are added (i.e. in a new pipe rotation, layer or multi-Z
+    /// link), otherwise unanchoring them.
     /// </summary>
     public static readonly CVarDef<bool> StrictPipeStacking =
         CVarDef.Create("atmos.strict_pipe_stacking", false, CVar.SERVERONLY);
 
     /// <summary>
-    ///     If an object's mass is below this number, then this number is used in place of mass to determine whether air pressure can throw an object.
-    ///     This has nothing to do with throwing force, only acting as a way of reducing the odds of tiny 5 gram objects from being yeeted by people's breath
+    /// If an object's mass is below this number, then this number is used in place of mass to determine whether air pressure
+    /// can throw an object.
+    /// This has nothing to do with throwing force, only acting as a way of reducing the odds of tiny 5 gram objects from being
+    /// yeeted by people's breath
     /// </summary>
     /// <remarks>
-    ///     If you are reading this because you want to change it, consider looking into why almost every item in the game weighs only 5 grams
-    ///     And maybe do your part to fix that? :)
+    /// If you are reading this because you want to change it, consider looking into why almost every item in the game weighs
+    /// only 5 grams
+    /// And maybe do your part to fix that? :)
     /// </remarks>
     public static readonly CVarDef<float> SpaceWindMinimumCalculatedMass =
         CVarDef.Create("atmos.space_wind_minimum_calculated_mass", 10f, CVar.SERVERONLY);
 
     /// <summary>
-    /// 	Calculated as 1/Mass, where Mass is the physics.Mass of the desired threshold.
-    /// 	If an object's inverse mass is lower than this, it is capped at this. Basically, an upper limit to how heavy an object can be before it stops resisting space wind more.
+    /// Calculated as 1/Mass, where Mass is the physics.Mass of the desired threshold.
+    /// If an object's inverse mass is lower than this, it is capped at this. Basically, an upper limit to how heavy an object
+    /// can be before it stops resisting space wind more.
     /// </summary>
     public static readonly CVarDef<float> SpaceWindMaximumCalculatedInverseMass =
         CVarDef.Create("atmos.space_wind_maximum_calculated_inverse_mass", 0.04f, CVar.SERVERONLY);
 
     /// <summary>
-    /// Increases default airflow calculations to O(n^2) complexity, for use with heavy space wind optimizations. Potato servers BEWARE
+    /// Increases default airflow calculations to O(n^2) complexity, for use with heavy space wind optimizations. Potato
+    /// servers BEWARE
     /// This solves the problem of objects being trapped in an infinite loop of slamming into a wall repeatedly.
     /// </summary>
     public static readonly CVarDef<bool> MonstermosUseExpensiveAirflow =
         CVarDef.Create("atmos.mmos_expensive_airflow", true, CVar.SERVERONLY);
 
     /// <summary>
-    ///     A multiplier on the amount of force applied to Humanoid entities, as tracked by HumanoidAppearanceComponent
-    ///     This multiplier is added after all other checks are made, and applies to both throwing force, and how easy it is for an entity to be thrown.
+    /// A multiplier on the amount of force applied to Humanoid entities, as tracked by HumanoidAppearanceComponent
+    /// This multiplier is added after all other checks are made, and applies to both throwing force, and how easy it is for an
+    /// entity to be thrown.
     /// </summary>
     public static readonly CVarDef<float> AtmosHumanoidThrowMultiplier =
         CVarDef.Create("atmos.humanoid_throw_multiplier", 2f, CVar.SERVERONLY);
 
     /// <summary>
-    ///     Taken as the cube of a tile's mass, this acts as a minimum threshold of mass for which air pressure calculates whether or not to rip a tile from the floor
-    ///     This should be set by default to the cube of the game's lowest mass tile as defined in their prototypes, but can be increased for server performance reasons
+    /// Taken as the cube of a tile's mass, this acts as a minimum threshold of mass for which air pressure calculates whether
+    /// or not to rip a tile from the floor
+    /// This should be set by default to the cube of the game's lowest mass tile as defined in their prototypes, but can be
+    /// increased for server performance reasons
     /// </summary>
     public static readonly CVarDef<float> MonstermosRipTilesMinimumPressure =
         CVarDef.Create("atmos.monstermos_rip_tiles_min_pressure", 7500f, CVar.SERVERONLY);
 
     /// <summary>
-    ///     Taken after the minimum pressure is checked, the effective pressure is multiplied by this amount.
-    ///		This allows server hosts to finely tune how likely floor tiles are to be ripped apart by air pressure
+    /// Taken after the minimum pressure is checked, the effective pressure is multiplied by this amount.
+    /// This allows server hosts to finely tune how likely floor tiles are to be ripped apart by air pressure
     /// </summary>
     public static readonly CVarDef<float> MonstermosRipTilesPressureOffset =
         CVarDef.Create("atmos.monstermos_rip_tiles_pressure_offset", 0.44f, CVar.SERVERONLY);
 
     /// <summary>
-    ///     Indicates how much players are required for the round to be considered lowpop.
-    ///     Used for dynamic gamemode.
+    /// Indicates how much players are required for the round to be considered lowpop.
+    /// Used for dynamic gamemode.
     /// </summary>
     public static readonly CVarDef<float> LowpopThreshold =
         CVarDef.Create("game.players.lowpop_threshold", 15f, CVar.SERVERONLY);
 
     /// <summary>
-    ///     Indicates how much players are required for the round to be considered highpop.
-    ///     Used for dynamic gamemode.
+    /// Indicates how much players are required for the round to be considered highpop.
+    /// Used for dynamic gamemode.
     /// </summary>
     public static readonly CVarDef<float> HighpopThreshold =
         CVarDef.Create("game.players.highpop_threshold", 50f, CVar.SERVERONLY);
@@ -76,13 +85,13 @@ public sealed partial class GoobCVars
         CVarDef.Create("game.antag.gain.remove_clumsy", false, CVar.SERVERONLY);
 
     /// <summary>
-    ///     Is ore silo enabled.
+    /// Is ore silo enabled.
     /// </summary>
     public static readonly CVarDef<bool> SiloEnabled =
         CVarDef.Create("goob.silo_enabled", true, CVar.SERVER | CVar.REPLICATED);
 
     /// <summary>
-    ///     Set a max drunk time in seconds to prevent permanent drunkeness.
+    /// Set a max drunk time in seconds to prevent permanent drunkeness.
     /// </summary>
     public static readonly CVarDef<float> MaxDrunkTime =
         CVarDef.Create("goob.max_drunk_time", 1500f, CVar.SERVER | CVar.REPLICATED);
@@ -110,161 +119,31 @@ public sealed partial class GoobCVars
     /// </summary>
     public static readonly CVarDef<float> RoundEndNoEorgPopupTime =
         CVarDef.Create("game.round_end_eorg_popup_time", 5f, CVar.SERVER | CVar.REPLICATED);
-  
+
     /// Easy mode for biomass requirements on cloning. If true, 30% less biomass is required to clone mobs.
     /// </summary>
     public static readonly CVarDef<bool> CloneBiomassEasyMode =
         CVarDef.Create("goob.clone_biomass_easy_mode", false, CVar.SERVER | CVar.SERVER);
 
-    #region Player Listener
-
     /// <summary>
-    ///     Is sprint enabled.
-    /// </summary>
-    public static readonly CVarDef<bool> ToggleSprint =
-        CVarDef.Create("control.toggle_sprint", false, CVar.CLIENTONLY | CVar.ARCHIVE);
-
-    /// <summary>
-    ///     Enable Dorm Notifier
-    /// </summary>
-    public static readonly CVarDef<bool> DormNotifier =
-        CVarDef.Create("dorm_notifier.enable", true, CVar.SERVER);
-
-    /// <summary>
-    ///     Check for dorm activity every X amount of ticks
-    ///     Default is 10.
-    /// </summary>
-    public static readonly CVarDef<int> DormNotifierFrequency =
-        CVarDef.Create("dorm_notifier.frequency", 10, CVar.SERVER);
-
-    /// <summary>
-    ///     Time given to be found to be engaging in dorm activity
-    ///     Default is 180.
-    /// </summary>
-    public static readonly CVarDef<int> DormNotifierPresenceTimeout =
-        CVarDef.Create("dorm_notifier.timeout", 180, CVar.SERVER, "Mark as condemned if present near a dorm marker for more than X amount of seconds.");
-
-    /// <summary>
-    ///     Time given to be found engaging in dorm activity if any of the sinners are nude
-    ///     Default if 60.
-    /// </summary>
-    public static readonly CVarDef<int> DormNotifierPresenceTimeoutNude =
-        CVarDef.Create("dorm_notifier.timeout_nude", 60, CVar.SERVER, "Mark as condemned if present near a dorm marker for more than X amount of seconds while being nude.");
-
-    /// <summary>
-    ///     Broadcast to all players that a player has ragequit.
-    /// </summary>
-    public static readonly CVarDef<bool> PlayerRageQuitNotify =
-        CVarDef.Create("ragequit.notify", true, CVar.SERVERONLY);
-
-    /// <summary>
-    ///     Time between being eligible for a "rage quit" after reaching a damage threshold.
-    ///     Default is 5f.
-    /// </summary>
-    public static readonly CVarDef<float> PlayerRageQuitTimeThreshold =
-        CVarDef.Create("ragequit.threshold", 30f, CVar.SERVERONLY);
-
-    /// <summary>
-    ///     Log ragequits to a discord webhook, set to empty to disable.
-    /// </summary>
-    public static readonly CVarDef<string> PlayerRageQuitDiscordWebhook =
-        CVarDef.Create("ragequit.discord_webhook", "", CVar.SERVERONLY | CVar.CONFIDENTIAL);
-
-    #endregion PlayerListener
-
-    #region Discord AHelp Reply System
-
-    /// <summary>
-    ///     If an admin replies to users from discord, should it use their discord role color? (if applicable)
-    ///     Overrides DiscordReplyColor and AdminBwoinkColor.
-    /// </summary>
-    public static readonly CVarDef<bool> UseDiscordRoleColor =
-        CVarDef.Create("admin.use_discord_role_color", true, CVar.SERVERONLY);
-
-    /// <summary>
-    ///     If an admin replies to users from discord, should it use their discord role name? (if applicable)
-    /// </summary>
-    public static readonly CVarDef<bool> UseDiscordRoleName =
-        CVarDef.Create("admin.use_discord_role_name", true, CVar.SERVERONLY);
-
-    /// <summary>
-    ///     The text before an admin's name when replying from discord to indicate they're speaking from discord.
-    /// </summary>
-    public static readonly CVarDef<string> DiscordReplyPrefix =
-        CVarDef.Create("admin.discord_reply_prefix", "(DISCORD) ", CVar.SERVERONLY);
-
-    /// <summary>
-    ///     The color of the names of admins. This is the fallback color for admins.
-    /// </summary>
-    public static readonly CVarDef<string> AdminBwoinkColor =
-        CVarDef.Create("admin.admin_bwoink_color", "red", CVar.SERVERONLY);
-
-    /// <summary>
-    ///     The color of the names of admins who reply from discord. Leave empty to disable.
-    ///     Overrides AdminBwoinkColor.
-    /// </summary>
-    public static readonly CVarDef<string> DiscordReplyColor =
-        CVarDef.Create("admin.discord_reply_color", string.Empty, CVar.SERVERONLY);
-
-    /// <summary>
-    ///     Use the admin's Admin OOC color in bwoinks.
-    ///     If either the ooc color or this is not set, uses the admin.admin_bwoink_color value.
-    /// </summary>
-    public static readonly CVarDef<bool> UseAdminOOCColorInBwoinks =
-        CVarDef.Create("admin.bwoink_use_admin_ooc_color", true, CVar.SERVERONLY);
-
-    /// <summary>
-    ///     Discord Webhook for the station report
-    /// </summary>
-    public static readonly CVarDef<string> StationReportDiscordWebHook =
-        CVarDef.Create("stationreport.discord_webhook", "", CVar.SERVERONLY | CVar.CONFIDENTIAL);
-
-    #endregion
-
-    /// <summary>
-    ///     Goobstation: The amount of time between NPC Silicons draining their battery in seconds.
+    /// Goobstation: The amount of time between NPC Silicons draining their battery in seconds.
     /// </summary>
     public static readonly CVarDef<float> SiliconNpcUpdateTime =
         CVarDef.Create("silicon.npcupdatetime", 1.5f, CVar.SERVERONLY);
 
     /// <summary>
-    ///     Sets the size of the hitbox where projectile/laser will hit any entity regardless of crawling
+    /// Sets the size of the hitbox where projectile/laser will hit any entity regardless of crawling
     /// </summary>
     public static readonly CVarDef<float> CrawlHitzoneSize =
         CVarDef.Create("goob.crawl_hitzone_size", 0.4f, CVar.SERVER | CVar.REPLICATED);
 
-    #region Blob
-    public static readonly CVarDef<int> BlobMax =
-        CVarDef.Create("blob.max", 3, CVar.SERVERONLY);
-
-    public static readonly CVarDef<int> BlobPlayersPer =
-        CVarDef.Create("blob.players_per", 20, CVar.SERVERONLY);
-
-    public static readonly CVarDef<bool> BlobCanGrowInSpace =
-        CVarDef.Create("blob.grow_space", true, CVar.SERVER);
-
-    #endregion
-
     #region Mechs
 
     /// <summary>
-    ///     Whether or not players can use mech guns outside of mechs.
+    /// Whether or not players can use mech guns outside of mechs.
     /// </summary>
     public static readonly CVarDef<bool> MechGunOutsideMech =
         CVarDef.Create("mech.gun_outside_mech", true, CVar.SERVER | CVar.REPLICATED);
-
-    #endregion
-
-    #region RMC
-
-    public static readonly CVarDef<int> RMCPatronLobbyMessageTimeSeconds =
-        CVarDef.Create("rmc.patron_lobby_message_time_seconds", 30, CVar.REPLICATED | CVar.SERVER);
-
-    public static readonly CVarDef<int> RMCPatronLobbyMessageInitialDelaySeconds =
-        CVarDef.Create("rmc.patron_lobby_message_initial_delay_seconds", 5, CVar.REPLICATED | CVar.SERVER);
-
-    public static readonly CVarDef<string> RMCDiscordAccountLinkingMessageLink =
-        CVarDef.Create("rmc.discord_account_linking_message_link", "", CVar.REPLICATED | CVar.SERVER);
 
     #endregion
 
@@ -278,6 +157,174 @@ public sealed partial class GoobCVars
 
     public static readonly CVarDef<float> BreedingInterval =
         CVarDef.Create("xenobiology.breeding.interval", 1f, CVar.REPLICATED | CVar.SERVER);
+
+    #endregion
+
+    #region Movement
+
+    public static readonly CVarDef<float> MaxSpeed =
+        CVarDef.Create("movement.max_speed", 2.7f, CVar.SERVER | CVar.REPLICATED);
+
+    #endregion
+
+    /// <summary>
+    /// Enables or disables contraband icons.
+    /// </summary>
+    public static readonly CVarDef<bool> ContrabandIconsEnabled =
+        CVarDef.Create("contraband.icons_enabled", false, CVar.SERVER | CVar.REPLICATED);
+
+    /// <summary>
+    /// Controls how often GPS updates.
+    /// </summary>
+    public static readonly CVarDef<float> GpsUpdateRate =
+        CVarDef.Create("gps.update_rate", 1f, CVar.SERVER | CVar.REPLICATED);
+
+    // TODO: Move trauma cvars to traumamod when it's real
+
+    #region Trauma
+
+    /// <summary>
+    /// Is sprinting enabled
+    /// </summary>
+    public static readonly CVarDef<bool> SprintEnabled =
+        CVarDef.Create("trauma.sprint_enabled", false, CVar.SERVER | CVar.REPLICATED);
+
+    #endregion
+
+    #region Player Listener
+
+    /// <summary>
+    /// Is sprint enabled.
+    /// </summary>
+    public static readonly CVarDef<bool> ToggleSprint =
+        CVarDef.Create("control.toggle_sprint", false, CVar.CLIENTONLY | CVar.ARCHIVE);
+
+    /// <summary>
+    /// Enable Dorm Notifier
+    /// </summary>
+    public static readonly CVarDef<bool> DormNotifier =
+        CVarDef.Create("dorm_notifier.enable", true, CVar.SERVER);
+
+    /// <summary>
+    /// Check for dorm activity every X amount of ticks
+    /// Default is 10.
+    /// </summary>
+    public static readonly CVarDef<int> DormNotifierFrequency =
+        CVarDef.Create("dorm_notifier.frequency", 10, CVar.SERVER);
+
+    /// <summary>
+    /// Time given to be found to be engaging in dorm activity
+    /// Default is 180.
+    /// </summary>
+    public static readonly CVarDef<int> DormNotifierPresenceTimeout =
+        CVarDef.Create("dorm_notifier.timeout",
+            180,
+            CVar.SERVER,
+            "Mark as condemned if present near a dorm marker for more than X amount of seconds.");
+
+    /// <summary>
+    /// Time given to be found engaging in dorm activity if any of the sinners are nude
+    /// Default if 60.
+    /// </summary>
+    public static readonly CVarDef<int> DormNotifierPresenceTimeoutNude =
+        CVarDef.Create("dorm_notifier.timeout_nude",
+            60,
+            CVar.SERVER,
+            "Mark as condemned if present near a dorm marker for more than X amount of seconds while being nude.");
+
+    /// <summary>
+    /// Broadcast to all players that a player has ragequit.
+    /// </summary>
+    public static readonly CVarDef<bool> PlayerRageQuitNotify =
+        CVarDef.Create("ragequit.notify", true, CVar.SERVERONLY);
+
+    /// <summary>
+    /// Time between being eligible for a "rage quit" after reaching a damage threshold.
+    /// Default is 5f.
+    /// </summary>
+    public static readonly CVarDef<float> PlayerRageQuitTimeThreshold =
+        CVarDef.Create("ragequit.threshold", 30f, CVar.SERVERONLY);
+
+    /// <summary>
+    /// Log ragequits to a discord webhook, set to empty to disable.
+    /// </summary>
+    public static readonly CVarDef<string> PlayerRageQuitDiscordWebhook =
+        CVarDef.Create("ragequit.discord_webhook", "", CVar.SERVERONLY | CVar.CONFIDENTIAL);
+
+    #endregion PlayerListener
+
+    #region Discord AHelp Reply System
+
+    /// <summary>
+    /// If an admin replies to users from discord, should it use their discord role color? (if applicable)
+    /// Overrides DiscordReplyColor and AdminBwoinkColor.
+    /// </summary>
+    public static readonly CVarDef<bool> UseDiscordRoleColor =
+        CVarDef.Create("admin.use_discord_role_color", true, CVar.SERVERONLY);
+
+    /// <summary>
+    /// If an admin replies to users from discord, should it use their discord role name? (if applicable)
+    /// </summary>
+    public static readonly CVarDef<bool> UseDiscordRoleName =
+        CVarDef.Create("admin.use_discord_role_name", true, CVar.SERVERONLY);
+
+    /// <summary>
+    /// The text before an admin's name when replying from discord to indicate they're speaking from discord.
+    /// </summary>
+    public static readonly CVarDef<string> DiscordReplyPrefix =
+        CVarDef.Create("admin.discord_reply_prefix", "(DISCORD) ", CVar.SERVERONLY);
+
+    /// <summary>
+    /// The color of the names of admins. This is the fallback color for admins.
+    /// </summary>
+    public static readonly CVarDef<string> AdminBwoinkColor =
+        CVarDef.Create("admin.admin_bwoink_color", "red", CVar.SERVERONLY);
+
+    /// <summary>
+    /// The color of the names of admins who reply from discord. Leave empty to disable.
+    /// Overrides AdminBwoinkColor.
+    /// </summary>
+    public static readonly CVarDef<string> DiscordReplyColor =
+        CVarDef.Create("admin.discord_reply_color", string.Empty, CVar.SERVERONLY);
+
+    /// <summary>
+    /// Use the admin's Admin OOC color in bwoinks.
+    /// If either the ooc color or this is not set, uses the admin.admin_bwoink_color value.
+    /// </summary>
+    public static readonly CVarDef<bool> UseAdminOOCColorInBwoinks =
+        CVarDef.Create("admin.bwoink_use_admin_ooc_color", true, CVar.SERVERONLY);
+
+    /// <summary>
+    /// Discord Webhook for the station report
+    /// </summary>
+    public static readonly CVarDef<string> StationReportDiscordWebHook =
+        CVarDef.Create("stationreport.discord_webhook", "", CVar.SERVERONLY | CVar.CONFIDENTIAL);
+
+    #endregion
+
+    #region Blob
+
+    public static readonly CVarDef<int> BlobMax =
+        CVarDef.Create("blob.max", 3, CVar.SERVERONLY);
+
+    public static readonly CVarDef<int> BlobPlayersPer =
+        CVarDef.Create("blob.players_per", 20, CVar.SERVERONLY);
+
+    public static readonly CVarDef<bool> BlobCanGrowInSpace =
+        CVarDef.Create("blob.grow_space", true, CVar.SERVER);
+
+    #endregion
+
+    #region RMC
+
+    public static readonly CVarDef<int> RMCPatronLobbyMessageTimeSeconds =
+        CVarDef.Create("rmc.patron_lobby_message_time_seconds", 30, CVar.REPLICATED | CVar.SERVER);
+
+    public static readonly CVarDef<int> RMCPatronLobbyMessageInitialDelaySeconds =
+        CVarDef.Create("rmc.patron_lobby_message_initial_delay_seconds", 5, CVar.REPLICATED | CVar.SERVER);
+
+    public static readonly CVarDef<string> RMCDiscordAccountLinkingMessageLink =
+        CVarDef.Create("rmc.discord_account_linking_message_link", "", CVar.REPLICATED | CVar.SERVER);
 
     #endregion
 
@@ -345,46 +392,47 @@ public sealed partial class GoobCVars
     #region Contests System
 
     /// <summary>
-    ///     The MASTER TOGGLE for the entire Contests System.
-    ///     ALL CONTESTS BELOW, regardless of type or setting will output 1f when false.
+    /// The MASTER TOGGLE for the entire Contests System.
+    /// ALL CONTESTS BELOW, regardless of type or setting will output 1f when false.
     /// </summary>
     public static readonly CVarDef<bool> DoContestsSystem =
         CVarDef.Create("contests.do_contests_system", true, CVar.REPLICATED | CVar.SERVER);
 
     /// <summary>
-    ///     Contest functions normally include an optional override to bypass the clamp set by max_percentage.
-    ///     This CVar disables the bypass when false, forcing all implementations to comply with max_percentage.
+    /// Contest functions normally include an optional override to bypass the clamp set by max_percentage.
+    /// This CVar disables the bypass when false, forcing all implementations to comply with max_percentage.
     /// </summary>
     public static readonly CVarDef<bool> AllowClampOverride =
         CVarDef.Create("contests.allow_clamp_override", true, CVar.REPLICATED | CVar.SERVER);
+
     /// <summary>
-    ///     Toggles all MassContest functions. All mass contests output 1f when false
+    /// Toggles all MassContest functions. All mass contests output 1f when false
     /// </summary>
     public static readonly CVarDef<bool> DoMassContests =
         CVarDef.Create("contests.do_mass_contests", true, CVar.REPLICATED | CVar.SERVER);
 
     /// <summary>
-    ///     Toggles all StaminaContest functions. All stamina contests output 1f when false
+    /// Toggles all StaminaContest functions. All stamina contests output 1f when false
     /// </summary>
     public static readonly CVarDef<bool> DoStaminaContests =
         CVarDef.Create("contests.do_stamina_contests", true, CVar.REPLICATED | CVar.SERVER);
 
     /// <summary>
-    ///     Toggles all HealthContest functions. All health contests output 1f when false
+    /// Toggles all HealthContest functions. All health contests output 1f when false
     /// </summary>
     public static readonly CVarDef<bool> DoHealthContests =
         CVarDef.Create("contests.do_health_contests", true, CVar.REPLICATED | CVar.SERVER);
 
     /// <summary>
-    ///     Toggles all MindContest functions. All mind contests output 1f when false.
-    ///     MindContests are not currently implemented, and are awaiting completion of the Psionic Refactor
+    /// Toggles all MindContest functions. All mind contests output 1f when false.
+    /// MindContests are not currently implemented, and are awaiting completion of the Psionic Refactor
     /// </summary>
     public static readonly CVarDef<bool> DoMindContests =
         CVarDef.Create("contests.do_mind_contests", true, CVar.REPLICATED | CVar.SERVER);
 
     /// <summary>
-    ///     The maximum amount that Mass Contests can modify a physics multiplier, given as a +/- percentage
-    ///     Default of 0.25f outputs between * 0.75f and 1.25f
+    /// The maximum amount that Mass Contests can modify a physics multiplier, given as a +/- percentage
+    /// Default of 0.25f outputs between * 0.75f and 1.25f
     /// </summary>
     public static readonly CVarDef<float> MassContestsMaxPercentage =
         CVarDef.Create("contests.max_percentage", 1f, CVar.REPLICATED | CVar.SERVER);
@@ -392,6 +440,7 @@ public sealed partial class GoobCVars
     #endregion
 
     #region Shoving - WD Port
+
     /// <summary>
     /// Shove range multiplier.
     /// </summary>
@@ -409,6 +458,7 @@ public sealed partial class GoobCVars
     /// </summary>
     public static readonly CVarDef<float> ShoveMassFactor =
         CVarDef.Create("game.shove_mass_factor", 3f, CVar.SERVER | CVar.ARCHIVE);
+
     #endregion
 
     #region Chat
@@ -423,7 +473,7 @@ public sealed partial class GoobCVars
     /// Whether or not to coalesce identical messages in the chat.
     /// </summary>
     public static readonly CVarDef<bool> CoalesceIdenticalMessages =
-         CVarDef.Create("chat.coalesce_identical_messages", true, CVar.CLIENT | CVar.ARCHIVE | CVar.CLIENTONLY);
+        CVarDef.Create("chat.coalesce_identical_messages", true, CVar.CLIENT | CVar.ARCHIVE | CVar.CLIENTONLY);
 
     /// <summary>
     /// Set to true to enable voice barks and disable default speech sounds.
@@ -445,7 +495,10 @@ public sealed partial class GoobCVars
     /// Controls whether the Lidgren voice chat server is enabled and running.
     /// </summary>
     public static readonly CVarDef<bool> VoiceChatEnabled =
-        CVarDef.Create("voice.enabled", false, CVar.SERVER | CVar.REPLICATED | CVar.ARCHIVE, "Is the voice chat server enabled?");
+        CVarDef.Create("voice.enabled",
+            false,
+            CVar.SERVER | CVar.REPLICATED | CVar.ARCHIVE,
+            "Is the voice chat server enabled?");
 
     /// <summary>
     /// The UDP port the Lidgren voice chat server will listen on.
@@ -460,58 +513,76 @@ public sealed partial class GoobCVars
     /// Multiplier for the adaptive buffer target size calculation.
     /// </summary>
     public static readonly CVarDef<float> VoiceChatBufferTargetMultiplier =
-        CVarDef.Create("voice.buffer_target_multiplier", 1.0f, CVar.CLIENTONLY | CVar.ARCHIVE, "Multiplier for adaptive buffer target size calculation.");
+        CVarDef.Create("voice.buffer_target_multiplier",
+            1.0f,
+            CVar.CLIENTONLY | CVar.ARCHIVE,
+            "Multiplier for adaptive buffer target size calculation.");
 
     /// <summary>
     /// Minimum buffer size for voice chat, regardless of network conditions.
     /// </summary>
     public static readonly CVarDef<int> VoiceChatMinBufferSize =
-        CVarDef.Create("voice.min_buffer_size", 10, CVar.CLIENTONLY | CVar.ARCHIVE, "Minimum buffer size for voice chat.");
+        CVarDef.Create("voice.min_buffer_size",
+            10,
+            CVar.CLIENTONLY | CVar.ARCHIVE,
+            "Minimum buffer size for voice chat.");
 
     /// <summary>
     /// Maximum buffer size for voice chat to prevent excessive memory usage.
     /// </summary>
     public static readonly CVarDef<int> VoiceChatMaxBufferSize =
-        CVarDef.Create("voice.max_buffer_size", 50, CVar.CLIENTONLY | CVar.ARCHIVE, "Maximum buffer size for voice chat.");
+        CVarDef.Create("voice.max_buffer_size",
+            50,
+            CVar.CLIENTONLY | CVar.ARCHIVE,
+            "Maximum buffer size for voice chat.");
 
     /// <summary>
     /// Enable advanced time-stretching algorithms for better audio quality.
     /// </summary>
     public static readonly CVarDef<bool> VoiceChatAdvancedTimeStretch =
-        CVarDef.Create("voice.advanced_time_stretch", true, CVar.CLIENTONLY | CVar.ARCHIVE, "Enable advanced time-stretching for voice chat.");
+        CVarDef.Create("voice.advanced_time_stretch",
+            true,
+            CVar.CLIENTONLY | CVar.ARCHIVE,
+            "Enable advanced time-stretching for voice chat.");
 
     /// <summary>
     /// Enable debug logging for voice chat buffer management.
     /// </summary>
     public static readonly CVarDef<bool> VoiceChatDebugLogging =
-        CVarDef.Create("voice.debug_logging", false, CVar.CLIENTONLY | CVar.ARCHIVE, "Enable debug logging for voice chat buffer management.");
+        CVarDef.Create("voice.debug_logging",
+            false,
+            CVar.CLIENTONLY | CVar.ARCHIVE,
+            "Enable debug logging for voice chat buffer management.");
 
     /// <summary>
     /// Whether to hear audio from your own entity (useful for testing).
     /// </summary>
     public static readonly CVarDef<bool> VoiceChatHearSelf =
-        CVarDef.Create("voice.hear_self", false, CVar.CLIENTONLY | CVar.ARCHIVE, "Whether to hear audio from your own entity.");
+        CVarDef.Create("voice.hear_self",
+            false,
+            CVar.CLIENTONLY | CVar.ARCHIVE,
+            "Whether to hear audio from your own entity.");
 
     #endregion
 
     #region Queue
 
     /// <summary>
-    ///     Controls if the connections queue is enabled
-    ///     If enabled plyaers will be added to a queue instead of being kicked after SoftMaxPlayers is reached
+    /// Controls if the connections queue is enabled
+    /// If enabled plyaers will be added to a queue instead of being kicked after SoftMaxPlayers is reached
     /// </summary>
     public static readonly CVarDef<bool> QueueEnabled =
         CVarDef.Create("queue.enabled", false, CVar.SERVERONLY);
 
     /// <summary>
-    ///     If enabled patrons will be sent to the front of the queue.
+    /// If enabled patrons will be sent to the front of the queue.
     /// </summary>
     public static readonly CVarDef<bool> PatreonSkip =
         CVarDef.Create("queue.patreon_skip", true, CVar.SERVERONLY);
 
     /// <summary>
-    ///     How long in seconds to hold a queue position for a disconnected player.
-    ///     If they reconnect within this window, they are placed at the front of the queue.
+    /// How long in seconds to hold a queue position for a disconnected player.
+    /// If they reconnect within this window, they are placed at the front of the queue.
     /// </summary>
     public static readonly CVarDef<int> QueueReconnectGraceSeconds =
         CVarDef.Create("queue.reconnect_grace_seconds", 120, CVar.SERVERONLY);
@@ -540,13 +611,6 @@ public sealed partial class GoobCVars
 
     #endregion
 
-    #region Movement
-
-    public static readonly CVarDef<float> MaxSpeed =
-        CVarDef.Create("movement.max_speed", 2.7f, CVar.SERVER | CVar.REPLICATED);
-
-    #endregion
-
     #region LightDetection
 
     /// <summary>
@@ -566,7 +630,6 @@ public sealed partial class GoobCVars
     /// </summary>
     public static readonly CVarDef<float> LightMaximumLevel =
         CVarDef.Create("light.maximum_light_level", 10f, CVar.SERVER);
-
 
     #endregion
 
@@ -655,28 +718,6 @@ public sealed partial class GoobCVars
     /// </summary>
     public static readonly CVarDef<int> SpaceWhaleSpawnDistance =
         CVarDef.Create("misc.space_whale_spawn_distance", 1965, CVar.SERVER);
-
-    #endregion
-    /// <summary>
-    /// Enables or disables contraband icons.
-    /// </summary>
-    public static readonly CVarDef<bool> ContrabandIconsEnabled =
-        CVarDef.Create("contraband.icons_enabled", false, CVar.SERVER | CVar.REPLICATED);
-
-    /// <summary>
-    /// Controls how often GPS updates.
-    /// </summary>
-    public static readonly CVarDef<float> GpsUpdateRate =
-        CVarDef.Create("gps.update_rate", 1f, CVar.SERVER | CVar.REPLICATED);
-
-    // TODO: Move trauma cvars to traumamod when it's real
-    #region Trauma
-
-    /// <summary>
-    ///     Is sprinting enabled
-    /// </summary>
-    public static readonly CVarDef<bool> SprintEnabled =
-        CVarDef.Create("trauma.sprint_enabled", false, CVar.SERVER | CVar.REPLICATED);
 
     #endregion
 }

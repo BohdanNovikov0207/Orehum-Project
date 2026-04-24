@@ -3,12 +3,12 @@
 //
 // SPDX-License-Identifier: AGPL-3.0-or-later
 
-using Content.Goobstation.Shared.Clothing;
 using Content.Goobstation.Maths.FixedPoint;
 using Robust.Shared.Audio;
 using Robust.Shared.Prototypes;
 
 namespace Content.Goobstation.Shared.Clothing.Components;
+
 /// <summary>
 /// Component applied by clothing that allows the wearer to inject themselves with a reagent on a cooldown.
 /// Used for auto-injection mechanisms like emergency epi-pens or stimulants. Possible uses for a modsuit in the future.
@@ -17,14 +17,16 @@ namespace Content.Goobstation.Shared.Clothing.Components;
 public sealed partial class ClothingAutoInjectComponent : Component
 {
     /// <summary>
-    /// Dictionary of reagents and their quantities to be injected.
-    /// Key: Reagent ID, Value: Quantity to inject.
+    /// The ID of the action used to activate the auto-injector.
     /// </summary>
-    [DataField(required: true)]
-    public Dictionary<string, FixedPoint2> Reagents = new();
+    [DataField]
+    public EntProtoId Action = "ActionActivateAutoinjector";
+
+    [ViewVariables]
+    public EntityUid? ActionEntity;
 
     [DataField]
-    public bool AutoInjectOnCrit = true;
+    public TimeSpan AutoInjectInterval = TimeSpan.FromSeconds(120);
 
     /// <summary>
     /// Can this autoinjector be activated manually?
@@ -33,25 +35,23 @@ public sealed partial class ClothingAutoInjectComponent : Component
     public bool AutoInjectOnAbility;
 
     [DataField]
-    public TimeSpan AutoInjectInterval = TimeSpan.FromSeconds(120);
+    public bool AutoInjectOnCrit = true;
+
+    [DataField]
+    public SoundSpecifier InjectSound = new SoundPathSpecifier("/Audio/Items/hypospray.ogg");
 
     /// <summary>
     /// When the auto-injector can activate again.
     /// </summary>
     public TimeSpan NextAutoInjectTime;
 
-    /// <summary>
-    /// The ID of the action used to activate the auto-injector.
-    /// </summary>
-    [DataField]
-    public EntProtoId Action = "ActionActivateAutoinjector";
-
-    [DataField]
-    public SoundSpecifier InjectSound = new SoundPathSpecifier("/Audio/Items/hypospray.ogg");
-
     [DataField]
     public LocId Popup = "autoinjector-injection-hardsuit";
 
-    [ViewVariables]
-    public EntityUid? ActionEntity;
+    /// <summary>
+    /// Dictionary of reagents and their quantities to be injected.
+    /// Key: Reagent ID, Value: Quantity to inject.
+    /// </summary>
+    [DataField(required: true)]
+    public Dictionary<string, FixedPoint2> Reagents = new();
 }

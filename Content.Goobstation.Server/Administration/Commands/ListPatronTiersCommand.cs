@@ -18,7 +18,7 @@ internal sealed class ListPatronTiersCommand : LocalizedCommands
     public override string Description => "List all debug patron tiers and their assignments";
 
     public override string Help => "Usage: listpatrontiers\n" +
-                                    "Shows all defined patron tiers and which players have them assigned.";
+                                   "Shows all defined patron tiers and which players have them assigned.";
 
     public override void Execute(IConsoleShell shell, string argStr, string[] args)
     {
@@ -50,12 +50,11 @@ internal sealed class ListPatronTiersCommand : LocalizedCommands
                 {
                     var playerName = "Unknown";
                     if (_playerManager.TryGetSessionById(userId, out var session))
-                    {
                         playerName = session.Name;
-                    }
                     shell.WriteLine($"    - {playerName}");
                 }
             }
+
             shell.WriteLine("");
         }
     }

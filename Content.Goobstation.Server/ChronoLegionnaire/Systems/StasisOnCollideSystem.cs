@@ -29,9 +29,7 @@ public sealed class StasisOnCollideSystem : EntitySystem
     private void TryCollideStasis(Entity<StasisOnCollideComponent> projectile, EntityUid target)
     {
         if (EntityManager.TryGetComponent<StatusEffectsComponent>(target, out var status))
-        {
             _stasisSystem.TryStasis((target, status), true, projectile.Comp.StasisTime);
-        }
     }
 
     /// <summary>
@@ -48,9 +46,6 @@ public sealed class StasisOnCollideSystem : EntitySystem
     /// <summary>
     /// For throwing (in chrono bola case)
     /// </summary>
-    private void HandleThrow(Entity<StasisOnCollideComponent> projectile, ref ThrowDoHitEvent args)
-    {
+    private void HandleThrow(Entity<StasisOnCollideComponent> projectile, ref ThrowDoHitEvent args) =>
         TryCollideStasis(projectile, args.Target);
-    }
-
 }

@@ -16,7 +16,7 @@ public abstract partial class SharedClowncarSystem
         if (args.Handled)
             return;
 
-        ToggleCannon(uid, component, args.Performer, true);//component.CannonEntity == null);
+        ToggleCannon(uid, component, args.Performer, true); //component.CannonEntity == null);
         args.Handled = true;
     }
 }

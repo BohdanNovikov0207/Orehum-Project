@@ -38,19 +38,18 @@ namespace Content.Goobstation.Server.Illusion;
 
 public sealed class IllusionSystem : EntitySystem
 {
-    [Dependency] private readonly IRobustRandom _random = default!;
-
-    [Dependency] private readonly CloningSystem _cloning = default!;
-    [Dependency] private readonly TransformSystem _xform = default!;
-    [Dependency] private readonly SharedHandsSystem _hands = default!;
-    [Dependency] private readonly NPCSystem _npc = default!;
-    [Dependency] private readonly NpcFactionSystem _npcFaction = default!;
-    [Dependency] private readonly HTNSystem _htn = default!;
-    [Dependency] private readonly MobThresholdSystem _threshold = default!;
-    [Dependency] private readonly PopupSystem _popup = default!;
-
     private static readonly ProtoId<CloningSettingsPrototype> Settings = "Illusion";
     private static readonly ProtoId<HTNCompoundPrototype> Compound = "IllusionCompound";
+
+    [Dependency] private readonly CloningSystem _cloning = default!;
+    [Dependency] private readonly SharedHandsSystem _hands = default!;
+    [Dependency] private readonly HTNSystem _htn = default!;
+    [Dependency] private readonly NPCSystem _npc = default!;
+    [Dependency] private readonly NpcFactionSystem _npcFaction = default!;
+    [Dependency] private readonly PopupSystem _popup = default!;
+    [Dependency] private readonly IRobustRandom _random = default!;
+    [Dependency] private readonly MobThresholdSystem _threshold = default!;
+    [Dependency] private readonly TransformSystem _xform = default!;
 
     public List<Type> ComponentsToRemove =
     [
@@ -76,10 +75,7 @@ public sealed class IllusionSystem : EntitySystem
         SubscribeLocalEvent<IllusionComponent, TimedDespawnEvent>(OnDespawn);
     }
 
-    private void OnDespawn(Entity<IllusionComponent> ent, ref TimedDespawnEvent args)
-    {
-        DeathPopup(ent);
-    }
+    private void OnDespawn(Entity<IllusionComponent> ent, ref TimedDespawnEvent args) => DeathPopup(ent);
 
     private void OnStateChanged(Entity<IllusionComponent> ent, ref MobStateChangedEvent args)
     {
@@ -90,12 +86,10 @@ public sealed class IllusionSystem : EntitySystem
         QueueDel(ent);
     }
 
-    private void DeathPopup(Entity<IllusionComponent> ent)
-    {
+    private void DeathPopup(Entity<IllusionComponent> ent) =>
         _popup.PopupCoordinates(Loc.GetString(ent.Comp.DeathMessage, ("ent", Identity.Entity(ent, EntityManager))),
             Transform(ent).Coordinates,
             PopupType.SmallCaution);
-    }
 
     private void OnHit(Entity<IllusionOnMeleeHitComponent> ent, ref MeleeHitEvent args)
     {

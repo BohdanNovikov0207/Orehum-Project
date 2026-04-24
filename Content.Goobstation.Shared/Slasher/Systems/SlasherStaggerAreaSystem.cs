@@ -17,17 +17,16 @@ namespace Content.Goobstation.Shared.Slasher.Systems;
 /// </summary>
 public sealed class SlasherStaggerAreaSystem : EntitySystem
 {
-
     public static readonly EntProtoId EffectId = "SlasherSlowdownStatusEffect";
+    [Dependency] private readonly SharedActionsSystem _actions = default!;
+    [Dependency] private readonly SharedAudioSystem _audio = default!;
+    [Dependency] private readonly SharedInteractionSystem _interact = default!;
+    [Dependency] private readonly EntityLookupSystem _lookup = default!;
+    [Dependency] private readonly MovementModStatusSystem _movemod = default!;
+    [Dependency] private readonly INetManager _net = default!;
 
     [Dependency] private readonly SharedPopupSystem _popup = default!;
     [Dependency] private readonly SharedStunSystem _stun = default!;
-    [Dependency] private readonly EntityLookupSystem _lookup = default!;
-    [Dependency] private readonly SharedAudioSystem _audio = default!;
-    [Dependency] private readonly SharedInteractionSystem _interact = default!;
-    [Dependency] private readonly SharedActionsSystem _actions = default!;
-    [Dependency] private readonly INetManager _net = default!;
-    [Dependency] private readonly MovementModStatusSystem _movemod = default!;
 
     public override void Initialize()
     {
@@ -38,15 +37,11 @@ public sealed class SlasherStaggerAreaSystem : EntitySystem
         SubscribeLocalEvent<SlasherStaggerAreaComponent, SlasherStaggerAreaEvent>(OnUse);
     }
 
-    private void OnMapInit(Entity<SlasherStaggerAreaComponent> ent, ref MapInitEvent args)
-    {
+    private void OnMapInit(Entity<SlasherStaggerAreaComponent> ent, ref MapInitEvent args) =>
         _actions.AddAction(ent.Owner, ref ent.Comp.ActionEnt, ent.Comp.ActionId);
-    }
 
-    private void OnShutdown(Entity<SlasherStaggerAreaComponent> ent, ref ComponentShutdown args)
-    {
+    private void OnShutdown(Entity<SlasherStaggerAreaComponent> ent, ref ComponentShutdown args) =>
         _actions.RemoveAction(ent.Comp.ActionEnt);
-    }
 
     private void OnUse(Entity<SlasherStaggerAreaComponent> ent, ref SlasherStaggerAreaEvent args)
     {
@@ -55,7 +50,9 @@ public sealed class SlasherStaggerAreaSystem : EntitySystem
 
         var (uid, comp) = ent;
 
-        foreach (var (targetUid, _) in _lookup.GetEntitiesInRange<StatusEffectsComponent>(Transform(uid).Coordinates, comp.Range, LookupFlags.Dynamic))
+        foreach (var (targetUid, _) in _lookup.GetEntitiesInRange<StatusEffectsComponent>(Transform(uid).Coordinates,
+                     comp.Range,
+                     LookupFlags.Dynamic))
         {
             if (targetUid == uid)
                 continue;
@@ -63,11 +60,18 @@ public sealed class SlasherStaggerAreaSystem : EntitySystem
             if (!_interact.InRangeUnobstructed(uid, targetUid, comp.Range))
                 continue;
 
-            _movemod.TryUpdateMovementSpeedModDuration(targetUid, EffectId, TimeSpan.FromSeconds(comp.SlowDuration), comp.SlowMultiplier, comp.SlowMultiplier);
+            _movemod.TryUpdateMovementSpeedModDuration(targetUid,
+                EffectId,
+                TimeSpan.FromSeconds(comp.SlowDuration),
+                comp.SlowMultiplier,
+                comp.SlowMultiplier);
 
             // Show popup to the victim only
             if (_net.IsServer)
-                _popup.PopupEntity(Loc.GetString("slasher-staggerarea-victim"), targetUid, targetUid, PopupType.MediumCaution);
+                _popup.PopupEntity(Loc.GetString("slasher-staggerarea-victim"),
+                    targetUid,
+                    targetUid,
+                    PopupType.MediumCaution);
         }
 
         _audio.PlayPredicted(comp.StaggerSound, uid, uid);

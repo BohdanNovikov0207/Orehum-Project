@@ -14,4 +14,4 @@ public record struct GetTemperatureThresholdsEvent(
 [ByRefEvent]
 public record struct GetCurrentTemperatureEvent(
     float? CurrentTemperature
-    );
+);

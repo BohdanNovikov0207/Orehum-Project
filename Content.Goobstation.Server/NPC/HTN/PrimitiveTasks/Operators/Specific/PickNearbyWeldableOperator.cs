@@ -28,9 +28,9 @@ public sealed partial class PickNearbyWeldableOperator : HTNOperator
     [Dependency] private readonly IEntityManager _entManager = default!;
     [Dependency] private readonly IPrototypeManager _prototypeManager = default!;
     private EntityLookupSystem _lookup = default!;
-    private WeldbotSystem _weldbot = default!;
     private PathfindingSystem _pathfinding = default!;
     private TagSystem _tagSystem = default!;
+    private WeldbotSystem _weldbot = default!;
 
     [DataField]
     public string RangeKey = NPCBlackboard.WeldbotWeldRange;
@@ -61,7 +61,8 @@ public sealed partial class PickNearbyWeldableOperator : HTNOperator
     {
         var owner = blackboard.GetValue<EntityUid>(NPCBlackboard.Owner);
 
-        if (!blackboard.TryGetValue<float>(RangeKey, out var range, _entManager) || !_entManager.TryGetComponent<WeldbotComponent>(owner, out var weldbot))
+        if (!blackboard.TryGetValue<float>(RangeKey, out var range, _entManager) ||
+            !_entManager.TryGetComponent<WeldbotComponent>(owner, out var weldbot))
             return (false, null);
 
         var damageQuery = _entManager.GetEntityQuery<DamageableComponent>();
@@ -76,7 +77,8 @@ public sealed partial class PickNearbyWeldableOperator : HTNOperator
                 continue;
 
             // Check if weldbot can repair this entity
-            if (!emagged && damage.Damage.DamageDict.Keys.Intersect(weldbot.DamageAmount.DamageDict.Keys).All(key => damage.Damage.DamageDict[key] == 0))
+            if (!emagged && damage.Damage.DamageDict.Keys.Intersect(weldbot.DamageAmount.DamageDict.Keys)
+                    .All(key => damage.Damage.DamageDict[key] == 0))
                 continue;
 
             //Needed to make sure it doesn't sometimes stop right outside it's interaction range
@@ -86,11 +88,11 @@ public sealed partial class PickNearbyWeldableOperator : HTNOperator
             if (path.Result == PathResult.NoPath)
                 continue;
 
-            return (true, new Dictionary<string, object>()
+            return (true, new Dictionary<string, object>
             {
-                {TargetKey, target},
-                {TargetMoveKey, _entManager.GetComponent<TransformComponent>(target).Coordinates},
-                {NPCBlackboard.PathfindKey, path},
+                { TargetKey, target },
+                { TargetMoveKey, _entManager.GetComponent<TransformComponent>(target).Coordinates },
+                { NPCBlackboard.PathfindKey, path },
             });
         }
 

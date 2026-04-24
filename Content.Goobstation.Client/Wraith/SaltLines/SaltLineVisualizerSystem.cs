@@ -7,7 +7,8 @@ public sealed class SaltLineVisualizerSystem : EntitySystem
 {
     [Dependency] private readonly AppearanceSystem _appearanceSystem = default!;
     [Dependency] private readonly SpriteSystem _spriteSystem = default!;
-    /// <inheritdoc/>
+
+    /// <inheritdoc />
     public override void Initialize()
     {
         base.Initialize();
@@ -20,9 +21,12 @@ public sealed class SaltLineVisualizerSystem : EntitySystem
         if (args.Sprite == null)
             return;
 
-        if (!_appearanceSystem.TryGetData<SaltLineVisDirFlags>(ent.Owner, SaltLineVisuals.ConnectedMask, out var mask, args.Component))
+        if (!_appearanceSystem.TryGetData<SaltLineVisDirFlags>(ent.Owner,
+                SaltLineVisuals.ConnectedMask,
+                out var mask,
+                args.Component))
             mask = SaltLineVisDirFlags.None;
 
-        _spriteSystem.LayerSetRsiState((ent.Owner, args.Sprite), 0, $"{ent.Comp.State}{(int)mask}");
+        _spriteSystem.LayerSetRsiState((ent.Owner, args.Sprite), 0, $"{ent.Comp.State}{(int) mask}");
     }
 }

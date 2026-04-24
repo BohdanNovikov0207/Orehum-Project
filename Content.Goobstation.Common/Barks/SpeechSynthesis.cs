@@ -3,9 +3,9 @@ using Robust.Shared.Prototypes;
 
 namespace Content.Goobstation.Common.Barks;
 
-[RegisterComponent, NetworkedComponent, AutoGenerateComponentState]
+[RegisterComponent] [NetworkedComponent] [AutoGenerateComponentState]
 public sealed partial class SpeechSynthesisComponent : Component
 {
-    [DataField("voice"), AutoNetworkedField]
+    [DataField("voice")] [AutoNetworkedField]
     public ProtoId<BarkPrototype>? VoicePrototypeId;
 }

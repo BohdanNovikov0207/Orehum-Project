@@ -19,6 +19,7 @@ namespace Content.Goobstation.Server.CloneProjector;
 public partial class CloneProjectorSystem
 {
     [Dependency] private readonly SharedBodySystem _body = default!;
+
     public void InitializeClone()
     {
         SubscribeLocalEvent<HolographicCloneComponent, MapInitEvent>(OnInit);
@@ -42,6 +43,7 @@ public partial class CloneProjectorSystem
             Dirty(part.Id, woundable);
         }
     }
+
     private void OnCloneStateChanged(Entity<HolographicCloneComponent> clone, ref MobStateChangedEvent args)
     {
         if (!_mobState.IsIncapacitated(clone)
@@ -63,6 +65,7 @@ public partial class CloneProjectorSystem
         _stun.TryUpdateParalyzeDuration(host, projector.Comp.StunDuration);
         _damageable.TryChangeDamage(host, projector.Comp.DamageOnDestroyed, true, targetPart: TargetBodyPart.Groin);
     }
+
     private void OnExamined(Entity<HolographicCloneComponent> clone, ref ExaminedEvent args)
     {
         if (!args.IsInDetailsRange

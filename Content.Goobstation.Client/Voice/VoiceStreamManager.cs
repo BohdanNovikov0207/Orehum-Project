@@ -3,44 +3,45 @@
 //
 // SPDX-License-Identifier: AGPL-3.0-or-later
 
+using System.Linq;
+using Content.Goobstation.Common.CCVar;
 using Robust.Client.Audio;
 using Robust.Shared.Audio;
-using Robust.Shared.Timing;
 using Robust.Shared.Configuration;
-using Content.Goobstation.Common.CCVar;
-using System.Linq;
+using Robust.Shared.Timing;
 
 namespace Content.Goobstation.Client.Voice;
 
 public sealed class VoiceStreamManager : IDisposable
 {
-    private readonly Queue<byte[]> _packetQueue = new();
-    private readonly object _queueLock = new();
-    private bool _isPlaying;
-    private bool _isDisposed;
-    private TimeSpan? _expectedChunkEndTime;
-
-    private readonly int _sampleRate;
+    private const int BytesPerSample = 2;
+    private const int Channels = 1;
     private readonly IAudioManager _audioManager;
     private readonly AudioSystem _audioSystem;
-    private readonly EntityUid _sourceEntity;
-    private readonly ISawmill _sawmill;
+    private readonly AdaptiveBufferThresholds _bufferThresholds;
+    private readonly IConfigurationManager _cfg;
+    private readonly TimeSpan _chunkOverlap = TimeSpan.FromMilliseconds(0);
     private readonly IGameTiming _gameTiming;
 
     // New adaptive components
     private readonly NetworkConditionMonitor _networkMonitor;
-    private readonly AdaptiveBufferThresholds _bufferThresholds;
+    private readonly Queue<byte[]> _packetQueue = new();
     private readonly AdaptivePlaybackEngine _playbackEngine;
-    private readonly IConfigurationManager _cfg;
+    private readonly object _queueLock = new();
 
-    private const int BytesPerSample = 2;
-    private const int Channels = 1;
+    private readonly int _sampleRate;
+    private readonly ISawmill _sawmill;
+    private readonly EntityUid _sourceEntity;
+    private TimeSpan? _expectedChunkEndTime;
+    private bool _isDisposed;
+    private bool _isPlaying;
     private int _maxQueuedPackets = 50;
     private float _volume = 0.5f;
-    private readonly TimeSpan _chunkOverlap = TimeSpan.FromMilliseconds(0);
 
-    public VoiceStreamManager(IAudioManager audioManager, AudioSystem audioSystem,
-                             EntityUid sourceEntity, int sampleRate)
+    public VoiceStreamManager(IAudioManager audioManager,
+        AudioSystem audioSystem,
+        EntityUid sourceEntity,
+        int sampleRate)
     {
         _audioManager = audioManager;
         _audioSystem = audioSystem;
@@ -68,6 +69,32 @@ public sealed class VoiceStreamManager : IDisposable
         _cfg.OnValueChanged(GoobCVars.VoiceChatMaxBufferSize, OnMaxBufferSizeChanged);
         _cfg.OnValueChanged(GoobCVars.VoiceChatDebugLogging, OnDebugLoggingChanged);
         _cfg.OnValueChanged(GoobCVars.VoiceChatVolume, OnVolumeChanged);
+    }
+
+    /// <summary>
+    /// Disposes the voice stream manager and cleans up resources.
+    /// </summary>
+    public void Dispose()
+    {
+        if (_isDisposed)
+            return;
+
+        _isDisposed = true;
+        _isPlaying = false;
+        _expectedChunkEndTime = null;
+
+        _cfg.UnsubValueChanged(GoobCVars.VoiceChatBufferTargetMultiplier, OnBufferMultiplierChanged);
+        _cfg.UnsubValueChanged(GoobCVars.VoiceChatMinBufferSize, OnMinBufferSizeChanged);
+        _cfg.UnsubValueChanged(GoobCVars.VoiceChatMaxBufferSize, OnMaxBufferSizeChanged);
+        _cfg.UnsubValueChanged(GoobCVars.VoiceChatDebugLogging, OnDebugLoggingChanged);
+        _cfg.UnsubValueChanged(GoobCVars.VoiceChatVolume, OnVolumeChanged);
+
+        lock (_queueLock)
+        {
+            _packetQueue.Clear();
+        }
+
+        _sawmill.Debug($"Disposed voice stream for entity {_sourceEntity}");
     }
 
     /// <summary>
@@ -127,7 +154,8 @@ public sealed class VoiceStreamManager : IDisposable
     /// </summary>
     public void AddPacket(byte[] pcmData)
     {
-        if (_isDisposed) return;
+        if (_isDisposed)
+            return;
 
         lock (_queueLock)
         {
@@ -136,7 +164,8 @@ public sealed class VoiceStreamManager : IDisposable
 
             if (_packetQueue.Count >= _maxQueuedPackets)
             {
-                _sawmill.Warning($"[{_gameTiming.CurTime.TotalSeconds:F3}] Voice buffer full for {_sourceEntity} (Queue: {_packetQueue.Count}/{_maxQueuedPackets}). Dropping packet ({pcmData.Length} bytes).");
+                _sawmill.Warning(
+                    $"[{_gameTiming.CurTime.TotalSeconds:F3}] Voice buffer full for {_sourceEntity} (Queue: {_packetQueue.Count}/{_maxQueuedPackets}). Dropping packet ({pcmData.Length} bytes).");
                 return;
             }
 
@@ -150,16 +179,17 @@ public sealed class VoiceStreamManager : IDisposable
                 var targetSize = _networkMonitor.CalculateTargetBufferSize();
                 var avgInterval = _networkMonitor.AverageInterval.TotalMilliseconds;
                 var jitter = _networkMonitor.Jitter.TotalMilliseconds;
-                _sawmill.Info($"[VOICE BUFFER] Target: {targetSize}, Queue: {_packetQueue.Count}, AvgInterval: {avgInterval:F1}ms, Jitter: {jitter:F1}ms");
+                _sawmill.Info(
+                    $"[VOICE BUFFER] Target: {targetSize}, Queue: {_packetQueue.Count}, AvgInterval: {avgInterval:F1}ms, Jitter: {jitter:F1}ms");
             }
             else
-            {
-                _sawmill.Debug($"[{_gameTiming.CurTime.TotalSeconds:F3}] AddPacket: Packet received for {_sourceEntity} ({pcmData.Length} bytes). Queue size now: {_packetQueue.Count}/{_maxQueuedPackets}");
-            }
+                _sawmill.Debug(
+                    $"[{_gameTiming.CurTime.TotalSeconds:F3}] AddPacket: Packet received for {_sourceEntity} ({pcmData.Length} bytes). Queue size now: {_packetQueue.Count}/{_maxQueuedPackets}");
 
             if (!_isPlaying && _packetQueue.Count >= 2)
             {
-                _sawmill.Debug($"[{_gameTiming.CurTime.TotalSeconds:F3}] Sufficient packets ({_packetQueue.Count}/2) for chunk reached for {_sourceEntity}. Starting playback.");
+                _sawmill.Debug(
+                    $"[{_gameTiming.CurTime.TotalSeconds:F3}] Sufficient packets ({_packetQueue.Count}/2) for chunk reached for {_sourceEntity}. Starting playback.");
                 _isPlaying = true;
                 PlayNextChunk();
             }
@@ -174,27 +204,35 @@ public sealed class VoiceStreamManager : IDisposable
     /// <returns>Processed audio data as byte array.</returns>
     private byte[] ProcessPackets(List<byte[]> packetsToProcess, float ratio)
     {
-        int totalBytes = 0;
-        foreach (var p in packetsToProcess) totalBytes += p.Length;
+        var totalBytes = 0;
+        foreach (var p in packetsToProcess)
+        {
+            totalBytes += p.Length;
+        }
 
         if (Math.Abs(ratio - 1.0f) < 0.001f)
         {
-            byte[] concatResult = new byte[totalBytes];
-            int offset = 0;
+            var concatResult = new byte[totalBytes];
+            var offset = 0;
             foreach (var packet in packetsToProcess)
             {
-                for (int i = 0; i < packet.Length; i++) concatResult[offset + i] = packet[i];
+                for (var i = 0; i < packet.Length; i++)
+                {
+                    concatResult[offset + i] = packet[i];
+                }
+
                 offset += packet.Length;
             }
+
             return concatResult;
         }
 
         var totalSamples = totalBytes / BytesPerSample;
         var targetSamples = (int) (totalSamples * ratio);
-        byte[] result = new byte[targetSamples * BytesPerSample];
-        int resultIndex = 0;
+        var result = new byte[targetSamples * BytesPerSample];
+        var resultIndex = 0;
 
-        for (int i = 0; i < targetSamples; i++)
+        for (var i = 0; i < targetSamples; i++)
         {
             var sourceSampleFloat = i / ratio;
             var sourceSampleIndex = (int) sourceSampleFloat;
@@ -211,8 +249,10 @@ public sealed class VoiceStreamManager : IDisposable
             var finalSample = sample1;
 
             if (ratio > 1.0f && fraction > 0.001f && sourceSampleIndex + 1 < totalSamples)
+            {
                 if (TryGetSample(packetsToProcess, sourceSampleIndex + 1, out sample2))
                     finalSample = (short) (sample1 + (sample2 - sample1) * fraction);
+            }
 
             if (resultIndex < result.Length - 1)
             {
@@ -221,16 +261,19 @@ public sealed class VoiceStreamManager : IDisposable
             }
             else
             {
-                _sawmill.Warning($"ProcessPackets calculation error: result index {resultIndex} out of bounds for result length {result.Length}");
+                _sawmill.Warning(
+                    $"ProcessPackets calculation error: result index {resultIndex} out of bounds for result length {result.Length}");
                 break;
             }
         }
 
         if (resultIndex != result.Length)
         {
-            _sawmill.Warning($"ProcessPackets result size mismatch: expected {result.Length}, got {resultIndex}. Trimming.");
+            _sawmill.Warning(
+                $"ProcessPackets result size mismatch: expected {result.Length}, got {resultIndex}. Trimming.");
             Array.Resize(ref result, resultIndex);
         }
+
         return result;
     }
 
@@ -240,21 +283,23 @@ public sealed class VoiceStreamManager : IDisposable
     private bool TryGetSample(List<byte[]> packets, int globalSampleIndex, out short sample)
     {
         sample = 0;
-        int globalByteIndex = globalSampleIndex * BytesPerSample;
-        int bytesScanned = 0;
+        var globalByteIndex = globalSampleIndex * BytesPerSample;
+        var bytesScanned = 0;
 
         foreach (var packet in packets)
         {
             if (globalByteIndex >= bytesScanned && globalByteIndex < bytesScanned + packet.Length - 1)
             {
-                int indexInPacket = globalByteIndex - bytesScanned;
-                byte b1 = packet[indexInPacket];
-                byte b2 = packet[indexInPacket + 1];
+                var indexInPacket = globalByteIndex - bytesScanned;
+                var b1 = packet[indexInPacket];
+                var b2 = packet[indexInPacket + 1];
                 sample = (short) ((b2 << 8) | b1);
                 return true;
             }
+
             bytesScanned += packet.Length;
         }
+
         return false;
     }
 
@@ -264,43 +309,51 @@ public sealed class VoiceStreamManager : IDisposable
     /// </summary>
     private void PlayNextChunk()
     {
-        if (_isDisposed) return;
+        if (_isDisposed)
+            return;
 
         byte[]? pcmData = null;
         PlaybackDecision decision;
 
         lock (_queueLock)
         {
-            int queueCount = _packetQueue.Count;
+            var queueCount = _packetQueue.Count;
 
             decision = _playbackEngine.DecidePlaybackStrategy(queueCount);
 
             if (decision.PacketsToConsume == 0 || queueCount < decision.PacketsToConsume)
             {
-                _sawmill.Debug($"[{_gameTiming.CurTime.TotalSeconds:F3}] PlayNextChunk: Not enough packets ({queueCount}/{decision.PacketsToConsume}) for {_sourceEntity}. Stopping playback.");
+                _sawmill.Debug(
+                    $"[{_gameTiming.CurTime.TotalSeconds:F3}] PlayNextChunk: Not enough packets ({queueCount}/{decision.PacketsToConsume}) for {_sourceEntity}. Stopping playback.");
                 _isPlaying = false;
                 _expectedChunkEndTime = null;
                 return;
             }
 
-            _sawmill.Debug($"[{_gameTiming.CurTime.TotalSeconds:F3}] PlayNextChunk: Queue count: {queueCount}. Mode: {decision.Mode}");
+            _sawmill.Debug(
+                $"[{_gameTiming.CurTime.TotalSeconds:F3}] PlayNextChunk: Queue count: {queueCount}. Mode: {decision.Mode}");
 
             var packetsToProcess = new List<byte[]>(decision.PacketsToConsume);
-            for (int i = 0; i < decision.PacketsToConsume; i++)
+            for (var i = 0; i < decision.PacketsToConsume; i++)
+            {
                 packetsToProcess.Add(_packetQueue.Dequeue());
+            }
 
             pcmData = ProcessPackets(packetsToProcess, decision.TimeStretchRatio);
 
-            _sawmill.Debug($"[{_gameTiming.CurTime.TotalSeconds:F3}] Decided Mode: {decision.Mode}. Processing (Ratio {decision.TimeStretchRatio:F2}) {decision.PacketsToConsume} packets for {_sourceEntity}. Queue size now: {_packetQueue.Count}/{_maxQueuedPackets}");
+            _sawmill.Debug(
+                $"[{_gameTiming.CurTime.TotalSeconds:F3}] Decided Mode: {decision.Mode}. Processing (Ratio {decision.TimeStretchRatio:F2}) {decision.PacketsToConsume} packets for {_sourceEntity}. Queue size now: {_packetQueue.Count}/{_maxQueuedPackets}");
         }
 
         if (pcmData != null && pcmData.Length > 0)
         {
-            var actualDuration = TimeSpan.FromSeconds((double) pcmData.Length / (_sampleRate * Channels * BytesPerSample));
-            _sawmill.Debug($"[{_gameTiming.CurTime.TotalSeconds:F3}] Calculated Actual Duration: {actualDuration.TotalMilliseconds:F1}ms for {pcmData.Length} bytes.");
+            var actualDuration =
+                TimeSpan.FromSeconds((double) pcmData.Length / (_sampleRate * Channels * BytesPerSample));
+            _sawmill.Debug(
+                $"[{_gameTiming.CurTime.TotalSeconds:F3}] Calculated Actual Duration: {actualDuration.TotalMilliseconds:F1}ms for {pcmData.Length} bytes.");
             try
             {
-                short[] shortArray = ConvertToShortArray(pcmData);
+                var shortArray = ConvertToShortArray(pcmData);
                 var audioStream = _audioManager.LoadAudioRaw(shortArray, Channels, _sampleRate);
 
                 if (audioStream != null)
@@ -309,7 +362,8 @@ public sealed class VoiceStreamManager : IDisposable
                         .WithVolume(_volume)
                         .WithMaxDistance(10f);
 
-                    _sawmill.Info($"[VOICE AUDIO] Playing audio for entity {_sourceEntity} with volume {_volume} (bytes: {pcmData.Length}, duration: {actualDuration.TotalMilliseconds:F1}ms)");
+                    _sawmill.Info(
+                        $"[VOICE AUDIO] Playing audio for entity {_sourceEntity} with volume {_volume} (bytes: {pcmData.Length}, duration: {actualDuration.TotalMilliseconds:F1}ms)");
 
                     var playResult = _sourceEntity.IsValid()
                         ? _audioSystem.PlayEntity(audioStream, _sourceEntity, null, audioParams)
@@ -318,11 +372,13 @@ public sealed class VoiceStreamManager : IDisposable
                     if (playResult != null)
                     {
                         _expectedChunkEndTime = _gameTiming.CurTime + actualDuration - _chunkOverlap;
-                        _sawmill.Debug($"[{_gameTiming.CurTime.TotalSeconds:F3}] Playing chunk for {_sourceEntity}. Actual Duration: {actualDuration.TotalMilliseconds:F1}ms. Next check scheduled at: {_expectedChunkEndTime.Value.TotalSeconds:F3}");
+                        _sawmill.Debug(
+                            $"[{_gameTiming.CurTime.TotalSeconds:F3}] Playing chunk for {_sourceEntity}. Actual Duration: {actualDuration.TotalMilliseconds:F1}ms. Next check scheduled at: {_expectedChunkEndTime.Value.TotalSeconds:F3}");
                     }
                     else
                     {
-                        _sawmill.Warning($"Failed to play audio for {_sourceEntity}. Attempting next chunk immediately.");
+                        _sawmill.Warning(
+                            $"Failed to play audio for {_sourceEntity}. Attempting next chunk immediately.");
                         _expectedChunkEndTime = null;
                         PlayNextChunk();
                     }
@@ -344,9 +400,11 @@ public sealed class VoiceStreamManager : IDisposable
         else
         {
             if (pcmData != null && pcmData.Length == 0)
-                _sawmill.Warning($"[{_gameTiming.CurTime.TotalSeconds:F3}] PlayNextChunk: Processed packet resulted in zero length for {_sourceEntity}. Skipping playback.");
+                _sawmill.Warning(
+                    $"[{_gameTiming.CurTime.TotalSeconds:F3}] PlayNextChunk: Processed packet resulted in zero length for {_sourceEntity}. Skipping playback.");
             else if (pcmData == null)
-                _sawmill.Error($"[{_gameTiming.CurTime.TotalSeconds:F3}] PlayNextChunk: Logic error - pcmData is null after processing for {_sourceEntity}.");
+                _sawmill.Error(
+                    $"[{_gameTiming.CurTime.TotalSeconds:F3}] PlayNextChunk: Logic error - pcmData is null after processing for {_sourceEntity}.");
 
             _expectedChunkEndTime = null;
         }
@@ -357,20 +415,21 @@ public sealed class VoiceStreamManager : IDisposable
     /// </summary>
     private short[] ConvertToShortArray(byte[] byteArray)
     {
-        int byteLength = byteArray.Length;
+        var byteLength = byteArray.Length;
         if (byteLength % 2 != 0)
         {
             _sawmill.Warning($"ConvertToShortArray: Odd byte array length ({byteLength}). Truncating last byte.");
             byteLength--;
-            if (byteLength < 0) return Array.Empty<short>();
+            if (byteLength < 0)
+                return Array.Empty<short>();
         }
 
-        int shortCount = byteLength / 2;
-        short[] result = new short[shortCount];
+        var shortCount = byteLength / 2;
+        var result = new short[shortCount];
 
-        for (int i = 0; i < shortCount; i++)
+        for (var i = 0; i < shortCount; i++)
         {
-            int byteIndex = i * 2;
+            var byteIndex = i * 2;
             result[i] = (short) ((byteArray[byteIndex + 1] << 8) | byteArray[byteIndex]);
         }
 
@@ -388,31 +447,6 @@ public sealed class VoiceStreamManager : IDisposable
     }
 
     /// <summary>
-    /// Disposes the voice stream manager and cleans up resources.
-    /// </summary>
-    public void Dispose()
-    {
-        if (_isDisposed) return;
-
-        _isDisposed = true;
-        _isPlaying = false;
-        _expectedChunkEndTime = null;
-
-        _cfg.UnsubValueChanged(GoobCVars.VoiceChatBufferTargetMultiplier, OnBufferMultiplierChanged);
-        _cfg.UnsubValueChanged(GoobCVars.VoiceChatMinBufferSize, OnMinBufferSizeChanged);
-        _cfg.UnsubValueChanged(GoobCVars.VoiceChatMaxBufferSize, OnMaxBufferSizeChanged);
-        _cfg.UnsubValueChanged(GoobCVars.VoiceChatDebugLogging, OnDebugLoggingChanged);
-        _cfg.UnsubValueChanged(GoobCVars.VoiceChatVolume, OnVolumeChanged);
-
-        lock (_queueLock)
-        {
-            _packetQueue.Clear();
-        }
-
-        _sawmill.Debug($"Disposed voice stream for entity {_sourceEntity}");
-    }
-
-    /// <summary>
     /// Called every frame to check if the next audio chunk should be played.
     /// </summary>
     public void Update()
@@ -422,25 +456,29 @@ public sealed class VoiceStreamManager : IDisposable
 
         if (_expectedChunkEndTime == null)
         {
-            bool canPlay = false;
+            var canPlay = false;
             lock (_queueLock) { canPlay = _packetQueue.Count >= 1; }
 
             if (canPlay)
             {
-                _sawmill.Debug($"[{_gameTiming.CurTime.TotalSeconds:F3}] Update: Expected end time is null for {_sourceEntity}, attempting PlayNextChunk.");
+                _sawmill.Debug(
+                    $"[{_gameTiming.CurTime.TotalSeconds:F3}] Update: Expected end time is null for {_sourceEntity}, attempting PlayNextChunk.");
                 PlayNextChunk();
             }
             else
             {
                 _isPlaying = false;
-                _sawmill.Debug($"[{_gameTiming.CurTime.TotalSeconds:F3}] Update: Setting _isPlaying = false due to insufficient packets in Update check.");
+                _sawmill.Debug(
+                    $"[{_gameTiming.CurTime.TotalSeconds:F3}] Update: Setting _isPlaying = false due to insufficient packets in Update check.");
             }
+
             return;
         }
 
         if (_gameTiming.CurTime >= _expectedChunkEndTime)
         {
-            _sawmill.Debug($"[{_gameTiming.CurTime.TotalSeconds:F3}] Update: Expected end time reached for {_sourceEntity}.");
+            _sawmill.Debug(
+                $"[{_gameTiming.CurTime.TotalSeconds:F3}] Update: Expected end time reached for {_sourceEntity}.");
             _expectedChunkEndTime = null;
             PlayNextChunk();
         }
@@ -453,7 +491,7 @@ public enum BufferHealthState
     Low,
     Optimal,
     High,
-    Overflow
+    Overflow,
 }
 
 public class PlaybackDecision
@@ -466,14 +504,14 @@ public class PlaybackDecision
 
 public class NetworkConditionMonitor
 {
-    private readonly Queue<TimeSpan> _packetIntervals = new();
     private readonly int _maxSamples = 50;
-    private TimeSpan _lastPacketTime;
+    private readonly Queue<TimeSpan> _packetIntervals = new();
     private TimeSpan _averageInterval = TimeSpan.FromMilliseconds(20);
-    private TimeSpan _jitter = TimeSpan.Zero;
     private float _bufferMultiplier;
-    private int _minBufferSize;
+    private TimeSpan _jitter = TimeSpan.Zero;
+    private TimeSpan _lastPacketTime;
     private int _maxBufferSize;
+    private int _minBufferSize;
 
     public NetworkConditionMonitor(float bufferMultiplier, int minBufferSize, int maxBufferSize)
     {
@@ -481,6 +519,9 @@ public class NetworkConditionMonitor
         _minBufferSize = minBufferSize;
         _maxBufferSize = maxBufferSize;
     }
+
+    public TimeSpan AverageInterval => _averageInterval;
+    public TimeSpan Jitter => _jitter;
 
     public void UpdateSettings(float bufferMultiplier, int minBufferSize, int maxBufferSize)
     {
@@ -501,17 +542,20 @@ public class NetworkConditionMonitor
 
             UpdateStatistics();
         }
+
         _lastPacketTime = currentTime;
     }
 
     private void UpdateStatistics()
     {
-        if (_packetIntervals.Count == 0) return;
+        if (_packetIntervals.Count == 0)
+            return;
 
         var intervals = _packetIntervals.ToArray();
         _averageInterval = TimeSpan.FromMilliseconds(intervals.Average(i => i.TotalMilliseconds));
 
-        var variance = intervals.Select(i => Math.Pow(i.TotalMilliseconds - _averageInterval.TotalMilliseconds, 2)).Average();
+        var variance = intervals.Select(i => Math.Pow(i.TotalMilliseconds - _averageInterval.TotalMilliseconds, 2))
+            .Average();
         _jitter = TimeSpan.FromMilliseconds(Math.Sqrt(variance));
     }
 
@@ -535,15 +579,12 @@ public class NetworkConditionMonitor
 
         return Math.Clamp(targetSize, effectiveMin, effectiveMax);
     }
-
-    public TimeSpan AverageInterval => _averageInterval;
-    public TimeSpan Jitter => _jitter;
 }
 
 public class AdaptiveBufferThresholds
 {
-    private int _targetBufferSize = 20;
     private readonly NetworkConditionMonitor _networkMonitor;
+    private int _targetBufferSize = 20;
 
     public AdaptiveBufferThresholds(NetworkConditionMonitor networkMonitor)
     {
@@ -557,29 +598,30 @@ public class AdaptiveBufferThresholds
     public int CompressExitThreshold => (int) (_targetBufferSize * 1.2);
     public int AggressiveThreshold => (int) (_targetBufferSize * 2.0);
 
-    public void UpdateTarget()
-    {
-        _targetBufferSize = _networkMonitor.CalculateTargetBufferSize();
-    }
+    public void UpdateTarget() => _targetBufferSize = _networkMonitor.CalculateTargetBufferSize();
 
     public BufferHealthState GetBufferState(int currentSize)
     {
-        if (currentSize < EmergencyThreshold) return BufferHealthState.Critical;
-        if (currentSize < StretchEnterThreshold) return BufferHealthState.Low;
-        if (currentSize < CompressEnterThreshold) return BufferHealthState.Optimal;
-        if (currentSize < AggressiveThreshold) return BufferHealthState.High;
+        if (currentSize < EmergencyThreshold)
+            return BufferHealthState.Critical;
+        if (currentSize < StretchEnterThreshold)
+            return BufferHealthState.Low;
+        if (currentSize < CompressEnterThreshold)
+            return BufferHealthState.Optimal;
+        if (currentSize < AggressiveThreshold)
+            return BufferHealthState.High;
         return BufferHealthState.Overflow;
     }
 }
 
 public class AdaptivePlaybackEngine
 {
-    private BufferHealthState _currentState = BufferHealthState.Optimal;
-    private readonly AdaptiveBufferThresholds _thresholds;
     private readonly ISawmill _sawmill;
+    private readonly AdaptiveBufferThresholds _thresholds;
+    private BufferHealthState _currentState = BufferHealthState.Optimal;
     private bool _debugLogging;
-    private int _modeChangeCount = 0;
     private TimeSpan _lastModeChange = TimeSpan.Zero;
+    private int _modeChangeCount;
 
     public AdaptivePlaybackEngine(AdaptiveBufferThresholds thresholds, ISawmill sawmill, bool debugLogging = false)
     {
@@ -588,10 +630,7 @@ public class AdaptivePlaybackEngine
         _debugLogging = debugLogging;
     }
 
-    public void UpdateDebugLogging(bool debugLogging)
-    {
-        _debugLogging = debugLogging;
-    }
+    public void UpdateDebugLogging(bool debugLogging) => _debugLogging = debugLogging;
 
     public PlaybackDecision DecidePlaybackStrategy(int queueSize)
     {
@@ -606,13 +645,13 @@ public class AdaptivePlaybackEngine
 
             if (_debugLogging)
             {
-                _sawmill.Info($"[VOICE BUFFER] State change #{_modeChangeCount}: {_currentState} -> {newState} (Queue: {queueSize}, Time since last: {timeSinceLastChange.TotalSeconds:F1}s)");
-                _sawmill.Info($"[VOICE BUFFER] Thresholds - Emergency: {_thresholds.EmergencyThreshold}, Stretch: {_thresholds.StretchEnterThreshold}-{_thresholds.StretchExitThreshold}, Compress: {_thresholds.CompressEnterThreshold}-{_thresholds.CompressExitThreshold}");
+                _sawmill.Info(
+                    $"[VOICE BUFFER] State change #{_modeChangeCount}: {_currentState} -> {newState} (Queue: {queueSize}, Time since last: {timeSinceLastChange.TotalSeconds:F1}s)");
+                _sawmill.Info(
+                    $"[VOICE BUFFER] Thresholds - Emergency: {_thresholds.EmergencyThreshold}, Stretch: {_thresholds.StretchEnterThreshold}-{_thresholds.StretchExitThreshold}, Compress: {_thresholds.CompressEnterThreshold}-{_thresholds.CompressExitThreshold}");
             }
             else
-            {
                 _sawmill.Debug($"Buffer state changing from {_currentState} to {newState} (Queue: {queueSize})");
-            }
 
             _currentState = newState;
         }
@@ -637,42 +676,40 @@ public class AdaptivePlaybackEngine
         }
     }
 
-    private PlaybackDecision CreatePlaybackDecision(BufferHealthState state, int queueSize)
-    {
-        return state switch
+    private PlaybackDecision CreatePlaybackDecision(BufferHealthState state, int queueSize) =>
+        state switch
         {
             BufferHealthState.Critical => new PlaybackDecision
             {
                 PacketsToConsume = Math.Min(1, queueSize),
                 TimeStretchRatio = 1.1f,
                 Mode = "Emergency",
-                UseInterpolation = true
+                UseInterpolation = true,
             },
             BufferHealthState.Low => new PlaybackDecision
             {
                 PacketsToConsume = queueSize >= 3 ? 1 : Math.Min(1, queueSize),
                 TimeStretchRatio = 1.15f,
-                Mode = "Stretch"
+                Mode = "Stretch",
             },
             BufferHealthState.Optimal => new PlaybackDecision
             {
                 PacketsToConsume = Math.Min(2, queueSize),
                 TimeStretchRatio = 1.0f,
-                Mode = "Normal"
+                Mode = "Normal",
             },
             BufferHealthState.High => new PlaybackDecision
             {
                 PacketsToConsume = Math.Min(2, queueSize),
                 TimeStretchRatio = 0.9f,
-                Mode = "Compress"
+                Mode = "Compress",
             },
             BufferHealthState.Overflow => new PlaybackDecision
             {
                 PacketsToConsume = Math.Min(3, queueSize),
                 TimeStretchRatio = 0.8f,
-                Mode = "Aggressive"
+                Mode = "Aggressive",
             },
-            _ => throw new ArgumentOutOfRangeException()
+            _ => throw new ArgumentOutOfRangeException(),
         };
-    }
 }

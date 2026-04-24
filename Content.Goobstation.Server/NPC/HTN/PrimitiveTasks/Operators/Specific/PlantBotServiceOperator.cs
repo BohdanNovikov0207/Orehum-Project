@@ -24,22 +24,21 @@ namespace Content.Goobstation.Server.NPC.HTN.PrimitiveTasks.Operators.Specific;
 
 public sealed partial class PlantbotServiceOperator : HTNOperator
 {
-    [Dependency] private readonly IEntityManager _entMan = default!;
-    [Dependency] private readonly IPrototypeManager _prototypeManager = default!;
-
-    private ChatSystem _chat = default!;
-    private SharedAudioSystem _audio = default!;
-    private SharedInteractionSystem _interaction = default!;
-    private SharedPopupSystem _popup = default!;
-    private PlantHolderSystem _plantHolderSystem = default!;
-    private DamageableSystem _damageableSystem = default!;
-    private TagSystem _tagSystem = default!;
-
     public const float RequiredWaterLevelToService = 80f;
     public const float RequiredWeedsAmountToWeed = 1f;
     public const float WaterTransferAmount = 10f;
     public const float WeedsRemovedAmount = 1f;
     public const string SiliconTag = "SiliconMob";
+    [Dependency] private readonly IEntityManager _entMan = default!;
+    [Dependency] private readonly IPrototypeManager _prototypeManager = default!;
+    private SharedAudioSystem _audio = default!;
+
+    private ChatSystem _chat = default!;
+    private DamageableSystem _damageableSystem = default!;
+    private SharedInteractionSystem _interaction = default!;
+    private PlantHolderSystem _plantHolderSystem = default!;
+    private SharedPopupSystem _popup = default!;
+    private TagSystem _tagSystem = default!;
 
     /// <summary>
     /// Target entity to inject.
@@ -74,7 +73,10 @@ public sealed partial class PlantbotServiceOperator : HTNOperator
         if (!_entMan.TryGetComponent<PlantbotComponent>(owner, out var botComp)
             || !_entMan.TryGetComponent<PlantHolderComponent>(target, out var plantHolderComponent)
             || !_interaction.InRangeUnobstructed(owner, target)
-            || (plantHolderComponent is { WaterLevel: >= RequiredWaterLevelToService, WeedLevel: <= RequiredWeedsAmountToWeed } && (!_entMan.HasComponent<EmaggedComponent>(owner) || plantHolderComponent.Dead || plantHolderComponent.WaterLevel <= 0f)))
+            || plantHolderComponent is
+                { WaterLevel: >= RequiredWaterLevelToService, WeedLevel: <= RequiredWeedsAmountToWeed } &&
+            (!_entMan.HasComponent<EmaggedComponent>(owner) || plantHolderComponent.Dead ||
+             plantHolderComponent.WaterLevel <= 0f))
             return HTNOperatorStatus.Failed;
 
         if (botComp.IsEmagged)
@@ -88,13 +90,21 @@ public sealed partial class PlantbotServiceOperator : HTNOperator
             {
                 _plantHolderSystem.AdjustWater(target, 10);
                 _audio.PlayPvs(botComp.WaterSound, target);
-                _chat.TrySendInGameICMessage(owner, Loc.GetString("plantbot-add-water"), InGameICChatType.Speak, hideChat: true, hideLog: true);
+                _chat.TrySendInGameICMessage(owner,
+                    Loc.GetString("plantbot-add-water"),
+                    InGameICChatType.Speak,
+                    true,
+                    true);
             }
             else if (plantHolderComponent.WeedLevel >= RequiredWeedsAmountToWeed)
             {
                 plantHolderComponent.WeedLevel -= WeedsRemovedAmount;
                 _audio.PlayPvs(botComp.WeedSound, target);
-                _chat.TrySendInGameICMessage(owner, Loc.GetString("plantbot-remove-weeds"), InGameICChatType.Speak, hideChat: true, hideLog: true);
+                _chat.TrySendInGameICMessage(owner,
+                    Loc.GetString("plantbot-remove-weeds"),
+                    InGameICChatType.Speak,
+                    true,
+                    true);
             }
             else
                 return HTNOperatorStatus.Failed;

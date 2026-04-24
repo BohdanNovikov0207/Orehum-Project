@@ -15,11 +15,11 @@ using Robust.Server.Audio;
 
 namespace Content.Goobstation.Server.CheckInfection;
 
-public sealed partial class CheckInfectionSystem : EntitySystem
+public sealed class CheckInfectionSystem : EntitySystem
 {
+    [Dependency] private readonly AudioSystem _audio = default!;
     [Dependency] private readonly DoAfterSystem _doafter = default!;
     [Dependency] private readonly PopupSystem _popup = default!;
-    [Dependency] private readonly AudioSystem _audio = default!;
 
     public override void Initialize()
     {
@@ -58,9 +58,9 @@ public sealed partial class CheckInfectionSystem : EntitySystem
     private void OnDoAfter(EntityUid uid, CheckInfectionComponent component, ref CheckInfectionDoAfter args)
     {
         if (args.Cancelled
-        || args.Handled
-        || args.Target is not { } target)
-        return;
+            || args.Handled
+            || args.Target is not { } target)
+            return;
 
         _audio.PlayPvs(component.ScanningEndSound, uid);
         component.LastTarget = target;
@@ -74,23 +74,22 @@ public sealed partial class CheckInfectionSystem : EntitySystem
             return;
         }
 
-        var infectedString = Loc.GetString("check-infection-infected", ("time", (int)zed.GracePeriod.TotalSeconds));
+        var infectedString = Loc.GetString("check-infection-infected", ("time", (int) zed.GracePeriod.TotalSeconds));
         _popup.PopupEntity(infectedString, uid, PopupType.MediumCaution);
         component.WasInfected = true;
-
     }
 
     private void OnExamined(EntityUid uid, CheckInfectionComponent component, ref ExaminedEvent args)
     {
         if (!args.IsInDetailsRange
-        || component.LastTarget is not { } lastTarget)
+            || component.LastTarget is not { } lastTarget)
             return;
 
         var target = Loc.GetString("check-infection-examined-target", ("target", lastTarget));
-        var infectionStatus = Loc.GetString("check-infection-examined-infection-status", ("status", component.WasInfected));
+        var infectionStatus =
+            Loc.GetString("check-infection-examined-infection-status", ("status", component.WasInfected));
 
         args.PushMarkup(target, 1);
         args.PushMarkup(infectionStatus);
     }
-
 }

@@ -8,7 +8,7 @@ namespace Content.Goobstation.Server.Wraith.Systems.Minions;
 /// </summary>
 public sealed class SummonRatDenSystem : EntitySystem
 {
-    /// <inheritdoc/>
+    /// <inheritdoc />
     public override void Initialize()
     {
         base.Initialize();

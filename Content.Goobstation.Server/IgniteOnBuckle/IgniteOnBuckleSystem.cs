@@ -8,13 +8,12 @@ using Content.Server.Atmos.Components;
 using Content.Server.Atmos.EntitySystems;
 using Content.Shared.Buckle.Components;
 
-
 namespace Content.Goobstation.Server.IgniteOnBuckle;
 
 public sealed class IgniteOnBuckleSystem : EntitySystem
 {
-
     [Dependency] private readonly FlammableSystem _flammable = default!;
+
     public override void Initialize()
     {
         base.Initialize();
@@ -29,5 +28,4 @@ public sealed class IgniteOnBuckleSystem : EntitySystem
         flammable.FireStacks += ent.Comp.FireStacks;
         _flammable.Ignite(args.Buckle, args.Strap, flammable);
     }
-
 }

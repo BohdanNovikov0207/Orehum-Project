@@ -6,14 +6,20 @@ namespace Content.Goobstation.Shared.Shadowling.Components.Abilities.CollectiveM
 /// <summary>
 /// This is used for the Null Charge ability.
 /// </summary>
-[RegisterComponent, NetworkedComponent]
+[RegisterComponent] [NetworkedComponent]
 public sealed partial class ShadowlingNullChargeComponent : Component
 {
     [DataField]
-    public EntProtoId ActionId = "ActionNullCharge";
+    public EntityUid? ActionEnt;
 
     [DataField]
-    public EntityUid? ActionEnt;
+    public EntProtoId ActionId = "ActionNullCharge";
+
+    /// <summary>
+    /// The effect that is used once the ability activates.
+    /// </summary>
+    [DataField]
+    public EntProtoId NullChargeEffect = "ShadowlingNullChargeEffect";
 
     /// <summary>
     /// The seconds it takes for the null charge ability to complete.
@@ -26,10 +32,4 @@ public sealed partial class ShadowlingNullChargeComponent : Component
     /// </summary>
     [DataField]
     public float Range = 1f;
-
-    /// <summary>
-    /// The effect that is used once the ability activates.
-    /// </summary>
-    [DataField]
-    public EntProtoId NullChargeEffect = "ShadowlingNullChargeEffect";
 }

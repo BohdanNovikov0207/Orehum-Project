@@ -3,7 +3,6 @@
 using System.Numerics;
 using Content.Client._RMC14.LinkAccount;
 using Content.Shared.GameTicking;
-using Content.Shared.Random.Helpers;
 using Content.Trauma.Common.CCVar;
 using Robust.Client.Graphics;
 using Robust.Client.ResourceManagement;
@@ -18,20 +17,20 @@ namespace Content.Trauma.Client.RoundEndCredits;
 
 public sealed class RoundEndCreditsSystem : EntitySystem
 {
-    [Dependency] private readonly IUserInterfaceManager _ui = default!;
-    [Dependency] private readonly IClyde _clyde = default!;
     [Dependency] private readonly IResourceCache _cache = default!;
+    [Dependency] private readonly IConfigurationManager _cfg = default!;
+    [Dependency] private readonly IClyde _clyde = default!;
+    [Dependency] private readonly LinkAccountManager _linkAccount = default!;
     [Dependency] private readonly IPrototypeManager _proto = default!;
     [Dependency] private readonly IRobustRandom _random = default!;
-    [Dependency] private readonly LinkAccountManager _linkAccount = default!;
-    [Dependency] private readonly IConfigurationManager _cfg = default!;
-
-    private float _timer;
+    [Dependency] private readonly IUserInterfaceManager _ui = default!;
+    private readonly bool Debug = false; // Set this to true if you want a bunch of dummy characters to spawn
     private EndRoundCreditsControl? _creditsContainer;
     private BoxContainer? _exitContainer;
     private bool _showCredits = true;
+
+    private float _timer;
     private float _uiScale;
-    private bool Debug = false; // Set this to true if you want a bunch of dummy characters to spawn
 
     public override void Initialize()
     {
@@ -93,7 +92,7 @@ public sealed class RoundEndCreditsSystem : EntitySystem
         var normalSpeed = 200f;
         var speedUpDuration = 10f;
         var easing = Easings.InSine;
-        return easing(Math.Min((float)time.TotalSeconds / speedUpDuration, 1f)) * normalSpeed;
+        return easing(Math.Min((float) time.TotalSeconds / speedUpDuration, 1f)) * normalSpeed;
     }
 
     private void CloseCredits()

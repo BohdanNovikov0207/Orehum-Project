@@ -18,7 +18,7 @@ public sealed class ParalyzeOnCollideSystem : EntitySystem
     [Dependency] private readonly SharedStunSystem _stunSystem = default!;
     [Dependency] private readonly EntityWhitelistSystem _whitelistSystem = default!;
 
-    /// <inheritdoc/>
+    /// <inheritdoc />
     public override void Initialize()
     {
         SubscribeLocalEvent<ParalyzeOnCollideComponent, StartCollideEvent>(OnStartCollide);
@@ -37,16 +37,12 @@ public sealed class ParalyzeOnCollideSystem : EntitySystem
             _stunSystem.TryUpdateParalyzeDuration(uid, component.ParalyzeTime);
 
         if (component.RemoveAfterCollide)
-        {
             RemComp(uid, component);
-        }
     }
 
     private void OnLand(EntityUid uid, ParalyzeOnCollideComponent component, ref LandEvent args)
     {
         if (component.RemoveOnLand)
-        {
             RemComp(uid, component);
-        }
     }
 }

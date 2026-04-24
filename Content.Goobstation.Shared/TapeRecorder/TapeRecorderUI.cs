@@ -8,46 +8,48 @@ using Robust.Shared.Serialization;
 
 namespace Content.Goobstation.Shared.TapeRecorder;
 
-[Serializable, NetSerializable]
+[Serializable] [NetSerializable]
 public enum TapeRecorderVisuals : byte
 {
     Mode,
-    TapeInserted
+    TapeInserted,
 }
 
-[Serializable, NetSerializable]
+[Serializable] [NetSerializable]
 public enum TapeRecorderMode : byte
 {
     Stopped,
     Recording,
     Playing,
-    Rewinding
+    Rewinding,
 }
 
-[Serializable, NetSerializable]
+[Serializable] [NetSerializable]
 public enum TapeRecorderUIKey : byte
 {
-    Key
+    Key,
 }
 
-[Serializable, NetSerializable]
+[Serializable] [NetSerializable]
 public sealed class ChangeModeTapeRecorderMessage(TapeRecorderMode mode) : BoundUserInterfaceMessage
 {
     public TapeRecorderMode Mode = mode;
 }
 
-[Serializable, NetSerializable]
+[Serializable] [NetSerializable]
 public sealed class PrintTapeRecorderMessage : BoundUserInterfaceMessage;
 
-[Serializable, NetSerializable]
+[Serializable] [NetSerializable]
 public sealed class TapeRecorderState : BoundUserInterfaceState
 {
+    public string CassetteName;
+
+    public float CurrentTime;
+
     // TODO: check the itemslot on client instead of putting easy casette stuff in the state
     public bool HasCasette;
     public bool HasData;
-    public float CurrentTime;
     public float MaxTime;
-    public string CassetteName;
     public TimeSpan PrintCooldown;
 
     public TapeRecorderState(

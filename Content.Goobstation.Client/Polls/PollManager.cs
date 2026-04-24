@@ -6,18 +6,17 @@ namespace Content.Goobstation.Client.Polls;
 
 public sealed class PollManager
 {
-    [Dependency] private readonly IClientNetManager _net = default!;
-
     private readonly Dictionary<int, PollData> _activePolls = [];
+    [Dependency] private readonly IClientNetManager _net = default!;
     private readonly Dictionary<int, List<PollVoteData>> _playerVotes = [];
+
+    public IReadOnlyDictionary<int, PollData> ActivePolls => _activePolls;
 
     public event Action<List<PollData>>? OnActivePollsUpdated;
     public event Action<PollData>? OnPollUpdated;
     public event Action<int>? OnPollClosed;
     public event Action<PollData, List<PollVoteData>>? OnPollDetailsReceived;
     public event Action<bool, string?>? OnVoteResponse;
-
-    public IReadOnlyDictionary<int, PollData> ActivePolls => _activePolls;
 
     public void Initialize()
     {
@@ -54,18 +53,19 @@ public sealed class PollManager
 
         if (!_playerVotes[pollId].Any(v => v.OptionId == optionId))
         {
-            _playerVotes[pollId].Add(new PollVoteData
-            {
-                PollId = pollId,
-                OptionId = optionId,
-                VotedAt = DateTime.UtcNow
-            });
+            _playerVotes[pollId]
+                .Add(new PollVoteData
+                {
+                    PollId = pollId,
+                    OptionId = optionId,
+                    VotedAt = DateTime.UtcNow,
+                });
         }
 
         var msg = new MsgCastPollVote
         {
             PollId = pollId,
-            OptionId = optionId
+            OptionId = optionId,
         };
         _net.ClientSendMessage(msg);
     }
@@ -78,16 +78,14 @@ public sealed class PollManager
         var msg = new MsgRemovePollVote
         {
             PollId = pollId,
-            OptionId = optionId
+            OptionId = optionId,
         };
 
         _net.ClientSendMessage(msg);
     }
 
-    public List<PollVoteData> GetPlayerVotes(int pollId)
-    {
-        return _playerVotes.TryGetValue(pollId, out var votes) ? votes : [];
-    }
+    public List<PollVoteData> GetPlayerVotes(int pollId) =>
+        _playerVotes.TryGetValue(pollId, out var votes) ? votes : [];
 
     public bool HasVotedForOption(int pollId, int optionId)
     {
@@ -102,7 +100,9 @@ public sealed class PollManager
         _activePolls.Clear();
 
         foreach (var poll in msg.Polls)
+        {
             _activePolls[poll.PollId] = poll;
+        }
 
         OnActivePollsUpdated?.Invoke(msg.Polls);
     }

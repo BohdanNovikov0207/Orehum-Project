@@ -7,27 +7,26 @@
 
 using Content.Goobstation.Server.RelayedDeathrattle;
 using Content.Goobstation.Shared.CrewMonitoring;
+using Content.Server.Popups;
 using Content.Shared.DoAfter;
 using Content.Shared.Humanoid;
-using Content.Shared.Interaction;
-using Content.Shared.Whitelist;
-using Content.Shared.Implants;
 using Content.Shared.IdentityManagement;
-using Content.Server.Popups;
+using Content.Shared.Implants;
+using Content.Shared.Interaction;
 using Content.Shared.Popups;
+using Content.Shared.Whitelist;
 
 namespace Content.Goobstation.Server.CrewMonitoring;
 
 public sealed class CrewMonitorScanningSystem : EntitySystem
 {
+    private const string CommandTrackerImplant = "CommandTrackingImplant";
+    private const string CommandTrackerImplantName = "command tracking implant";
     [Dependency] private readonly SharedDoAfterSystem _doAfter = default!;
-    [Dependency] private readonly EntityWhitelistSystem _whitelist = default!;
 
     [Dependency] private readonly SharedSubdermalImplantSystem _implantSystem = default!;
     [Dependency] private readonly PopupSystem _popup = default!;
-
-    private const string CommandTrackerImplant = "CommandTrackingImplant";
-    private const string CommandTrackerImplantName = "command tracking implant";
+    [Dependency] private readonly EntityWhitelistSystem _whitelist = default!;
 
     public override void Initialize()
     {
@@ -44,9 +43,18 @@ public sealed class CrewMonitorScanningSystem : EntitySystem
         var userName = Identity.Entity(args.User, EntityManager);
         _popup.PopupEntity(Loc.GetString("injector-component-injecting-user"), args.Target.Value, args.User);
         if (args.User != args.Target.Value)
-            _popup.PopupEntity(Loc.GetString("implanter-component-implanting-target", ("user", userName)), args.User, args.Target.Value, PopupType.LargeCaution);
+            _popup.PopupEntity(Loc.GetString("implanter-component-implanting-target", ("user", userName)),
+                args.User,
+                args.Target.Value,
+                PopupType.LargeCaution);
 
-        _doAfter.TryStartDoAfter(new DoAfterArgs(EntityManager, args.User, comp.DoAfterTime, new CrewMonitorScanningDoAfterEvent(), uid, args.Target, uid) { NeedHand = true, BreakOnMove = true });
+        _doAfter.TryStartDoAfter(new DoAfterArgs(EntityManager,
+            args.User,
+            comp.DoAfterTime,
+            new CrewMonitorScanningDoAfterEvent(),
+            uid,
+            args.Target,
+            uid) { NeedHand = true, BreakOnMove = true });
     }
 
     private void OnScanComplete(EntityUid uid, CrewMonitorScanningComponent comp, CrewMonitorScanningDoAfterEvent args)
@@ -57,15 +65,18 @@ public sealed class CrewMonitorScanningSystem : EntitySystem
 
         if (comp.ScannedEntities.Contains(args.Target.Value))
         {
-            var msg = Loc.GetString("implanter-component-implant-already", ("implant", CommandTrackerImplantName), ("target", name));
+            var msg = Loc.GetString("implanter-component-implant-already",
+                ("implant", CommandTrackerImplantName),
+                ("target", name));
             _popup.PopupEntity(msg, args.Target.Value, args.User);
             return;
         }
 
         if (_whitelist.IsWhitelistFail(comp.Whitelist, args.Target.Value))
         {
-
-            var msg = Loc.GetString("implanter-component-implant-failed", ("implant", CommandTrackerImplantName), ("target", name));
+            var msg = Loc.GetString("implanter-component-implant-failed",
+                ("implant", CommandTrackerImplantName),
+                ("target", name));
             _popup.PopupEntity(msg, args.Target.Value, args.User);
             return;
         }

@@ -1,18 +1,19 @@
+using System.Linq;
 using Content.Shared.EntityEffects;
 using Content.Shared.Humanoid.Prototypes;
 using Robust.Shared.Prototypes;
 using Robust.Shared.Random;
-using System.Linq;
-using Content.Shared.EntityEffects;
 
 namespace Content.Goobstation.Shared.EntityEffects;
+
 public sealed partial class RandomSpeciesChange : EntityEffect
 {
-    protected override string? ReagentEffectGuidebookText(IPrototypeManager prototype, IEntitySystemManager entSys)
-        => Loc.GetString("reagent-effect-guidebook-change-species-random");
+    [DataField] public List<ProtoId<SpeciesPrototype>>? SpeciesBlacklist;
 
     [DataField] public List<ProtoId<SpeciesPrototype>>? SpeciesWhitelist;
-    [DataField] public List<ProtoId<SpeciesPrototype>>? SpeciesBlacklist;
+
+    protected override string? ReagentEffectGuidebookText(IPrototypeManager prototype, IEntitySystemManager entSys)
+        => Loc.GetString("reagent-effect-guidebook-change-species-random");
 
     public override void Effect(EntityEffectBaseArgs args)
     {

@@ -5,8 +5,9 @@
 //
 // SPDX-License-Identifier: AGPL-3.0-or-later
 
+using System.Numerics;
+using Content.Goobstation.Common.CCVar;
 using Content.Goobstation.Common.Movement;
-using Content.Shared.Damage.Events;
 using Content.Shared._EinsteinEngines.Flight.Events;
 using Content.Shared.Bed.Sleep;
 using Content.Shared.Buckle.Components;
@@ -14,6 +15,7 @@ using Content.Shared.CombatMode;
 using Content.Shared.Cuffs.Components;
 using Content.Shared.Damage;
 using Content.Shared.Damage.Components;
+using Content.Shared.Damage.Events;
 using Content.Shared.Damage.Systems;
 using Content.Shared.Gravity;
 using Content.Shared.Input;
@@ -27,29 +29,28 @@ using Content.Shared.Standing;
 using Content.Shared.Stunnable;
 using Content.Shared.Zombies;
 using Robust.Shared.Audio.Systems;
+using Robust.Shared.Configuration;
 using Robust.Shared.Input;
 using Robust.Shared.Input.Binding;
 using Robust.Shared.Network;
 using Robust.Shared.Player;
 using Robust.Shared.Timing;
-using System.Numerics;
-using Content.Goobstation.Common.CCVar;
-using Robust.Shared.Configuration;
 
 namespace Content.Goobstation.Shared.Sprinting;
+
 public abstract class SharedSprintingSystem : EntitySystem
 {
-    [Dependency] private readonly SharedStaminaSystem _staminaSystem = default!;
-    [Dependency] private readonly MovementSpeedModifierSystem _movementSpeed = default!;
     [Dependency] private readonly SharedAudioSystem _audio = default!;
-    [Dependency] private readonly SharedGravitySystem _gravity = default!;
-    [Dependency] private readonly SharedPopupSystem _popupSystem = default!;
-    [Dependency] private readonly StandingStateSystem _standing = default!;
-    [Dependency] private readonly IGameTiming _timing = default!;
+    [Dependency] private readonly IConfigurationManager _cfg = default!; // Traumastation
     [Dependency] private readonly DamageableSystem _damageable = default!;
+    [Dependency] private readonly SharedGravitySystem _gravity = default!;
+    [Dependency] private readonly MovementSpeedModifierSystem _movementSpeed = default!;
     [Dependency] private readonly SharedMoverController _moverController = default!;
     [Dependency] private readonly INetManager _net = default!;
-    [Dependency] private readonly IConfigurationManager _cfg = default!; // Traumastation
+    [Dependency] private readonly SharedPopupSystem _popupSystem = default!;
+    [Dependency] private readonly SharedStaminaSystem _staminaSystem = default!;
+    [Dependency] private readonly StandingStateSystem _standing = default!;
+    [Dependency] private readonly IGameTiming _timing = default!;
 
     protected bool SprintEnabled; // Traumastation
 
@@ -84,7 +85,9 @@ public abstract class SharedSprintingSystem : EntitySystem
 
     private sealed class SprintInputCmdHandler(SharedSprintingSystem system) : InputCmdHandler
     {
-        public override bool HandleCmdMessage(IEntityManager entManager, ICommonSession? session, IFullInputCmdMessage message)
+        public override bool HandleCmdMessage(IEntityManager entManager,
+            ICommonSession? session,
+            IFullInputCmdMessage message)
         {
             if (session?.AttachedEntity == null)
                 return false;
@@ -139,13 +142,18 @@ public abstract class SharedSprintingSystem : EntitySystem
 
         if (!sprinterComponent.CanSprint)
         {
-            if (message.State == BoundKeyState.Down) // Without this check the message triggers when holding and releasing.
-                _popupSystem.PopupClient(Loc.GetString("sprint-disabled"), session.AttachedEntity.Value, session.AttachedEntity.Value, PopupType.Medium);
+            if (message.State ==
+                BoundKeyState.Down) // Without this check the message triggers when holding and releasing.
+                _popupSystem.PopupClient(Loc.GetString("sprint-disabled"),
+                    session.AttachedEntity.Value,
+                    session.AttachedEntity.Value,
+                    PopupType.Medium);
 
             return;
         }
 
-        RaiseLocalEvent(session.AttachedEntity.Value, new SprintToggleEvent(!sprinterComponent.IsSprinting && message.State == BoundKeyState.Down));
+        RaiseLocalEvent(session.AttachedEntity.Value,
+            new SprintToggleEvent(!sprinterComponent.IsSprinting && message.State == BoundKeyState.Down));
     }
 
     private void OnSprintToggle(EntityUid uid, SprinterComponent component, ref SprintToggleEvent args) =>
@@ -159,7 +167,7 @@ public abstract class SharedSprintingSystem : EntitySystem
 
         if (newSprintState
             && (!CanSprint(uid, component)
-            || _timing.CurTime - component.LastSprint < component.TimeBetweenSprints))
+                || _timing.CurTime - component.LastSprint < component.TimeBetweenSprints))
             return;
 
         component.LastSprint = _timing.CurTime;
@@ -175,7 +183,12 @@ public abstract class SharedSprintingSystem : EntitySystem
             _damageable.TryChangeDamage(uid, component.SprintDamageSpecifier);
 
         _movementSpeed.RefreshMovementSpeedModifiers(uid);
-        _staminaSystem.ToggleStaminaDrain(uid, component.StaminaDrainRate, newSprintState, true, component.StaminaDrainKey, uid);
+        _staminaSystem.ToggleStaminaDrain(uid,
+            component.StaminaDrainRate,
+            newSprintState,
+            true,
+            component.StaminaDrainKey,
+            uid);
         Dirty(uid, component);
     }
 
@@ -207,7 +220,9 @@ public abstract class SharedSprintingSystem : EntitySystem
         args.Cancel();
     }
 
-    private void OnStandingStateSprintAttempt(EntityUid uid, StandingStateComponent component, ref SprintAttemptEvent args)
+    private void OnStandingStateSprintAttempt(EntityUid uid,
+        StandingStateComponent component,
+        ref SprintAttemptEvent args)
     {
         if (!_standing.IsDown(uid, component))
             return;
@@ -238,6 +253,7 @@ public abstract class SharedSprintingSystem : EntitySystem
     #endregion
 
     #region Misc.Handlers
+
     private void OnBeforeStaminaDamage(EntityUid uid, SprinterComponent component, ref BeforeStaminaDamageEvent args)
     {
         if (!component.IsSprinting
@@ -253,7 +269,7 @@ public abstract class SharedSprintingSystem : EntitySystem
             || args.NewMobState is MobState.Critical or MobState.Dead)
             return;
 
-        ToggleSprint(args.Target, component, false, gracefulStop: false);
+        ToggleSprint(args.Target, component, false, false);
     }
 
     private void OnSleep(EntityUid uid, SprinterComponent component, ref SleepStateChangedEvent args)
@@ -262,7 +278,7 @@ public abstract class SharedSprintingSystem : EntitySystem
             || !args.FellAsleep)
             return;
 
-        ToggleSprint(uid, component, false, gracefulStop: false);
+        ToggleSprint(uid, component, false, false);
     }
 
     private void OnFlight(EntityUid uid, SprinterComponent component, ref FlightEvent args)
@@ -295,8 +311,9 @@ public abstract class SharedSprintingSystem : EntitySystem
         if (!component.IsSprinting)
             return;
 
-        ToggleSprint(uid, component, false, gracefulStop: false);
+        ToggleSprint(uid, component, false, false);
     }
+
     private void OnZombified(EntityUid uid, SprinterComponent component, ref EntityZombifiedEvent args) =>
         component.SprintSpeedMultiplier *= 0.5f; // We dont want super fast zombies do we?
 
@@ -306,7 +323,7 @@ public abstract class SharedSprintingSystem : EntitySystem
             return;
 
         _staminaSystem.TakeStaminaDamage(uid, sprinter.StaminaPenaltyOnShove, applyResistances: true, logDamage: false);
-        ToggleSprint(uid, sprinter, false, gracefulStop: true);
+        ToggleSprint(uid, sprinter, false, true);
     }
 
     #endregion

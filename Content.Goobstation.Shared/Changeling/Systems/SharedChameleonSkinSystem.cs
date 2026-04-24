@@ -9,7 +9,7 @@ using Content.Shared.Stealth.Components;
 
 namespace Content.Goobstation.Shared.Changeling.Systems;
 
-public abstract partial class SharedChameleonSkinSystem : EntitySystem
+public abstract class SharedChameleonSkinSystem : EntitySystem
 {
     [Dependency] private readonly SharedActionsSystem _actions = default!;
     [Dependency] private readonly SharedPopupSystem _popup = default!;
@@ -82,6 +82,7 @@ public abstract partial class SharedChameleonSkinSystem : EntitySystem
 
         Dirty(ent);
     }
+
     #endregion
 
     #region Helper Methods
@@ -107,14 +108,10 @@ public abstract partial class SharedChameleonSkinSystem : EntitySystem
         RemComp<StealthOnMoveComponent>(ent);
     }
 
-    private bool OnFire(Entity<ChameleonSkinComponent> ent)
-    {
-        return HasComp<OnFireComponent>(ent);
-    }
+    private bool OnFire(Entity<ChameleonSkinComponent> ent) => HasComp<OnFireComponent>(ent);
 
-    private void DoPopup(Entity<ChameleonSkinComponent> ent, LocId popup, PopupType popupType = PopupType.Small)
-    {
+    private void DoPopup(Entity<ChameleonSkinComponent> ent, LocId popup, PopupType popupType = PopupType.Small) =>
         _popup.PopupClient(Loc.GetString(popup), ent, ent, popupType);
-    }
+
     #endregion
 }

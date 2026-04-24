@@ -6,9 +6,9 @@ namespace Content.Goobstation.Shared.Wraith.Actions;
 
 public sealed class ActionUserWhitelistSystem : EntitySystem
 {
-    [Dependency] private readonly EntityWhitelistSystem _whitelist = default!;
     [Dependency] private readonly SharedPopupSystem _popup = default!;
-    
+    [Dependency] private readonly EntityWhitelistSystem _whitelist = default!;
+
     public override void Initialize()
     {
         base.Initialize();

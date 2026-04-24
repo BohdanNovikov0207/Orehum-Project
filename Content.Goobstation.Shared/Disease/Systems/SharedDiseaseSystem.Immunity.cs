@@ -58,10 +58,8 @@ public partial class SharedDiseaseSystem
     /// <summary>
     /// Checks whether this entity can be infected by diseases of this genotype
     /// </summary>
-    public bool CanInfect(Entity<DiseaseCarrierComponent?, ImmunityComponent?> ent, int genotype)
-    {
-        return !HasDisease((ent, ent.Comp1), genotype) && !HasImmunity((ent, ent.Comp2), genotype);
-    }
+    public bool CanInfect(Entity<DiseaseCarrierComponent?, ImmunityComponent?> ent, int genotype) =>
+        !HasDisease((ent, ent.Comp1), genotype) && !HasImmunity((ent, ent.Comp2), genotype);
 
     public bool TryAddImmunity(Entity<ImmunityComponent?> ent, int genotype)
     {

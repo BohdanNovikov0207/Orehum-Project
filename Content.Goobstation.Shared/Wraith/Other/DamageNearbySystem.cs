@@ -8,12 +8,12 @@ namespace Content.Goobstation.Shared.Wraith.Other;
 
 public sealed class DamageNearbySystem : EntitySystem
 {
-    [Dependency] private readonly IGameTiming _timing = default!;
-    [Dependency] private readonly EntityLookupSystem _lookup = default!;
     [Dependency] private readonly DamageableSystem _damageable = default!;
-    [Dependency] private readonly EntityWhitelistSystem _whitelist = default!;
+    [Dependency] private readonly EntityLookupSystem _lookup = default!;
 
     private readonly HashSet<Entity<MobStateComponent>> _mobStates = new();
+    [Dependency] private readonly IGameTiming _timing = default!;
+    [Dependency] private readonly EntityWhitelistSystem _whitelist = default!;
 
     public override void Initialize()
     {
@@ -36,7 +36,6 @@ public sealed class DamageNearbySystem : EntitySystem
             comp.NextTick = _timing.CurTime + comp.Delay;
             Dirty(uid, comp);
         }
-
     }
 
     private void OnMapInit(Entity<DamageNearbyComponent> ent, ref MapInitEvent args)

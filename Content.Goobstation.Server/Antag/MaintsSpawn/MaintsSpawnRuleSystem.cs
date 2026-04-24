@@ -1,5 +1,4 @@
 using Content.Server.Antag;
-using Content.Server.StationEvents.Components;
 using Content.Server.StationEvents.Events;
 using Content.Shared.GameTicking.Components;
 using Content.Shared.Station.Components;
@@ -18,7 +17,10 @@ public sealed class MaintsSpawnRule : StationEventSystem<MaintsSpawnRuleComponen
         SubscribeLocalEvent<MaintsSpawnRuleComponent, AntagSelectLocationEvent>(OnSelectLocation);
     }
 
-    protected override void Added(EntityUid uid, MaintsSpawnRuleComponent component, GameRuleComponent gameRule, GameRuleAddedEvent args)
+    protected override void Added(EntityUid uid,
+        MaintsSpawnRuleComponent component,
+        GameRuleComponent gameRule,
+        GameRuleAddedEvent args)
     {
         base.Added(uid, component, gameRule, args);
 
@@ -49,7 +51,7 @@ public sealed class MaintsSpawnRule : StationEventSystem<MaintsSpawnRuleComponen
 
     private void OnSelectLocation(Entity<MaintsSpawnRuleComponent> ent, ref AntagSelectLocationEvent args)
     {
-        if (ent.Comp.Coords is {} coords)
+        if (ent.Comp.Coords is { } coords)
             args.Coordinates.AddRange(coords);
     }
 }

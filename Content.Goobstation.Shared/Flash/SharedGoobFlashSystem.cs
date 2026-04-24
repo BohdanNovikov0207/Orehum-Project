@@ -17,8 +17,6 @@ public sealed class SharedGoobFlashSystem : EntitySystem
         SubscribeLocalEvent<FlashVulnerableComponent, CheckFlashVulnerable>(OnFlashVulnerableCheck);
     }
 
-    public void OnFlashVulnerableCheck(Entity<FlashVulnerableComponent> ent, ref CheckFlashVulnerable args)
-    {
+    public void OnFlashVulnerableCheck(Entity<FlashVulnerableComponent> ent, ref CheckFlashVulnerable args) =>
         args.Vulnerable = true;
-    }
 }

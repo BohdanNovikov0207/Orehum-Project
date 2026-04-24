@@ -8,12 +8,12 @@ using Robust.Shared.Prototypes;
 namespace Content.Goobstation.Common.StationEvents.SecretPlus;
 
 /// <summary>
-///   Used to specify which events should be possible in the current game director rule.
+/// Used to specify which events should be possible in the current game director rule.
 /// </summary>
 [Prototype]
-public sealed partial class EventTypePrototype : IPrototype
+public sealed class EventTypePrototype : IPrototype
 {
     [ViewVariables]
     [IdDataField]
-    public string ID { get; private set; } = default!;
+    public string ID { get; } = default!;
 }

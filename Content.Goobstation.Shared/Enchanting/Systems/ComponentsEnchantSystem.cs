@@ -8,7 +8,7 @@ using Content.Goobstation.Shared.Enchanting.Components;
 namespace Content.Goobstation.Shared.Enchanting.Systems;
 
 /// <summary>
-/// Adds or removes components from an item enchanted with <see cref="ComponentsEnchantComponent"/>
+/// Adds or removes components from an item enchanted with <see cref="ComponentsEnchantComponent" />
 /// Multiple levels do nothing.
 /// </summary>
 public sealed class ComponentsEnchantSystem : EntitySystem
@@ -22,9 +22,9 @@ public sealed class ComponentsEnchantSystem : EntitySystem
 
     private void OnAdded(Entity<ComponentsEnchantComponent> ent, ref EnchantAddedEvent args)
     {
-        if (ent.Comp.Added is {} added)
+        if (ent.Comp.Added is { } added)
             EntityManager.AddComponents(args.Item, added);
-        if (ent.Comp.Removed is {} removed)
+        if (ent.Comp.Removed is { } removed)
             EntityManager.RemoveComponents(args.Item, removed);
     }
 }

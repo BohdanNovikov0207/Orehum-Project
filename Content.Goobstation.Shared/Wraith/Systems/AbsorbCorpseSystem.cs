@@ -1,4 +1,3 @@
-using Content.Goobstation.Shared.Changeling.Components;
 using Content.Goobstation.Shared.Wraith.Components;
 using Content.Goobstation.Shared.Wraith.Events;
 using Content.Goobstation.Shared.Wraith.WraithPoints;
@@ -17,19 +16,19 @@ using Robust.Shared.Network;
 
 namespace Content.Goobstation.Shared.Wraith.Systems;
 
-public sealed partial class AbsorbCorpseSystem : EntitySystem
+public sealed class AbsorbCorpseSystem : EntitySystem
 {
-    [Dependency] private readonly SharedPopupSystem _popup = default!;
-    [Dependency] private readonly MobStateSystem _mobState = default!;
-    [Dependency] private readonly WraithPointsSystem _wraithPoints = default!;
-    [Dependency] private readonly SharedAudioSystem _audio = default!;
-    [Dependency] private readonly SharedRottingSystem _rotting = default!;
-    [Dependency] private readonly DamageableSystem _damageable = default!;
-    [Dependency] private readonly SharedSolutionContainerSystem _solution = default!;
-    [Dependency] private readonly SharedBodySystem _body = default!;
-    [Dependency] private readonly INetManager _netManager = default!;
-    [Dependency] private readonly TagSystem _tag = default!;
     [Dependency] private readonly ISharedAdminLogManager _admin = default!;
+    [Dependency] private readonly SharedAudioSystem _audio = default!;
+    [Dependency] private readonly SharedBodySystem _body = default!;
+    [Dependency] private readonly DamageableSystem _damageable = default!;
+    [Dependency] private readonly MobStateSystem _mobState = default!;
+    [Dependency] private readonly INetManager _netManager = default!;
+    [Dependency] private readonly SharedPopupSystem _popup = default!;
+    [Dependency] private readonly SharedRottingSystem _rotting = default!;
+    [Dependency] private readonly SharedSolutionContainerSystem _solution = default!;
+    [Dependency] private readonly TagSystem _tag = default!;
+    [Dependency] private readonly WraithPointsSystem _wraithPoints = default!;
 
     public override void Initialize()
     {
@@ -44,7 +43,8 @@ public sealed partial class AbsorbCorpseSystem : EntitySystem
         var user = args.Performer;
         var target = args.Target;
 
-        if (_tag.HasTag(args.Target, ent.Comp.Tag) || !TryComp<WraithAbsorbableComponent>(args.Target, out var absorbable)) // save the monkeys
+        if (_tag.HasTag(args.Target, ent.Comp.Tag) ||
+            !TryComp<WraithAbsorbableComponent>(args.Target, out var absorbable)) // save the monkeys
             return;
 
         if (!_mobState.IsDead(target))
@@ -70,7 +70,8 @@ public sealed partial class AbsorbCorpseSystem : EntitySystem
             absorbable.Absorbed = true;
             Dirty(args.Target, absorbable);
 
-            _admin.Add(LogType.Action, LogImpact.Medium,
+            _admin.Add(LogType.Action,
+                LogImpact.Medium,
                 $"{ToPrettyString(ent.Owner)} absorbed the corpse of {ToPrettyString(args.Target)} as a Plaguebringer Wraith");
             args.Handled = true;
             return;
@@ -90,7 +91,9 @@ public sealed partial class AbsorbCorpseSystem : EntitySystem
         }
 
         // Spawn visual/sound effects
-        PredictedSpawnAtPosition(ent.Comp.SmokeProto, Transform(target).Coordinates); //Part 2 TO DO: Port nice smoke visuals from Goonstation instead of spawning this generic smoke.
+        PredictedSpawnAtPosition(ent.Comp.SmokeProto,
+            Transform(target)
+                .Coordinates); //Part 2 TO DO: Port nice smoke visuals from Goonstation instead of spawning this generic smoke.
         _audio.PlayPredicted(ent.Comp.AbsorbSound, ent.Owner, user);
 
         _wraithPoints.AdjustWpGenerationRate(ent.Comp.WpPassiveAdd, ent.Owner);
@@ -106,7 +109,8 @@ public sealed partial class AbsorbCorpseSystem : EntitySystem
         absorbable.Absorbed = true;
         Dirty(args.Target, absorbable);
 
-        _admin.Add(LogType.Action, LogImpact.Medium,
+        _admin.Add(LogType.Action,
+            LogImpact.Medium,
             $"{ToPrettyString(ent.Owner)} absorbed the corpse of {ToPrettyString(args.Target)} as a Wraith");
         args.Handled = true;
     }
@@ -127,7 +131,6 @@ public sealed partial class AbsorbCorpseSystem : EntitySystem
             _wraithPoints.AdjustWpGenerationRate(0.2, ent.Owner);
 
             _popup.PopupClient(Loc.GetString("wraith-absorb-rotbonus"), ent.Owner, ent.Owner, PopupType.Medium);
-
         }
         else if (toxinDamage < 30 && perish.Stage <= 2)
         {
@@ -141,29 +144,35 @@ public sealed partial class AbsorbCorpseSystem : EntitySystem
     #endregion
 
     #region Helper
+
     private bool RemoveReagent(EntityUid target, Entity<AbsorbCorpseComponent> ent)
     {
         if (!TryComp<BloodstreamComponent>(target, out var blood)
-            || !_solution.ResolveSolution(target, blood.ChemicalSolutionName, ref blood.ChemicalSolution, out var chemSolution))
+            || !_solution.ResolveSolution(target,
+                blood.ChemicalSolutionName,
+                ref blood.ChemicalSolution,
+                out var chemSolution))
             return false;
 
         foreach (var (reagentId, qty) in chemSolution.Contents)
         {
             if (reagentId.Prototype != ent.Comp.Reagent || qty < ent.Comp.FormaldehydeThreshhold)
-                    continue;
+                continue;
 
             _solution.RemoveReagent(blood.ChemicalSolution.Value, reagentId, ent.Comp.ChemToRemove);
 
-            _damageable.TryChangeDamage(ent.Owner, ent.Comp.Damage, ignoreResistances: true);
+            _damageable.TryChangeDamage(ent.Owner, ent.Comp.Damage, true);
             _popup.PopupClient(Loc.GetString("wraith-absorb-tainted"), ent.Owner, ent.Owner, PopupType.MediumCaution);
             return true;
         }
 
         return false;
     }
+
     #endregion
 
     #region Public
+
     public void Reset(Entity<AbsorbCorpseComponent?> ent)
     {
         if (!Resolve(ent.Owner, ref ent.Comp))
@@ -172,5 +181,6 @@ public sealed partial class AbsorbCorpseSystem : EntitySystem
         ent.Comp.CorpsesAbsorbed = 0;
         Dirty(ent);
     }
+
     #endregion
 }

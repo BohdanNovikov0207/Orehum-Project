@@ -10,7 +10,7 @@ using Robust.Shared.Serialization.TypeSerializers.Implementations.Generic;
 
 namespace Content.Goobstation.Server.StationEvents.Metric.Components;
 
-[RegisterComponent, Access(typeof(PuddleMetricSystem))]
+[RegisterComponent] [Access(typeof(PuddleMetricSystem))]
 public sealed partial class PuddleMetricComponent : Component
 {
     // Impact Constants
@@ -19,9 +19,12 @@ public sealed partial class PuddleMetricComponent : Component
     private const float ModerateImpact = 0.2f;
     private const float MajorImpact = 0.3f;
 
+    [DataField]
+    public FixedPoint2 PuddleDefault = 0.1f;
+
     /// <summary>
-    ///   The cost of each puddle, per mL. Note about 200 mL is one puddle.
-    ///   Example: A water puddle of 200mL would contribute (200 * 0.02) = 4 chaos points.
+    /// The cost of each puddle, per mL. Note about 200 mL is one puddle.
+    /// Example: A water puddle of 200mL would contribute (200 * 0.02) = 4 chaos points.
     /// </summary>
     [DataField(customTypeSerializer: typeof(DictionarySerializer<string, FixedPoint2>))] // this should be prototyped
     public Dictionary<string, FixedPoint2> Puddles =
@@ -47,8 +50,4 @@ public sealed partial class PuddleMetricComponent : Component
             { "SpaceLube", MajorImpact },
             { "SpaceGlue", MajorImpact },
         };
-
-    [DataField]
-    public FixedPoint2 PuddleDefault = 0.1f;
-
 }

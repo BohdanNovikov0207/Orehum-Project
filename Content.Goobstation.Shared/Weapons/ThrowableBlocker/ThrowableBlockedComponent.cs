@@ -14,7 +14,7 @@ namespace Content.Goobstation.Shared.Weapons.ThrowableBlocker;
 /// <summary>
 /// Added to objects that can be blocked by ThrowableBlockerComponent
 /// </summary>
-[RegisterComponent, NetworkedComponent]
+[RegisterComponent] [NetworkedComponent]
 public sealed partial class ThrowableBlockedComponent : Component
 {
     [DataField]

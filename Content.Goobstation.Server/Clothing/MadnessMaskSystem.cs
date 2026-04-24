@@ -25,12 +25,12 @@ namespace Content.Goobstation.Server.Clothing;
 
 public sealed class MadnessMaskSystem : EntitySystem
 {
-    [Dependency] private readonly EntityLookupSystem _lookup = default!;
-    [Dependency] private readonly SharedStaminaSystem _stamina = default!;
-    [Dependency] private readonly SharedJitteringSystem _jitter = default!;
-    [Dependency] private readonly StatusEffectsSystem _statusEffect = default!;
-    [Dependency] private readonly IRobustRandom _random = default!;
     [Dependency] private readonly HereticSystem _heretic = default!;
+    [Dependency] private readonly SharedJitteringSystem _jitter = default!;
+    [Dependency] private readonly EntityLookupSystem _lookup = default!;
+    [Dependency] private readonly IRobustRandom _random = default!;
+    [Dependency] private readonly SharedStaminaSystem _stamina = default!;
+    [Dependency] private readonly StatusEffectsSystem _statusEffect = default!;
 
     public override void Initialize()
     {
@@ -63,7 +63,8 @@ public sealed class MadnessMaskSystem : EntitySystem
             args.Args.TemperatureDelta = 0;
     }
 
-    private void OnGetProtection(Entity<MadnessMaskComponent> ent, ref InventoryRelayedEvent<GetFireProtectionEvent> args)
+    private void OnGetProtection(Entity<MadnessMaskComponent> ent,
+        ref InventoryRelayedEvent<GetFireProtectionEvent> args)
     {
         if (!_heretic.IsHereticOrGhoul(args.Args.Target) || HasComp<VeryFlammableComponent>(args.Args.Target))
             return;
@@ -99,7 +100,7 @@ public sealed class MadnessMaskSystem : EntitySystem
                     _stamina.TakeOvertimeStaminaDamage(look, 10f);
 
                 if (_random.Prob(.4f))
-                    _jitter.DoJitter(look, TimeSpan.FromSeconds(.5f), true, amplitude: 5, frequency: 10);
+                    _jitter.DoJitter(look, TimeSpan.FromSeconds(.5f), true, 5, 10);
 
                 if (_random.Prob(.25f))
                 {

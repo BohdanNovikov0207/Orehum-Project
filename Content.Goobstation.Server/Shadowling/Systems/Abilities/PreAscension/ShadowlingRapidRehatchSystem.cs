@@ -21,13 +21,13 @@ namespace Content.Goobstation.Server.Shadowling.Systems.Abilities.PreAscension;
 /// </summary>
 public sealed class ShadowlingRapidRehatchSystem : EntitySystem
 {
+    [Dependency] private readonly SharedActionsSystem _actions = default!;
+    [Dependency] private readonly SharedAudioSystem _audio = default!;
     [Dependency] private readonly SharedDoAfterSystem _doAfter = default!;
     [Dependency] private readonly MobStateSystem _mobState = default!;
     [Dependency] private readonly SharedPopupSystem _popup = default!;
     [Dependency] private readonly RejuvenateSystem _rejuvenate = default!;
-    [Dependency] private readonly SharedActionsSystem _actions = default!;
     [Dependency] private readonly SharedTransformSystem _transform = default!;
-    [Dependency] private readonly SharedAudioSystem _audio = default!;
 
     public override void Initialize()
     {
@@ -64,14 +64,16 @@ public sealed class ShadowlingRapidRehatchSystem : EntitySystem
             new RapidRehatchDoAfterEvent(),
             user)
         {
-            CancelDuplicate = true
+            CancelDuplicate = true,
         };
 
         _doAfter.TryStartDoAfter(doAfterArgs);
         args.Handled = true;
     }
 
-    private void OnRapidRehatchDoAfter(EntityUid uid, ShadowlingRapidRehatchComponent comp, RapidRehatchDoAfterEvent args)
+    private void OnRapidRehatchDoAfter(EntityUid uid,
+        ShadowlingRapidRehatchComponent comp,
+        RapidRehatchDoAfterEvent args)
     {
         if (args.Cancelled
             || args.Handled)

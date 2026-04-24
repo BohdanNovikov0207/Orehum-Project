@@ -5,13 +5,13 @@ using Content.Shared.Whitelist;
 
 namespace Content.Goobstation.Server.MobCall;
 
-public sealed partial class MobCallSystem : EntitySystem
+public sealed class MobCallSystem : EntitySystem
 {
     [Dependency] private readonly ChatSystem _chat = default!;
     [Dependency] private readonly EntityLookupSystem _lookup = default!;
-    [Dependency] private readonly EntityWhitelistSystem _whitelist = default!;
     [Dependency] private readonly NPCSystem _npc = default!;
     [Dependency] private readonly SharedTransformSystem _transform = default!;
+    [Dependency] private readonly EntityWhitelistSystem _whitelist = default!;
 
     public override void Initialize()
     {
@@ -31,6 +31,7 @@ public sealed partial class MobCallSystem : EntitySystem
             if (_whitelist.IsWhitelistPass(ent.Comp.Whitelist, uid))
                 _npc.SetBlackboard(uid, ent.Comp.Key, entCoord);
         }
+
         args.Handled = true;
     }
 }

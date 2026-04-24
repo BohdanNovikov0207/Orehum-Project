@@ -49,9 +49,7 @@ public class XenobiologyTransformingSystem : EntitySystem
 
         var @new = polymorphSystem.PolymorphEntity(uid, config);
         if (@new.HasValue)
-        {
             EntityManager.RemoveComponentDeferred<PolymorphedEntityComponent>(@new.Value);
-        }
     }
 
     private void OnScrambleNearby(EntityUid uid, HumanoidAppearanceComponent appearance, ScrambleNearbyEffect args)

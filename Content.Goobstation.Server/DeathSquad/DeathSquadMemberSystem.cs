@@ -14,9 +14,10 @@ namespace Content.Goobstation.Server.DeathSquad;
 /// <summary>
 /// In the future, I want this to block martial arts.
 /// </summary>
-public sealed partial class DeathSquadMemberSystem : EntitySystem
+public sealed class DeathSquadMemberSystem : EntitySystem
 {
     [Dependency] private readonly MobThresholdSystem _threshold = default!;
+
     public override void Initialize()
     {
         base.Initialize();

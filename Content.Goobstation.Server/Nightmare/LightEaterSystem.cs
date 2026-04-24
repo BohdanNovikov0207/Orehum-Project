@@ -24,9 +24,9 @@ namespace Content.Goobstation.Server.Nightmare;
 /// </summary>
 public sealed class LightEaterSystem : EntitySystem
 {
-    [Dependency] private readonly PowerCellSystem _powerCellSystem = default!;
-    [Dependency] private readonly SharedHandsSystem _handsSystem = default!;
     [Dependency] private readonly SharedActionsSystem _actions = default!;
+    [Dependency] private readonly SharedHandsSystem _handsSystem = default!;
+    [Dependency] private readonly PowerCellSystem _powerCellSystem = default!;
 
     public override void Initialize()
     {
@@ -55,9 +55,7 @@ public sealed class LightEaterSystem : EntitySystem
             var lightEater = Spawn(component.LightEaterProto, Transform(uid).Coordinates);
             component.LightEaterEntity = lightEater;
             if (!_handsSystem.TryPickupAnyHand(uid, lightEater))
-            {
                 QueueDel(component.LightEaterEntity);
-            }
         }
         else if (component.LightEaterEntity != null)
             QueueDel(component.LightEaterEntity);

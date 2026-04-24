@@ -25,14 +25,20 @@ public sealed partial class DashActionComponent : Component
 
 public sealed partial class DashActionEvent : WorldTargetActionEvent
 {
+    /// <summary>
+    /// Whether dash distance and speed are affected by performer's speed modifiers. Should be true most of the time.
+    /// </summary>
+    [DataField]
+    public bool AffectedBySpeed = true;
+
     [DataField]
     public float Distance = 4.65f;
 
+    /// <summary>
+    /// Animated emote to play on successful dash.
+    /// </summary>
     [DataField]
-    public float Speed = 9.65f;
-
-    [DataField]
-    public float? StaminaDrain;
+    public ProtoId<EmotePrototype>? Emote = "Flip";
 
     /// <summary>
     /// Whether you need gravity to perform the dash. Keep in mind there's no friction without gravity so if this
@@ -41,15 +47,9 @@ public sealed partial class DashActionEvent : WorldTargetActionEvent
     [DataField]
     public bool NeedsGravity = true;
 
-    /// <summary>
-    /// Whether dash distance and speed are affected by performer's speed modifiers. Should be true most of the time.
-    /// </summary>
     [DataField]
-    public bool AffectedBySpeed = true;
+    public float Speed = 9.65f;
 
-    /// <summary>
-    /// Animated emote to play on successful dash.
-    /// </summary>
     [DataField]
-    public ProtoId<EmotePrototype>? Emote = "Flip";
+    public float? StaminaDrain;
 }

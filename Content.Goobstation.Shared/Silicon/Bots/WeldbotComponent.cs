@@ -22,31 +22,31 @@ namespace Content.Goobstation.Shared.Silicon.Bots;
 public sealed partial class WeldbotComponent : Component
 {
     /// <summary>
-    /// Sound played after welding a patient.
-    /// </summary>
-    [DataField]
-    public SoundSpecifier WeldSound = new SoundPathSpecifier("/Audio/Items/welder2.ogg");
-
-    /// <summary>
     /// Heal or emagged damage amount
     /// </summary>
     [DataField]
     public DamageSpecifier DamageAmount = new()
     {
-        DamageDict = new()
+        DamageDict = new Dictionary<string, FixedPoint2>
         {
             { "Blunt", -10 },
             { "Slash", -10 },
             { "Piercing", -10 },
-            { "Structural", -20 }
-        }
+            { "Structural", -20 },
+        },
     };
 
     [DataField]
     public SoundSpecifier EmagSparkSound = new SoundCollectionSpecifier("sparks")
     {
-        Params = AudioParams.Default.WithVolume(8f)
+        Params = AudioParams.Default.WithVolume(8f),
     };
 
     public bool IsEmagged = false;
+
+    /// <summary>
+    /// Sound played after welding a patient.
+    /// </summary>
+    [DataField]
+    public SoundSpecifier WeldSound = new SoundPathSpecifier("/Audio/Items/welder2.ogg");
 }

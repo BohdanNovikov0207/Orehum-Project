@@ -1,4 +1,3 @@
-using Content.Goobstation.Shared.Disease;
 using Content.Goobstation.Shared.Disease.Components;
 using Content.Shared.EntityEffects;
 using Robust.Shared.Prototypes;
@@ -17,12 +16,13 @@ public sealed partial class MutateDiseases : EventEntityEffect<MutateDiseases>
     public float MutationRate = 0.05f;
 
     [DataField]
-    public bool Scaled = true;
+    public float Quantity = 1f;
 
     [DataField]
     public float Scale = 1f;
+
     [DataField]
-    public float Quantity = 1f;
+    public bool Scaled = true;
 
     public MutateDiseases(float mutationRate, bool scaled, float scale, float quantity)
     {
@@ -32,11 +32,9 @@ public sealed partial class MutateDiseases : EventEntityEffect<MutateDiseases>
         Quantity = quantity;
     }
 
-    protected override string? ReagentEffectGuidebookText(IPrototypeManager prototype, IEntitySystemManager entSys)
-    {
-        return Loc.GetString("reagent-effect-guidebook-disease-mutate",
+    protected override string? ReagentEffectGuidebookText(IPrototypeManager prototype, IEntitySystemManager entSys) =>
+        Loc.GetString("reagent-effect-guidebook-disease-mutate",
             ("amount", MutationRate));
-    }
 
     public override void Effect(EntityEffectBaseArgs args)
     {

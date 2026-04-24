@@ -18,19 +18,14 @@ namespace Content.Goobstation.Shared.Redial;
 
 public sealed class MsgRedial : NetMessage
 {
+    public string Address = string.Empty;
     public override MsgGroups MsgGroup => MsgGroups.Core;
 
-    public string Address = string.Empty;
-
-    public override void ReadFromBuffer(NetIncomingMessage buffer, IRobustSerializer serializer)
-    {
-        Address = buffer.ReadString();
-    }
-
-    public override void WriteToBuffer(NetOutgoingMessage buffer, IRobustSerializer serializer)
-    {
-        buffer.Write(Address);
-    }
-
     public override NetDeliveryMethod DeliveryMethod => NetDeliveryMethod.ReliableOrdered;
+
+    public override void ReadFromBuffer(NetIncomingMessage buffer, IRobustSerializer serializer) =>
+        Address = buffer.ReadString();
+
+    public override void WriteToBuffer(NetOutgoingMessage buffer, IRobustSerializer serializer) =>
+        buffer.Write(Address);
 }

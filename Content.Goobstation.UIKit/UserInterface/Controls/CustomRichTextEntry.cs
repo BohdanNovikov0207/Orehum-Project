@@ -3,7 +3,6 @@
 //
 // SPDX-License-Identifier: AGPL-3.0-or-later
 
-using System.Linq;
 using System.Numerics;
 using System.Text;
 using Content.Goobstation.UIKit.UserInterface.RichText;
@@ -27,17 +26,17 @@ internal struct CustomRichTextEntry
     public readonly FormattedMessage Message;
 
     /// <summary>
-    ///     The vertical size of this entry, in pixels.
+    /// The vertical size of this entry, in pixels.
     /// </summary>
     public int Height;
 
     /// <summary>
-    ///     The horizontal size of this entry, in pixels.
+    /// The horizontal size of this entry, in pixels.
     /// </summary>
     public int Width;
 
     /// <summary>
-    ///     The combined text indices in the message's text tags to put line breaks.
+    /// The combined text indices in the message's text tags to put line breaks.
     /// </summary>
     public ValueList<int> LineBreaks;
 
@@ -48,12 +47,12 @@ internal struct CustomRichTextEntry
     public readonly Dictionary<int, Control>? Controls;
 
     public CustomRichTextEntry(
-            FormattedMessage message,
-            Control parent,
-            MarkupTagManager tagManager,
-            IEntityManager entManager,
-            Type[]? tagsAllowed = null,
-            Color? defaultColor = null)
+        FormattedMessage message,
+        Control parent,
+        MarkupTagManager tagManager,
+        IEntityManager entManager,
+        Type[]? tagsAllowed = null,
+        Color? defaultColor = null)
     {
         Message = message;
         Height = 0;
@@ -61,7 +60,7 @@ internal struct CustomRichTextEntry
         LineBreaks = default;
         IsInBox = false;
         _entManager = entManager;
-        _defaultColor = defaultColor ?? new(200, 200, 200);
+        _defaultColor = defaultColor ?? new Color(200, 200, 200);
         _tagsAllowed = tagsAllowed;
         Dictionary<int, Control>? tagControls = null;
 
@@ -76,7 +75,8 @@ internal struct CustomRichTextEntry
             if (node.Name == ExamineBorderTag.TagName)
                 IsInBox = true;
 
-            if (!tagManager.TryGetMarkupTagHandler(node.Name, _tagsAllowed, out var handler) || !handler.TryCreateControl(node, out var control))
+            if (!tagManager.TryGetMarkupTagHandler(node.Name, _tagsAllowed, out var handler) ||
+                !handler.TryCreateControl(node, out var control))
                 continue;
 
             // Markup tag handler instances are shared across controls. We need to ensure that the hanlder doesn't
@@ -95,6 +95,7 @@ internal struct CustomRichTextEntry
 
         Controls = tagControls;
     }
+
     // TODO RICH TEXT
     // Somehow ensure that this **has** to be called when removing rich text from some control.
     /// <summary>
@@ -112,13 +113,17 @@ internal struct CustomRichTextEntry
     }
 
     /// <summary>
-    ///     Recalculate line dimensions and where it has line breaks for word wrapping.
+    /// Recalculate line dimensions and where it has line breaks for word wrapping.
     /// </summary>
     /// <param name="defaultFont">The font being used for display.</param>
     /// <param name="maxSizeX">The maximum horizontal size of the container of this entry.</param>
     /// <param name="uiScale"></param>
     /// <param name="lineHeightScale"></param>
-    public CustomRichTextEntry Update(MarkupTagManager tagManager, Font defaultFont, float maxSizeX, float uiScale, float lineHeightScale = 1)
+    public CustomRichTextEntry Update(MarkupTagManager tagManager,
+        Font defaultFont,
+        float maxSizeX,
+        float uiScale,
+        float lineHeightScale = 1)
     {
         // This method is gonna suck due to complexity.
         // Bear with me here.
@@ -169,7 +174,8 @@ internal struct CustomRichTextEntry
 
             var desiredSize = control.DesiredPixelSize;
             var controlMetrics = new CharMetrics(
-                0, 0,
+                0,
+                0,
                 desiredSize.X,
                 desiredSize.X,
                 desiredSize.Y);
@@ -225,6 +231,7 @@ internal struct CustomRichTextEntry
                 controlTyped.IsVisible = false;
                 continue;
             }
+
             control.Visible = false;
         }
     }
@@ -243,15 +250,15 @@ internal struct CustomRichTextEntry
         var screenHandle = (DrawingHandleScreen) handle;
         // TODO: It should precalculate, instead of drawing, calculate and draw again
         var bounds = DrawBoxContent(
-                tagManager,
-                handle,
-                defaultFont,
-                drawBox,
-                verticalOffset,
-                scrollBarPixelSize,
-                context,
-                uiScale,
-                lineHeightScale);
+            tagManager,
+            handle,
+            defaultFont,
+            drawBox,
+            verticalOffset,
+            scrollBarPixelSize,
+            context,
+            uiScale,
+            lineHeightScale);
 
         // Draw background box
         if (IsInBox)
@@ -261,8 +268,7 @@ internal struct CustomRichTextEntry
 
             screenHandle.DrawRect(
                 bounds,
-                Color.FromHex("#1b1a22"),
-                true);
+                Color.FromHex("#1b1a22"));
 
             screenHandle.DrawRect(
                 bounds,
@@ -272,7 +278,15 @@ internal struct CustomRichTextEntry
         }
 
         // And draw actual content
-        DrawBoxContent(tagManager, handle, defaultFont, drawBox, verticalOffset, scrollBarPixelSize, context, uiScale, lineHeightScale);
+        DrawBoxContent(tagManager,
+            handle,
+            defaultFont,
+            drawBox,
+            verticalOffset,
+            scrollBarPixelSize,
+            context,
+            uiScale,
+            lineHeightScale);
     }
 
     private UIBox2 DrawBoxContent(
@@ -290,17 +304,18 @@ internal struct CustomRichTextEntry
         context.Color.Push(_defaultColor);
         context.Font.Push(defaultFont);
 
-        float sPixelWidth = 0f;
-        float margin = 0f;
+        var sPixelWidth = 0f;
+        var margin = 0f;
         if (IsInBox)
         {
             sPixelWidth = scrollBarPixelSize.X;
-            margin = (Margin / 4) * uiScale;
+            margin = Margin / 4 * uiScale;
         }
 
         var globalBreakCounter = 0;
         var lineBreakIndex = 0;
-        var baseLine = drawBox.TopLeft + new Vector2(margin - sPixelWidth, defaultFont.GetAscent(uiScale) + verticalOffset);
+        var baseLine = drawBox.TopLeft +
+                       new Vector2(margin - sPixelWidth, defaultFont.GetAscent(uiScale) + verticalOffset);
         var baseLineBase = baseLine;
         var controlYAdvance = 0f;
 
@@ -323,7 +338,8 @@ internal struct CustomRichTextEntry
                 if (lineBreakIndex < LineBreaks.Count &&
                     LineBreaks[lineBreakIndex] == globalBreakCounter)
                 {
-                    baseLine = new Vector2(drawBox.Left + margin - sPixelWidth, baseLine.Y + GetLineHeight(font, uiScale, lineHeightScale) + controlYAdvance);
+                    baseLine = new Vector2(drawBox.Left + margin - sPixelWidth,
+                        baseLine.Y + GetLineHeight(font, uiScale, lineHeightScale) + controlYAdvance);
                     controlYAdvance = 0;
                     lineBreakIndex += 1;
                 }
@@ -346,7 +362,8 @@ internal struct CustomRichTextEntry
                 control.Visible = true;
 
             var invertedScale = 1f / uiScale;
-            var pos = new Vector2(baseLine.X * invertedScale, (baseLine.Y - defaultFont.GetAscent(uiScale)) * invertedScale);
+            var pos = new Vector2(baseLine.X * invertedScale,
+                (baseLine.Y - defaultFont.GetAscent(uiScale)) * invertedScale);
             LayoutContainer.SetPosition(control, pos);
             control.Measure(new Vector2(Width, Height));
             if (staticSprite is not null &&
@@ -357,8 +374,8 @@ internal struct CustomRichTextEntry
                 !metaData.Deleted)
             {
                 var spritePos = new Vector2(
-                        pos.X + (staticSprite.SetWidth/2),
-                        pos.Y + (staticSprite.SetHeight/2));
+                    pos.X + staticSprite.SetWidth / 2,
+                    pos.Y + staticSprite.SetHeight / 2);
                 float spriteScaleX;
                 float spriteScaleY;
                 if (spriteComp.Icon is not null)
@@ -373,21 +390,23 @@ internal struct CustomRichTextEntry
                 }
 
                 screenHandle.DrawEntity(staticSprite.Entity.Value,
-                        spritePos * uiScale,
-                        new Vector2(spriteScaleX, spriteScaleY) * uiScale,
-                        Angle.Zero);
+                    spritePos * uiScale,
+                    new Vector2(spriteScaleX, spriteScaleY) * uiScale,
+                    Angle.Zero);
             }
 
             var advanceX = control.SetWidth;
-            controlYAdvance = Math.Max(0f, (control.DesiredPixelSize.Y - GetLineHeight(font, uiScale, lineHeightScale)) * invertedScale);
+            controlYAdvance = Math.Max(0f,
+                (control.DesiredPixelSize.Y - GetLineHeight(font, uiScale, lineHeightScale)) * invertedScale);
             baseLine += new Vector2(advanceX, 0);
         }
 
-        var boxPadding = (BoxPadding * uiScale);
+        var boxPadding = BoxPadding * uiScale;
 
         return new UIBox2(
-                new Vector2(drawBox.Left + (margin - boxPadding) - sPixelWidth, baseLineBase.Y - boxPadding),
-                new Vector2(drawBox.Right - (margin - boxPadding) - sPixelWidth, baseLine.Y - GetLineHeight(defaultFont, uiScale, lineHeightScale) + boxPadding));
+            new Vector2(drawBox.Left + (margin - boxPadding) - sPixelWidth, baseLineBase.Y - boxPadding),
+            new Vector2(drawBox.Right - (margin - boxPadding) - sPixelWidth,
+                baseLine.Y - GetLineHeight(defaultFont, uiScale, lineHeightScale) + boxPadding));
     }
 
     private readonly string ProcessNode(MarkupTagManager tagManager, MarkupNode node, MarkupDrawingContext context)
@@ -413,6 +432,6 @@ internal struct CustomRichTextEntry
     private static int GetLineHeight(Font font, float uiScale, float lineHeightScale)
     {
         var height = font.GetLineHeight(uiScale);
-        return (int)(height * lineHeightScale);
+        return (int) (height * lineHeightScale);
     }
 }

@@ -21,13 +21,11 @@ namespace Content.Goobstation.Client.Physics;
 
 public sealed class ComplexJointVisualsOverlay : Overlay
 {
-    public override OverlaySpace Space => OverlaySpace.WorldSpaceEntities;
-
     private readonly IEntityManager _entManager;
 
     private readonly SpriteSystem _sprite;
-    private readonly TransformSystem _transform;
     private readonly IGameTiming _timing;
+    private readonly TransformSystem _transform;
 
     private readonly ShaderInstance _unshadedShader;
 
@@ -44,6 +42,8 @@ public sealed class ComplexJointVisualsOverlay : Overlay
 
         _unshadedShader = prototype.Index<ShaderPrototype>("unshaded").Instance();
     }
+
+    public override OverlaySpace Space => OverlaySpace.WorldSpaceEntities;
 
     protected override void Draw(in OverlayDrawArgs args)
     {

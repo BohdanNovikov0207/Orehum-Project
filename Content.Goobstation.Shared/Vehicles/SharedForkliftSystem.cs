@@ -2,7 +2,6 @@
 // SPDX-License-Identifier: AGPL-3.0-or-later
 
 using System.Linq;
-using System.Numerics;
 using Content.Goobstation.Shared.Training;
 using Content.Shared.Actions;
 using Content.Shared.Actions.Components;
@@ -17,17 +16,16 @@ namespace Content.Goobstation.Shared.Vehicles;
 
 public sealed class ForkliftSystem : EntitySystem
 {
-    [Dependency] private readonly SharedAppearanceSystem _appearance = default!;
-    [Dependency] private readonly SharedContainerSystem _container = default!;
-    [Dependency] private readonly TagSystem _tag = default!;
-    [Dependency] private readonly SharedActionsSystem _action = default!;
-    [Dependency] private readonly SharedAudioSystem _audio = default!;
-    [Dependency] private readonly IGameTiming _timing = default!;
-
     private const string CrateContainerId = "crate_storage";
     private static readonly ProtoId<TagPrototype> CrateTag = "Crate";
     private static readonly EntProtoId LiftForkActionId = "ActionForklift";
     private static readonly EntProtoId UnliftForkActionId = "ActionUnforklift";
+    [Dependency] private readonly SharedActionsSystem _action = default!;
+    [Dependency] private readonly SharedAppearanceSystem _appearance = default!;
+    [Dependency] private readonly SharedAudioSystem _audio = default!;
+    [Dependency] private readonly SharedContainerSystem _container = default!;
+    [Dependency] private readonly TagSystem _tag = default!;
+    [Dependency] private readonly IGameTiming _timing = default!;
 
     public override void Initialize()
     {
@@ -40,7 +38,6 @@ public sealed class ForkliftSystem : EntitySystem
         SubscribeLocalEvent<ForkliftComponent, StrapAttemptEvent>(OnStrapAttempt);
         SubscribeLocalEvent<ForkliftActionEvent>(OnLiftForks);
         SubscribeLocalEvent<ForkliftComponent, UnforkliftActionEvent>(OnUnliftForks);
-
     }
 
     public override void Update(float frameTime)
@@ -57,13 +54,15 @@ public sealed class ForkliftSystem : EntitySystem
                 _audio.Stop(comp.LiftSoundUid.Value);
                 comp.LiftSoundUid = null;
             }
+
             comp.LiftSoundEndTime = null;
         }
     }
 
     private void OnUnliftForks(Entity<ForkliftComponent> ent, ref UnforkliftActionEvent args)
     {
-        if (args.Handled || !_container.TryGetContainer(ent.Owner, CrateContainerId, out var container) || container.ContainedEntities.Count == 0)
+        if (args.Handled || !_container.TryGetContainer(ent.Owner, CrateContainerId, out var container) ||
+            container.ContainedEntities.Count == 0)
             return;
 
         var targetCoords = Transform(ent).Coordinates.Offset(Transform(ent).LocalRotation.GetDir().ToVec());
@@ -121,15 +120,12 @@ public sealed class ForkliftSystem : EntitySystem
         _action.AddAction(args.Buckle.Owner, ref ent.Comp.UnliftAction, UnliftForkActionId, ent);
     }
 
-    private void OnUpdate<T>(Entity<ForkliftComponent> ent, ref T args)
-    {
-        UpdateAppearance(ent);
-    }
+    private void OnUpdate<T>(Entity<ForkliftComponent> ent, ref T args) => UpdateAppearance(ent);
 
     private void UpdateAppearance(Entity<ForkliftComponent> ent)
     {
-
-        if(!_container.TryGetContainer(ent, CrateContainerId, out var container) || !TryComp<VehicleComponent>(ent, out var vehicle) || vehicle.ActiveOverlay == null)
+        if (!_container.TryGetContainer(ent, CrateContainerId, out var container) ||
+            !TryComp<VehicleComponent>(ent, out var vehicle) || vehicle.ActiveOverlay == null)
             return;
 
         var state = container.ContainedEntities.Count switch

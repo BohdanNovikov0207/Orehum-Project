@@ -3,7 +3,7 @@ using Content.Shared.Weapons.Melee.Events;
 
 namespace Content.Goobstation.Shared.Disease.Systems;
 
-public sealed partial class DiseaseOnHitSystem : EntitySystem
+public sealed class DiseaseOnHitSystem : EntitySystem
 {
     [Dependency] private readonly SharedDiseaseSystem _disease = default!;
 
@@ -22,16 +22,16 @@ public sealed partial class DiseaseOnHitSystem : EntitySystem
         foreach (var target in args.HitEntities)
         {
             if (ent.Comp.Disease != null)
-            {
                 _disease.DoInfectionAttempt(target, ent.Comp.Disease.Value, ent.Comp.SpreadParams);
-            }
             else
             {
                 if (!TryComp<DiseaseCarrierComponent>(ent, out var carrier))
                     return;
 
                 foreach (var disease in carrier.Diseases.ContainedEntities)
+                {
                     _disease.DoInfectionAttempt(target, disease, ent.Comp.SpreadParams);
+                }
             }
         }
     }

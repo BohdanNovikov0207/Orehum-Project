@@ -4,6 +4,8 @@
 //
 // SPDX-License-Identifier: AGPL-3.0-or-later
 
+using System.Diagnostics.CodeAnalysis;
+using System.Linq;
 using Content.Client.Message;
 using Content.Client.Stylesheets;
 using Content.Client.UserInterface.Controls;
@@ -17,8 +19,6 @@ using Robust.Client.UserInterface.Controls;
 using Robust.Client.UserInterface.XAML;
 using Robust.Shared.Timing;
 using Robust.Shared.Utility;
-using System.Diagnostics.CodeAnalysis;
-using System.Linq;
 
 namespace Content.Goobstation.Client.Supermatter.Consoles;
 
@@ -26,31 +26,29 @@ namespace Content.Goobstation.Client.Supermatter.Consoles;
 public sealed partial class SupermatterConsoleWindow : FancyWindow
 {
     private readonly IEntityManager _entManager;
-    private readonly SpriteSystem _spriteSystem;
     private readonly SharedNavMapSystem _navMapSystem;
 
-    private EntityUid? _owner;
-    private NetEntity? _trackedEntity;
-
-    private SupermatterConsoleEntry[]? _supermatters = null;
+    private readonly EntityUid? _owner;
+    private readonly SpriteSystem _spriteSystem;
     private IEnumerable<SupermatterConsoleEntry>? _activeAlerts = null;
 
-    public event Action<NetEntity?>? SendFocusChangeMessageAction;
+    private bool _autoScrollActive;
+    private bool _autoScrollAwaitsUpdate;
+    private Color _dangerColor = new(255, 67, 67);
+    private Color _goodColor = Color.LimeGreen;
+    private Color _inactiveColor = StyleNano.DisabledFore;
+    private Color _monitorBlipColor = Color.Cyan;
+    private Color _regionBaseColor = new(154, 154, 154);
+    private Color _statusTextColor = StyleNano.GoodGreenFore;
 
-    private bool _autoScrollActive = false;
-    private bool _autoScrollAwaitsUpdate = false;
+    private SupermatterConsoleEntry[]? _supermatters;
+    private Color _tileColor = new(28, 28, 28);
+    private NetEntity? _trackedEntity;
+    private Color _untrackedEntColor = Color.DimGray;
 
     // Colors
-    private Color _wallColor = new Color(64, 64, 64);
-    private Color _tileColor = new Color(28, 28, 28);
-    private Color _monitorBlipColor = Color.Cyan;
-    private Color _untrackedEntColor = Color.DimGray;
-    private Color _regionBaseColor = new Color(154, 154, 154);
-    private Color _inactiveColor = StyleNano.DisabledFore;
-    private Color _statusTextColor = StyleNano.GoodGreenFore;
-    private Color _goodColor = Color.LimeGreen;
-    private Color _warningColor = new Color(255, 182, 72);
-    private Color _dangerColor = new Color(255, 67, 67);
+    private Color _wallColor = new(64, 64, 64);
+    private Color _warningColor = new(255, 182, 72);
 
     public SupermatterConsoleWindow(SupermatterConsoleBoundUserInterface userInterface, EntityUid? owner)
     {
@@ -65,6 +63,8 @@ public sealed partial class SupermatterConsoleWindow : FancyWindow
         // Set supermatter monitoring message action
         SendFocusChangeMessageAction += userInterface.SendFocusChangeMessage;
     }
+
+    public event Action<NetEntity?>? SendFocusChangeMessageAction;
 
     public void UpdateUI(SupermatterConsoleEntry[] supermatters, SupermatterFocusData? focusData)
     {
@@ -85,10 +85,12 @@ public sealed partial class SupermatterConsoleWindow : FancyWindow
         var supermattersCount = _supermatters.Count();
 
         while (SupermattersTable.ChildCount > supermattersCount)
+        {
             SupermattersTable.RemoveChild(SupermattersTable.GetChild(SupermattersTable.ChildCount - 1));
+        }
 
         // Update all entries in each table
-        for (int index = 0; index < _supermatters.Count(); index++)
+        for (var index = 0; index < _supermatters.Count(); index++)
         {
             var entry = _supermatters.ElementAt(index);
             UpdateUIEntry(entry, index, SupermattersTable, console, focusData);
@@ -97,7 +99,7 @@ public sealed partial class SupermatterConsoleWindow : FancyWindow
         // If no alerts are active, display a message
         if (supermattersCount == 0)
         {
-            var label = new RichTextLabel()
+            var label = new RichTextLabel
             {
                 HorizontalExpand = true,
                 VerticalExpand = true,
@@ -118,7 +120,11 @@ public sealed partial class SupermatterConsoleWindow : FancyWindow
         }
     }
 
-    private void UpdateUIEntry(SupermatterConsoleEntry entry, int index, Control table, SupermatterConsoleComponent console, SupermatterFocusData? focusData = null)
+    private void UpdateUIEntry(SupermatterConsoleEntry entry,
+        int index,
+        Control table,
+        SupermatterConsoleComponent console,
+        SupermatterFocusData? focusData = null)
     {
         // Make new UI entry if required
         if (index >= table.ChildCount)
@@ -152,7 +158,7 @@ public sealed partial class SupermatterConsoleWindow : FancyWindow
             return;
         }
 
-        var entryContainer = (SupermatterEntryContainer)tableChild;
+        var entryContainer = (SupermatterEntryContainer) tableChild;
 
         entryContainer.UpdateEntry(entry, entry.NetEntity == _trackedEntity, focusData);
     }
@@ -174,7 +180,7 @@ public sealed partial class SupermatterConsoleWindow : FancyWindow
         var scroll = SupermattersTable.Parent as ScrollContainer;
         if (scroll == null
             || !TryGetVerticalScrollbar(scroll, out var vScrollbar)
-            || !TryGetNextScrollPosition(out float? nextScrollPosition))
+            || !TryGetNextScrollPosition(out var nextScrollPosition))
             return;
 
         vScrollbar.ValueTarget = nextScrollPosition.Value;
@@ -213,7 +219,7 @@ public sealed partial class SupermatterConsoleWindow : FancyWindow
             return false;
 
         var container = scroll.Children.ElementAt(0) as BoxContainer;
-        if (container == null 
+        if (container == null
             || container.Children.Count() == 0)
             return false;
 
@@ -225,11 +231,11 @@ public sealed partial class SupermatterConsoleWindow : FancyWindow
 
         foreach (var control in container.Children)
         {
-            if (control == null 
+            if (control == null
                 || control is not SupermatterEntryContainer)
                 continue;
 
-            if (((SupermatterEntryContainer)control).NetEntity == _trackedEntity)
+            if (((SupermatterEntryContainer) control).NetEntity == _trackedEntity)
                 return true;
 
             nextScrollPosition += control.Height;

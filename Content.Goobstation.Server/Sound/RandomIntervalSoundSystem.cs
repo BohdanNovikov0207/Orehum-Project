@@ -13,11 +13,11 @@ namespace Content.Goobstation.Server.Sound;
 /// </summary>
 public sealed class RandomIntervalSoundSystem : EntitySystem
 {
-    [Dependency] private readonly IGameTiming _timing = default!;
-    [Dependency] private readonly IRobustRandom _random = default!;
     [Dependency] private readonly SharedAudioSystem _audio = default!;
     [Dependency] private readonly SharedContainerSystem _containers = default!;
     [Dependency] private readonly MobStateSystem _mobState = default!;
+    [Dependency] private readonly IRobustRandom _random = default!;
+    [Dependency] private readonly IGameTiming _timing = default!;
 
     public override void Initialize()
     {
@@ -76,10 +76,8 @@ public sealed class RandomIntervalSoundSystem : EntitySystem
         }
     }
 
-    private TimeSpan GetInterval(RandomIntervalSoundComponent comp)
-    {
-        return comp.MinInterval < comp.MaxInterval
+    private TimeSpan GetInterval(RandomIntervalSoundComponent comp) =>
+        comp.MinInterval < comp.MaxInterval
             ? _random.Next(comp.MinInterval, comp.MaxInterval)
             : comp.MaxInterval;
-    }
 }

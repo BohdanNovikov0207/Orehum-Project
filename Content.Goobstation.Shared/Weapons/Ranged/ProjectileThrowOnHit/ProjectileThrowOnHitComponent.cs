@@ -13,42 +13,46 @@ namespace Content.Goobstation.Shared.Weapons.Ranged.ProjectileThrowOnHit;
 /// <summary>
 /// This is used for a projectile that tosses entities it hits.
 /// </summary>
-[RegisterComponent, NetworkedComponent, AutoGenerateComponentState]
+[RegisterComponent] [NetworkedComponent] [AutoGenerateComponentState]
 public sealed partial class ProjectileThrowOnHitComponent : Component
 {
     /// <summary>
-    /// The speed at which hit entities should be thrown.
-    /// </summary>
-    [DataField, AutoNetworkedField]
-    public float Speed = 10f;
-
-    /// <summary>
     /// The maximum distance the hit entity should be thrown.
     /// </summary>
-    [DataField, AutoNetworkedField]
+    [DataField] [AutoNetworkedField]
     public float Distance = 20f;
 
     /// <summary>
-    /// Whether or not anchorable entities should be unanchored when hit.
+    /// The speed at which hit entities should be thrown.
     /// </summary>
-    [DataField, AutoNetworkedField]
-    public bool UnanchorOnHit;
+    [DataField] [AutoNetworkedField]
+    public float Speed = 10f;
 
     /// <summary>
     /// How long should this stun the target, if applicable?
     /// </summary>
-    [DataField, AutoNetworkedField]
+    [DataField] [AutoNetworkedField]
     public TimeSpan? StunTime;
+
+    /// <summary>
+    /// Whether or not anchorable entities should be unanchored when hit.
+    /// </summary>
+    [DataField] [AutoNetworkedField]
+    public bool UnanchorOnHit;
 }
 
 /// <summary>
-/// Raised a weapon entity with <see cref="ProjectileThrowOnHitComponent"/> to see if a throw is allowed.
+/// Raised a weapon entity with <see cref="ProjectileThrowOnHitComponent" /> to see if a throw is allowed.
 /// </summary>
 [ByRefEvent]
-public record struct AttemptProjectileThrowOnHitEvent(EntityUid Target, EntityUid? User, bool Cancelled = false, bool Handled = false);
+public record struct AttemptProjectileThrowOnHitEvent(
+    EntityUid Target,
+    EntityUid? User,
+    bool Cancelled = false,
+    bool Handled = false);
 
 /// <summary>
-/// Raised a target entity before it is thrown by <see cref="ProjectileThrowOnHitComponent"/>.
+/// Raised a target entity before it is thrown by <see cref="ProjectileThrowOnHitComponent" />.
 /// </summary>
 [ByRefEvent]
 public record struct ProjectileThrowOnHitStartEvent(EntityUid Weapon, EntityUid? User);

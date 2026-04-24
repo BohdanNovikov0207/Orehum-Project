@@ -13,7 +13,7 @@ namespace Content.Goobstation.Shared.Enchanting.Components;
 /// Linearly reduces damage from firestacks by <c>factor * level</c>.
 /// Similar to <c>FireProtectionComponent</c> for clothing but networked.
 /// </summary>
-[RegisterComponent, NetworkedComponent, Access(typeof(FireProtEnchantSystem))]
+[RegisterComponent] [NetworkedComponent] [Access(typeof(FireProtEnchantSystem))]
 [AutoGenerateComponentState]
 [EntityCategory("Enchants")]
 public sealed partial class FireProtEnchantComponent : Component
@@ -22,13 +22,13 @@ public sealed partial class FireProtEnchantComponent : Component
     /// Base of the linear fire protection function.
     /// Gets repeatedly added for each level then subtracted from the fire modifier.
     /// </summary>
-    [DataField, AutoNetworkedField]
+    [DataField] [AutoNetworkedField]
     public float Reduction = 0.1f;
 
     /// <summary>
     /// Base of the exponential heat protection function.
     /// Gets exponentially smaller with higher levels, eventually making it nigh-impossible to heat you up.
     /// </summary>
-    [DataField, AutoNetworkedField]
+    [DataField] [AutoNetworkedField]
     public float TempModifier = 0.1f;
 }

@@ -53,10 +53,8 @@ public partial class SharedMartialArtsSystem
             Dirty(ent);
     }
 
-    private void OnSave(Entity<CanPerformComboComponent> ent, ref SaveLastAttacksEvent args)
-    {
-        ent.Comp.LastAttacksSaved = new(ent.Comp.LastAttacks);
-    }
+    private void OnSave(Entity<CanPerformComboComponent> ent, ref SaveLastAttacksEvent args) =>
+        ent.Comp.LastAttacksSaved = new List<ComboAttackType>(ent.Comp.LastAttacks);
 
     private void OnMapInit(EntityUid uid, CanPerformComboComponent component, MapInitEvent args)
     {
@@ -93,6 +91,7 @@ public partial class SharedMartialArtsSystem
             if (difference > 0)
                 component.LastAttacks.RemoveRange(0, difference);
         }
+
         CheckCombo(uid, args.Target, component);
         RaiseLocalEvent(uid, ref afterEv);
         Dirty(uid, component);
@@ -127,8 +126,7 @@ public partial class SharedMartialArtsSystem
             RaiseLocalEvent(uid, ev);
         }
     }
-    private void OnComboBeingPerformed(Entity<CanPerformComboComponent> ent, ref ComboBeingPerformedEvent args)
-    {
+
+    private void OnComboBeingPerformed(Entity<CanPerformComboComponent> ent, ref ComboBeingPerformedEvent args) =>
         ent.Comp.BeingPerformed = args.ProtoId;
-    }
 }

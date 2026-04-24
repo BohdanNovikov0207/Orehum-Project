@@ -8,7 +8,7 @@ using Robust.Shared.Serialization;
 
 namespace Content.Goobstation.Shared.MartialArts.Events;
 
-[Serializable, NetSerializable, ImplicitDataDefinitionForInheritors]
+[Serializable] [NetSerializable] [ImplicitDataDefinitionForInheritors]
 public abstract partial class BaseKungFuDragonEvent : EntityEventArgs
 {
     [DataField]
@@ -22,10 +22,10 @@ public sealed partial class DragonClawPerformedEvent : BaseKungFuDragonEvent
     public TimeSpan SlowdownTime = TimeSpan.FromSeconds(2);
 
     [DataField]
-    public float WalkSpeedModifier = 0.6f;
+    public float SprintSpeedModifier = 0.6f;
 
     [DataField]
-    public float SprintSpeedModifier = 0.6f;
+    public float WalkSpeedModifier = 0.6f;
 }
 
 [DataDefinition]

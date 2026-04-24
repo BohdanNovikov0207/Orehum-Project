@@ -30,13 +30,13 @@ namespace Content.Goobstation.Shared.EntityEffects;
 public sealed partial class CreateRQuantityEntityReactionEffect : EntityEffect
 {
     /// <summary>
-    ///     What entity to create.
+    /// What entity to create.
     /// </summary>
     [DataField(required: true, customTypeSerializer: typeof(PrototypeIdSerializer<EntityPrototype>))]
     public string Entity = default!;
 
     /// <summary>
-    ///     What is our maximum allowed entities to be spawned?
+    /// What is our maximum allowed entities to be spawned?
     /// </summary>
     [DataField]
     public int MaxEntities = 1;
@@ -56,7 +56,8 @@ public sealed partial class CreateRQuantityEntityReactionEffect : EntityEffect
 
         for (var i = 0; i < quantity; i++)
         {
-            var uid = args.EntityManager.SpawnEntity(Entity, transformSystem.GetMapCoordinates(args.TargetEntity, xform: transform));
+            var uid = args.EntityManager.SpawnEntity(Entity,
+                transformSystem.GetMapCoordinates(args.TargetEntity, transform));
             transformSystem.AttachToGridOrMap(uid);
         }
     }

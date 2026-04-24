@@ -31,6 +31,7 @@ public sealed class ActionUseDelayOnUseSystem : EntitySystem
 
         ent.Comp.OriginalUseDelay = action.UseDelay.Value;
     }
+
     private void OnActionPerformed(Entity<ActionUseDelayOnUseComponent> ent, ref ActionPerformedEvent args)
     {
         if (!_actionQuery.TryComp(ent, out var action))

@@ -4,7 +4,6 @@
 // SPDX-License-Identifier: AGPL-3.0-or-later
 
 using Content.Goobstation.Shared.Devil.Condemned;
-using Content.Goobstation.Shared.Enchanting.Components;
 using Content.Shared.IdentityManagement;
 using Content.Shared.Mind;
 using Content.Shared.Mobs;
@@ -48,7 +47,7 @@ public sealed class EnchantSacrificeSystem : EntitySystem
             return;
 
         // only care if the mob dies on an enchanting table
-        if (_enchanting.FindTable(mob) is not {} table)
+        if (_enchanting.FindTable(mob) is not { } table)
             return;
 
         var items = _enchanting.FindEnchantedItems(table);
@@ -64,7 +63,7 @@ public sealed class EnchantSacrificeSystem : EntitySystem
         }
 
         // nothing was upgraded L
-        if (upgraded == 0 || anyItem is not {} any)
+        if (upgraded == 0 || anyItem is not { } any)
             return;
 
         // no double dipping

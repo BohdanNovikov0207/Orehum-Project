@@ -25,10 +25,8 @@ public sealed class WaddleAnimationSystem : SharedWaddleAnimationSystem
         SubscribeLocalEvent<WaddleAnimationComponent, AnimationCompletedEvent>(OnAnimationCompleted);
     }
 
-    private void OnHandleState(Entity<WaddleAnimationComponent> ent, ref AfterAutoHandleStateEvent args)
-    {
+    private void OnHandleState(Entity<WaddleAnimationComponent> ent, ref AfterAutoHandleStateEvent args) =>
         UpdateAnimation(ent);
-    }
 
     private void OnAnimationCompleted(Entity<WaddleAnimationComponent> ent, ref AnimationCompletedEvent args)
     {
@@ -66,19 +64,15 @@ public sealed class WaddleAnimationSystem : SharedWaddleAnimationSystem
         sprite.Rotation = Angle.FromDegrees(0);
     }
 
-    private void PlayAnimation(Entity<WaddleAnimationComponent> ent)
-    {
+    private void PlayAnimation(Entity<WaddleAnimationComponent> ent) =>
         PlayWaddleAnimationUsing(
             ent,
             CalculateAnimationLength(ent),
             CalculateTumbleIntensity(ent)
         );
-    }
 
-    private float CalculateTumbleIntensity(WaddleAnimationComponent comp)
-    {
-        return comp.LastStep ? 360 - comp.TumbleIntensity : comp.TumbleIntensity;
-    }
+    private float CalculateTumbleIntensity(WaddleAnimationComponent comp) =>
+        comp.LastStep ? 360 - comp.TumbleIntensity : comp.TumbleIntensity;
 
     private TimeSpan CalculateAnimationLength(Entity<WaddleAnimationComponent> ent)
     {
@@ -95,12 +89,12 @@ public sealed class WaddleAnimationSystem : SharedWaddleAnimationSystem
 
         // jump peaks halfway through the animation
         var peak = (float) len.TotalSeconds * 0.5f;
-        var anim = new Animation()
+        var anim = new Animation
         {
             Length = len,
             AnimationTracks =
             {
-                new AnimationTrackComponentProperty()
+                new AnimationTrackComponentProperty
                 {
                     ComponentType = typeof(SpriteComponent),
                     Property = nameof(SpriteComponent.Rotation),
@@ -110,9 +104,9 @@ public sealed class WaddleAnimationSystem : SharedWaddleAnimationSystem
                         new AnimationTrackProperty.KeyFrame(Angle.FromDegrees(0), 0),
                         new AnimationTrackProperty.KeyFrame(Angle.FromDegrees(tumbleIntensity), peak),
                         new AnimationTrackProperty.KeyFrame(Angle.FromDegrees(0), peak),
-                    }
+                    },
                 },
-                new AnimationTrackComponentProperty()
+                new AnimationTrackComponentProperty
                 {
                     ComponentType = typeof(SpriteComponent),
                     Property = nameof(SpriteComponent.Offset),
@@ -122,9 +116,9 @@ public sealed class WaddleAnimationSystem : SharedWaddleAnimationSystem
                         new AnimationTrackProperty.KeyFrame(new Vector2(), 0),
                         new AnimationTrackProperty.KeyFrame(ent.Comp.HopIntensity, peak),
                         new AnimationTrackProperty.KeyFrame(new Vector2(), peak),
-                    }
-                }
-            }
+                    },
+                },
+            },
         };
 
         _animation.Play(ent.Owner, anim, ent.Comp.KeyName);

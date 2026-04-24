@@ -57,7 +57,8 @@ public sealed partial class PickNearbyServicableHydroponicsTrayOperator : HTNOpe
     {
         var owner = blackboard.GetValue<EntityUid>(NPCBlackboard.Owner);
 
-        if (!blackboard.TryGetValue<float>(RangeKey, out var range, _entManager) || !_entManager.TryGetComponent<PlantbotComponent>(owner, out _))
+        if (!blackboard.TryGetValue<float>(RangeKey, out var range, _entManager) ||
+            !_entManager.TryGetComponent<PlantbotComponent>(owner, out _))
             return (false, null);
 
         var entityQuery = _entManager.GetEntityQuery<PlantHolderComponent>();
@@ -68,7 +69,11 @@ public sealed partial class PickNearbyServicableHydroponicsTrayOperator : HTNOpe
             if (!entityQuery.TryGetComponent(target, out var plantHolderComponent))
                 continue;
 
-            if (plantHolderComponent is { WaterLevel: >= PlantbotServiceOperator.RequiredWaterLevelToService, WeedLevel: <= PlantbotServiceOperator.RequiredWeedsAmountToWeed } && (!emagged || plantHolderComponent.Dead || plantHolderComponent.WaterLevel <= 0f))
+            if (plantHolderComponent is
+                {
+                    WaterLevel: >= PlantbotServiceOperator.RequiredWaterLevelToService,
+                    WeedLevel: <= PlantbotServiceOperator.RequiredWeedsAmountToWeed,
+                } && (!emagged || plantHolderComponent.Dead || plantHolderComponent.WaterLevel <= 0f))
                 continue;
 
             //Needed to make sure it doesn't sometimes stop right outside it's interaction range
@@ -78,11 +83,11 @@ public sealed partial class PickNearbyServicableHydroponicsTrayOperator : HTNOpe
             if (path.Result == PathResult.NoPath)
                 continue;
 
-            return (true, new Dictionary<string, object>()
+            return (true, new Dictionary<string, object>
             {
-                {TargetKey, target},
-                {TargetMoveKey, _entManager.GetComponent<TransformComponent>(target).Coordinates},
-                {NPCBlackboard.PathfindKey, path},
+                { TargetKey, target },
+                { TargetMoveKey, _entManager.GetComponent<TransformComponent>(target).Coordinates },
+                { NPCBlackboard.PathfindKey, path },
             });
         }
 

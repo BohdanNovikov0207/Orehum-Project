@@ -1,15 +1,14 @@
+using System.Numerics;
+using Content.Goobstation.Common.Ingestion;
 using Content.Goobstation.Shared.EatToGrow;
 using Content.Shared.Mobs;
-using Content.Goobstation.Common.Ingestion;
+using Content.Shared.Sprite;
 using Robust.Server.GameObjects;
 using Robust.Shared.Physics;
 using Robust.Shared.Physics.Collision.Shapes;
 using Robust.Shared.Physics.Systems;
-using System.Numerics;
-using Content.Shared.Sprite;
 
 namespace Content.Goobstation.Server.EatToGrow;
-
 
 public sealed class EatToGrowSystem : EntitySystem
 {
@@ -48,7 +47,10 @@ public sealed class EatToGrowSystem : EntitySystem
         if (!_appearance.TryGetData<Vector2>(eater, ScaleVisuals.Scale, out var oldScale, appearanceComponent))
             oldScale = Vector2.One;
 
-        _appearance.SetData(eater, ScaleVisuals.Scale, oldScale + scale * new Vector2(comp.Growth, comp.Growth), appearanceComponent);
+        _appearance.SetData(eater,
+            ScaleVisuals.Scale,
+            oldScale + scale * new Vector2(comp.Growth, comp.Growth),
+            appearanceComponent);
 
         Dirty(eater, comp); // Sync updated growth to client.
 
@@ -63,16 +65,23 @@ public sealed class EatToGrowSystem : EntitySystem
                 if (fixture.Shape is PhysShapeCircle circle)
                 {
                     _physics.SetPositionRadius(
-                        eater, id, fixture, circle,
-                        circle.Position, circle.Radius + scale * (comp.Growth / 4), manager);
+                        eater,
+                        id,
+                        fixture,
+                        circle,
+                        circle.Position,
+                        circle.Radius + scale * (comp.Growth / 4),
+                        manager);
                 }
             }
         }
     }
+
     private void ShrinkOnDeath(Entity<EatToGrowComponent> eater, ref MobStateChangedEvent args)
     {
         // Copied from TryGrow, just need to grow in reverse
-        if (args.NewMobState != MobState.Dead || !TryComp<EatToGrowComponent>(eater, out var comp) || comp.ShrinkOnDeath == false)
+        if (args.NewMobState != MobState.Dead || !TryComp<EatToGrowComponent>(eater, out var comp) ||
+            !comp.ShrinkOnDeath)
             return;
 
         // shrink the entity
@@ -82,4 +91,4 @@ public sealed class EatToGrowSystem : EntitySystem
         comp.CurrentScale = 1f;
         comp.TimesGrown = 0;
     }
-};
+}

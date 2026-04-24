@@ -12,12 +12,12 @@ namespace Content.Goobstation.Shared.Factory.Slots;
 /// </summary>
 public sealed partial class AutomatedSolution : AutomationSlot
 {
-    [DataField(required: true)]
-    public string SolutionName;
-
     private Entity<SolutionComponent>? _solution;
 
     private SharedSolutionContainerSystem _solutionSys;
+
+    [DataField(required: true)]
+    public string SolutionName;
 
     public override void Initialize()
     {
@@ -34,6 +34,7 @@ public sealed partial class AutomatedSolution : AutomationSlot
         if (_solutionSys.TryGetSolution(Owner, SolutionName, out _solution, true))
             return _solution;
 
-        throw new InvalidOperationException($"Entity {EntMan.ToPrettyString(Owner)} had no solution {SolutionName} for automation!");
+        throw new InvalidOperationException(
+            $"Entity {EntMan.ToPrettyString(Owner)} had no solution {SolutionName} for automation!");
     }
 }

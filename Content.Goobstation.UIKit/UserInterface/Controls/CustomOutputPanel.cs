@@ -3,58 +3,50 @@
 //
 // SPDX-License-Identifier: AGPL-3.0-or-later
 
+using System.Numerics;
 using Robust.Client.Graphics;
 using Robust.Client.UserInterface;
 using Robust.Client.UserInterface.Controls;
 using Robust.Client.UserInterface.RichText;
 using Robust.Shared.Utility;
-using System.Numerics;
 
 namespace Content.Goobstation.UIKit.UserInterface.Controls;
 
 [Virtual]
 public sealed class CustomOutputPanel : Control
 {
-    [Dependency] private readonly MarkupTagManager _tagManager = default!;
+    public const string StylePropertyStyleBox = "stylebox";
     [Dependency] private readonly IEntityManager _entManager = default!;
 
-    public const string StylePropertyStyleBox = "stylebox";
-
     private readonly CustomRingBufferList<CustomRichTextEntry> _entries = new();
-    private bool _isAtBottom = true;
-
-    private int _totalContentHeight;
+    private readonly VScrollBar _scrollBar;
+    [Dependency] private readonly MarkupTagManager _tagManager = default!;
     private bool _firstLine = true;
-    private StyleBox? _styleBoxOverride;
-    private VScrollBar _scrollBar;
-
-    public bool ScrollFollowing { get; set; } = true;
 
     private bool _invalidOnVisible;
+    private bool _isAtBottom = true;
+    private StyleBox? _styleBoxOverride;
+
+    private int _totalContentHeight;
 
     public CustomOutputPanel()
     {
         IoCManager.InjectDependencies(this);
-        MouseFilter = Control.MouseFilterMode.Pass;
+        MouseFilter = MouseFilterMode.Pass;
         RectClipContent = true;
 
         _scrollBar = new VScrollBar
         {
             Name = "_v_scroll",
-            HorizontalAlignment = Control.HAlignment.Right
+            HorizontalAlignment = HAlignment.Right,
         };
         AddChild(_scrollBar);
         _scrollBar.OnValueChanged += _ => _isAtBottom = _scrollBar.IsAtEnd;
     }
 
-    public int EntryCount => _entries.Count;
+    public bool ScrollFollowing { get; set; } = true;
 
-    public void UpdateLastMessage(FormattedMessage message)
-    {
-        var newEnt = new CustomRichTextEntry(message, this, _tagManager, _entManager, null);
-        newEnt.Update(_tagManager, _getFont(), _getContentBox().Width, UIScale);
-        _entries[_entries.Count - 1] = newEnt;
-    }
+    public int EntryCount => _entries.Count;
 
     public StyleBox? StyleBoxOverride
     {
@@ -65,6 +57,13 @@ public sealed class CustomOutputPanel : Control
             InvalidateMeasure();
             _invalidateEntries();
         }
+    }
+
+    public void UpdateLastMessage(FormattedMessage message)
+    {
+        var newEnt = new CustomRichTextEntry(message, this, _tagManager, _entManager);
+        newEnt.Update(_tagManager, _getFont(), _getContentBox().Width, UIScale);
+        _entries[_entries.Count - 1] = newEnt;
     }
 
     public void Clear()
@@ -90,9 +89,7 @@ public sealed class CustomOutputPanel : Control
         var font = _getFont();
         _totalContentHeight -= entry.Height + font.GetLineSeparation(UIScale);
         if (_entries.Count == 0)
-        {
             Clear();
-        }
 
         _scrollBar.MaxValue = Math.Max(_scrollBar.Page, _totalContentHeight);
     }
@@ -106,7 +103,7 @@ public sealed class CustomOutputPanel : Control
 
     public void AddMessage(FormattedMessage message)
     {
-        var entry = new CustomRichTextEntry(message, this, _tagManager, _entManager, null);
+        var entry = new CustomRichTextEntry(message, this, _tagManager, _entManager);
 
         entry.Update(_tagManager, _getFont(), _getContentBox().Width, UIScale);
 
@@ -114,19 +111,13 @@ public sealed class CustomOutputPanel : Control
         var font = _getFont();
         _totalContentHeight += entry.Height;
         if (_firstLine)
-        {
             _firstLine = false;
-        }
         else
-        {
             _totalContentHeight += font.GetLineSeparation(UIScale);
-        }
 
         _scrollBar.MaxValue = Math.Max(_scrollBar.Page, _totalContentHeight);
         if (_isAtBottom && ScrollFollowing)
-        {
             _scrollBar.MoveToEnd();
-        }
     }
 
     public void ScrollToBottom()
@@ -184,9 +175,7 @@ public sealed class CustomOutputPanel : Control
         base.MouseWheel(args);
 
         if (MathHelper.CloseToPercent(0, args.Delta.Y))
-        {
             return;
-        }
 
         _scrollBar.ValueTarget -= _getScrollSpeed() * args.Delta.Y;
     }
@@ -201,10 +190,7 @@ public sealed class CustomOutputPanel : Control
         _invalidateEntries();
     }
 
-    protected override Vector2 MeasureOverride(Vector2 availableSize)
-    {
-        return _getStyleBox()?.MinimumSize ?? Vector2.Zero;
-    }
+    protected override Vector2 MeasureOverride(Vector2 availableSize) => _getStyleBox()?.MinimumSize ?? Vector2.Zero;
 
     public void _invalidateEntries()
     {
@@ -219,18 +205,14 @@ public sealed class CustomOutputPanel : Control
 
         _scrollBar.MaxValue = Math.Max(_scrollBar.Page, _totalContentHeight);
         if (_isAtBottom && ScrollFollowing)
-        {
             _scrollBar.MoveToEnd();
-        }
     }
 
     [System.Diagnostics.Contracts.Pure]
     private Font _getFont()
     {
         if (TryGetStyleProperty<Font>("font", out var font))
-        {
             return font;
-        }
 
         return UserInterfaceManager.ThemeDefaults.DefaultFont;
     }
@@ -239,20 +221,16 @@ public sealed class CustomOutputPanel : Control
     private StyleBox? _getStyleBox()
     {
         if (StyleBoxOverride != null)
-        {
             return StyleBoxOverride;
-        }
 
         TryGetStyleProperty<StyleBox>(StylePropertyStyleBox, out var box);
         return box;
     }
 
     [System.Diagnostics.Contracts.Pure]
-    private float _getScrollSpeed()
-    {
+    private float _getScrollSpeed() =>
         // The scroll speed depends on the UI scale because the scroll bar is working with physical pixels.
-        return GetScrollSpeed(_getFont(), UIScale);
-    }
+        GetScrollSpeed(_getFont(), UIScale);
 
     [System.Diagnostics.Contracts.Pure]
     private UIBox2 _getContentBox()
@@ -276,10 +254,7 @@ public sealed class CustomOutputPanel : Control
         base.UIScaleChanged();
     }
 
-    internal static float GetScrollSpeed(Font font, float scale)
-    {
-        return font.GetLineHeight(scale) * 2;
-    }
+    internal static float GetScrollSpeed(Font font, float scale) => font.GetLineHeight(scale) * 2;
 
     protected override void EnteredTree()
     {

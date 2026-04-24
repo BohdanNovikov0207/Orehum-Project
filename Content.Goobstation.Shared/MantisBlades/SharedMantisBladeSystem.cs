@@ -17,8 +17,6 @@ public sealed class SharedMantisBladeSystem : EntitySystem
         SubscribeLocalEvent<MantisBladeArmComponent, ExaminedEvent>(OnExamined);
     }
 
-    private void OnExamined(EntityUid uid, MantisBladeArmComponent component, ref ExaminedEvent args)
-    {
+    private void OnExamined(EntityUid uid, MantisBladeArmComponent component, ref ExaminedEvent args) =>
         args.PushMarkup(Loc.GetString("mantis-blade-arm-examine"));
-    }
 }

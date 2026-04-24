@@ -9,43 +9,33 @@ using System.Linq;
 using Content.Goobstation.Server.StationEvents.Metric.Components;
 using Content.Server.Station.Systems;
 using Content.Shared.Damage;
-using Content.Goobstation.Maths.FixedPoint;
 using Content.Shared.Inventory;
 using Content.Shared.Mind.Components;
 using Content.Shared.Mobs;
 using Content.Shared.Mobs.Components;
-using Content.Shared.NPC.Systems;
 using Content.Shared.NPC.Components;
 using Content.Shared.NPC.Systems;
 using Content.Shared.Roles;
 using Content.Shared.Tag;
-using Robust.Shared.Prototypes;
 using Prometheus;
+using Robust.Shared.Prototypes;
 
 namespace Content.Goobstation.Server.StationEvents.Metric;
 
 /// <summary>
-///   Measures the strength of friendies and hostiles. Also calculates related health / death stats.
-///
-///   I've used 10 points per entity because later we might somehow estimate combat strength
-///   as a multiplier. We could for instance detect damage delt / recieved and look also at
-///   entity hitpoints & resistances as an analogue for danger.
-///
-///   Writes the following
-///   Friend : -10 per each friendly entity on the station (negative is GOOD in chaos)
-///   Hostile : about 10 points per hostile (those with antag roles) - varies per constants
-///   Combat: friendlies + hostiles (to represent the balance of power)
-///   Death: 20 per dead body,
-///   Medical: 10 for crit + 0.05 * damage (so 5 for 100 damage),
+/// Measures the strength of friendies and hostiles. Also calculates related health / death stats.
+/// I've used 10 points per entity because later we might somehow estimate combat strength
+/// as a multiplier. We could for instance detect damage delt / recieved and look also at
+/// entity hitpoints & resistances as an analogue for danger.
+/// Writes the following
+/// Friend : -10 per each friendly entity on the station (negative is GOOD in chaos)
+/// Hostile : about 10 points per hostile (those with antag roles) - varies per constants
+/// Combat: friendlies + hostiles (to represent the balance of power)
+/// Death: 20 per dead body,
+/// Medical: 10 for crit + 0.05 * damage (so 5 for 100 damage),
 /// </summary>
 public sealed class CombatMetricSystem : ChaosMetricSystem<CombatMetricComponent>
 {
-    [Dependency] private readonly SharedRoleSystem _roles = default!;
-    [Dependency] private readonly StationSystem _stationSystem = default!;
-    [Dependency] private readonly InventorySystem _inventory = default!;
-    [Dependency] private readonly NpcFactionSystem _faction = default!;
-    public readonly string NanotrasenFactionId = "NanoTrasen";
-
     private static readonly Gauge HostileEntitiesTotal = Metrics.CreateGauge(
         "game_director_metric_combat_hostile_entities_total",
         "Total number of hostile entities counted.");
@@ -90,6 +80,12 @@ public sealed class CombatMetricSystem : ChaosMetricSystem<CombatMetricComponent
         "game_director_metric_combat_death_chaos_calculated",
         "Calculated chaos value contributed by deaths.");
 
+    [Dependency] private readonly NpcFactionSystem _faction = default!;
+    [Dependency] private readonly InventorySystem _inventory = default!;
+    [Dependency] private readonly SharedRoleSystem _roles = default!;
+    [Dependency] private readonly StationSystem _stationSystem = default!;
+    public readonly string NanotrasenFactionId = "NanoTrasen";
+
     private double InventoryPower(EntityUid uid, CombatMetricComponent component)
     {
         // Iterate through items to determine how powerful the entity is
@@ -98,8 +94,10 @@ public sealed class CombatMetricSystem : ChaosMetricSystem<CombatMetricComponent
         var allTags = new HashSet<ProtoId<TagPrototype>>();
 
         foreach (var item in _inventory.GetHandOrInventoryEntities(uid))
+        {
             if (tagsQ.TryGetComponent(item, out var tags)) // thanks code rabbit
                 allTags.UnionWith(tags.Tags);
+        }
 
         var threat = allTags.Sum(key => component.ItemThreat.GetValueOrDefault(key));
 
@@ -158,11 +156,19 @@ public sealed class CombatMetricSystem : ChaosMetricSystem<CombatMetricComponent
                     deathChaos += combatMetric.DeadScore;
                     continue;
                 }
+
                 hostileCount++;
             }
             else
             {
-                if (!CalculateFriendlyCount(combatMetric, mobState, damage, ref deadFriendlyCount, ref deathChaos, ref friendlyCount, ref medicalChaos, ref critFriendlyCount))
+                if (!CalculateFriendlyCount(combatMetric,
+                        mobState,
+                        damage,
+                        ref deadFriendlyCount,
+                        ref deathChaos,
+                        ref friendlyCount,
+                        ref medicalChaos,
+                        ref critFriendlyCount))
                     continue;
             }
 
@@ -194,13 +200,13 @@ public sealed class CombatMetricSystem : ChaosMetricSystem<CombatMetricComponent
         DeathChaosCalculated.Set(deathChaos);
 
 
-        var chaos = new ChaosMetrics(new Dictionary<ChaosMetric, double>()
+        var chaos = new ChaosMetrics(new Dictionary<ChaosMetric, double>
         {
-            {ChaosMetric.Friend, -friendliesChaos}, // Friendlies are good, so make a negative chaos score
-            {ChaosMetric.Hostile, hostilesChaos},
+            { ChaosMetric.Friend, -friendliesChaos }, // Friendlies are good, so make a negative chaos score
+            { ChaosMetric.Hostile, hostilesChaos },
 
-            {ChaosMetric.Death, deathChaos},
-            {ChaosMetric.Medical, medicalChaos},
+            { ChaosMetric.Death, deathChaos },
+            { ChaosMetric.Medical, medicalChaos },
         });
         return chaos;
     }
@@ -245,6 +251,7 @@ public sealed class CombatMetricSystem : ChaosMetricSystem<CombatMetricComponent
             deathChaos += combatMetric.DeadScore;
             return false;
         }
+
         friendlyCount++;
         var totalDamage = damage.Damage.GetTotal().Double();
         medicalChaos += totalDamage * combatMetric.MedicalMultiplier;

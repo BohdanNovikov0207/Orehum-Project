@@ -24,7 +24,8 @@ public sealed partial class MantisBladeArmComponent : Component
     public EntityUid? BladeUid;
 
     [DataField]
-    public SoundSpecifier? ExtendSound = new SoundPathSpecifier("/Audio/_Goobstation/Weapons/MantisBlades/mantis_extend.ogg");
+    public SoundSpecifier? ExtendSound =
+        new SoundPathSpecifier("/Audio/_Goobstation/Weapons/MantisBlades/mantis_extend.ogg");
 
     [DataField]
     public SoundSpecifier? RetractSound = new SoundCollectionSpecifier("MantisBladeRetract");

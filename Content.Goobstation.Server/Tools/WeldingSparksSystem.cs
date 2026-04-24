@@ -27,9 +27,7 @@ public sealed class WeldingSparksSystem : EntitySystem
     private void OnUseTool(Entity<WeldingSparksComponent> ent, ref UseToolEvent args)
     {
         if (TryComp<ToolComponent>(ent, out var toolComp))
-        {
             _toolSystem.PlayToolSound(ent, toolComp, null, AudioParams.Default.AddVolume(-2f));
-        }
 
         // Get the actual `DoAfterID` using its index, for use as a dictionary key.
         var doAfterId = new DoAfterId(args.User, args.DoAfterIdx);
@@ -37,19 +35,22 @@ public sealed class WeldingSparksSystem : EntitySystem
         var spawnLoc = GetSpawnLoc(ent, args.Target);
         if (spawnLoc is not { } loc)
             return;
-            
+
         SpawnEffect(ent, ref args, doAfterId, loc);
     }
 
-    private void SpawnEffect(Entity<WeldingSparksComponent> ent, ref UseToolEvent args, DoAfterId id, EntityCoordinates spawnLoc)
+    private void SpawnEffect(Entity<WeldingSparksComponent> ent,
+        ref UseToolEvent args,
+        DoAfterId id,
+        EntityCoordinates spawnLoc)
     {
         var effect = Spawn(ent.Comp.EffectProto, spawnLoc);
         ent.Comp.SpawnedEffects.Add(id, effect);
 
         if (args.Target is { } target)
-        {
-            RaiseNetworkEvent(new SpawnedWeldingSparksEvent(GetNetEntity(target), GetNetEntity(effect), args.DoAfterLength));
-        }
+            RaiseNetworkEvent(new SpawnedWeldingSparksEvent(GetNetEntity(target),
+                GetNetEntity(effect),
+                args.DoAfterLength));
     }
 
     private EntityCoordinates? GetSpawnLoc(Entity<WeldingSparksComponent> ent, EntityUid? target)

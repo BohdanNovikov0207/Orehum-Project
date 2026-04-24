@@ -18,8 +18,8 @@ internal sealed class SetPatronCommand : LocalizedCommands
     public override string Description => "Assign a debug patron tier to a player";
 
     public override string Help => "Usage: setpatron <player> <tierId|clear>\n" +
-                                    "Example: setpatron \"John Doe\" captain\n" +
-                                    "Example: setpatron username clear";
+                                   "Example: setpatron \"John Doe\" captain\n" +
+                                   "Example: setpatron username clear";
 
     public override void Execute(IConsoleShell shell, string argStr, string[] args)
     {

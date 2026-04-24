@@ -1,14 +1,12 @@
 using Content.Goobstation.Shared.CustomLawboard;
 using Content.Shared.Silicons.Laws;
-using Content.Shared.Silicons.Laws.Components;
 using JetBrains.Annotations;
 using Robust.Client.UserInterface;
-using Robust.Client.UserInterface.Controls;
 
 namespace Content.Goobstation.Client.CustomLawboard;
 
 /// <summary>
-/// Initializes a <see cref="LawboardSiliconLawUi"/> and updates it when new server messages are received.
+/// Initializes a <see cref="LawboardSiliconLawUi" /> and updates it when new server messages are received.
 /// </summary>
 [UsedImplicitly]
 public sealed class CustomLawboardBoundInterface : BoundUserInterface
@@ -35,11 +33,10 @@ public sealed class CustomLawboardBoundInterface : BoundUserInterface
             _window.LawboardComponent = customLawboard;
             _window.SetLaws(customLawboard.Laws);
         }
+
         Update();
     }
 
-    private void OnLawsChanged(List<SiliconLaw> value, bool popup)
-    {
+    private void OnLawsChanged(List<SiliconLaw> value, bool popup) =>
         SendPredictedMessage(new CustomLawboardChangeLawsMessage(value, popup));
-    }
 }

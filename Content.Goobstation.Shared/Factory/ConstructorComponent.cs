@@ -14,24 +14,24 @@ namespace Content.Goobstation.Shared.Factory;
 /// Machine that starts constructions.
 /// Multi-step objects will need interactors to complete their steps.
 /// </summary>
-[RegisterComponent, NetworkedComponent, Access(typeof(SharedConstructorSystem))]
+[RegisterComponent] [NetworkedComponent] [Access(typeof(SharedConstructorSystem))]
 [AutoGenerateComponentState]
 public sealed partial class ConstructorComponent : Component
 {
     /// <summary>
     /// The construction it will try to build when start is invoked.
     /// </summary>
-    [DataField, AutoNetworkedField]
+    [DataField] [AutoNetworkedField]
     public ProtoId<ConstructionPrototype>? Construction;
 }
 
-[Serializable, NetSerializable]
+[Serializable] [NetSerializable]
 public enum ConstructorUiKey : byte
 {
-    Key
+    Key,
 }
 
-[Serializable, NetSerializable]
+[Serializable] [NetSerializable]
 public sealed class ConstructorSetProtoMessage(ProtoId<ConstructionPrototype>? id) : BoundUserInterfaceMessage
 {
     public ProtoId<ConstructionPrototype>? Id = id;

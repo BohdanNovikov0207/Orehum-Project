@@ -18,8 +18,8 @@ public sealed partial class ChangePrefixAfterDelayComponent : Component
     public TimeSpan Delay = TimeSpan.FromSeconds(0.3);
 
     [DataField]
-    public string? NewHeldPrefix;
+    public string? NewEquippedPrefix;
 
     [DataField]
-    public string? NewEquippedPrefix;
+    public string? NewHeldPrefix;
 }

@@ -6,16 +6,6 @@ namespace Content.Goobstation.Common.JoinQueue;
 public interface IJoinQueueManager
 {
     /// <summary>
-    /// Initializes the join queue manager.
-    /// </summary>
-    void Initialize();
-
-    /// <summary>
-    /// Called each server tick to periodically refresh queue info.
-    /// </summary>
-    void Update(float frameTime);
-
-    /// <summary>
     /// Gets the total number of players currently waiting in any queue (patron or regular).
     /// </summary>
     int PlayerInQueueCount { get; }
@@ -24,4 +14,14 @@ public interface IJoinQueueManager
     /// Gets the number of players currently considered "in the game" (not in the queue).
     /// </summary>
     int ActualPlayersCount { get; }
+
+    /// <summary>
+    /// Initializes the join queue manager.
+    /// </summary>
+    void Initialize();
+
+    /// <summary>
+    /// Called each server tick to periodically refresh queue info.
+    /// </summary>
+    void Update(float frameTime);
 }

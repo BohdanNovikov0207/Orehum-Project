@@ -11,9 +11,9 @@ public sealed class PatronSupportUIController : UIController, IOnStateEntered<Lo
 {
     [Dependency] private readonly IConfigurationManager _cfg = default!;
     [Dependency] private readonly IUriOpener _uriOpener = default!;
+    private bool _hasShownThisSession;
 
     private PatronSupportWindow? _supportWindow;
-    private bool _hasShownThisSession;
 
     public void OnStateEntered(LobbyState state)
     {

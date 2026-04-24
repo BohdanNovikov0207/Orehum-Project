@@ -4,13 +4,11 @@
 // SPDX-License-Identifier: AGPL-3.0-or-later
 
 using Content.Goobstation.Shared.Enchanting.Components;
-using Content.Goobstation.Shared.Enchanting.Systems;
 using Content.Shared.Clothing;
 using Content.Shared.Hands;
 using Robust.Client.GameObjects;
 using Robust.Client.Graphics;
 using Robust.Shared.Prototypes;
-using System.Linq;
 
 namespace Content.Goobstation.Client.Enchanting.Systems;
 
@@ -40,15 +38,11 @@ public sealed class EnchantVisualsSystem : EntitySystem
         sprite.PostShader = _proto.Index(Shader).InstanceUnique();
     }
 
-    private void OnHeldVisualsUpdated(Entity<EnchantedComponent> ent, ref HeldVisualsUpdatedEvent args)
-    {
+    private void OnHeldVisualsUpdated(Entity<EnchantedComponent> ent, ref HeldVisualsUpdatedEvent args) =>
         SetLayers(args.User, args.RevealedLayers);
-    }
 
-    private void OnEquipmentVisualsUpdated(Entity<EnchantedComponent> ent, ref EquipmentVisualsUpdatedEvent args)
-    {
+    private void OnEquipmentVisualsUpdated(Entity<EnchantedComponent> ent, ref EquipmentVisualsUpdatedEvent args) =>
         SetLayers(args.Equipee, args.RevealedLayers);
-    }
 
     private void SetLayers(EntityUid uid, HashSet<string> keys)
     {

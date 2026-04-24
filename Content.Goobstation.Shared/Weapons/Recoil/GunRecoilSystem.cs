@@ -12,8 +12,8 @@ namespace Content.Goobstation.Shared.Weapons.Recoil;
 
 public sealed class GunRecoilSystem : EntitySystem
 {
-    [Dependency] private readonly ThrowingSystem _throwing = default!;
     [Dependency] private readonly SharedStunSystem _stun = default!;
+    [Dependency] private readonly ThrowingSystem _throwing = default!;
     [Dependency] private readonly SharedTransformSystem _transform = default!;
 
     public override void Initialize()

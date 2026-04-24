@@ -18,7 +18,7 @@ public sealed class InsertToContainerOnCollideSystem : EntitySystem
     [Dependency] private readonly EntityWhitelistSystem _whitelistSystem = default!;
 
 
-    /// <inheritdoc/>
+    /// <inheritdoc />
     public override void Initialize()
     {
         base.Initialize();
@@ -26,7 +26,9 @@ public sealed class InsertToContainerOnCollideSystem : EntitySystem
         SubscribeLocalEvent<InsertToContainerOnCollideComponent, StartCollideEvent>(OnStartCollide);
     }
 
-    private void OnStartCollide(EntityUid uid, InsertToContainerOnCollideComponent component, ref StartCollideEvent args)
+    private void OnStartCollide(EntityUid uid,
+        InsertToContainerOnCollideComponent component,
+        ref StartCollideEvent args)
     {
         var currentVelocity = args.OurBody.LinearVelocity.Length();
         if (currentVelocity < component.RequiredVelocity)
@@ -35,10 +37,12 @@ public sealed class InsertToContainerOnCollideSystem : EntitySystem
         if (!_containerSystem.TryGetContainer(uid, component.Container, out var container))
             return;
 
-        if (component.BlacklistedEntities != null && _whitelistSystem.IsValid(component.BlacklistedEntities, args.OtherEntity))
+        if (component.BlacklistedEntities != null &&
+            _whitelistSystem.IsValid(component.BlacklistedEntities, args.OtherEntity))
             return;
 
-        if (component.InsertableEntities != null && !_whitelistSystem.IsValid(component.InsertableEntities, args.OtherEntity))
+        if (component.InsertableEntities != null &&
+            !_whitelistSystem.IsValid(component.InsertableEntities, args.OtherEntity))
             return;
 
         if (container.Contains(args.OtherEntity))
@@ -49,10 +53,7 @@ public sealed class InsertToContainerOnCollideSystem : EntitySystem
             // Spellcasting failed! Log the arcane failure if needed
             //todo add log on success
         }
-        else
-        {
-            //todo
-            //log on faliure
-        }
+        //todo
+        //log on faliure
     }
 }

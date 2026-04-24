@@ -34,7 +34,9 @@ public sealed class SuitSensorShockableSystem : EntitySystem
                 || sensor.User != args.TargetUid)
                 continue;
 
-            _suitSensorSystem.SetSensor(new Entity<SuitSensorComponent>(item, sensor), _random.Pick(modes), args.TargetUid);
+            _suitSensorSystem.SetSensor(new Entity<SuitSensorComponent>(item, sensor),
+                _random.Pick(modes),
+                args.TargetUid);
             _popup.PopupEntity(Loc.GetString("suit-sensor-got-shocked", ("suit", item)),
                 args.TargetUid,
                 args.TargetUid,

@@ -6,17 +6,24 @@ using Robust.Shared.Serialization;
 
 namespace Content.Goobstation.Shared.SecondSkin;
 
-[RegisterComponent, NetworkedComponent, AutoGenerateComponentState]
+[RegisterComponent] [NetworkedComponent] [AutoGenerateComponentState]
 public sealed partial class SecondSkinComponent : Component
 {
+    [ViewVariables(VVAccess.ReadWrite)]
+    public float Accumulator;
+
     [DataField(required: true)]
     public Color Color;
 
-    [ViewVariables]
-    public bool IsActive => User != null;
+    [DataField]
+    public DamageSpecifier DamageToSilicons = new();
 
-    [DataField, AutoNetworkedField]
-    public EntityUid? User;
+    [DataField]
+    public float DisgustRate;
+
+    [DataField]
+    public TargetBodyPart Parts = TargetBodyPart.FullLegs | TargetBodyPart.FullArms | TargetBodyPart.Chest |
+                                  TargetBodyPart.Groin;
 
     [DataField]
     public SoundSpecifier SoundEquip =
@@ -27,23 +34,16 @@ public sealed partial class SecondSkinComponent : Component
         new SoundPathSpecifier("/Audio/_Goobstation/Changeling/Effects/armour_strip.ogg");
 
     [DataField]
-    public DamageSpecifier DamageToSilicons = new();
-
-    [DataField]
     public float UpdateTime = 1f;
 
-    [ViewVariables(VVAccess.ReadWrite)]
-    public float Accumulator;
+    [DataField] [AutoNetworkedField]
+    public EntityUid? User;
 
-    [DataField]
-    public TargetBodyPart Parts = TargetBodyPart.FullLegs | TargetBodyPart.FullArms | TargetBodyPart.Chest |
-                                  TargetBodyPart.Groin;
-
-    [DataField]
-    public float DisgustRate;
+    [ViewVariables]
+    public bool IsActive => User != null;
 }
 
-[Serializable, NetSerializable]
+[Serializable] [NetSerializable]
 public enum SecondSkinKey : byte
 {
     Key,

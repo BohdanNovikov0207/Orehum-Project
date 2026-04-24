@@ -5,10 +5,8 @@
 //
 // SPDX-License-Identifier: AGPL-3.0-or-later
 
-using Content.Shared.Physics;
 using Content.Shared.Whitelist;
 using Robust.Shared.Physics;
-using Robust.Shared.Physics.Dynamics;
 using Robust.Shared.Physics.Events;
 
 namespace Content.Goobstation.Shared.Weapons.Ranged.ProjectileRequiresWhitelist;
@@ -16,6 +14,7 @@ namespace Content.Goobstation.Shared.Weapons.Ranged.ProjectileRequiresWhitelist;
 public sealed class ProjectileRequireWhitelistSystem : EntitySystem
 {
     [Dependency] private readonly EntityWhitelistSystem _whitelist = default!;
+
     public override void Initialize()
     {
         base.Initialize();
@@ -46,12 +45,12 @@ public sealed class ProjectileRequireWhitelistSystem : EntitySystem
             return;
 
         // stop when a wall is hit
-        if (comp.CollideWithWalls && args.OtherFixture.Hard && args.OtherBody.BodyType is BodyType.Static or BodyType.Dynamic)
+        if (comp.CollideWithWalls && args.OtherFixture.Hard &&
+            args.OtherBody.BodyType is BodyType.Static or BodyType.Dynamic)
             return;
 
         // Prevent collision in all other cases
         args.Cancelled = true;
         Dirty(ent);
     }
-
 }

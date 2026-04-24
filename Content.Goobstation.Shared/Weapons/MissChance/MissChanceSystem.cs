@@ -28,8 +28,8 @@ public sealed class MissChanceSystem : EntitySystem
         var random = new Random((int) _timing.CurTick.Value + (int) GetNetEntity(ent));
 
         if (args.Cancelled
-        || !HasComp<MobStateComponent>(args.OtherEntity)
-        || !random.Prob(ent.Comp.Chance))
+            || !HasComp<MobStateComponent>(args.OtherEntity)
+            || !random.Prob(ent.Comp.Chance))
             return;
 
         args.Cancelled = true;
@@ -41,7 +41,7 @@ public sealed class MissChanceSystem : EntitySystem
         if (_netManager.IsClient || ent == null)
             return;
 
-        var missComp = EnsureComp<MissChanceComponent>((EntityUid)ent);
+        var missComp = EnsureComp<MissChanceComponent>((EntityUid) ent);
         missComp.Chance = chance;
     }
 }

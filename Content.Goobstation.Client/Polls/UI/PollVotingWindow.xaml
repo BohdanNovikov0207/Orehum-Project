@@ -15,9 +15,9 @@
 
         <ScrollContainer HorizontalExpand="True" VerticalExpand="True">
             <BoxContainer Name="PollsList"
-                         Orientation="Vertical"
-                         SeparationOverride="8"
-                         HorizontalExpand="True" />
+                          Orientation="Vertical"
+                          SeparationOverride="8"
+                          HorizontalExpand="True" />
         </ScrollContainer>
 
         <Label Name="StatusLabel"

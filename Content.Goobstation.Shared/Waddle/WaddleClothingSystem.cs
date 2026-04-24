@@ -5,9 +5,6 @@
 // SPDX-License-Identifier: AGPL-3.0-or-later
 
 using Content.Shared.Clothing;
-using Content.Shared.Clothing.Components;
-using Content.Shared.Movement.Components;
-using Content.Shared.Inventory.Events;
 
 namespace Content.Goobstation.Shared.Waddle;
 
@@ -32,13 +29,13 @@ public sealed class WaddleClothingSystem : EntitySystem
         Dirty(ent);
 
         var comp = ent.Comp;
-        if (comp.AnimationLength is {} length)
+        if (comp.AnimationLength is { } length)
             waddle.AnimationLength = length;
-        if (comp.HopIntensity is {} hopIntensity)
+        if (comp.HopIntensity is { } hopIntensity)
             waddle.HopIntensity = hopIntensity;
-        if (comp.TumbleIntensity is {} tumbleIntensity)
+        if (comp.TumbleIntensity is { } tumbleIntensity)
             waddle.TumbleIntensity = tumbleIntensity;
-        if (comp.RunAnimationLengthMultiplier is {} multiplier)
+        if (comp.RunAnimationLengthMultiplier is { } multiplier)
             waddle.RunAnimationLengthMultiplier = multiplier;
 
         // very unlikely that some waddle clothing doesn't change at least 1 property, don't bother doing change detection meme

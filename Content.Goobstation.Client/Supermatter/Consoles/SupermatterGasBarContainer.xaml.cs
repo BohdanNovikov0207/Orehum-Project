@@ -14,8 +14,8 @@ namespace Content.Goobstation.Client.Supermatter.Consoles;
 [GenerateTypedNameReferences]
 public sealed partial class SupermatterGasBarContainer : BoxContainer
 {
-    private readonly IEntityManager _entManager;
     private readonly IResourceCache _cache;
+    private readonly IEntityManager _entManager;
 
     public SupermatterGasBarContainer()
     {
@@ -25,8 +25,10 @@ public sealed partial class SupermatterGasBarContainer : BoxContainer
         _cache = IoCManager.Resolve<IResourceCache>();
 
         // Load fonts
-        var normalFont = new VectorFont(_cache.GetResource<FontResource>("/Fonts/NotoSansDisplay/NotoSansDisplay-Regular.ttf"), 11);
-        var monoFont = new VectorFont(_cache.GetResource<FontResource>("/EngineFonts/NotoSans/NotoSansMono-Regular.ttf"), 10);
+        var normalFont =
+            new VectorFont(_cache.GetResource<FontResource>("/Fonts/NotoSansDisplay/NotoSansDisplay-Regular.ttf"), 11);
+        var monoFont =
+            new VectorFont(_cache.GetResource<FontResource>("/EngineFonts/NotoSans/NotoSansMono-Regular.ttf"), 10);
 
         // Set fonts
         GasLabel.FontOverride = normalFont;
@@ -43,10 +45,10 @@ public sealed partial class SupermatterGasBarContainer : BoxContainer
         GasBar.ForegroundStyleBoxOverride ??= new StyleBoxFlat();
         GasBarBorder.PanelOverride ??= new StyleBoxFlat();
 
-        var barOverride = (StyleBoxFlat)GasBar.ForegroundStyleBoxOverride;
+        var barOverride = (StyleBoxFlat) GasBar.ForegroundStyleBoxOverride;
         barOverride.BackgroundColor = color;
 
-        var borderOverride = (StyleBoxFlat)GasBarBorder.PanelOverride;
+        var borderOverride = (StyleBoxFlat) GasBarBorder.PanelOverride;
         borderOverride.BackgroundColor = color;
     }
 }

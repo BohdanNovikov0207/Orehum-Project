@@ -7,15 +7,14 @@ namespace Content.Goobstation.Server.StationEvents.GameDirector;
 
 public sealed partial class GameDirectorSystem
 {
-
     /// <summary>
-    ///   Count the active players and ghosts on the server.
-    ///   Players gates which stories and events are available
-    ///   Ghosts can be used to gate certain events (which require ghosts to occur)
+    /// Count the active players and ghosts on the server.
+    /// Players gates which stories and events are available
+    /// Ghosts can be used to gate certain events (which require ghosts to occur)
     /// </summary>
     private PlayerCount CountActivePlayers()
     {
-        var allPlayers = Enumerable.ToList<ICommonSession>(_playerManager.Sessions);
+        var allPlayers = _playerManager.Sessions.ToList<ICommonSession>();
         var count = new PlayerCount();
         foreach (var player in allPlayers)
         {
@@ -47,7 +46,7 @@ public sealed partial class GameDirectorSystem
     }
 
     /// <summary>
-    ///   Count all the players on the server.
+    /// Count all the players on the server.
     /// </summary>
     private int GetTotalPlayerCount(IList<ICommonSession> pool)
     {

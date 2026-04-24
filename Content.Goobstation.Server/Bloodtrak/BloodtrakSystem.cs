@@ -21,13 +21,13 @@ namespace Content.Goobstation.Server.Bloodtrak;
 
 public sealed class BloodtrakSystem : SharedBloodtrakSystem
 {
-    [Dependency] private readonly TagSystem _tag = default!;
-    [Dependency] private readonly ForensicsSystem _forensicsSystem = default!;
-    [Dependency] private readonly SharedTransformSystem _transform = default!;
     [Dependency] private readonly SharedAppearanceSystem _appearance = default!;
+    [Dependency] private readonly UseDelaySystem _delaySystem = default!;
+    [Dependency] private readonly ForensicsSystem _forensicsSystem = default!;
     [Dependency] private readonly IGameTiming _gameTiming = default!;
     [Dependency] private readonly SharedPopupSystem _popupSystem = default!;
-    [Dependency] private readonly UseDelaySystem _delaySystem = default!;
+    [Dependency] private readonly TagSystem _tag = default!;
+    [Dependency] private readonly SharedTransformSystem _transform = default!;
 
     public override void Initialize()
     {
@@ -78,7 +78,6 @@ public sealed class BloodtrakSystem : SharedBloodtrakSystem
 
         foreach (var (dna, freshnessTimestamp) in solutionsDna)
         {
-
             if (!targetDna.TryGetValue(dna, out var uid))
                 continue;
 
@@ -117,12 +116,13 @@ public sealed class BloodtrakSystem : SharedBloodtrakSystem
 
         args.Handled = true;
         var dnaOwner = GetPuddleDnaOwner(target, component, args.User);
-        if (dnaOwner is { })
+        if (dnaOwner is not null)
         {
             component.Target = dnaOwner.Value.Item1;
             component.Freshness = dnaOwner.Value.Item2;
             return;
         }
+
         component.Target = null;
         component.Freshness = TimeSpan.Zero;
     }
@@ -147,12 +147,14 @@ public sealed class BloodtrakSystem : SharedBloodtrakSystem
                 return false;
 
             // Tracking duration scales linearly with freshness.
-            var newExpirationTime = _gameTiming.CurTime + pinpointer.MaximumTrackingDuration - (_gameTiming.CurTime - pinpointer.Freshness);
+            var newExpirationTime = _gameTiming.CurTime + pinpointer.MaximumTrackingDuration -
+                                    (_gameTiming.CurTime - pinpointer.Freshness);
             if (newExpirationTime <= _gameTiming.CurTime)
             {
                 _popupSystem.PopupEntity(Loc.GetString("bloodtrak-sample-expired"), uid);
                 return false;
             }
+
             pinpointer.ExpirationTime = newExpirationTime;
         }
 
@@ -197,7 +199,9 @@ public sealed class BloodtrakSystem : SharedBloodtrakSystem
             if (!targetValid || expired)
             {
                 // Deactivate only if target is invalid or time expired
-                _popupSystem.PopupEntity(Loc.GetString(targetValid ? "bloodtrak-tracking-expired" : "bloodtrak-target-lost"), uid);
+                _popupSystem.PopupEntity(
+                    Loc.GetString(targetValid ? "bloodtrak-tracking-expired" : "bloodtrak-target-lost"),
+                    uid);
                 TogglePinpointer(uid, tracker);
                 tracker.Target = null;
 

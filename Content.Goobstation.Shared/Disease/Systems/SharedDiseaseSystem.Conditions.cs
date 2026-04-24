@@ -12,12 +12,12 @@ public partial class SharedDiseaseSystem
         SubscribeLocalEvent<DiseaseProgressConditionComponent, DiseaseCheckConditionsEvent>(CheckSeverityCondition);
     }
 
-    private void CheckChanceCondition(Entity<DiseaseChanceConditionComponent> ent, ref DiseaseCheckConditionsEvent args)
-    {
+    private void
+        CheckChanceCondition(Entity<DiseaseChanceConditionComponent> ent, ref DiseaseCheckConditionsEvent args) =>
         args.DoEffect = args.DoEffect && _random.Prob(ent.Comp.Chance * GetScale(args, ent.Comp));
-    }
 
-    private void CheckPeriodicCondition(Entity<DiseasePeriodicConditionComponent> ent, ref DiseaseCheckConditionsEvent args)
+    private void CheckPeriodicCondition(Entity<DiseasePeriodicConditionComponent> ent,
+        ref DiseaseCheckConditionsEvent args)
     {
         if (ent.Comp.CurrentDelay == null)
         {
@@ -26,7 +26,10 @@ public partial class SharedDiseaseSystem
                 args.DoEffect = false;
                 return;
             }
-            ent.Comp.CurrentDelay = TimeSpan.FromSeconds(_random.NextDouble(ent.Comp.DelayMin.TotalSeconds, ent.Comp.DelayMax.TotalSeconds));
+
+            ent.Comp.CurrentDelay =
+                TimeSpan.FromSeconds(_random.NextDouble(ent.Comp.DelayMin.TotalSeconds,
+                    ent.Comp.DelayMax.TotalSeconds));
         }
 
         ent.Comp.TimeSinceLast += TimeSpan.FromSeconds(GetScale(args, ent.Comp));
@@ -42,17 +45,14 @@ public partial class SharedDiseaseSystem
         Dirty(ent);
     }
 
-    private void CheckSeverityCondition(Entity<DiseaseProgressConditionComponent> ent, ref DiseaseCheckConditionsEvent args)
-    {
+    private void CheckSeverityCondition(Entity<DiseaseProgressConditionComponent> ent,
+        ref DiseaseCheckConditionsEvent args) =>
         args.DoEffect = args.DoEffect
-            && (ent.Comp.MinProgress == null || args.Disease.Comp.InfectionProgress > ent.Comp.MinProgress)
-            && (ent.Comp.MaxProgress == null || args.Disease.Comp.InfectionProgress > ent.Comp.MaxProgress);
-    }
+                        && (ent.Comp.MinProgress == null || args.Disease.Comp.InfectionProgress > ent.Comp.MinProgress)
+                        && (ent.Comp.MaxProgress == null || args.Disease.Comp.InfectionProgress > ent.Comp.MaxProgress);
 
-    protected float GetScale(DiseaseCheckConditionsEvent args, ScalingDiseaseEffect effect)
-    {
-        return (effect.SeverityScale ? args.Comp.Severity : 1f)
-            * (effect.TimeScale ? (float)_updateInterval.TotalSeconds : 1f)
-            * (effect.ProgressScale ? args.Disease.Comp.InfectionProgress : 1f);
-    }
+    protected float GetScale(DiseaseCheckConditionsEvent args, ScalingDiseaseEffect effect) =>
+        (effect.SeverityScale ? args.Comp.Severity : 1f)
+        * (effect.TimeScale ? (float) _updateInterval.TotalSeconds : 1f)
+        * (effect.ProgressScale ? args.Disease.Comp.InfectionProgress : 1f);
 }

@@ -1,5 +1,3 @@
-using Robust.Shared.Maths;
-
 namespace Content.Goobstation.UIKit.UserInterface.Controls;
 
 /// <summary>

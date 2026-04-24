@@ -5,7 +5,7 @@ using Content.Shared.Polymorph;
 
 namespace Content.Goobstation.Server.Changeling;
 
-public sealed partial class ChangelingChemicalSystem : SharedChangelingChemicalSystem
+public sealed class ChangelingChemicalSystem : SharedChangelingChemicalSystem
 {
     [Dependency] private readonly PolymorphSystem _polymorph = default!;
 

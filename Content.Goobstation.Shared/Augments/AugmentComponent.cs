@@ -4,15 +4,15 @@ namespace Content.Goobstation.Shared.Augments;
 
 /// <summary>
 /// Component that indicates an entity is an augment
-/// The augmented body can be retrieved with <see cref="AugmentSystem.GetBody"/>.
+/// The augmented body can be retrieved with <see cref="AugmentSystem.GetBody" />.
 /// </summary>
-[RegisterComponent, NetworkedComponent]
+[RegisterComponent] [NetworkedComponent]
 public sealed partial class AugmentComponent : Component;
 
 /// <summary>
 /// Component that tracks which augments are installed on this body
 /// </summary>
-[RegisterComponent, NetworkedComponent]
+[RegisterComponent] [NetworkedComponent]
 public sealed partial class InstalledAugmentsComponent : Component
 {
     /// <summary>

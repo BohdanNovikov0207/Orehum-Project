@@ -13,7 +13,7 @@ namespace Content.Goobstation.Server.SlaughterDemon.Items;
 /// </summary>
 public sealed class VialSummonSystem : EntitySystem
 {
-    /// <inheritdoc/>
+    /// <inheritdoc />
     public override void Initialize()
     {
         base.Initialize();

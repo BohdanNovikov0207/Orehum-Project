@@ -31,9 +31,9 @@ namespace Content.Goobstation.Shared.ChronoLegionnaire.EntitySystems;
 
 public abstract class SharedStasisSystem : EntitySystem
 {
-    [Dependency] private readonly ActionBlockerSystem _blocker = default!;
     [Dependency] private readonly ISharedAdminLogManager _adminLogger = default!;
     [Dependency] private readonly SharedAudioSystem _audio = default!;
+    [Dependency] private readonly ActionBlockerSystem _blocker = default!;
     [Dependency] private readonly StatusEffectsSystem _statusEffects = default!;
     [Dependency] private readonly SharedTransformSystem _transformSystem = default!;
 
@@ -98,50 +98,8 @@ public abstract class SharedStasisSystem : EntitySystem
     /// <summary>
     /// Prevents entity in stasis get any damage (it's stuck in time, so no damage)
     /// </summary>
-    public void OnDamage(Entity<InsideStasisComponent> stasised, ref BeforeDamageChangedEvent args)
-    {
+    public void OnDamage(Entity<InsideStasisComponent> stasised, ref BeforeDamageChangedEvent args) =>
         args.Cancelled = true;
-    }
-
-    #region Cancelling interactions attemps
-
-    /// <summary>
-    /// Prevents any attempt by the player to do anything
-    /// </summary>
-    private void OnAttempt(EntityUid uid, InsideStasisComponent component, CancellableEntityEventArgs args)
-    {
-        args.Cancel();
-    }
-
-    /// <summary>
-    /// Prevents any player attempt to interact with world
-    /// </summary>
-    private void OnInteractionAttempt(Entity<InsideStasisComponent> stasised, ref InteractionAttemptEvent args)
-    {
-        args.Cancelled = true;
-    }
-
-    /// <summary>
-    /// Prevents everyone except stasisImmune persons to interact with target in stasis (stripping/dragging/etc.)
-    /// </summary>
-    private void OnInteractionWithAttempt(Entity<InsideStasisComponent> stasised, ref GettingInteractedWithAttemptEvent args)
-    {
-        if (HasComp<StasisImmunityComponent>(args.Uid))
-            return;
-
-        args.Cancelled = true;
-    }
-
-    private void OnMoveAttempt(Entity<InsideStasisComponent> stasised, ref UpdateCanMoveEvent args)
-    {
-        // Check to return the player's ability to move as soon as possible
-        if (stasised.Comp.LifeStage > ComponentLifeStage.Running)
-            return;
-
-        args.Cancel();
-    }
-
-    #endregion
 
     public bool TryStasis(Entity<StatusEffectsComponent?> target, bool refresh, TimeSpan? time = null)
     {
@@ -169,7 +127,71 @@ public abstract class SharedStasisSystem : EntitySystem
         return true;
     }
 
+    /// <summary>
+    /// Preventing open container from inside
+    /// </summary>
+    private void OnStorageOpenAttempt(Entity<StasisContainerComponent> stasised, ref StorageOpenAttemptEvent args)
+    {
+        if (HasComp<InsideStasisComponent>(args.User))
+            args.Cancelled = true;
+    }
+
+    /// <summary>
+    /// Try to apply stasis on the target when it in the stasis container
+    /// </summary>
+    public void OnContained(Entity<StasisContainerComponent> container, ref ContainerIsInsertingAttemptEvent args)
+    {
+        if (HasComp<StasisImmunityComponent>(args.EntityUid))
+            return;
+
+        TryStasis((args.EntityUid, null), true);
+    }
+
+    /// <summary>
+    /// Removing stasis effect if target left container
+    /// </summary>
+    public void OnContainRemoved(Entity<StasisContainerComponent> container,
+        ref ContainerIsRemovingAttemptEvent args) => _statusEffects.TryRemoveStatusEffect(args.EntityUid, "Stasis");
+
+    #region Cancelling interactions attemps
+
+    /// <summary>
+    /// Prevents any attempt by the player to do anything
+    /// </summary>
+    private void OnAttempt(EntityUid uid, InsideStasisComponent component, CancellableEntityEventArgs args) =>
+        args.Cancel();
+
+    /// <summary>
+    /// Prevents any player attempt to interact with world
+    /// </summary>
+    private void OnInteractionAttempt(Entity<InsideStasisComponent> stasised, ref InteractionAttemptEvent args) =>
+        args.Cancelled = true;
+
+    /// <summary>
+    /// Prevents everyone except stasisImmune persons to interact with target in stasis (stripping/dragging/etc.)
+    /// </summary>
+    private void OnInteractionWithAttempt(Entity<InsideStasisComponent> stasised,
+        ref GettingInteractedWithAttemptEvent args)
+    {
+        if (HasComp<StasisImmunityComponent>(args.Uid))
+            return;
+
+        args.Cancelled = true;
+    }
+
+    private void OnMoveAttempt(Entity<InsideStasisComponent> stasised, ref UpdateCanMoveEvent args)
+    {
+        // Check to return the player's ability to move as soon as possible
+        if (stasised.Comp.LifeStage > ComponentLifeStage.Running)
+            return;
+
+        args.Cancel();
+    }
+
+    #endregion
+
     #region Stasis protection
+
     public void OnEquip(Entity<StasisProtectionComponent> protection, ref GotEquippedEvent args)
     {
         // Making x10 staminaDamage to make sure no one stunbaton them (until stun resist will be added)
@@ -191,37 +213,9 @@ public abstract class SharedStasisSystem : EntitySystem
             staminaComp.Decay /= protection.Comp.StaminaModifier;
         }
 
-        if (HasComp<StasisImmunityComponent>(args.Equipee) )
+        if (HasComp<StasisImmunityComponent>(args.Equipee))
             EntityManager.RemoveComponent<StasisImmunityComponent>(args.Equipee);
     }
 
     #endregion
-
-    /// <summary>
-    /// Preventing open container from inside
-    /// </summary>
-    private void OnStorageOpenAttempt(Entity<StasisContainerComponent> stasised, ref StorageOpenAttemptEvent args)
-    {
-        if (HasComp<InsideStasisComponent>(args.User))
-            args.Cancelled = true;
-    }
-
-    /// <summary>
-    /// Try to apply stasis on the target when it in the stasis container
-    /// </summary>
-    public void OnContained(Entity<StasisContainerComponent> container, ref ContainerIsInsertingAttemptEvent args)
-    {
-        if (HasComp<StasisImmunityComponent>(args.EntityUid))
-            return;
-
-        TryStasis((args.EntityUid, null), true, null);
-    }
-
-    /// <summary>
-    /// Removing stasis effect if target left container
-    /// </summary>
-    public void OnContainRemoved(Entity<StasisContainerComponent> container, ref ContainerIsRemovingAttemptEvent args)
-    {
-        _statusEffects.TryRemoveStatusEffect(args.EntityUid, "Stasis");
-    }
 }

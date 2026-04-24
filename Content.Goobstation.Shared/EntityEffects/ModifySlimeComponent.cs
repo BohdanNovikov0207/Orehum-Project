@@ -3,7 +3,6 @@
 //
 // SPDX-License-Identifier: AGPL-3.0-or-later
 
-using Content.Goobstation.Maths.FixedPoint;
 using Content.Goobstation.Shared.Xenobiology.Components;
 using Content.Shared.EntityEffects;
 using Robust.Shared.Prototypes;
@@ -12,6 +11,12 @@ namespace Content.Goobstation.Shared.EntityEffects;
 
 public sealed partial class ModifySlimeComponent : EntityEffect
 {
+    /// <summary>
+    /// How much will we increase/decrease the mutation chance?
+    /// </summary>
+    [DataField]
+    public float? ChanceModifier;
+
     /// <summary>
     /// How many additional extracts will be produced?
     /// </summary>
@@ -23,12 +28,6 @@ public sealed partial class ModifySlimeComponent : EntityEffect
     /// </summary>
     [DataField]
     public int? OffspringBonus;
-
-    /// <summary>
-    /// How much will we increase/decrease the mutation chance?
-    /// </summary>
-    [DataField]
-    public float? ChanceModifier;
 
     protected override string? ReagentEffectGuidebookText(IPrototypeManager prototype, IEntitySystemManager entSys)
         => null; // todo add something here

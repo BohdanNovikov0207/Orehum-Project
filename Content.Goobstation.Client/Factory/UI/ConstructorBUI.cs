@@ -5,6 +5,7 @@
 //
 // SPDX-License-Identifier: AGPL-3.0-or-later
 
+using System.Linq;
 using Content.Client.Construction;
 using Content.Client.Construction.UI;
 using Content.Goobstation.Shared.Factory;
@@ -13,24 +14,22 @@ using Content.Shared.Whitelist;
 using Robust.Client.GameObjects;
 using Robust.Client.Graphics;
 using Robust.Client.UserInterface;
-using Robust.Client.UserInterface.Controls;
 using Robust.Shared.Prototypes;
-using System.Linq;
 
 namespace Content.Goobstation.Client.Factory.UI;
 
 public sealed class ConstructorBUI : BoundUserInterface
 {
-    [Dependency] private readonly IPrototypeManager _proto = default!;
     private readonly ConstructionSystem _construction;
-    private readonly EntityWhitelistSystem _whitelist;
-    private readonly SpriteSystem _sprite;
-
-    private ConstructionMenu? _menu;
-    private string? _id;
-    private List<ConstructionMenu.ConstructionMenuListData> _recipes = new();
     private readonly LocId _favoriteCatName = "construction-category-favorites";
     private readonly LocId _forAllCategoryName = "construction-category-all";
+    [Dependency] private readonly IPrototypeManager _proto = default!;
+    private readonly List<ConstructionMenu.ConstructionMenuListData> _recipes = new();
+    private readonly SpriteSystem _sprite;
+    private readonly EntityWhitelistSystem _whitelist;
+    private string? _id;
+
+    private ConstructionMenu? _menu;
 
     public ConstructorBUI(EntityUid owner, Enum uiKey) : base(owner, uiKey)
     {
@@ -56,15 +55,16 @@ public sealed class ConstructorBUI : BoundUserInterface
             if (item != null && item.Prototype != null)
             {
                 _id = item.Prototype.ID;
-                _menu.SetRecipeInfo(item.Prototype.Name ?? "", item.Prototype.Description ?? "", item?.TargetPrototype,
-                    item!.Prototype.Type != ConstructionType.Item, true); // TODO: favourites
+                _menu.SetRecipeInfo(item.Prototype.Name ?? "",
+                    item.Prototype.Description ?? "",
+                    item?.TargetPrototype,
+                    item!.Prototype.Type != ConstructionType.Item,
+                    true); // TODO: favourites
 
                 GenerateStepList(item.Prototype);
             }
             else
-            {
                 _id = null;
-            }
         };
         _menu.BuildButtonToggled += (_, _) =>
         {
@@ -75,7 +75,7 @@ public sealed class ConstructorBUI : BoundUserInterface
 
     private void PopulateCategories(string? selected = null)
     {
-        if (_menu is not {} menu)
+        if (_menu is not { } menu)
             return;
 
         var categories = new HashSet<string>();
@@ -132,7 +132,7 @@ public sealed class ConstructorBUI : BoundUserInterface
             if (_whitelist.IsWhitelistFail(recipe.EntityWhitelist, user))
                 continue;
 
-            if (searching 
+            if (searching
                 && recipe.Name != null
                 && !recipe.Name.ToLowerInvariant().Contains(search))
                 continue;
@@ -144,7 +144,7 @@ public sealed class ConstructorBUI : BoundUserInterface
                 //if (!_favoritedRecipes.Contains(recipe))
                 if (category == _favoriteCatName)
                     continue;
-                else if (recipe.Category != category)
+                if (recipe.Category != category)
                     continue;
             }
 
@@ -154,7 +154,7 @@ public sealed class ConstructorBUI : BoundUserInterface
             if (!_proto.TryIndex(targetProtoId, out EntityPrototype? proto))
                 continue;
 
-            _recipes.Add(new(recipe, proto));
+            _recipes.Add(new ConstructionMenu.ConstructionMenuListData(recipe, proto));
         }
 
         _recipes.Sort((a, b) => string.Compare(a.Prototype.Name, b.Prototype.Name, StringComparison.InvariantCulture));
@@ -180,8 +180,11 @@ public sealed class ConstructorBUI : BoundUserInterface
                 : Loc.GetString(entry.Localization);
 
             if (entry.EntryNumber is { } number)
+            {
                 text = Loc.GetString("construction-presenter-step-wrapper",
-                    ("step-number", number), ("text", text));
+                    ("step-number", number),
+                    ("text", text));
+            }
 
             // The padding needs to be applied regardless of text length... (See PadLeft documentation)
             text = text.PadLeft(text.Length + entry.Padding);

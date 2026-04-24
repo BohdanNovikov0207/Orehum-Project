@@ -10,7 +10,7 @@ public sealed class ServerAdminNotificationsSystem : SharedAdminNotificationSyst
 {
     [Dependency] private readonly IAdminManager _admin = default!;
 
-    /// <inheritdoc/>
+    /// <inheritdoc />
     public override void PlayNotification(SoundSpecifier? path)
     {
         foreach (var admin in _admin.ActiveAdmins)
@@ -19,7 +19,7 @@ public sealed class ServerAdminNotificationsSystem : SharedAdminNotificationSyst
         }
     }
 
-    /// <inheritdoc/>
+    /// <inheritdoc />
     public override void PlayNotification(SoundSpecifier? path, ICommonSession session)
     {
         if (path == null)

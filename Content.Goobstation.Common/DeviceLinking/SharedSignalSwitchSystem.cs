@@ -2,15 +2,15 @@ using Robust.Shared.Serialization;
 
 namespace Content.Goobstation.Common.DeviceLinking;
 
-[Serializable, NetSerializable]
+[Serializable] [NetSerializable]
 public enum SignalSwitchVisuals : byte
 {
-    State
+    State,
 }
 
-[Serializable, NetSerializable]
+[Serializable] [NetSerializable]
 public enum SignalSwitchState : byte
 {
     On,
-    Off
+    Off,
 }

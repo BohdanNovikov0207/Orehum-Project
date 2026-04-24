@@ -13,20 +13,13 @@ namespace Content.Goobstation.Client.ServerCurrency;
 
 public sealed class ClientCurrencyManager : ICommonCurrencyManager, IEntityEventSubscriber, IPostInjectInit
 {
+    private static int _cachedBalance = -1;
     [Dependency] private readonly IEntityManager _ent = default!;
     [Dependency] private readonly IPlayerManager _playMan = default!;
-
-    private static int _cachedBalance = -1;
     public event Action? ClientBalanceChange;
     public event Action<PlayerBalanceChangeEvent>? BalanceChange;
 
-    public void PostInject()
-    {
-        _playMan.PlayerStatusChanged += OnStatusChanged;
-    }
-
-    public void Initialize()
-    {
+    public void Initialize() =>
         /*
          * This looks fucked, so I'll explain
          * With durk server currency currently it's reliant on events, events rely on something called an EventBus.
@@ -36,9 +29,33 @@ public sealed class ClientCurrencyManager : ICommonCurrencyManager, IEntityEvent
          *
          * Also I really wanted to manually try out EventBus subscriptions outside EntitySystems.
          */
-
         _ent.EventBus.SubscribeSessionEvent<PlayerBalanceUpdateEvent>(EventSource.Network, this, UpdateBalance);
+
+    public void Shutdown() => _playMan.PlayerStatusChanged -= OnStatusChanged;
+
+    public bool CanAfford(NetUserId? userId, int amount, out int balance)
+    {
+        balance = _cachedBalance;
+        return balance >= amount && balance - amount >= 0;
     }
+
+    /// <inheritdoc />
+    public string Stringify(int amount) => amount == 1
+        ? $"{amount} {Loc.GetString("server-currency-name-singular")}"
+        : $"{amount} {Loc.GetString("server-currency-name-plural")}";
+
+    public int AddCurrency(NetUserId userId, int amount) => throw new NotImplementedException();
+
+    public int RemoveCurrency(NetUserId userId, int amount) => throw new NotImplementedException();
+
+    public (int, int) TransferCurrency(NetUserId sourceUserId, NetUserId targetUserId, int amount) =>
+        throw new NotImplementedException();
+
+    public int SetBalance(NetUserId userId, int amount) => throw new NotImplementedException();
+
+    public int GetBalance(NetUserId? userId = null) => _cachedBalance;
+
+    public void PostInject() => _playMan.PlayerStatusChanged += OnStatusChanged;
 
     private void OnStatusChanged(object? sender, SessionStatusEventArgs e)
     {
@@ -54,46 +71,4 @@ public sealed class ClientCurrencyManager : ICommonCurrencyManager, IEntityEvent
         _cachedBalance = msg.NewBalance;
         ClientBalanceChange?.Invoke();
     }
-
-    public void Shutdown()
-    {
-        _playMan.PlayerStatusChanged -= OnStatusChanged;
-    }
-
-    public bool CanAfford(NetUserId? userId, int amount, out int balance)
-    {
-        balance = _cachedBalance;
-        return balance >= amount && balance - amount >= 0;
-    }
-
-    /// <inheritdoc/>
-    public string Stringify(int amount) => amount == 1
-        ? $"{amount} {Loc.GetString("server-currency-name-singular")}"
-        : $"{amount} {Loc.GetString("server-currency-name-plural")}";
-
-    public int AddCurrency(NetUserId userId, int amount)
-    {
-        throw new NotImplementedException();
-    }
-
-    public int RemoveCurrency(NetUserId userId, int amount)
-    {
-        throw new NotImplementedException();
-    }
-
-    public (int, int) TransferCurrency(NetUserId sourceUserId, NetUserId targetUserId, int amount)
-    {
-        throw new NotImplementedException();
-    }
-
-    public int SetBalance(NetUserId userId, int amount)
-    {
-        throw new NotImplementedException();
-    }
-
-    public int GetBalance(NetUserId? userId = null)
-    {
-        return _cachedBalance;
-    }
-
 }

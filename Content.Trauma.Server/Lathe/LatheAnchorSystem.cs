@@ -15,8 +15,8 @@ namespace Content.Trauma.Server.Lathe;
 /// </summary>
 public sealed class LatheAnchorSystem : EntitySystem
 {
-    [Dependency] private readonly LatheSystem _lathe = default!;
     [Dependency] private readonly SharedAppearanceSystem _appearance = default!;
+    [Dependency] private readonly LatheSystem _lathe = default!;
 
     private EntityQuery<ApcPowerReceiverComponent> _powerQuery;
 

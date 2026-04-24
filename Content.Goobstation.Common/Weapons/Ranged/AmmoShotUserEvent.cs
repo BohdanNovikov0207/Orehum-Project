@@ -5,6 +5,6 @@ namespace Content.Goobstation.Common.Weapons.Ranged;
 /// </summary>
 public sealed class AmmoShotUserEvent : EntityEventArgs
 {
-    public EntityUid Gun;
     public List<EntityUid> FiredProjectiles = default!;
+    public EntityUid Gun;
 }

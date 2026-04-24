@@ -5,26 +5,17 @@ using Robust.Shared.Prototypes;
 using Robust.Shared.Serialization;
 
 namespace Content.Goobstation.Shared.NTR;
+
 /// <summary>
 /// This is a prototype for a cargo bounty, a set of items
 /// that must be sold together in a labeled container in order
 /// to receive a monetary reward.
 /// </summary>
-[Prototype, Serializable, NetSerializable]
+[Prototype] [Serializable] [NetSerializable]
 public sealed class NtrTaskPrototype : IPrototype
 {
     [DataField]
-    public string Proto { get; init; } = default!;
-
-    /// <inheritdoc/>
-    [IdDataField]
-    public string ID { get; private set; } = default!;
-
-    /// <summary>
-    /// The monetary reward for completing the bounty
-    /// </summary>
-    [DataField(required: true)]
-    public int Reward;
+    public float Cooldown; //in seconds
 
     /// <summary>
     /// A description for flava purposes.
@@ -45,13 +36,19 @@ public sealed class NtrTaskPrototype : IPrototype
     public string IdPrefix = "CC";
 
     /// <summary>
+    /// The monetary reward for completing the bounty
+    /// </summary>
+    [DataField(required: true)]
+    public int Reward;
+
+    /// <summary>
     /// Weight for random selection (higher = more frequent)
     /// </summary>
     [DataField]
     public float Weight = 1.0f;
 
     [DataField]
-    public float Cooldown; //in seconds
+    public string Proto { get; init; } = default!;
 
     [DataField]
     public Dictionary<ProtoId<ReagentPrototype>, FixedPoint2> Reagents { get; init; } = new();
@@ -64,9 +61,13 @@ public sealed class NtrTaskPrototype : IPrototype
 
     [DataField]
     public int Penalty { get; } = 1;
+
+    /// <inheritdoc />
+    [IdDataField]
+    public string ID { get; private set; } = default!;
 }
 
-[DataDefinition, Serializable, NetSerializable]
+[DataDefinition] [Serializable] [NetSerializable]
 public readonly partial record struct NtrTaskItemEntry()
 {
     [DataField]

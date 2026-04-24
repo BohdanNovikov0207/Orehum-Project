@@ -5,8 +5,8 @@
 // SPDX-License-Identifier: AGPL-3.0-or-later
 
 using Content.Goobstation.Shared.Humanoid;
-using Content.Shared.Humanoid;
 using Content.Shared.EntityEffects;
+using Content.Shared.Humanoid;
 using JetBrains.Annotations;
 using Robust.Shared.Prototypes;
 
@@ -16,7 +16,7 @@ namespace Content.Goobstation.Shared.EntityEffects;
 public sealed partial class SexChange : EntityEffect
 {
     /// <summary>
-    ///     What sex is the consumer changed to? If not set then swap between male/female.
+    /// What sex is the consumer changed to? If not set then swap between male/female.
     /// </summary>
     [DataField] public Sex? NewSex;
 

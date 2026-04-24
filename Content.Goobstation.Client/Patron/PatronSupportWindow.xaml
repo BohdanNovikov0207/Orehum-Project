@@ -1,9 +1,7 @@
 <ui:FancyWindow
     xmlns="https://spacestation14.io"
     xmlns:ui="clr-namespace:Content.Client.UserInterface.Controls;assembly=Content.Client"
-    xmlns:controls="clr-namespace:Content.Goobstation.Client.Patron"
     xmlns:cc="clr-namespace:Content.Client.Administration.UI.CustomControls;assembly=Content.Client"
-    xmlns:maths="clr-namespace:Robust.Shared.Maths;assembly=Robust.Shared.Maths"
     Title="{Loc 'patron-support-window-title'}"
     MinSize="555 300"
     SetSize="555 400">
@@ -48,7 +46,8 @@
 
         <ui:StripeBack>
             <BoxContainer Orientation="Horizontal" HorizontalAlignment="Center" Margin="6 4">
-                <Button Name="PatreonButton" Access="Public" Text="{Loc 'patron-support-window-button'}" StyleClasses="ButtonBig" MinWidth="260" />
+                <Button Name="PatreonButton" Access="Public" Text="{Loc 'patron-support-window-button'}"
+                        StyleClasses="ButtonBig" MinWidth="260" />
             </BoxContainer>
         </ui:StripeBack>
     </BoxContainer>

@@ -12,7 +12,7 @@ namespace Content.Goobstation.Shared.Enchanting.Components;
 /// Controls <c>IgniteOnMeleeHit</c> with enchantment level.
 /// The system is in server because flammable shitcode is too.
 /// </summary>
-[RegisterComponent, NetworkedComponent]
+[RegisterComponent] [NetworkedComponent]
 [EntityCategory("Enchants")]
 public sealed partial class FireAspectEnchantComponent : Component
 {

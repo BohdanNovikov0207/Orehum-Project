@@ -15,8 +15,9 @@ namespace Content.Goobstation.Shared.CloneProjector;
 
 public abstract class SharedCloneProjectorSystem : EntitySystem
 {
-    [Dependency] private readonly SharedPopupSystem _popupSystem = default!;
     [Dependency] private readonly SharedContainerSystem _container = default!;
+    [Dependency] private readonly SharedPopupSystem _popupSystem = default!;
+
     public override void Initialize()
     {
         base.Initialize();
@@ -26,10 +27,9 @@ public abstract class SharedCloneProjectorSystem : EntitySystem
         SubscribeLocalEvent<HolographicCloneComponent, ShotAttemptedEvent>(OnShotAttempted);
     }
 
-    private void OnStartup(Entity<HolographicCloneComponent> clone, ref ComponentStartup args)
-    {
+    private void OnStartup(Entity<HolographicCloneComponent> clone, ref ComponentStartup args) =>
         EnsureComp<HologramVisualsComponent>(clone);
-    }
+
     private void OnMeleeHit(Entity<HolographicCloneComponent> clone, ref MeleeHitEvent args)
     {
         if (!args.IsHit
@@ -57,5 +57,4 @@ public abstract class SharedCloneProjectorSystem : EntitySystem
         _popupSystem.PopupClient(Loc.GetString("gun-disabled"), ent, ent);
         args.Cancel();
     }
-
 }

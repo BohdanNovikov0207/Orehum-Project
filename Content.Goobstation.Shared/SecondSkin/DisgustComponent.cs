@@ -5,29 +5,26 @@ using Robust.Shared.Prototypes;
 
 namespace Content.Goobstation.Shared.SecondSkin;
 
-[RegisterComponent, NetworkedComponent]
+[RegisterComponent] [NetworkedComponent]
 public sealed partial class DisgustComponent : Component
 {
+    [DataField]
+    public float AccumulationMultiplier = 1f;
+
+    [ViewVariables]
+    public float Accumulator;
+
+    [DataField]
+    public ProtoId<AlertPrototype> Alert = "Disgust";
+
+    [DataField(serverOnly: true)] [NonSerialized]
+    public Dictionary<float, List<EntityEffect>> EffectsThresholds = new();
+
     [DataField]
     public float Level;
 
     [DataField]
     public float ReductionRate = 2f;
-
-    [DataField]
-    public float AccumulationMultiplier = 1f;
-
-    [DataField]
-    public float UpdateTime = 1f;
-
-    [ViewVariables]
-    public float Accumulator;
-
-    [DataField(serverOnly: true), NonSerialized]
-    public Dictionary<float, List<EntityEffect>> EffectsThresholds = new();
-
-    [DataField]
-    public ProtoId<AlertPrototype> Alert = "Disgust";
 
     [DataField]
     public Dictionary<float, short> SeverityLevels = new()
@@ -36,4 +33,7 @@ public sealed partial class DisgustComponent : Component
         { 30f, 2 },
         { 60f, 3 },
     };
+
+    [DataField]
+    public float UpdateTime = 1f;
 }

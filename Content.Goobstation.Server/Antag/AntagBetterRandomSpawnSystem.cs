@@ -3,15 +3,13 @@ using Content.Server.Antag;
 using Content.Server.Atmos.EntitySystems;
 using Content.Server.GameTicking.Rules;
 using Content.Server.SurveillanceCamera;
-using Content.Server.Storage.Components;
 using Content.Shared.GameTicking.Components;
 using Content.Shared.Interaction;
 using Content.Shared.Physics;
 using Robust.Shared.Map;
+using Robust.Shared.Physics;
 using Robust.Shared.Physics.Components;
 using Robust.Shared.Physics.Systems;
-using Robust.Shared.Physics;
-using Robust.Shared.Containers;
 
 namespace Content.Goobstation.Server.Antag;
 
@@ -20,12 +18,12 @@ namespace Content.Goobstation.Server.Antag;
 /// </summary>
 public sealed class AntagBetterRandomSpawnSystem : GameRuleSystem<AntagBetterRandomSpawnComponent>
 {
-    [Dependency] private readonly SharedTransformSystem _transform = default!;
+    [Dependency] private readonly AtmosphereSystem _atmosphere = default!;
+    [Dependency] private readonly FixtureSystem _fixtures = default!;
     [Dependency] private readonly SharedInteractionSystem _interaction = default!;
     [Dependency] private readonly EntityLookupSystem _lookup = default!;
-    [Dependency] private readonly AtmosphereSystem _atmosphere = default!;
     [Dependency] private readonly SharedPhysicsSystem _physics = default!;
-    [Dependency] private readonly FixtureSystem _fixtures = default!;
+    [Dependency] private readonly SharedTransformSystem _transform = default!;
 
     public override void Initialize()
     {
@@ -34,7 +32,10 @@ public sealed class AntagBetterRandomSpawnSystem : GameRuleSystem<AntagBetterRan
         SubscribeLocalEvent<AntagBetterRandomSpawnComponent, AntagSelectLocationEvent>(OnSelectLocation);
     }
 
-    protected override void Added(EntityUid uid, AntagBetterRandomSpawnComponent comp, GameRuleComponent gameRule, GameRuleAddedEvent args)
+    protected override void Added(EntityUid uid,
+        AntagBetterRandomSpawnComponent comp,
+        GameRuleComponent gameRule,
+        GameRuleAddedEvent args)
     {
         base.Added(uid, comp, gameRule, args);
 
@@ -61,7 +62,9 @@ public sealed class AntagBetterRandomSpawnSystem : GameRuleSystem<AntagBetterRan
     /// <summary>
     /// Attempts to find a safe random location that avoids cameras and solid objects.
     /// </summary>
-    public bool TryFindSafeRandomLocation(out EntityCoordinates coords, int maxAttempts = 2000, float cameraCheckRange = 15f)
+    public bool TryFindSafeRandomLocation(out EntityCoordinates coords,
+        int maxAttempts = 2000,
+        float cameraCheckRange = 15f)
     {
         coords = EntityCoordinates.Invalid;
 
@@ -125,7 +128,9 @@ public sealed class AntagBetterRandomSpawnSystem : GameRuleSystem<AntagBetterRan
         var mapCoords = _transform.ToMapCoordinates(coords);
         var checkPos = mapCoords.Position;
 
-        var entities = _lookup.GetEntitiesInRange(mapCoords, 0.5f, LookupFlags.Static | LookupFlags.Dynamic | LookupFlags.Sundries);
+        var entities = _lookup.GetEntitiesInRange(mapCoords,
+            0.5f,
+            LookupFlags.Static | LookupFlags.Dynamic | LookupFlags.Sundries);
 
         foreach (var entity in entities)
         {
@@ -147,8 +152,10 @@ public sealed class AntagBetterRandomSpawnSystem : GameRuleSystem<AntagBetterRan
             var entityTransform = _physics.GetPhysicsTransform(entity);
 
             foreach (var fixture in fixturesComp.Fixtures.Values)
+            {
                 if (_fixtures.TestPoint(fixture.Shape, entityTransform, checkPos))
                     return true;
+            }
         }
 
         return false;

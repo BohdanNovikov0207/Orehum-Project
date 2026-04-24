@@ -9,9 +9,10 @@ namespace Content.Goobstation.Server.Wraith;
 
 public sealed class StatusEffectOnCollideGhostSystem : SharedStatusEffectOnCollideGhostSystem
 {
-    [Dependency] private readonly FixtureSystem _fixtures = default!;
     [Dependency] private readonly CollisionWakeSystem _collisionWake = default!;
-    /// <inheritdoc/>
+    [Dependency] private readonly FixtureSystem _fixtures = default!;
+
+    /// <inheritdoc />
     public override void Initialize()
     {
         base.Initialize();
@@ -23,8 +24,10 @@ public sealed class StatusEffectOnCollideGhostSystem : SharedStatusEffectOnColli
     private IPhysShape GetOrCreateShape(EntityUid uid, FixturesComponent? fixtures = null)
     {
         if (Resolve(uid, ref fixtures))
+        {
             if (fixtures.Fixtures.TryGetValue("fix1", out var fix))
                 return fix.Shape;
+        }
 
         return new PhysShapeCircle(0.35f);
     }
@@ -37,8 +40,8 @@ public sealed class StatusEffectOnCollideGhostSystem : SharedStatusEffectOnColli
             GetOrCreateShape(ent.Owner, fixtures),
             ent.Comp.FixtureId,
             hard: false,
-            collisionMask: (int)CollisionGroup.GhostImpassable,
-            collisionLayer: (int)CollisionGroup.GhostImpassable,
+            collisionMask: (int) CollisionGroup.GhostImpassable,
+            collisionLayer: (int) CollisionGroup.GhostImpassable,
             manager: fixtures
         );
 

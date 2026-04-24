@@ -21,7 +21,8 @@ public sealed class ChangelingEquipmentSystem : EntitySystem
 
         SubscribeLocalEvent<ChangelingEquipmentComponent, ContainerGettingRemovedAttemptEvent>(OnRemoveAttempt);
 
-        SubscribeLocalEvent<ChangelingEquipmentComponent, InventoryRelayedEvent<InternalResourcesRegenModifierEvent>>(OnChangelingChemicalRegenEvent);
+        SubscribeLocalEvent<ChangelingEquipmentComponent, InventoryRelayedEvent<InternalResourcesRegenModifierEvent>>(
+            OnChangelingChemicalRegenEvent);
     }
 
     private void OnEquipped(Entity<ChangelingEquipmentComponent> ent, ref GotEquippedEvent args)
@@ -35,15 +36,11 @@ public sealed class ChangelingEquipmentSystem : EntitySystem
         Dirty(ent);
     }
 
-    private void OnUnequipped(Entity<ChangelingEquipmentComponent> ent, ref GotUnequippedEvent args)
-    {
+    private void OnUnequipped(Entity<ChangelingEquipmentComponent> ent, ref GotUnequippedEvent args) =>
         PredictedQueueDel(ent.Owner);
-    }
 
-    private void OnDropped(Entity<ChangelingEquipmentComponent> ent, ref DroppedEvent args)
-    {
+    private void OnDropped(Entity<ChangelingEquipmentComponent> ent, ref DroppedEvent args) =>
         PredictedQueueDel(ent.Owner);
-    }
 
     private void OnRemoveAttempt(Entity<ChangelingEquipmentComponent> ent, ref ContainerGettingRemovedAttemptEvent args)
     {
@@ -51,7 +48,8 @@ public sealed class ChangelingEquipmentSystem : EntitySystem
             args.Cancel();
     }
 
-    private void OnChangelingChemicalRegenEvent(Entity<ChangelingEquipmentComponent> ent, ref InventoryRelayedEvent<InternalResourcesRegenModifierEvent> args)
+    private void OnChangelingChemicalRegenEvent(Entity<ChangelingEquipmentComponent> ent,
+        ref InventoryRelayedEvent<InternalResourcesRegenModifierEvent> args)
     {
         if (args.Args.Data.InternalResourcesType != ent.Comp.ResourceType
             || ent.Comp.User == null)

@@ -4,10 +4,8 @@
 // SPDX-License-Identifier: AGPL-3.0-or-later
 
 using Content.Goobstation.Shared.Silicon.AiCameraWarping;
-using Content.Server.Station.Systems;
 using Content.Server.SurveillanceCamera;
 using Content.Shared.Silicons.StationAi;
-using Microsoft.VisualBasic;
 using Robust.Server.GameObjects;
 using Robust.Shared.Player;
 
@@ -16,8 +14,8 @@ namespace Content.Goobstation.Server.Silicon.AiCameraWarping;
 public sealed class StationAiWarpSystem : SharedStationAiWarpSystem
 {
     [Dependency] private readonly SharedStationAiSystem _stationAiSystem = default!;
-    [Dependency] private readonly SharedTransformSystem _xformSystem = default!;
     [Dependency] private readonly UserInterfaceSystem _userInterface = default!;
+    [Dependency] private readonly SharedTransformSystem _xformSystem = default!;
 
     public override void Initialize()
     {
@@ -72,7 +70,7 @@ public sealed class StationAiWarpSystem : SharedStationAiWarpSystem
             var data = new CameraWarpData
             {
                 NetEntityUid = GetNetEntity(queryUid),
-                DisplayName = comp.CameraId
+                DisplayName = comp.CameraId,
             };
 
             cameras.Add(data);

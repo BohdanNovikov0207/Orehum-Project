@@ -7,7 +7,7 @@ namespace Content.Goobstation.Shared.Surgery.Steps;
 /// <summary>
 /// Deals damage to the surgeon when a step is done.
 /// </summary>
-[RegisterComponent, NetworkedComponent, Access(typeof(SurgeryDamageUserSystem))]
+[RegisterComponent] [NetworkedComponent] [Access(typeof(SurgeryDamageUserSystem))]
 public sealed partial class SurgeryDamageUserComponent : Component
 {
     [DataField(required: true)]

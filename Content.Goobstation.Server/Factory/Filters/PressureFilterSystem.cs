@@ -3,8 +3,6 @@
 //
 // SPDX-License-Identifier: AGPL-3.0-or-later
 
-using Content.Server.Atmos.Components;
-using Content.Server.Atmos.Piping.Unary.Components;
 using Content.Goobstation.Shared.Factory.Filters;
 using Content.Shared.Atmos.Components;
 using Content.Shared.Atmos.Piping.Unary.Components;
@@ -23,7 +21,7 @@ public sealed class PressureFilterSystem : EntitySystem
     private void OnPressureFilter(Entity<PressureFilterComponent> ent, ref AutomationFilterEvent args)
     {
         // TODO: replace this shit with InternalAir if it gets refactored
-        float pressure = 0f;
+        var pressure = 0f;
         if (TryComp<GasTankComponent>(args.Item, out var tank))
             pressure = tank.Air.Pressure;
         else if (TryComp<GasCanisterComponent>(args.Item, out var can))

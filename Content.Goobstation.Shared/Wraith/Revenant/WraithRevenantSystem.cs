@@ -48,6 +48,7 @@ public sealed class WraithRevenantSystem : EntitySystem
     }
 
     #region Helpers
+
     private void Reset(Entity<WraithRevenantComponent> ent)
     {
         EntityManager.RemoveComponents(ent.Owner, _proto.Index(ent.Comp.RevenantAbilities));
@@ -65,7 +66,9 @@ public sealed class WraithRevenantSystem : EntitySystem
         RemComp<PassiveDamageComponent>(ent.Owner);
     }
 
-    public void SetPassiveDamageValues(Entity<WraithRevenantComponent> ent, DamageSpecifier newDamage, List<MobState> allowedStates)
+    public void SetPassiveDamageValues(Entity<WraithRevenantComponent> ent,
+        DamageSpecifier newDamage,
+        List<MobState> allowedStates)
     {
         if (TryComp<PassiveDamageComponent>(ent.Owner, out var passive))
         {
@@ -84,5 +87,6 @@ public sealed class WraithRevenantSystem : EntitySystem
 
         Dirty(ent);
     }
+
     #endregion
 }

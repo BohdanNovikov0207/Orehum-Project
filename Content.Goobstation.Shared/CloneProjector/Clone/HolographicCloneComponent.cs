@@ -7,13 +7,12 @@ using Robust.Shared.GameStates;
 
 namespace Content.Goobstation.Shared.CloneProjector.Clone;
 
-[RegisterComponent, NetworkedComponent, AutoGenerateComponentState]
+[RegisterComponent] [NetworkedComponent] [AutoGenerateComponentState]
 public sealed partial class HolographicCloneComponent : Component
 {
-    [ViewVariables(VVAccess.ReadOnly)]
-    public Entity<CloneProjectorComponent>? HostProjector;
-
-    [ViewVariables(VVAccess.ReadOnly), AutoNetworkedField]
+    [ViewVariables(VVAccess.ReadOnly)] [AutoNetworkedField]
     public EntityUid? HostEntity;
 
+    [ViewVariables(VVAccess.ReadOnly)]
+    public Entity<CloneProjectorComponent>? HostProjector;
 }

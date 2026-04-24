@@ -11,8 +11,8 @@ namespace Content.Goobstation.Server.Slasher.Systems;
 public sealed class SlasherPossessionSystem : EntitySystem
 {
     [Dependency] private readonly ActionsSystem _actions = default!;
-    [Dependency] private readonly PossessionSystem _possession = default!;
     [Dependency] private readonly SharedPopupSystem _popup = default!;
+    [Dependency] private readonly PossessionSystem _possession = default!;
 
     public override void Initialize()
     {
@@ -23,15 +23,11 @@ public sealed class SlasherPossessionSystem : EntitySystem
         SubscribeLocalEvent<SlasherPossessionComponent, SlasherPossessionEvent>(OnPossess);
     }
 
-    private void OnMapInit(Entity<SlasherPossessionComponent> ent, ref MapInitEvent args)
-    {
+    private void OnMapInit(Entity<SlasherPossessionComponent> ent, ref MapInitEvent args) =>
         _actions.AddAction(ent.Owner, ref ent.Comp.ActionEnt, ent.Comp.ActionId);
-    }
 
-    private void OnShutdown(Entity<SlasherPossessionComponent> ent, ref ComponentShutdown args)
-    {
+    private void OnShutdown(Entity<SlasherPossessionComponent> ent, ref ComponentShutdown args) =>
         _actions.RemoveAction(ent.Owner, ent.Comp.ActionEnt);
-    }
 
     /// <summary>
     /// Slasher - Handles the possession of a target.
@@ -55,7 +51,7 @@ public sealed class SlasherPossessionSystem : EntitySystem
         _possession.TryPossessTarget(args.Target,
             ent.Owner,
             ent.Comp.PossessionDuration,
-            pacifyPossessed: false,
+            false,
             hideActions: false, // Doesn't actually work I guess
             polymorphPossessor: true);
 

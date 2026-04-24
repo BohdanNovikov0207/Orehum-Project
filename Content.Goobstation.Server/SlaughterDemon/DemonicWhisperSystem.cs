@@ -19,10 +19,10 @@ namespace Content.Goobstation.Server.SlaughterDemon;
 /// </summary>
 public sealed class DemonicWhisperSystem : EntitySystem
 {
-    [Dependency] private readonly QuickDialogSystem _quickDialog = default!;
-    [Dependency] private readonly PrayerSystem _prayer = default!;
-    [Dependency] private readonly PopupSystem _popup = default!;
     [Dependency] private readonly IdentitySystem _identity = default!;
+    [Dependency] private readonly PopupSystem _popup = default!;
+    [Dependency] private readonly PrayerSystem _prayer = default!;
+    [Dependency] private readonly QuickDialogSystem _quickDialog = default!;
 
     private EntityQuery<ActorComponent> _actorQuery;
 
@@ -43,14 +43,20 @@ public sealed class DemonicWhisperSystem : EntitySystem
             || !_actorQuery.TryComp(target, out var actorTarget))
             return;
 
-        _quickDialog.OpenDialog(actor.PlayerSession, Loc.GetString("demonic-whisper-title"), "Message", (string message) =>
-        {
-            _prayer.SendSubtleMessage(actorTarget.PlayerSession, actor.PlayerSession, message, Loc.GetString("demonic-whisper-popup"));
+        _quickDialog.OpenDialog(actor.PlayerSession,
+            Loc.GetString("demonic-whisper-title"),
+            "Message",
+            (string message) =>
+            {
+                _prayer.SendSubtleMessage(actorTarget.PlayerSession,
+                    actor.PlayerSession,
+                    message,
+                    Loc.GetString("demonic-whisper-popup"));
 
-            _popup.PopupEntity(Loc.GetString("demonic-whisper-whisper",
-                ("name", _identity.GetEntityIdentity(target)),
-                ("message", FormattedMessage.EscapeText(message))),
-                ent.Owner);
-        });
+                _popup.PopupEntity(Loc.GetString("demonic-whisper-whisper",
+                        ("name", _identity.GetEntityIdentity(target)),
+                        ("message", FormattedMessage.EscapeText(message))),
+                    ent.Owner);
+            });
     }
 }

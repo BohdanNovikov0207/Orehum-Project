@@ -23,13 +23,13 @@ namespace Content.Goobstation.Shared.Electrocution;
 
 public sealed class ExplosiveShockSystem : EntitySystem
 {
+    [Dependency] private readonly ISharedAdminLogManager _adminLogger = default!;
     [Dependency] private readonly SharedBodySystem _body = default!;
     [Dependency] private readonly DamageableSystem _damageable = default!;
     [Dependency] private readonly SharedExplosionSystem _explosion = default!;
-    [Dependency] private readonly IGameTiming _timing = default!;
-    [Dependency] private readonly ISharedAdminLogManager _adminLogger = default!;
     [Dependency] private readonly SharedPopupSystem _popup = default!;
     [Dependency] private readonly SharedStunSystem _stun = default!;
+    [Dependency] private readonly IGameTiming _timing = default!;
 
     public override void Initialize()
     {
@@ -50,19 +50,24 @@ public sealed class ExplosiveShockSystem : EntitySystem
         }
     }
 
-    private void OnElectrocuted(EntityUid uid, ExplosiveShockComponent explosiveShock, InventoryRelayedEvent<ElectrocutionAttemptEvent> args)
+    private void OnElectrocuted(EntityUid uid,
+        ExplosiveShockComponent explosiveShock,
+        InventoryRelayedEvent<ElectrocutionAttemptEvent> args)
     {
         if (!TryComp<ExplosiveComponent>(uid, out var explosive))
             return;
 
         _popup.PopupEntity(Loc.GetString("explosive-shock-sizzle", ("item", uid)), uid);
-        _adminLogger.Add(LogType.Electrocution, $"{ToPrettyString(args.Args.TargetUid):entity} triggered explosive shock item {ToPrettyString(uid):entity}");
+        _adminLogger.Add(LogType.Electrocution,
+            $"{ToPrettyString(args.Args.TargetUid):entity} triggered explosive shock item {ToPrettyString(uid):entity}");
         EnsureComp<ExplosiveShockIgnitedComponent>(uid, out var ignited);
         ignited.ExplodeAt = _timing.CurTime + explosiveShock.ExplosionDelay;
     }
 
-    private void TryExplode(EntityUid uid) {
-        if (Deleted(uid) || !TryComp<ExplosiveComponent>(uid, out var explosive) || !TryComp<ExplosiveShockComponent>(uid, out var explosiveShock))
+    private void TryExplode(EntityUid uid)
+    {
+        if (Deleted(uid) || !TryComp<ExplosiveComponent>(uid, out var explosive) ||
+            !TryComp<ExplosiveShockComponent>(uid, out var explosiveShock))
             return;
 
         EntityUid? target = null;
@@ -75,12 +80,16 @@ public sealed class ExplosiveShockSystem : EntitySystem
         {
             // gloves go under armor so ignore resistances
             foreach (var part in _body.GetBodyChildrenOfType(target.Value, BodyPartType.Hand))
+            {
                 _damageable.TryChangeDamage(part.Id, explosiveShock.HandsDamage, true);
+            }
 
             foreach (var part in _body.GetBodyChildrenOfType(target.Value, BodyPartType.Arm))
+            {
                 _damageable.TryChangeDamage(part.Id, explosiveShock.ArmsDamage, true);
+            }
 
-            _stun.TryKnockdown(target.Value, explosiveShock.KnockdownTime, true);
+            _stun.TryKnockdown(target.Value, explosiveShock.KnockdownTime);
         }
     }
 }

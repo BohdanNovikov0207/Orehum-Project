@@ -2,7 +2,6 @@ using Content.Goobstation.Shared.Wraith.Components;
 using Content.Goobstation.Shared.Wraith.Events;
 using Content.Server.Body.Systems;
 using Content.Server.Popups;
-using Content.Server.Storage.Components;
 using Content.Server.Storage.EntitySystems;
 using Content.Shared.Atmos.Rotting;
 using Content.Shared.Mobs.Systems;
@@ -12,11 +11,11 @@ namespace Content.Goobstation.Server.Wraith.Systems;
 
 public sealed class RaiseSkeletonSystem : EntitySystem
 {
-    [Dependency] private readonly PopupSystem _popup = default!;
-    [Dependency] private readonly MobStateSystem _mobState = default!;
-    [Dependency] private readonly SharedRottingSystem _rotting = default!;
     [Dependency] private readonly BodySystem _bodySystem = default!;
     [Dependency] private readonly EntityStorageSystem _entityStorage = default!;
+    [Dependency] private readonly MobStateSystem _mobState = default!;
+    [Dependency] private readonly PopupSystem _popup = default!;
+    [Dependency] private readonly SharedRottingSystem _rotting = default!;
 
     public override void Initialize()
     {
@@ -57,7 +56,7 @@ public sealed class RaiseSkeletonSystem : EntitySystem
         }
 
         // since both conditions passed, deploy the skeleton and gib them
-         Spawn(ent.Comp.SkeletonProto, Transform(args.Target).Coordinates);
+        Spawn(ent.Comp.SkeletonProto, Transform(args.Target).Coordinates);
         _bodySystem.GibBody(args.Target);
 
         args.Handled = true;

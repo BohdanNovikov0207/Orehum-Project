@@ -7,7 +7,7 @@ namespace Content.Goobstation.Shared.Wraith.Other;
 /// <summary>
 /// Damages entities that are near to the source
 /// </summary>
-[RegisterComponent, NetworkedComponent]
+[RegisterComponent] [NetworkedComponent]
 [AutoGenerateComponentState]
 public sealed partial class DamageNearbyComponent : Component
 {
@@ -15,14 +15,14 @@ public sealed partial class DamageNearbyComponent : Component
     public DamageSpecifier Damage = new();
 
     [DataField]
-    public EntityWhitelist? Whitelist = new();
-
-    [DataField]
     public TimeSpan Delay = TimeSpan.FromSeconds(15);
 
-    [DataField, AutoNetworkedField]
+    [DataField] [AutoNetworkedField]
     public TimeSpan NextTick;
 
     [DataField]
     public float Range = 5f;
+
+    [DataField]
+    public EntityWhitelist? Whitelist = new();
 }

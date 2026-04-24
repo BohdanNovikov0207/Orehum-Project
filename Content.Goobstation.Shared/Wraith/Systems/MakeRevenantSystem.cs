@@ -4,18 +4,19 @@ using Content.Shared.Atmos.Rotting;
 using Content.Shared.Mind;
 using Content.Shared.Popups;
 using Content.Shared.Rejuvenate;
-using Content.Shared.Revenant.Components;
 using Robust.Shared.Audio.Systems;
 using Robust.Shared.Network;
 
 namespace Content.Goobstation.Shared.Wraith.Systems;
+
 public sealed class MakeRevenentSystem : EntitySystem
 {
-    [Dependency] private readonly SharedMindSystem _mind = default!;
-    [Dependency] private readonly WraithPossessedSystem _wraithPossessed = default!;
-    [Dependency] private readonly INetManager _netManager = default!;
     [Dependency] private readonly SharedAudioSystem _audio = default!;
+    [Dependency] private readonly SharedMindSystem _mind = default!;
+    [Dependency] private readonly INetManager _netManager = default!;
     [Dependency] private readonly SharedPopupSystem _popup = default!;
+    [Dependency] private readonly WraithPossessedSystem _wraithPossessed = default!;
+
     public override void Initialize()
     {
         base.Initialize();
@@ -26,7 +27,6 @@ public sealed class MakeRevenentSystem : EntitySystem
     //TO DO: Add action for wraith to leave body
     private void OnMakeRevenant(Entity<MakeRevenantComponent> ent, ref MakeRevenantEvent args)
     {
-
         if (!_mind.TryGetMind(ent.Owner, out var mindId, out _))
             return;
 

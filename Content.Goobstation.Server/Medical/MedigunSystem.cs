@@ -35,21 +35,22 @@ namespace Content.Goobstation.Server.Medical;
 // TODO: Move this to Shared when battery systems will be predicted
 public sealed class MedigunSystem : SharedMedigunSystem
 {
-    [Dependency] private readonly IGameTiming _timing = default!;
-    [Dependency] private readonly SharedTransformSystem _xform = default!;
+    private const string PainModifierIdentifier = "PainSuppressant";
     [Dependency] private readonly SharedActionsSystem _action = default!;
-    [Dependency] private readonly SharedAudioSystem _audio = default!;
-    [Dependency] private readonly SharedBodySystem _body = default!;
     [Dependency] private readonly AlertsSystem _alert = default!;
+    [Dependency] private readonly SharedAudioSystem _audio = default!;
     [Dependency] private readonly BatterySystem _battery = default!;
     [Dependency] private readonly BloodstreamSystem _bloodstreamSystem = default!;
+    [Dependency] private readonly SharedBodySystem _body = default!;
     [Dependency] private readonly ConsciousnessSystem _consciousness = default!; // Shitmed Change
-    [Dependency] private readonly EntityWhitelistSystem _whitelist = default!;
-    [Dependency] private readonly ExplosionSystem _explosion = default!;
     [Dependency] private readonly DamageableSystem _damage = default!;
-    [Dependency] private readonly ItemToggleSystem _toggle = default!;
+    [Dependency] private readonly ExplosionSystem _explosion = default!;
     [Dependency] private readonly PainSystem _pain = default!; // Shitmed Change
+    [Dependency] private readonly IGameTiming _timing = default!;
+    [Dependency] private readonly ItemToggleSystem _toggle = default!;
     [Dependency] private readonly UseDelaySystem _useDelay = default!;
+    [Dependency] private readonly EntityWhitelistSystem _whitelist = default!;
+    [Dependency] private readonly SharedTransformSystem _xform = default!;
 
     private EntityQuery<BatteryComponent> _batteryQuery;
     private EntityQuery<DamageableComponent> _damageableQuery;
@@ -103,11 +104,12 @@ public sealed class MedigunSystem : SharedMedigunSystem
             if (component.UberPoints > component.PointsToUber
                 && component.ParentEntity != null
                 && !component.UberActivated)
-                _action.AddAction(component.ParentEntity.Value, ref component.UberAction, component.UberActionId, medical);
+                _action.AddAction(component.ParentEntity.Value,
+                    ref component.UberAction,
+                    component.UberActionId,
+                    medical);
         }
     }
-
-    private const string PainModifierIdentifier = "PainSuppressant";
 
     /// <summary>
     /// Returns false if target had failed to be healed.
@@ -125,7 +127,7 @@ public sealed class MedigunSystem : SharedMedigunSystem
             healedPos.MapId != mediGunPos.MapId)
             return false;
 
-        var batteryToWithdraw = comp.UberActivated ? comp.UberBatteryWithdraw: comp.BatteryWithdraw;
+        var batteryToWithdraw = comp.UberActivated ? comp.UberBatteryWithdraw : comp.BatteryWithdraw;
         if (_batteryQuery.TryComp(ent.Owner, out var batteryComp)
             && !_battery.TryUseCharge(ent, batteryToWithdraw, batteryComp))
         {
@@ -174,9 +176,17 @@ public sealed class MedigunSystem : SharedMedigunSystem
             return true;
 
         if (!_pain.TryGetPainModifier(nerveSys.Value, bodyPart.Value.Id, PainModifierIdentifier, out var modifier))
-            _pain.TryAddPainModifier(nerveSys.Value, bodyPart.Value.Id, PainModifierIdentifier, ent.Comp.PainAmountModifier, time: TimeSpan.FromSeconds(1.5f));
+            _pain.TryAddPainModifier(nerveSys.Value,
+                bodyPart.Value.Id,
+                PainModifierIdentifier,
+                ent.Comp.PainAmountModifier,
+                time: TimeSpan.FromSeconds(1.5f));
         else
-            _pain.TryChangePainModifier(nerveSys.Value, bodyPart.Value.Id, PainModifierIdentifier, modifier.Value.Change + ent.Comp.PainAmountModifier, time: TimeSpan.FromSeconds(1.5f));
+            _pain.TryChangePainModifier(nerveSys.Value,
+                bodyPart.Value.Id,
+                PainModifierIdentifier,
+                modifier.Value.Change + ent.Comp.PainAmountModifier,
+                time: TimeSpan.FromSeconds(1.5f));
 
         return true;
     }
@@ -323,8 +333,6 @@ public sealed class MedigunSystem : SharedMedigunSystem
 
             healComp.LineColor = comp.UberLineColor;
             Dirty(healed, healComp);
-
-
         }
     }
 

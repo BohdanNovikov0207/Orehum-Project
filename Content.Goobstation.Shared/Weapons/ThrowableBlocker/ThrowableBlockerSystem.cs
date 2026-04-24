@@ -11,9 +11,7 @@ using Content.Shared.Damage;
 using Content.Shared.Hands.EntitySystems;
 using Content.Shared.Inventory;
 using Content.Shared.Item.ItemToggle;
-using Content.Shared.Nutrition.EntitySystems;
 using Content.Shared.Popups;
-using Content.Shared.Projectiles;
 using Content.Shared.Throwing;
 using Content.Shared.Weapons.Reflect;
 using Robust.Shared.Audio.Systems;
@@ -25,20 +23,21 @@ namespace Content.Goobstation.Shared.Weapons.ThrowableBlocker;
 
 public sealed class ThrowableBlockerSystem : EntitySystem
 {
-    [Dependency] private readonly ItemToggleSystem _toggle = default!;
-    [Dependency] private readonly SharedHandsSystem _hands = default!;
-    [Dependency] private readonly SharedPopupSystem _popup = default!;
     [Dependency] private readonly SharedAudioSystem _audio = default!;
     [Dependency] private readonly DamageableSystem _damageable = default!;
-    [Dependency] private readonly SharedPhysicsSystem _physics = default!;
+    [Dependency] private readonly SharedHandsSystem _hands = default!;
     [Dependency] private readonly INetManager _net = default!;
+    [Dependency] private readonly SharedPhysicsSystem _physics = default!;
+    [Dependency] private readonly SharedPopupSystem _popup = default!;
+    [Dependency] private readonly ItemToggleSystem _toggle = default!;
 
     public override void Initialize()
     {
         base.Initialize();
 
         Subs.SubscribeWithRelay<ReflectComponent, ThrowHitByEvent>(
-            OnThrowHit, baseEvent: false);
+            OnThrowHit,
+            false);
     }
 
     private void OnThrowHit(Entity<ReflectComponent> ent, ref ThrowHitByEvent args)

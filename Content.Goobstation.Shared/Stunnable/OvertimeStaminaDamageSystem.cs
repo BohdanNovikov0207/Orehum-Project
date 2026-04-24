@@ -13,10 +13,10 @@ using Robust.Shared.Network;
 
 namespace Content.Goobstation.Shared.Stunnable;
 
-public sealed partial class OvertimeStaminaDamageSystem : EntitySystem
+public sealed class OvertimeStaminaDamageSystem : EntitySystem
 {
-    [Dependency] private readonly SharedStaminaSystem _stamina = default!;
     [Dependency] private readonly INetManager _net = default!;
+    [Dependency] private readonly SharedStaminaSystem _stamina = default!;
 
     public override void Initialize()
     {

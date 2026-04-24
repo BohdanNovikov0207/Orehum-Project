@@ -8,5 +8,5 @@ using Robust.Shared.Serialization;
 
 namespace Content.Goobstation.Shared.CheckInfection;
 
-[Serializable, NetSerializable]
+[Serializable] [NetSerializable]
 public sealed partial class CheckInfectionDoAfter : SimpleDoAfterEvent;

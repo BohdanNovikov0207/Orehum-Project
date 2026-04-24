@@ -14,12 +14,12 @@ namespace Content.Goobstation.Shared.Shadowling.Systems.Abilities.PreAscension;
 /// </summary>
 public sealed class ShadowlingShadowWalkSystem : EntitySystem
 {
-    [Dependency] private readonly IGameTiming _timing = default!;
-    [Dependency] private readonly SharedStealthSystem _stealth = default!;
-    [Dependency] private readonly MovementSpeedModifierSystem _movementSpeedModifier = default!;
-    [Dependency] private readonly SharedTransformSystem _transform = default!;
-    [Dependency] private readonly SharedAudioSystem _audio = default!;
     [Dependency] private readonly SharedActionsSystem _actions = default!;
+    [Dependency] private readonly SharedAudioSystem _audio = default!;
+    [Dependency] private readonly MovementSpeedModifierSystem _movementSpeedModifier = default!;
+    [Dependency] private readonly SharedStealthSystem _stealth = default!;
+    [Dependency] private readonly IGameTiming _timing = default!;
+    [Dependency] private readonly SharedTransformSystem _transform = default!;
 
     public override void Initialize()
     {
@@ -63,8 +63,11 @@ public sealed class ShadowlingShadowWalkSystem : EntitySystem
                 {
                     _stealth.SetVisibility(uid, 1f, stealth);
                     RemComp<StealthComponent>(uid);
-                    _audio.PlayPvs(shadowWalk.ShadowWalkSound, uid, AudioParams.Default.WithVolume(-2f).WithPitchScale(2f));
+                    _audio.PlayPvs(shadowWalk.ShadowWalkSound,
+                        uid,
+                        AudioParams.Default.WithVolume(-2f).WithPitchScale(2f));
                 }
+
                 shadowWalk.IsActive = false;
                 shadowWalk.EffectActivated = false;
                 _movementSpeedModifier.RefreshMovementSpeedModifiers(uid);

@@ -7,10 +7,10 @@ namespace Content.Goobstation.Server.MisandryBox.Thunderdome;
 
 public sealed class ThunderdomeLoadoutEui : BaseEui
 {
-    private readonly ThunderdomeRuleSystem _thunderdomeSystem;
     private readonly IEntityManager _entManager;
     private readonly EntityUid _ruleEntity;
     private readonly ICommonSession _session;
+    private readonly ThunderdomeRuleSystem _thunderdomeSystem;
 
     public ThunderdomeLoadoutEui(ThunderdomeRuleSystem thunderdomeSystem, EntityUid ruleEntity, ICommonSession session)
     {
@@ -47,8 +47,5 @@ public sealed class ThunderdomeLoadoutEui : BaseEui
         StateDirty();
     }
 
-    public override void Closed()
-    {
-        base.Closed();
-    }
+    public override void Closed() => base.Closed();
 }

@@ -14,12 +14,12 @@ namespace Content.Goobstation.Shared.Factory.Slots;
 /// </summary>
 public sealed partial class AutomatedMaterialStorage : AutomationSlot
 {
+    private EntityQuery<PhysicalCompositionComponent> _compositionQuery;
     private SharedMaterialStorageSystem _material;
-    private SharedPowerReceiverSystem _power;
 
     private EntityQuery<MaterialComponent> _materialQuery;
+    private SharedPowerReceiverSystem _power;
     private EntityQuery<MaterialStorageComponent> _storageQuery;
-    private EntityQuery<PhysicalCompositionComponent> _compositionQuery;
 
     public override void Initialize()
     {
@@ -33,10 +33,8 @@ public sealed partial class AutomatedMaterialStorage : AutomationSlot
         _compositionQuery = EntMan.GetEntityQuery<PhysicalCompositionComponent>();
     }
 
-    public override bool Insert(EntityUid item)
-    {
-        return base.Insert(item) && _material.TryInsertMaterialEntity(user: Owner, item, Owner);
-    }
+    public override bool Insert(EntityUid item) =>
+        base.Insert(item) && _material.TryInsertMaterialEntity(Owner, item, Owner);
 
     public override bool CanInsert(EntityUid item)
     {

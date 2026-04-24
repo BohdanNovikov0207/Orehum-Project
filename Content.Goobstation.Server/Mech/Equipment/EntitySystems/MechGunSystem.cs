@@ -16,10 +16,11 @@ using Content.Shared.Mech.Equipment.Components;
 using Content.Shared.Weapons.Ranged.Components;
 
 namespace Content.Goobstation.Server.Mech.Equipment.EntitySystems;
+
 public sealed class MechGunSystem : EntitySystem
 {
-    [Dependency] private readonly MechSystem _mech = default!;
     [Dependency] private readonly BatterySystem _battery = default!;
+    [Dependency] private readonly MechSystem _mech = default!;
 
     public override void Initialize()
     {
@@ -29,7 +30,9 @@ public sealed class MechGunSystem : EntitySystem
         SubscribeLocalEvent<ProjectileBatteryAmmoProviderComponent, CheckMechWeaponBatteryEvent>(OnCheckBattery);
     }
 
-    private void OnHandleMechEquipmentBattery(EntityUid uid, MechEquipmentComponent component, HandleMechEquipmentBatteryEvent args)
+    private void OnHandleMechEquipmentBattery(EntityUid uid,
+        MechEquipmentComponent component,
+        HandleMechEquipmentBatteryEvent args)
     {
         if (!component.EquipmentOwner.HasValue)
             return;

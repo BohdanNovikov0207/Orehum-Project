@@ -10,12 +10,24 @@ namespace Content.Goobstation.Server.Polls;
 
 public sealed class PollManager : IPostInjectInit
 {
-    [Dependency] private readonly IServerDbManager _db = null!;
-    [Dependency] private readonly IPlayerManager _playerManager = null!;
-    [Dependency] private readonly INetManager _net = null!;
-
     private readonly Dictionary<int, Poll> _cachedPolls = [];
     private readonly object _cacheLock = new();
+    [Dependency] private readonly IServerDbManager _db = null!;
+    [Dependency] private readonly INetManager _net = null!;
+    [Dependency] private readonly IPlayerManager _playerManager = null!;
+
+    void IPostInjectInit.PostInject()
+    {
+        _net.RegisterNetMessage<MsgRequestActivePolls>(OnRequestActivePolls);
+        _net.RegisterNetMessage<MsgActivePollsResponse>();
+        _net.RegisterNetMessage<MsgRequestPollDetails>(OnRequestPollDetails);
+        _net.RegisterNetMessage<MsgPollDetailsResponse>();
+        _net.RegisterNetMessage<MsgCastPollVote>(OnCastVote);
+        _net.RegisterNetMessage<MsgRemovePollVote>(OnRemoveVote);
+        _net.RegisterNetMessage<MsgPollVoteResponse>();
+        _net.RegisterNetMessage<MsgPollUpdated>();
+        _net.RegisterNetMessage<MsgPollClosed>();
+    }
 
     public async Task<PollData?> CreatePoll(
         string title,
@@ -35,7 +47,7 @@ public sealed class PollManager : IPostInjectInit
             AllowMultipleChoices = allowMultipleChoices,
             CreatedById = creatorId?.UserId,
             CreatedAt = DateTime.UtcNow,
-            Options = []
+            Options = [],
         };
 
         for (var i = 0; i < options.Count; i++)
@@ -43,7 +55,7 @@ public sealed class PollManager : IPostInjectInit
             poll.Options.Add(new PollOption
             {
                 OptionText = options[i],
-                DisplayOrder = i
+                DisplayOrder = i,
             });
         }
 
@@ -51,7 +63,9 @@ public sealed class PollManager : IPostInjectInit
         poll.Id = pollId;
 
         lock (_cacheLock)
+        {
             _cachedPolls[pollId] = poll;
+        }
 
         var pollData = await ConvertToPollData(poll);
 
@@ -82,7 +96,9 @@ public sealed class PollManager : IPostInjectInit
         return poll != null ? await ConvertToPollData(poll) : null;
     }
 
-    public async Task<(bool success, string? error, PollData? poll)> CastVote(int pollId, int optionId, NetUserId userId)
+    public async Task<(bool success, string? error, PollData? poll)> CastVote(int pollId,
+        int optionId,
+        NetUserId userId)
     {
         var poll = await _db.GetPollAsync(pollId);
 
@@ -107,10 +123,8 @@ public sealed class PollManager : IPostInjectInit
         return (true, null, updatedPoll);
     }
 
-    public async Task<bool> RemoveVote(int pollId, int optionId, NetUserId userId)
-    {
-        return await _db.RemovePollVoteAsync(pollId, optionId, userId);
-    }
+    public async Task<bool> RemoveVote(int pollId, int optionId, NetUserId userId) =>
+        await _db.RemovePollVoteAsync(pollId, optionId, userId);
 
     public async Task<List<PollVoteData>> GetPlayerVotes(int pollId, NetUserId userId)
     {
@@ -119,7 +133,7 @@ public sealed class PollManager : IPostInjectInit
         {
             PollId = v.PollId,
             OptionId = v.PollOptionId,
-            VotedAt = v.VotedAt
+            VotedAt = v.VotedAt,
         });
     }
 
@@ -144,7 +158,8 @@ public sealed class PollManager : IPostInjectInit
         string? creatorName = null;
         if (poll.CreatedBy != null)
         {
-            var creatorRecord = await _db.GetPlayerRecordByUserId(new NetUserId(poll.CreatedBy.UserId), CancellationToken.None);
+            var creatorRecord =
+                await _db.GetPlayerRecordByUserId(new NetUserId(poll.CreatedBy.UserId), CancellationToken.None);
             creatorName = creatorRecord?.LastSeenUserName;
         }
 
@@ -158,13 +173,17 @@ public sealed class PollManager : IPostInjectInit
             Active = poll.Active,
             AllowMultipleChoices = poll.AllowMultipleChoices,
             CreatedByName = creatorName,
-            Options = [.. poll.Options.OrderBy(o => o.DisplayOrder).Select(o => new PollOptionData
-            {
-                OptionId = o.Id,
-                OptionText = o.OptionText,
-                DisplayOrder = o.DisplayOrder,
-                VoteCount = results.TryGetValue(o.Id, out var count) ? count : 0
-            })]
+            Options =
+            [
+                .. poll.Options.OrderBy(o => o.DisplayOrder)
+                    .Select(o => new PollOptionData
+                    {
+                        OptionId = o.Id,
+                        OptionText = o.OptionText,
+                        DisplayOrder = o.DisplayOrder,
+                        VoteCount = results.TryGetValue(o.Id, out var count) ? count : 0,
+                    }),
+            ],
         };
     }
 
@@ -192,7 +211,7 @@ public sealed class PollManager : IPostInjectInit
         var response = new MsgPollDetailsResponse
         {
             Poll = poll,
-            PlayerVotes = playerVotes
+            PlayerVotes = playerVotes,
         };
 
         _net.ServerSendMessage(response, msg.MsgChannel);
@@ -217,7 +236,10 @@ public sealed class PollManager : IPostInjectInit
     {
         if (!_playerManager.TryGetSessionByChannel(msg.MsgChannel, out var session) || session.UserId == default)
         {
-            SendVoteResponse(false, "Not logged in", null, msg.MsgChannel); // is this even possbile really? dunno but might as well check
+            SendVoteResponse(false,
+                "Not logged in",
+                null,
+                msg.MsgChannel); // is this even possbile really? dunno but might as well check
             return;
         }
 
@@ -236,22 +258,9 @@ public sealed class PollManager : IPostInjectInit
         {
             Success = success,
             ErrorMessage = error,
-            UpdatedPoll = poll
+            UpdatedPoll = poll,
         };
 
         _net.ServerSendMessage(response, channel);
-    }
-
-    void IPostInjectInit.PostInject()
-    {
-        _net.RegisterNetMessage<MsgRequestActivePolls>(OnRequestActivePolls);
-        _net.RegisterNetMessage<MsgActivePollsResponse>();
-        _net.RegisterNetMessage<MsgRequestPollDetails>(OnRequestPollDetails);
-        _net.RegisterNetMessage<MsgPollDetailsResponse>();
-        _net.RegisterNetMessage<MsgCastPollVote>(OnCastVote);
-        _net.RegisterNetMessage<MsgRemovePollVote>(OnRemoveVote);
-        _net.RegisterNetMessage<MsgPollVoteResponse>();
-        _net.RegisterNetMessage<MsgPollUpdated>();
-        _net.RegisterNetMessage<MsgPollClosed>();
     }
 }

@@ -15,10 +15,10 @@ using Content.Shared.GameTicking.Components;
 
 namespace Content.Goobstation.Server.Pirates.Ransom;
 
-public sealed partial class RansomSystem : EntitySystem
+public sealed class RansomSystem : EntitySystem
 {
-    [Dependency] private readonly PendingPirateRuleSystem _pprs = default!;
     [Dependency] private readonly GameTicker _gt = default!;
+    [Dependency] private readonly PendingPirateRuleSystem _pprs = default!;
 
     public override void Initialize()
     {

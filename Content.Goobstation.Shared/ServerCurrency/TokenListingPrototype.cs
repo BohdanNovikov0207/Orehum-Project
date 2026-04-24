@@ -12,9 +12,6 @@ namespace Content.Goobstation.Shared.ServerCurrency;
 [Prototype("tokenListing")]
 public sealed class TokenListingPrototype : IPrototype
 {
-    [IdDataField]
-    public string ID { get; private set; } = default!;
-
     [DataField("name", required: true)]
     public string Name { get; private set; } = string.Empty;
 
@@ -29,4 +26,7 @@ public sealed class TokenListingPrototype : IPrototype
 
     [DataField("adminNote", required: true)]
     public string AdminNote { get; private set; } = string.Empty;
+
+    [IdDataField]
+    public string ID { get; } = default!;
 }

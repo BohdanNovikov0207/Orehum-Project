@@ -26,14 +26,14 @@ namespace Content.Goobstation.Server.Xenobiology.XenobiologyBountyConsole;
 /// </summary>
 public sealed class XenobiologyBountyConsoleSystem : EntitySystem
 {
-    [Dependency] private readonly EntityWhitelistSystem _whitelist = default!;
+    [Dependency] private readonly AccessReaderSystem _access = default!;
+    [Dependency] private readonly SharedAudioSystem _audio = default!;
+    [Dependency] private readonly IPrototypeManager _proto = default!;
+    [Dependency] private readonly ResearchSystem _research = default!;
     [Dependency] private readonly StationSystem _station = default!;
     [Dependency] private readonly IGameTiming _timing = default!;
     [Dependency] private readonly UserInterfaceSystem _uiSystem = default!;
-    [Dependency] private readonly SharedAudioSystem _audio = default!;
-    [Dependency] private readonly AccessReaderSystem _access = default!;
-    [Dependency] private readonly IPrototypeManager _proto = default!;
-    [Dependency] private readonly ResearchSystem _research = default!;
+    [Dependency] private readonly EntityWhitelistSystem _whitelist = default!;
     [Dependency] private readonly StationXenobiologyBountyDatabaseSystem _xenoDatabase = default!;
 
     private EntityQuery<StackComponent> _stackQuery;
@@ -82,7 +82,9 @@ public sealed class XenobiologyBountyConsoleSystem : EntitySystem
             return;
 
         foreach (var bountyEnt in bountyEntities)
+        {
             Del(bountyEnt);
+        }
 
         var pointsToAward = !_proto.TryIndex(bounty.Bounty, out var bp) ? 0 : bp.PointsAwarded;
         _research.ModifyServerPoints(server.Value, (int) pointsToAward, serverComponent);
@@ -123,6 +125,7 @@ public sealed class XenobiologyBountyConsoleSystem : EntitySystem
     }
 
     #region Bounty Management
+
     private bool IsBountyComplete(EntityUid entity, XenobiologyBountyData data, out HashSet<EntityUid> bountyEntities)
     {
         if (_proto.TryIndex(data.Bounty, out var proto))
@@ -132,10 +135,8 @@ public sealed class XenobiologyBountyConsoleSystem : EntitySystem
         return false;
     }
 
-    public bool IsBountyComplete(EntityUid entity, string id)
-    {
-        return _proto.TryIndex<XenobiologyBountyPrototype>(id, out var proto) && IsBountyComplete(entity, proto.Entries);
-    }
+    public bool IsBountyComplete(EntityUid entity, string id) =>
+        _proto.TryIndex<XenobiologyBountyPrototype>(id, out var proto) && IsBountyComplete(entity, proto.Entries);
 
     public bool IsBountyComplete(EntityUid entity, ProtoId<XenobiologyBountyPrototype> prototypeId)
     {
@@ -144,20 +145,18 @@ public sealed class XenobiologyBountyConsoleSystem : EntitySystem
         return IsBountyComplete(entity, prototype.Entries);
     }
 
-    private bool IsBountyComplete(EntityUid container, IEnumerable<XenobiologyBountyItemEntry> entries)
-    {
-        return IsBountyComplete(container, entries, out _);
-    }
+    private bool IsBountyComplete(EntityUid container, IEnumerable<XenobiologyBountyItemEntry> entries) =>
+        IsBountyComplete(container, entries, out _);
 
-    private bool IsBountyComplete(EntityUid container, IEnumerable<XenobiologyBountyItemEntry> entries, out HashSet<EntityUid> bountyEntities)
-    {
-        return IsBountyComplete(GetBountyEntities(container), entries, out bountyEntities);
-    }
+    private bool IsBountyComplete(EntityUid container,
+        IEnumerable<XenobiologyBountyItemEntry> entries,
+        out HashSet<EntityUid> bountyEntities) =>
+        IsBountyComplete(GetBountyEntities(container), entries, out bountyEntities);
 
     /// <summary>
-    /// Determines whether the <paramref name="entity"/> meets the criteria for the bounty <paramref name="entry"/>.
+    /// Determines whether the <paramref name="entity" /> meets the criteria for the bounty <paramref name="entry" />.
     /// </summary>
-    /// <returns>true if <paramref name="entity"/> is a valid item for the bounty entry, otherwise false</returns>
+    /// <returns>true if <paramref name="entity" /> is a valid item for the bounty entry, otherwise false</returns>
     private bool IsValidBountyEntry(EntityUid entity, XenobiologyBountyItemEntry entry)
     {
         if (!_whitelist.IsValid(entry.Whitelist, entity))
@@ -166,7 +165,9 @@ public sealed class XenobiologyBountyConsoleSystem : EntitySystem
         return entry.Blacklist == null || !_whitelist.IsValid(entry.Blacklist, entity);
     }
 
-    private bool IsBountyComplete(HashSet<EntityUid> entities, IEnumerable<XenobiologyBountyItemEntry> entries, out HashSet<EntityUid> bountyEntities)
+    private bool IsBountyComplete(HashSet<EntityUid> entities,
+        IEnumerable<XenobiologyBountyItemEntry> entries,
+        out HashSet<EntityUid> bountyEntities)
     {
         bountyEntities = [];
 
@@ -207,7 +208,9 @@ public sealed class XenobiologyBountyConsoleSystem : EntitySystem
         foreach (var child in containers.Containers.Values
                      .SelectMany(container => container.ContainedEntities, (_, ent) => GetBountyEntities(ent))
                      .SelectMany(children => children))
+        {
             entities.Add(child);
+        }
 
         return entities;
     }

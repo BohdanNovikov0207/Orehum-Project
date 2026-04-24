@@ -25,7 +25,7 @@ public sealed class RoboticArmAnimationSystem : EntitySystem
             if (comp.ItemSlot == null)
                 continue;
 
-            if (comp.NextMove is {} nextMove)
+            if (comp.NextMove is { } nextMove)
                 Animate((uid, comp), nextMove);
             else
                 Reset((uid, comp));

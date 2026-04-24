@@ -4,13 +4,12 @@
 // SPDX-License-Identifier: AGPL-3.0-or-later
 
 using Content.Goobstation.Shared.Enchanting.Components;
-using Content.Shared.Mobs.Components;
 using Content.Shared.Weapons.Melee.Events;
 
 namespace Content.Goobstation.Shared.Enchanting.Systems;
 
 /// <summary>
-/// Handles fire + temperature events for <see cref="BonusDamageEnchantComponent"/>.
+/// Handles fire + temperature events for <see cref="BonusDamageEnchantComponent" />.
 /// </summary>
 public sealed class BonusDamageEnchantSystem : EntitySystem
 {
@@ -25,15 +24,11 @@ public sealed class BonusDamageEnchantSystem : EntitySystem
         SubscribeLocalEvent<BonusDamageEnchantComponent, MeleeHitEvent>(OnMeleeHit);
     }
 
-    private void OnAdded(Entity<BonusDamageEnchantComponent> ent, ref EnchantAddedEvent args)
-    {
-        Modify(ent, (float) args.Level);
-    }
+    private void OnAdded(Entity<BonusDamageEnchantComponent> ent, ref EnchantAddedEvent args) =>
+        Modify(ent, args.Level);
 
-    private void OnUpgraded(Entity<BonusDamageEnchantComponent> ent, ref EnchantUpgradedEvent args)
-    {
-        Modify(ent, (float) args.Level / (float) args.OldLevel);
-    }
+    private void OnUpgraded(Entity<BonusDamageEnchantComponent> ent, ref EnchantUpgradedEvent args) =>
+        Modify(ent, args.Level / (float) args.OldLevel);
 
     private void Modify(Entity<BonusDamageEnchantComponent> ent, float factor)
     {
@@ -41,8 +36,6 @@ public sealed class BonusDamageEnchantSystem : EntitySystem
         Dirty(ent);
     }
 
-    private void OnMeleeHit(Entity<BonusDamageEnchantComponent> ent, ref MeleeHitEvent args)
-    {
+    private void OnMeleeHit(Entity<BonusDamageEnchantComponent> ent, ref MeleeHitEvent args) =>
         args.BonusDamage += ent.Comp.Damage;
-    }
 }

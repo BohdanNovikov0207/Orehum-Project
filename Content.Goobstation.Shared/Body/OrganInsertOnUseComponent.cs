@@ -3,15 +3,15 @@ using Robust.Shared.GameStates;
 
 namespace Content.Goobstation.Shared.Body;
 
-[RegisterComponent, NetworkedComponent]
+[RegisterComponent] [NetworkedComponent]
 public sealed partial class OrganInsertOnUseComponent : Component
 {
-    [DataField(required: true)]
-    public string SlotId;
-
     [DataField(required: true)]
     public BodyPartType PartType;
 
     [DataField]
     public bool PreventRemoval = true;
+
+    [DataField(required: true)]
+    public string SlotId;
 }

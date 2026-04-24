@@ -18,16 +18,16 @@ namespace Content.Goobstation.Shared.FloorCleaner;
 
 public sealed class FloorCleanerSystem : EntitySystem
 {
-    [Dependency] private readonly SharedDoAfterSystem _doAfter = default!;
-    [Dependency] private readonly SharedPopupSystem _popup = default!;
-    [Dependency] private readonly EntityLookupSystem _lookup = default!;
-    [Dependency] private readonly SharedInteractionSystem _interaction = default!;
-    [Dependency] private readonly SharedDecalSystem _decal = default!;
-    [Dependency] private readonly SharedMapSystem _map = default!;
-    [Dependency] private readonly SharedTransformSystem _transform = default!;
     [Dependency] private readonly SharedAbsorbentSystem _absorbent = default!;
-    [Dependency] private readonly SharedSolutionContainerSystem _solutionContainer = default!;
+    [Dependency] private readonly SharedDecalSystem _decal = default!;
+    [Dependency] private readonly SharedDoAfterSystem _doAfter = default!;
+    [Dependency] private readonly SharedInteractionSystem _interaction = default!;
+    [Dependency] private readonly EntityLookupSystem _lookup = default!;
+    [Dependency] private readonly SharedMapSystem _map = default!;
+    [Dependency] private readonly SharedPopupSystem _popup = default!;
     [Dependency] private readonly SharedPuddleSystem _puddle = default!;
+    [Dependency] private readonly SharedSolutionContainerSystem _solutionContainer = default!;
+    [Dependency] private readonly SharedTransformSystem _transform = default!;
     [Dependency] private readonly UseDelaySystem _useDelay = default!;
 
     public override void Initialize()
@@ -56,7 +56,7 @@ public sealed class FloorCleanerSystem : EntitySystem
 
         if (TryComp<MapGridComponent>(gridUid, out var mapgrid))
         {
-            var tileRef =  _map.GetTileRef(gridUid.Value, mapgrid, args.ClickLocation);
+            var tileRef = _map.GetTileRef(gridUid.Value, mapgrid, args.ClickLocation);
             foundDecals = _decal.GetDecalsInRange(tileRef.GridUid, tileRef.GridIndices, floorCleaner.Comp.Radius);
         }
 
@@ -114,7 +114,7 @@ public sealed class FloorCleanerSystem : EntitySystem
         {
             var gridNullable = Transform(floorCleaner).GridUid;
 
-            if (gridNullable is {} grid)
+            if (gridNullable is { } grid)
                 _decal.RemoveDecal(grid, index);
         }
     }
@@ -126,7 +126,7 @@ public sealed class FloorCleanerSystem : EntitySystem
     /// <returns> returns false if failed to run</returns>
     private bool StartCleaning(EntityUid uid, EntityUid target)
     {
-        if(!TryComp<AbsorbentComponent>(uid, out var absorb))
+        if (!TryComp<AbsorbentComponent>(uid, out var absorb))
             return false;
         if (!TryComp<UseDelayComponent>(uid, out var useDelay))
             return false;
@@ -135,12 +135,12 @@ public sealed class FloorCleanerSystem : EntitySystem
 
         if (FixedPoint2.Zero ==
             absorberSoln.Value.Comp.Solution.GetTotalPrototypeQuantity(
-                _puddle.GetAbsorbentReagents(absorberSoln.Value.Comp.Solution)))// no cleaning reagent in scrubber
+                _puddle.GetAbsorbentReagents(absorberSoln.Value.Comp.Solution))) // no cleaning reagent in scrubber
             return true;
 
-        _absorbent.Mop((uid,absorb), uid, target );
+        _absorbent.Mop((uid, absorb), uid, target);
         _useDelay.CancelDelay((uid, useDelay)); // prevents cleaning loop from being aborted
 
-        return true; 
+        return true;
     }
 }

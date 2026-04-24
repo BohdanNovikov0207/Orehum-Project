@@ -6,27 +6,26 @@
 using Content.Shared.Radio;
 using Robust.Shared.Prototypes;
 
-namespace Content.Goobstation.Server.PanicButton
+namespace Content.Goobstation.Server.PanicButton;
+
+[RegisterComponent]
+public sealed partial class PanicButtonComponent : Component
 {
-    [RegisterComponent]
-    public sealed partial class PanicButtonComponent : Component
-    {
-        /// <summary>
-        /// What message to send over the radio.
-        /// </summary>
-        [DataField]
-        public LocId DistressMessage = "panic-button-distress";
+    /// <summary>
+    /// How long is the cooldown before you can send another message.
+    /// </summary>
+    [DataField]
+    public TimeSpan CoolDown = TimeSpan.FromSeconds(70);
 
-        /// <summary>
-        /// How long is the cooldown before you can send another message.
-        /// </summary>
-        [DataField]
-        public TimeSpan CoolDown = TimeSpan.FromSeconds(70);
+    /// <summary>
+    /// What message to send over the radio.
+    /// </summary>
+    [DataField]
+    public LocId DistressMessage = "panic-button-distress";
 
-        /// <summary>
-        /// Which channel to send the message over.
-        /// </summary>
-        [DataField]
-        public ProtoId<RadioChannelPrototype> RadioChannel = "Security";
-    }
+    /// <summary>
+    /// Which channel to send the message over.
+    /// </summary>
+    [DataField]
+    public ProtoId<RadioChannelPrototype> RadioChannel = "Security";
 }

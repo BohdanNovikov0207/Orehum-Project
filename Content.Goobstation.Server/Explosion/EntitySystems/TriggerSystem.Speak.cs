@@ -4,9 +4,6 @@
 // SPDX-License-Identifier: AGPL-3.0-or-later
 
 using Content.Goobstation.Server.Explosion.Components;
-using Content.Server.Explosion.EntitySystems;
-using Content.Server.Speech;
-using Content.Server.Speech.Components;
 using Content.Shared.Speech;
 using Content.Shared.Speech.Components;
 using Content.Shared.Trigger.Systems;
@@ -16,8 +13,8 @@ namespace Content.Goobstation.Server.Explosion.EntitySystems;
 
 public sealed class TriggerOnSpeakSystem : EntitySystem
 {
-    [Dependency] private readonly TriggerSystem _triggerSystem = default!;
     [Dependency] private readonly ContainerSystem _containerSystem = default!;
+    [Dependency] private readonly TriggerSystem _triggerSystem = default!;
 
     public override void Initialize()
     {

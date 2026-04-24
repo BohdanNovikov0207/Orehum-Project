@@ -7,9 +7,10 @@ using Content.Shared.Toggleable;
 
 namespace Content.Goobstation.Shared.Skinnable;
 
-public abstract partial class SharedSkinnableSystem : EntitySystem
+public abstract class SharedSkinnableSystem : EntitySystem
 {
     [Dependency] private readonly SharedAppearanceSystem _appearance = null!;
+
     protected void ChangeVisuals(Entity<SkinnableComponent> ent)
     {
         if (!TryComp<AppearanceComponent>(ent, out var appearance))
@@ -17,6 +18,4 @@ public abstract partial class SharedSkinnableSystem : EntitySystem
 
         _appearance.SetData(ent, ToggleableVisuals.Enabled, true, appearance);
     }
-
-
 }

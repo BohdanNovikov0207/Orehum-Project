@@ -17,14 +17,20 @@ namespace Content.Goobstation.Shared.Boomerang;
 /// <summary>
 /// Component for entities that should boomerang back to their thrower once thrown
 /// </summary>
-[NetworkedComponent, RegisterComponent, AutoGenerateComponentState]
+[NetworkedComponent] [RegisterComponent] [AutoGenerateComponentState]
 public sealed partial class BoomerangComponent : Component
 {
     /// <summary>
-    /// Entity we should return to after landing
+    /// Return hops we've made so far
     /// </summary>
-    [DataField, AutoNetworkedField]
-    public EntityUid? Thrower;
+    [DataField] [AutoNetworkedField]
+    public int CurrentHops = 0;
+
+    /// <summary>
+    /// Maximum return hops we can make
+    /// </summary>
+    [DataField]
+    public int MaxHops = 6;
 
     /// <summary>
     /// Distance to thrower we should try get picked up at or fail
@@ -39,14 +45,8 @@ public sealed partial class BoomerangComponent : Component
     public float ReturnSpeed = 10f;
 
     /// <summary>
-    /// Maximum return hops we can make
+    /// Entity we should return to after landing
     /// </summary>
-    [DataField]
-    public int MaxHops = 6;
-
-    /// <summary>
-    /// Return hops we've made so far
-    /// </summary>
-    [DataField, AutoNetworkedField]
-    public int CurrentHops = 0;
+    [DataField] [AutoNetworkedField]
+    public EntityUid? Thrower;
 }

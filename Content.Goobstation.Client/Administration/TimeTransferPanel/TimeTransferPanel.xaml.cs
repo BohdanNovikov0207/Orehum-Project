@@ -21,14 +21,13 @@ namespace Content.Goobstation.Client.Administration.TimeTransferPanel;
 [GenerateTypedNameReferences]
 public sealed partial class TimeTransferPanel : DefaultWindow
 {
-    [Dependency] private readonly IGameTiming _gameTiming = default!;
     [Dependency] private readonly IEntityManager _entityManager = default!;
+    [Dependency] private readonly IGameTiming _gameTiming = default!;
     [Dependency] private readonly IPrototypeManager _prototypeManager = default!;
 
     private readonly SpriteSystem _spriteSystem;
 
     public Action<(string playerId, List<TimeTransferData> transferList, bool overwrite)>? OnTransferMessageSend;
-    private TimeSpan? SetButtonResetOn { get; set; }
 
     public TimeTransferPanel()
     {
@@ -47,13 +46,15 @@ public sealed partial class TimeTransferPanel : DefaultWindow
         UpdateWarning(" ", Color.LightGreen);
     }
 
+    private TimeSpan? SetButtonResetOn { get; set; }
+
     public void PopulateJobs()
     {
         var jobs = _prototypeManager.EnumeratePrototypes<JobPrototype>()
             .OrderBy(job => job.LocalizedName)
             .ToList();
 
-        foreach(var job in jobs)
+        foreach (var job in jobs)
         {
             var jobEntry = new TimeTransferEntry(job, _spriteSystem, _prototypeManager);
             JobContainer.AddChild(jobEntry);
@@ -149,10 +150,7 @@ public sealed partial class TimeTransferPanel : DefaultWindow
         }
     }
 
-    public void OnJobSearchTextChanged(LineEdit.LineEditEventArgs args)
-    {
-        UpdateSearch();
-    }
+    public void OnJobSearchTextChanged(LineEdit.LineEditEventArgs args) => UpdateSearch();
 
     public void UpdateSearch()
     {
@@ -171,20 +169,13 @@ public sealed partial class TimeTransferPanel : DefaultWindow
         WarningLabel.Text = text;
     }
 
-    public bool ShouldShowJob(TimeTransferEntry jobEntry)
-    {
-        return jobEntry.JobName != null && JobSearch.Text != null && jobEntry.JobName.Contains(JobSearch.Text, StringComparison.OrdinalIgnoreCase);
-    }
+    public bool ShouldShowJob(TimeTransferEntry jobEntry) => jobEntry.JobName != null && JobSearch.Text != null &&
+                                                             jobEntry.JobName.Contains(JobSearch.Text,
+                                                                 StringComparison.OrdinalIgnoreCase);
 
-    public void OnGroupCheckboxPressed(BaseButton.ButtonEventArgs obj)
-    {
-        UpdateGroup();
-    }
+    public void OnGroupCheckboxPressed(BaseButton.ButtonEventArgs obj) => UpdateGroup();
 
-    public void OnAddTimeButtonPressed(BaseButton.ButtonEventArgs obj)
-    {
-        TimeTransfer(false);
-    }
+    public void OnAddTimeButtonPressed(BaseButton.ButtonEventArgs obj) => TimeTransfer();
 
     public void OnSetTimeButtonPressed(BaseButton.ButtonEventArgs obj)
     {

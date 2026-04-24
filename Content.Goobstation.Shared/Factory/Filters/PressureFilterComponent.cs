@@ -12,37 +12,37 @@ namespace Content.Goobstation.Shared.Factory.Filters;
 /// Requires that the pressure of an entity's gas mixture is within some range.
 /// Since atmos is server only, client will predict it blocking everything.
 /// </summary>
-[RegisterComponent, NetworkedComponent]
+[RegisterComponent] [NetworkedComponent]
 [AutoGenerateComponentState]
 public sealed partial class PressureFilterComponent : Component
 {
     /// <summary>
-    /// Minimum pressure to require.
-    /// </summary>
-    [DataField, AutoNetworkedField]
-    public float Min;
-
-    /// <summary>
     /// Maximum pressure to require.
     /// </summary>
-    [DataField, AutoNetworkedField]
+    [DataField] [AutoNetworkedField]
     public float Max = Atmospherics.OneAtmosphere * 10f;
+
+    /// <summary>
+    /// Minimum pressure to require.
+    /// </summary>
+    [DataField] [AutoNetworkedField]
+    public float Min;
 }
 
-[Serializable, NetSerializable]
+[Serializable] [NetSerializable]
 public enum PressureFilterUiKey : byte
 {
-    Key
+    Key,
 }
 
-[Serializable, NetSerializable]
-public sealed partial class PressureFilterSetMinMessage(float min) : BoundUserInterfaceMessage
+[Serializable] [NetSerializable]
+public sealed class PressureFilterSetMinMessage(float min) : BoundUserInterfaceMessage
 {
     public readonly float Min = min;
 }
 
-[Serializable, NetSerializable]
-public sealed partial class PressureFilterSetMaxMessage(float max) : BoundUserInterfaceMessage
+[Serializable] [NetSerializable]
+public sealed class PressureFilterSetMaxMessage(float max) : BoundUserInterfaceMessage
 {
     public readonly float Max = max;
 }

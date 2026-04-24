@@ -3,18 +3,18 @@
 namespace Content.Goobstation.Shared.Shadowling;
 
 [Prototype]
-public sealed partial class ShadowlingAbilityUnlockPrototype : IPrototype
+public sealed class ShadowlingAbilityUnlockPrototype : IPrototype
 {
-    /// <inheritdoc/>
-    [IdDataField]
-    public string ID { get; } = default!;
-
-    [DataField("count")]
-    public int UnlockAtThralls;
-
     [DataField]
     public ComponentRegistry? AddComponents;
 
     [DataField]
     public ComponentRegistry? RemoveComponents;
+
+    [DataField("count")]
+    public int UnlockAtThralls;
+
+    /// <inheritdoc />
+    [IdDataField]
+    public string ID { get; } = default!;
 }

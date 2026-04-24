@@ -26,19 +26,19 @@ namespace Content.Goobstation.Shared.Fishing.Systems;
 /// </summary>
 public abstract class SharedFishingSystem : EntitySystem
 {
-    [Dependency] protected readonly IGameTiming Timing = default!;
+    [Dependency] private readonly SharedActionsSystem _actions = default!;
+    [Dependency] private readonly SharedHandsSystem _hands = default!;
+    [Dependency] private readonly SharedPopupSystem _popup = default!;
     [Dependency] protected readonly INetManager Net = default!;
     [Dependency] protected readonly ThrowingSystem Throwing = default!;
+    [Dependency] protected readonly IGameTiming Timing = default!;
     [Dependency] protected readonly SharedTransformSystem Xform = default!;
-    [Dependency] private readonly SharedActionsSystem _actions = default!;
-    [Dependency] private readonly SharedPopupSystem _popup = default!;
-    [Dependency] private readonly SharedHandsSystem _hands = default!;
+    protected EntityQuery<ActiveFishingSpotComponent> ActiveFishSpotQuery;
 
     protected EntityQuery<ActiveFisherComponent> FisherQuery;
-    protected EntityQuery<ActiveFishingSpotComponent> ActiveFishSpotQuery;
-    protected EntityQuery<FishingSpotComponent> FishSpotQuery;
-    protected EntityQuery<FishingRodComponent> FishRodQuery;
     protected EntityQuery<FishingLureComponent> FishLureQuery;
+    protected EntityQuery<FishingRodComponent> FishRodQuery;
+    protected EntityQuery<FishingSpotComponent> FishSpotQuery;
 
     public override void Initialize()
     {
@@ -117,7 +117,8 @@ public abstract class SharedFishingSystem : EntitySystem
         var fishingSpots = EntityQueryEnumerator<ActiveFishingSpotComponent>();
         while (fishingSpots.MoveNext(out var activeSpotComp))
         {
-            if (currentTime < activeSpotComp.FishingStartTime || activeSpotComp.IsActive || activeSpotComp.FishingStartTime == null)
+            if (currentTime < activeSpotComp.FishingStartTime || activeSpotComp.IsActive ||
+                activeSpotComp.FishingStartTime == null)
                 continue;
 
             // Trigger start of the fishing process
@@ -144,7 +145,9 @@ public abstract class SharedFishingSystem : EntitySystem
             activeFisher.FishingRod = fishRod;
             activeFisher.ProgressPerUse *= fishRodComp.Efficiency;
             activeFisher.TotalProgress = fishRodComp.StartingProgress;
-            activeFisher.NextStruggle = Timing.CurTime + TimeSpan.FromSeconds(fishRodComp.StartingStruggleTime); // Compensate ping for 0.3 seconds
+            activeFisher.NextStruggle =
+                Timing.CurTime +
+                TimeSpan.FromSeconds(fishRodComp.StartingStruggleTime); // Compensate ping for 0.3 seconds
 
             // Predicted because it works like 99.9% of the time anyway.
             _popup.PopupPredicted(Loc.GetString("fishing-progress-start"), fisher, fisher);
@@ -202,12 +205,15 @@ public abstract class SharedFishingSystem : EntitySystem
         }
     }
 
-    protected abstract void CalculateFightingTimings(Entity<ActiveFisherComponent> fisher, ActiveFishingSpotComponent activeSpotComp);
+    protected abstract void CalculateFightingTimings(Entity<ActiveFisherComponent> fisher,
+        ActiveFishingSpotComponent activeSpotComp);
 
     /// <summary>
     /// Server-side only, sets up fishing float and throws it
     /// </summary>
-    protected abstract void SetupFishingFloat(Entity<FishingRodComponent> fishingRod, EntityUid player, EntityCoordinates target);
+    protected abstract void SetupFishingFloat(Entity<FishingRodComponent> fishingRod,
+        EntityUid player,
+        EntityCoordinates target);
 
     /// <summary>
     /// Server-side only, spawns a fish and throws it to our player!
@@ -244,20 +250,14 @@ public abstract class SharedFishingSystem : EntitySystem
 
     #region Terminating Events
 
-    private void OnRodTerminating(Entity<FishingRodComponent> ent, ref EntityTerminatingEvent args)
-    {
+    private void OnRodTerminating(Entity<FishingRodComponent> ent, ref EntityTerminatingEvent args) =>
         TryStopFishing(ent);
-    }
 
-    private void OnLureTerminating(Entity<FishingLureComponent> ent, ref EntityTerminatingEvent args)
-    {
+    private void OnLureTerminating(Entity<FishingLureComponent> ent, ref EntityTerminatingEvent args) =>
         TryStopFishing(ent);
-    }
 
-    private void OnSpotTerminating(Entity<ActiveFishingSpotComponent> ent, ref EntityTerminatingEvent args)
-    {
+    private void OnSpotTerminating(Entity<ActiveFishingSpotComponent> ent, ref EntityTerminatingEvent args) =>
         TryStopFishing(ent);
-    }
 
     #endregion
 
@@ -361,10 +361,8 @@ public abstract class SharedFishingSystem : EntitySystem
         args.Handled = true;
     }
 
-    private void OnFishingRodInit(Entity<FishingRodComponent> ent, ref MapInitEvent args)
-    {
+    private void OnFishingRodInit(Entity<FishingRodComponent> ent, ref MapInitEvent args) =>
         _actions.AddAction(ent, ref ent.Comp.ThrowLureActionEntity, ent.Comp.ThrowLureActionId);
-    }
 
     private void OnRodParentChanged(Entity<FishingRodComponent> ent, ref EntParentChangedMessage args)
     {
@@ -373,9 +371,7 @@ public abstract class SharedFishingSystem : EntitySystem
 
         // Anything that is an active fisher should be fine.
         if (!FisherQuery.HasComp(args.Transform.ParentUid))
-        {
             StopFishing(ent, args.OldParent);
-        }
     }
 
     private void OnGetActions(Entity<FishingRodComponent> ent, ref GetItemActionsEvent args)

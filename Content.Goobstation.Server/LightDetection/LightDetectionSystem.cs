@@ -18,27 +18,27 @@ namespace Content.Goobstation.Server.LightDetection;
 /// </summary>
 public sealed class LightDetectionSystem : SharedLightDetectionSystem
 {
-    [Dependency] private readonly SharedPhysicsSystem _physicsSystem = default!;
-    [Dependency] private readonly EntityLookupSystem _lookup = default!;
-    [Dependency] private readonly SharedTransformSystem _transformSystem = default!;
-    [Dependency] private readonly IGameTiming _timing = default!;
-    [Dependency] private readonly IParallelManager _parallel = default!;
     [Dependency] private readonly IConfigurationManager _cfg = default!;
-
-    protected override string SawmillName => "light_damage";
-
-    public float LookupRange;
-    public float UpdateFrequency;
-    public float MaximumLightLevel;
+    [Dependency] private readonly EntityLookupSystem _lookup = default!;
+    [Dependency] private readonly IParallelManager _parallel = default!;
+    [Dependency] private readonly SharedPhysicsSystem _physicsSystem = default!;
+    [Dependency] private readonly IGameTiming _timing = default!;
+    [Dependency] private readonly SharedTransformSystem _transformSystem = default!;
 
     private HandleLightJob _job;
     private TimeSpan _nextUpdate = TimeSpan.Zero;
+
+    public float LookupRange;
+    public float MaximumLightLevel;
+    public float UpdateFrequency;
+
+    protected override string SawmillName => "light_damage";
 
     public override void Initialize()
     {
         base.Initialize();
 
-        _job = new()
+        _job = new HandleLightJob
         {
             LightSys = this,
             XformSys = _transformSystem,
@@ -70,13 +70,13 @@ public sealed class LightDetectionSystem : SharedLightDetectionSystem
 
     private record struct HandleLightJob() : IParallelRobustJob
     {
-        public readonly int BatchSize => 16;
         public readonly List<Entity<LightDetectionComponent, TransformComponent>> UpdateEnts = [];
 
         public required LightDetectionSystem LightSys;
-        public required SharedTransformSystem XformSys;
-        public required SharedPhysicsSystem PhysicsSys;
         public required EntityLookupSystem LookupSys;
+        public required SharedPhysicsSystem PhysicsSys;
+        public required SharedTransformSystem XformSys;
+        public readonly int BatchSize => 16;
 
         public void Execute(int index)
         {

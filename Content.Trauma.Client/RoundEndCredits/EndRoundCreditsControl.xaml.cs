@@ -18,17 +18,16 @@ namespace Content.Trauma.Client.RoundEndCredits;
 [GenerateTypedNameReferences]
 public sealed partial class EndRoundCreditsControl : ScrollContainer
 {
-    [Dependency] private readonly IEntitySystemManager _entitySystem = default!;
-    private readonly ClientGameTicker _gameTicker;
-
-    private static readonly ResPath Logo = new("/Textures/Logo/logo.png");
-    private static readonly ResPath Pixellari = new("/Fonts/Woodstick.ttf");
-    private static readonly ResPath GrandPixel = new("/Fonts/Harpseal.ttf");
-
     private const int SmallFontSize = 10;
     private const int NormalFontSize = 16;
     private const int BigFontSize = 24;
     private const int HeaderFontSize = 42;
+
+    private static readonly ResPath Logo = new("/Textures/Logo/logo.png");
+    private static readonly ResPath Pixellari = new("/Fonts/Woodstick.ttf");
+    private static readonly ResPath GrandPixel = new("/Fonts/Harpseal.ttf");
+    [Dependency] private readonly IEntitySystemManager _entitySystem = default!;
+    private readonly ClientGameTicker _gameTicker;
 
     public EndRoundCreditsControl()
     {
@@ -37,9 +36,12 @@ public sealed partial class EndRoundCreditsControl : ScrollContainer
         _gameTicker = _entitySystem.GetEntitySystem<ClientGameTicker>();
     }
 
-    public void Populate(RoundEndMessageEvent message, IResourceCache cache, IPrototypeManager proto, string shoutout, bool debug = false)
+    public void Populate(RoundEndMessageEvent message,
+        IResourceCache cache,
+        IPrototypeManager proto,
+        string shoutout,
+        bool debug = false)
     {
-
         var stationName = "Unknown";
 
         foreach (var (_, name) in _gameTicker.StationNames)
@@ -70,7 +72,9 @@ public sealed partial class EndRoundCreditsControl : ScrollContainer
 
         // Image mgsv episode number and jargon
         ServerImageBox.AddChild(serverImage);
-        EpisodeNumber.Text = Loc.GetString("round-end-credits-trauma-episode", ("roundid", message.RoundId), ("title", message.GamemodeTitle));
+        EpisodeNumber.Text = Loc.GetString("round-end-credits-trauma-episode",
+            ("roundid", message.RoundId),
+            ("title", message.GamemodeTitle));
         IntroJargonLabel.Text = Loc.GetString("round-end-credits-trauma-jargon", ("station", stationName));
 
         // The fonts
@@ -97,7 +101,11 @@ public sealed partial class EndRoundCreditsControl : ScrollContainer
         // Add each department
         foreach (var department in sortedDepartments)
         {
-            MainCreditVBox.AddChild(MakeDepartmentContainer(department, headerFont, playerNameFont, message.AllPlayersEndInfo, debug));
+            MainCreditVBox.AddChild(MakeDepartmentContainer(department,
+                headerFont,
+                playerNameFont,
+                message.AllPlayersEndInfo,
+                debug));
         }
 
         var antags = proto.EnumeratePrototypes<AntagPrototype>()
@@ -108,7 +116,7 @@ public sealed partial class EndRoundCreditsControl : ScrollContainer
         foreach (var antag in antags)
         {
             var antagBox = MakeAntagBox(message.AllPlayersEndInfo, playerNameFont, headerFont, antag, cache);
-            if (antagBox is {})
+            if (antagBox is not null)
                 MainCreditVBox.AddChild(antagBox);
         }
 
@@ -130,7 +138,11 @@ public sealed partial class EndRoundCreditsControl : ScrollContainer
         MainCreditVBox.AddChild(MakeKojimaBox(normalFont, bigFont));
     }
 
-    private BoxContainer MakePlayerInfoBox(RoundEndMessageEvent.RoundEndPlayerInfo playerInfo, VectorFont font, Color color, bool fullInfo = false, bool addSprite = true)
+    private BoxContainer MakePlayerInfoBox(RoundEndMessageEvent.RoundEndPlayerInfo playerInfo,
+        VectorFont font,
+        Color color,
+        bool fullInfo = false,
+        bool addSprite = true)
     {
         var box = new BoxContainer
         {
@@ -139,7 +151,7 @@ public sealed partial class EndRoundCreditsControl : ScrollContainer
             MaxHeight = 100,
         };
 
-        if (playerInfo.PlayerNetEntity is {} && addSprite)
+        if (playerInfo.PlayerNetEntity is not null && addSprite)
         {
             box.AddChild(new SpriteView(playerInfo.PlayerNetEntity.Value, IoCManager.Resolve<IEntityManager>())
             {
@@ -157,7 +169,12 @@ public sealed partial class EndRoundCreditsControl : ScrollContainer
         var text = new Label
         {
             Name = playerInfo.PlayerICName,
-            Text = fullInfo ? Loc.GetString("round-end-credits-trauma-player-name-role", ("name", playerInfo.PlayerICName ?? "Unknown"), ("role", role), ("player", playerInfo.PlayerOOCName)) : playerInfo.PlayerICName,
+            Text = fullInfo
+                ? Loc.GetString("round-end-credits-trauma-player-name-role",
+                    ("name", playerInfo.PlayerICName ?? "Unknown"),
+                    ("role", role),
+                    ("player", playerInfo.PlayerOOCName))
+                : playerInfo.PlayerICName,
             Align = Label.AlignMode.Center,
             FontOverride = font,
             FontColorOverride = color,
@@ -169,7 +186,11 @@ public sealed partial class EndRoundCreditsControl : ScrollContainer
         return box;
     }
 
-    private BoxContainer MakeDepartmentContainer(DepartmentPrototype department, VectorFont fontHeader, VectorFont smallFont, RoundEndMessageEvent.RoundEndPlayerInfo[] players, bool debug)
+    private BoxContainer MakeDepartmentContainer(DepartmentPrototype department,
+        VectorFont fontHeader,
+        VectorFont smallFont,
+        RoundEndMessageEvent.RoundEndPlayerInfo[] players,
+        bool debug)
     {
         var text = new Label
         {
@@ -215,7 +236,11 @@ public sealed partial class EndRoundCreditsControl : ScrollContainer
         return boxV;
     }
 
-    private BoxContainer? MakeAntagBox(RoundEndMessageEvent.RoundEndPlayerInfo[] players, VectorFont smallfont, VectorFont headerFont, AntagPrototype antag, IResourceCache cache)
+    private BoxContainer? MakeAntagBox(RoundEndMessageEvent.RoundEndPlayerInfo[] players,
+        VectorFont smallfont,
+        VectorFont headerFont,
+        AntagPrototype antag,
+        IResourceCache cache)
     {
         var boxH = new GridContainer
         {
@@ -331,7 +356,9 @@ public sealed partial class EndRoundCreditsControl : ScrollContainer
                 box.AddChild(new Label
                 {
                     FontOverride = font,
-                    Text = Loc.GetString("round-end-credits-trauma-lastwords", ("words", player.LastWords), ("player", player.PlayerICName ?? "Unknown")),
+                    Text = Loc.GetString("round-end-credits-trauma-lastwords",
+                        ("words", player.LastWords),
+                        ("player", player.PlayerICName ?? "Unknown")),
                     Align = Label.AlignMode.Center,
                 });
             }

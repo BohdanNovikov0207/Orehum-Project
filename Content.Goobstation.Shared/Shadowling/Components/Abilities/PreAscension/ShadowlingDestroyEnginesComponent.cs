@@ -6,14 +6,14 @@ namespace Content.Goobstation.Shared.Shadowling.Components.Abilities.PreAscensio
 /// <summary>
 /// This is used for Destroy Engines ability.
 /// </summary>
-[RegisterComponent, NetworkedComponent]
+[RegisterComponent] [NetworkedComponent]
 public sealed partial class ShadowlingDestroyEnginesComponent : Component
 {
     [DataField]
-    public EntProtoId ActionId = "ActionDestroyEngines";
+    public EntityUid? ActionEnt;
 
     [DataField]
-    public EntityUid? ActionEnt;
+    public EntProtoId ActionId = "ActionDestroyEngines";
 
     /// <summary>
     /// Indicates how long the shuttle wil be delayed for.

@@ -23,19 +23,20 @@ namespace Content.Goobstation.Client.Research.UI;
 [GenerateTypedNameReferences]
 public sealed partial class FancyResearchConsoleItem : LayoutContainer
 {
-    // Public fields
-    public TechnologyPrototype Prototype;
-    public Action<TechnologyPrototype, ResearchAvailability>? SelectAction;
-    public ResearchAvailability Availability;
-
     // Some visuals
     public static readonly Color DefaultColor = Color.FromHex("#141F2F");
     public static readonly Color DefaultBorderColor = Color.FromHex("#4972A1");
     public static readonly Color DefaultHoveredColor = Color.FromHex("#4972A1");
+    public ResearchAvailability Availability;
+    public Color BorderColor = DefaultBorderColor;
 
     public Color Color = DefaultColor;
-    public Color BorderColor = DefaultBorderColor;
+
     public Color HoveredColor = DefaultHoveredColor;
+
+    // Public fields
+    public TechnologyPrototype Prototype;
+    public Action<TechnologyPrototype, ResearchAvailability>? SelectAction;
 
     public FancyResearchConsoleItem(TechnologyPrototype proto, SpriteSystem sprite, ResearchAvailability availability)
     {
@@ -52,10 +53,12 @@ public sealed partial class FancyResearchConsoleItem : LayoutContainer
         (Color, HoveredColor, BorderColor) = availability switch
         {
             ResearchAvailability.Researched => (Color.DarkOliveGreen, Color.PaleGreen, Color.LimeGreen),
-            ResearchAvailability.Available => (Color.FromHex("#7c7d2a"), Color.FromHex("#ecfa52"), Color.FromHex("#e8fa25")),
-            ResearchAvailability.PrereqsMet => (Color.FromHex("#6b572f"), Color.FromHex("#fad398"), Color.FromHex("#cca031")),
+            ResearchAvailability.Available => (Color.FromHex("#7c7d2a"), Color.FromHex("#ecfa52"),
+                Color.FromHex("#e8fa25")),
+            ResearchAvailability.PrereqsMet => (Color.FromHex("#6b572f"), Color.FromHex("#fad398"),
+                Color.FromHex("#cca031")),
             ResearchAvailability.Unavailable => (Color.DarkRed, Color.PaleVioletRed, Color.Crimson),
-            _ => (Color.DarkRed, Color.PaleVioletRed, Color.Crimson)
+            _ => (Color.DarkRed, Color.PaleVioletRed, Color.Crimson),
         };
 
         UpdateColor();
@@ -76,10 +79,7 @@ public sealed partial class FancyResearchConsoleItem : LayoutContainer
         Button.OnPressed -= Selected;
     }
 
-    private void Selected(BaseButton.ButtonEventArgs args)
-    {
-        SelectAction?.Invoke(Prototype, Availability);
-    }
+    private void Selected(BaseButton.ButtonEventArgs args) => SelectAction?.Invoke(Prototype, Availability);
 
     public void SetScale(float scale)
     {
@@ -92,12 +92,5 @@ public sealed class DrawButton : Button
 {
     public event Action? OnDrawModeChanged;
 
-    public DrawButton()
-    {
-    }
-
-    protected override void DrawModeChanged()
-    {
-        OnDrawModeChanged?.Invoke();
-    }
+    protected override void DrawModeChanged() => OnDrawModeChanged?.Invoke();
 }

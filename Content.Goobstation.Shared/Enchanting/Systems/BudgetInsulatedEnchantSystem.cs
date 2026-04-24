@@ -10,7 +10,7 @@ using Robust.Shared.Random;
 namespace Content.Goobstation.Shared.Enchanting.Systems;
 
 /// <summary>
-/// Controls <see cref="BudgetInsulatedEnchantComponent"/> values with the enchant level.
+/// Controls <see cref="BudgetInsulatedEnchantComponent" /> values with the enchant level.
 /// </summary>
 public sealed class BudgetInsulatedEnchantSystem : EntitySystem
 {
@@ -26,15 +26,11 @@ public sealed class BudgetInsulatedEnchantSystem : EntitySystem
         SubscribeLocalEvent<BudgetInsulatedEnchantComponent, ElectrocutionAttemptEvent>(OnElectrocutionAttempt);
     }
 
-    private void OnAdded(Entity<BudgetInsulatedEnchantComponent> ent, ref EnchantAddedEvent args)
-    {
+    private void OnAdded(Entity<BudgetInsulatedEnchantComponent> ent, ref EnchantAddedEvent args) =>
         Modify(ent, args.Level);
-    }
 
-    private void OnUpgraded(Entity<BudgetInsulatedEnchantComponent> ent, ref EnchantUpgradedEvent args)
-    {
+    private void OnUpgraded(Entity<BudgetInsulatedEnchantComponent> ent, ref EnchantUpgradedEvent args) =>
         Modify(ent, args.Level);
-    }
 
     private void OnElectrocutionAttempt(Entity<BudgetInsulatedEnchantComponent> ent, ref ElectrocutionAttemptEvent args)
     {
@@ -48,7 +44,7 @@ public sealed class BudgetInsulatedEnchantSystem : EntitySystem
     private void Modify(Entity<BudgetInsulatedEnchantComponent> ent, int level)
     {
         // Insulated? IV becomes 40% real 60% nostuns
-        var max = 5f - (float) level;
+        var max = 5f - level;
         ent.Comp.Coefficients.RemoveAll(n => n > max);
         Cycle(ent);
     }

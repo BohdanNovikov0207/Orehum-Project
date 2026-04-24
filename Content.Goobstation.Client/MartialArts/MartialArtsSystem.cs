@@ -24,8 +24,6 @@ public sealed class MartialArtsSystem : SharedMartialArtsSystem
         SubscribeLocalEvent<CanPerformComboComponent, GetPerformedAttackTypesEvent>(OnGetAttackTypes);
     }
 
-    private void OnGetAttackTypes(Entity<CanPerformComboComponent> ent, ref GetPerformedAttackTypesEvent args)
-    {
+    private void OnGetAttackTypes(Entity<CanPerformComboComponent> ent, ref GetPerformedAttackTypesEvent args) =>
         args.AttackTypes = ent.Comp.LastAttacks;
-    }
 }

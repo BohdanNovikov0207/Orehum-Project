@@ -12,13 +12,12 @@ using Robust.Shared.Serialization;
 
 namespace Content.Goobstation.Shared.Blob.Events;
 
-
-[Serializable, NetSerializable]
+[Serializable] [NetSerializable]
 public sealed class BlobAttackEvent : EntityEventArgs
 {
-    public readonly Vector2 Position;
-    public readonly NetEntity BlobEntity;
     public readonly NetEntity AttackedEntity;
+    public readonly NetEntity BlobEntity;
+    public readonly Vector2 Position;
 
     public BlobAttackEvent(NetEntity blobEntity, NetEntity attackedEntity, Vector2 position)
     {

@@ -85,10 +85,6 @@ namespace Content.Goobstation.Client.CustomLawboard;
 public sealed partial class LawboardSiliconLawContainer : BoxContainer
 {
     private SiliconLaw? _law;
-    public event Action<SiliconLaw>? MoveLawUp;
-    public event Action<SiliconLaw>? MoveLawDown;
-    public event Action<SiliconLaw>? DeleteAction;
-    public event Action<SiliconLaw>? ChangeLawEvent;
 
 
     public LawboardSiliconLawContainer()
@@ -102,6 +98,11 @@ public sealed partial class LawboardSiliconLawContainer : BoxContainer
         LawContent.Placeholder = new Rope.Leaf(Loc.GetString("silicon-law-ui-placeholder"));
         Delete.OnPressed += _ => DeleteAction?.Invoke(_law!);
     }
+
+    public event Action<SiliconLaw>? MoveLawUp;
+    public event Action<SiliconLaw>? MoveLawDown;
+    public event Action<SiliconLaw>? DeleteAction;
+    public event Action<SiliconLaw>? ChangeLawEvent;
 
     public void SetLaw(SiliconLaw law)
     {

@@ -5,42 +5,31 @@
 //
 // SPDX-License-Identifier: AGPL-3.0-or-later
 
-using Content.Goobstation.Maths.FixedPoint;
-
 namespace Content.Goobstation.Server.StationEvents.Metric.Components;
 
-[RegisterComponent, Access(typeof(CombatMetricSystem))]
+[RegisterComponent] [Access(typeof(CombatMetricSystem))]
 public sealed partial class CombatMetricComponent : Component
 {
-    [DataField]
-    public double HostileScore = 10.0f;
-
-    [DataField]
-    public double FriendlyScore = 10.0f;
-
     /// <summary>
-    ///   Cost per point of medical damage for friendly entities
-    /// </summary>
-    [DataField]
-    public double MedicalMultiplier = 0.05f;
-
-    /// <summary>
-    ///   Cost for friendlies who are in crit
+    /// Cost for friendlies who are in crit
     /// </summary>
     [DataField]
     public double CritScore = 10.0f;
 
     /// <summary>
-    ///   Cost for friendlies who are dead
+    /// Cost for friendlies who are dead
     /// </summary>
     [DataField]
     public double DeadScore = 20.0f;
 
     [DataField]
-    public double MaxItemThreat = 15.0f;
+    public double FriendlyScore = 10.0f;
+
+    [DataField]
+    public double HostileScore = 10.0f;
 
     /// <summary>
-    ///   ItemThreat - evaluate based on item tags how powerful a player is
+    /// ItemThreat - evaluate based on item tags how powerful a player is
     /// </summary>
     [DataField]
     public Dictionary<string, double> ItemThreat =
@@ -59,4 +48,13 @@ public sealed partial class CombatMetricComponent : Component
             { "Hacking", 1.0f },
             { "Jetpack", 1.0f },
         };
+
+    [DataField]
+    public double MaxItemThreat = 15.0f;
+
+    /// <summary>
+    /// Cost per point of medical damage for friendly entities
+    /// </summary>
+    [DataField]
+    public double MedicalMultiplier = 0.05f;
 }

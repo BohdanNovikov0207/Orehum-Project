@@ -1,56 +1,52 @@
 using Robust.Shared.Timing;
 
-namespace Content.Goobstation.Shared.Disease.Chemistry
+namespace Content.Goobstation.Shared.Disease.Chemistry;
+
+public sealed class MetabolismImmunityModifierSystem : EntitySystem
 {
-    public sealed class MetabolismImmunityModifierSystem : EntitySystem
+    private readonly List<Entity<ImmunityModifierMetabolismComponent>> _components = new();
+    [Dependency] private readonly IGameTiming _gameTiming = default!;
+
+    public override void Initialize()
     {
-        [Dependency] private readonly IGameTiming _gameTiming = default!;
+        base.Initialize();
 
-        private readonly List<Entity<ImmunityModifierMetabolismComponent>> _components = new();
+        UpdatesOutsidePrediction = true;
 
-        public override void Initialize()
+        SubscribeLocalEvent<ImmunityModifierMetabolismComponent, ComponentStartup>(AddComponent);
+        SubscribeLocalEvent<ImmunityModifierMetabolismComponent, GetImmunityEvent>(OnGetImmunity);
+    }
+
+    private void OnGetImmunity(EntityUid uid, ImmunityModifierMetabolismComponent component, GetImmunityEvent args)
+    {
+        args.ImmunityGainRate += component.GainRateModifier;
+        args.ImmunityStrength += component.StrengthModifier;
+    }
+
+    private void AddComponent(Entity<ImmunityModifierMetabolismComponent> metabolism, ref ComponentStartup args) =>
+        _components.Add(metabolism);
+
+    public override void Update(float frameTime)
+    {
+        base.Update(frameTime);
+
+        var currentTime = _gameTiming.CurTime;
+
+        for (var i = _components.Count - 1; i >= 0; i--)
         {
-            base.Initialize();
+            var metabolism = _components[i];
 
-            UpdatesOutsidePrediction = true;
-
-            SubscribeLocalEvent<ImmunityModifierMetabolismComponent, ComponentStartup>(AddComponent);
-            SubscribeLocalEvent<ImmunityModifierMetabolismComponent, GetImmunityEvent>(OnGetImmunity);
-        }
-
-        private void OnGetImmunity(EntityUid uid, ImmunityModifierMetabolismComponent component, GetImmunityEvent args)
-        {
-            args.ImmunityGainRate += component.GainRateModifier;
-            args.ImmunityStrength += component.StrengthModifier;
-        }
-
-        private void AddComponent(Entity<ImmunityModifierMetabolismComponent> metabolism, ref ComponentStartup args)
-        {
-            _components.Add(metabolism);
-        }
-
-        public override void Update(float frameTime)
-        {
-            base.Update(frameTime);
-
-            var currentTime = _gameTiming.CurTime;
-
-            for (var i = _components.Count - 1; i >= 0; i--)
+            if (metabolism.Comp.Deleted)
             {
-                var metabolism = _components[i];
-
-                if (metabolism.Comp.Deleted)
-                {
-                    _components.RemoveAt(i);
-                    continue;
-                }
-
-                if (metabolism.Comp.ModifierTimer > currentTime)
-                    continue;
-
                 _components.RemoveAt(i);
-                RemComp<ImmunityModifierMetabolismComponent>(metabolism);
+                continue;
             }
+
+            if (metabolism.Comp.ModifierTimer > currentTime)
+                continue;
+
+            _components.RemoveAt(i);
+            RemComp<ImmunityModifierMetabolismComponent>(metabolism);
         }
     }
 }

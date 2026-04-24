@@ -10,47 +10,47 @@ using Robust.Shared.Prototypes;
 
 namespace Content.Goobstation.Shared.MartialArts.Components;
 
-[RegisterComponent, NetworkedComponent]
+[RegisterComponent] [NetworkedComponent]
 public sealed partial class NinjutsuSneakAttackComponent : Component
 {
     [DataField]
-    public float Multiplier = 2f;
-
-    [DataField]
-    public float AssassinateModifier = 180f;
-
-    [DataField]
-    public float AssassinateUnarmedModifier = 115f;
+    public ProtoId<AlertPrototype> Alert = "SneakAttack";
 
     [DataField]
     public float AssassinateArmorPierce = -2.5f;
-
-    [DataField]
-    public float TakedownSlowdownTime = 5f;
-
-    [DataField]
-    public float TakedownMuteTime = 10f;
-
-    [DataField]
-    public float TakedownSpeedModifier = 0.2f;
-
-    [DataField]
-    public float TakedownBackstabMultiplier = 1.5f;
-
-    [DataField]
-    public SoundSpecifier AssassinateSoundUnarmed = new SoundPathSpecifier("/Audio/Weapons/genhit1.ogg");
-
-    [DataField]
-    public SoundSpecifier AssassinateSoundArmed =
-            new SoundPathSpecifier("/Audio/_Goobstation/Weapons/Effects/guillotine.ogg");
 
     // This should be LocId but combos names don't use locale anyway
     [DataField]
     public string AssassinateComboName = "Assassinate";
 
     [DataField]
+    public float AssassinateModifier = 180f;
+
+    [DataField]
+    public SoundSpecifier AssassinateSoundArmed =
+        new SoundPathSpecifier("/Audio/_Goobstation/Weapons/Effects/guillotine.ogg");
+
+    [DataField]
+    public SoundSpecifier AssassinateSoundUnarmed = new SoundPathSpecifier("/Audio/Weapons/genhit1.ogg");
+
+    [DataField]
+    public float AssassinateUnarmedModifier = 115f;
+
+    [DataField]
+    public float Multiplier = 2f;
+
+    [DataField]
+    public float TakedownBackstabMultiplier = 1.5f;
+
+    [DataField]
     public string TakedownComboName = "Ninjutsu Takedown";
 
     [DataField]
-    public ProtoId<AlertPrototype> Alert = "SneakAttack";
+    public float TakedownMuteTime = 10f;
+
+    [DataField]
+    public float TakedownSlowdownTime = 5f;
+
+    [DataField]
+    public float TakedownSpeedModifier = 0.2f;
 }

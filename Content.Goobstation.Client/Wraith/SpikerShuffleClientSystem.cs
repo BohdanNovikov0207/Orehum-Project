@@ -10,7 +10,8 @@ public sealed class SpikerShuffleClientSystem : EntitySystem
 {
     [Dependency] private readonly AppearanceSystem _appearance = default!;
     [Dependency] private readonly SpriteSystem _spriteSystem = default!;
-    /// <inheritdoc/>
+
+    /// <inheritdoc />
     public override void Initialize()
     {
         base.Initialize();

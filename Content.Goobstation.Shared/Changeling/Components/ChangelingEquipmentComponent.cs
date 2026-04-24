@@ -5,25 +5,19 @@ using Robust.Shared.Prototypes;
 
 namespace Content.Goobstation.Shared.Changeling;
 
-[RegisterComponent, NetworkedComponent, AutoGenerateComponentState]
+[RegisterComponent] [NetworkedComponent] [AutoGenerateComponentState]
 public sealed partial class ChangelingEquipmentComponent : Component
 {
     /// <summary>
-    /// The user of the equipment.
-    /// </summary>
-    [DataField, AutoNetworkedField]
-    public EntityUid? User;
-
-    /// <summary>
     /// The value that will be applied to a changeling's chemical modifier
     /// </summary>
-    [DataField, AutoNetworkedField]
+    [DataField] [AutoNetworkedField]
     public float ChemModifier;
 
     /// <summary>
     /// The slot required.
     /// </summary>
-    [DataField, AutoNetworkedField]
+    [DataField] [AutoNetworkedField]
     public SlotFlags? RequiredSlot;
 
     /// <summary>
@@ -31,4 +25,10 @@ public sealed partial class ChangelingEquipmentComponent : Component
     /// </summary>
     [DataField]
     public ProtoId<InternalResourcesPrototype> ResourceType = "ChangelingChemicals";
+
+    /// <summary>
+    /// The user of the equipment.
+    /// </summary>
+    [DataField] [AutoNetworkedField]
+    public EntityUid? User;
 }

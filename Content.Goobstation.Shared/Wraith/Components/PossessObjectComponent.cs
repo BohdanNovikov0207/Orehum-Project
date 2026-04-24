@@ -3,12 +3,12 @@ using Robust.Shared.GameStates;
 
 namespace Content.Goobstation.Shared.Wraith.Components;
 
-[RegisterComponent, NetworkedComponent]
+[RegisterComponent] [NetworkedComponent]
 public sealed partial class PossessObjectComponent : Component
 {
     [DataField]
-    public SoundSpecifier? PossessSound = new SoundPathSpecifier("/Audio/_Goobstation/Wraith/wraithlivingobject.ogg");
+    public TimeSpan PossessDuration = TimeSpan.FromSeconds(30f);
 
     [DataField]
-    public TimeSpan PossessDuration = TimeSpan.FromSeconds(30f);
+    public SoundSpecifier? PossessSound = new SoundPathSpecifier("/Audio/_Goobstation/Wraith/wraithlivingobject.ogg");
 }

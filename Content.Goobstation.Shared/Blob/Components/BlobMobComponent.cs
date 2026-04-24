@@ -7,16 +7,16 @@
 //
 // SPDX-License-Identifier: AGPL-3.0-or-later
 
-using Content.Shared.Damage;
 using Content.Goobstation.Maths.FixedPoint;
+using Content.Shared.Damage;
 using Robust.Shared.GameStates;
 
 namespace Content.Goobstation.Shared.Blob.Components;
 
-[RegisterComponent, NetworkedComponent]
+[RegisterComponent] [NetworkedComponent]
 public sealed partial class BlobMobComponent : Component
 {
-    [ViewVariables(VVAccess.ReadOnly), DataField("healthOfPulse")]
+    [ViewVariables(VVAccess.ReadOnly)] [DataField("healthOfPulse")]
     public DamageSpecifier HealthOfPulse = new()
     {
         DamageDict = new Dictionary<string, FixedPoint2>
@@ -27,6 +27,6 @@ public sealed partial class BlobMobComponent : Component
             { "Heat", -4 },
             { "Cold", -4 },
             { "Shock", -4 },
-        }
+        },
     };
 }

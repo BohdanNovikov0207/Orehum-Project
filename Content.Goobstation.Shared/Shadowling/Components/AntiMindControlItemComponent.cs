@@ -5,7 +5,7 @@ namespace Content.Goobstation.Shared.Shadowling.Components;
 /// <summary>
 /// This is used for the Anti Mind Control device
 /// </summary>
-[RegisterComponent, NetworkedComponent]
+[RegisterComponent] [NetworkedComponent]
 public sealed partial class AntiMindControlItemComponent : Component
 {
     /// <summary>

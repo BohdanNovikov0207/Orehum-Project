@@ -9,8 +9,7 @@ using Content.Goobstation.Server.Devil.Objectives.Systems;
 
 namespace Content.Goobstation.Server.Devil.Objectives.Components;
 
-[RegisterComponent, Access(typeof(DevilContractSystem), typeof(DevilObjectiveSystem))]
-
+[RegisterComponent] [Access(typeof(DevilContractSystem), typeof(DevilObjectiveSystem))]
 public sealed partial class MeetContractWeightConditionComponent : Component
 {
     [DataField]

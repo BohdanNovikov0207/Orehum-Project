@@ -9,25 +9,25 @@ namespace Content.Goobstation.Shared.Disease.Components;
 public sealed partial class GrantDiseaseComponent : Component
 {
     /// <summary>
-    /// Complexity of disease to grant
-    /// </summary>
-    [DataField]
-    public float Complexity = 20f;
-
-    /// <summary>
-    /// The infection progress the disease starts out with
-    /// </summary>
-    public float Severity = 1f;
-
-    /// <summary>
     /// Disease to use as a base to mutate from
     /// </summary>
     [DataField]
     public EntProtoId BaseDisease = "DiseaseBase";
 
     /// <summary>
+    /// Complexity of disease to grant
+    /// </summary>
+    [DataField]
+    public float Complexity = 20f;
+
+    /// <summary>
     /// If not null, will set the disease to one of those types.
     /// </summary>
     [DataField]
     public List<ProtoId<DiseaseTypePrototype>>? PossibleTypes = null;
+
+    /// <summary>
+    /// The infection progress the disease starts out with
+    /// </summary>
+    public float Severity = 1f;
 }

@@ -28,23 +28,26 @@ public sealed class SealableClothingVisualizerSystem : VisualizerSystem<Sealable
     public override void Initialize()
     {
         base.Initialize();
-        SubscribeLocalEvent<SealableClothingVisualsComponent, GetEquipmentVisualsEvent>(OnGetEquipmentVisuals, after: new[] { typeof(ClientClothingSystem) });
+        SubscribeLocalEvent<SealableClothingVisualsComponent, GetEquipmentVisualsEvent>(OnGetEquipmentVisuals,
+            after: new[] { typeof(ClientClothingSystem) });
     }
 
-    protected override void OnAppearanceChange(EntityUid uid, SealableClothingVisualsComponent component, ref AppearanceChangeEvent args)
+    protected override void OnAppearanceChange(EntityUid uid,
+        SealableClothingVisualsComponent component,
+        ref AppearanceChangeEvent args)
     {
         if (!AppearanceSystem.TryGetData<bool>(uid, SealableClothingVisuals.Sealed, out var isSealed, args.Component))
             return;
 
-        if (args.Sprite != null && component.SpriteLayer != null && args.Sprite.LayerMapTryGet(component.SpriteLayer, out var layer))
-        {
+        if (args.Sprite != null && component.SpriteLayer != null &&
+            args.Sprite.LayerMapTryGet(component.SpriteLayer, out var layer))
             args.Sprite.LayerSetVisible(layer, isSealed);
-        }
 
         _itemSystem.VisualsChanged(uid);
     }
 
-    private void OnGetEquipmentVisuals(Entity<SealableClothingVisualsComponent> sealable, ref GetEquipmentVisualsEvent args)
+    private void OnGetEquipmentVisuals(Entity<SealableClothingVisualsComponent> sealable,
+        ref GetEquipmentVisualsEvent args)
     {
         var (uid, comp) = sealable;
 

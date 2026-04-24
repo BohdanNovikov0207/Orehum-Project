@@ -4,7 +4,6 @@
 // SPDX-License-Identifier: AGPL-3.0-or-later
 
 using System.Linq;
-using Content.Shared.Access.Components;
 using Content.Shared.Access.Systems;
 using Content.Shared.DoAfter;
 using Content.Shared.Doors.Components;
@@ -18,12 +17,13 @@ namespace Content.Goobstation.Shared.Keyring;
 
 public sealed class KeyringSystem : EntitySystem
 {
-    [Dependency] private readonly SharedDoAfterSystem _doAfter = default!;
-    [Dependency] private readonly SharedPopupSystem _popupSystem = default!;
-    [Dependency] private readonly SharedDoorSystem _doorSystem = default!;
     [Dependency] private readonly AccessReaderSystem _access = default!;
     [Dependency] private readonly SharedAudioSystem _audioSystem = default!;
+    [Dependency] private readonly SharedDoAfterSystem _doAfter = default!;
+    [Dependency] private readonly SharedDoorSystem _doorSystem = default!;
+    [Dependency] private readonly SharedPopupSystem _popupSystem = default!;
     [Dependency] private readonly IRobustRandom _random = default!;
+
     public override void Initialize()
     {
         base.Initialize();
@@ -41,10 +41,11 @@ public sealed class KeyringSystem : EntitySystem
         for (var i = 0; i < keyring.Comp.MaxPossibleAccesses; i++)
         {
             var pick = _random.PickAndTake(keyring.Comp.PossibleAccesses.ToList());
-            keyring.Comp.Tags.Add(pick); // We don't use access comp for this because otherwise you can use it like an ID card to bump open doors :P
+            keyring.Comp.Tags
+                .Add(pick); // We don't use access comp for this because otherwise you can use it like an ID card to bump open doors :P
         }
-
     }
+
     private void OnInteractUsing(Entity<KeyringComponent> keyring, ref AfterInteractEvent args)
     {
         if (args.Handled
@@ -73,7 +74,7 @@ public sealed class KeyringSystem : EntitySystem
 
         _audioSystem.PlayPredicted(keyring.Comp.UseSound, keyring, args.User);
 
-        args.Handled = true; 
+        args.Handled = true;
     }
 
     private void OnDoAfterEvent(Entity<KeyringComponent> keyring, ref KeyringDoAfterEvent args)
@@ -102,5 +103,4 @@ public sealed class KeyringSystem : EntitySystem
 
         args.Handled = true;
     }
-
 }

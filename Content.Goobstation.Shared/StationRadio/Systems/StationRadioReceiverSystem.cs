@@ -11,6 +11,7 @@ public sealed class StationRadioReceiverSystem : EntitySystem
 {
     [Dependency] private readonly SharedAudioSystem _audio = default!;
     [Dependency] private readonly SharedPowerReceiverSystem _power = default!;
+
     public override void Initialize()
     {
         base.Initialize();
@@ -22,9 +23,9 @@ public sealed class StationRadioReceiverSystem : EntitySystem
 
     private void OnPowerChanged(EntityUid uid, StationRadioReceiverComponent comp, PowerChangedEvent args)
     {
-        if(comp.SoundEntity != null && args.Powered)
+        if (comp.SoundEntity != null && args.Powered)
             _audio.SetGain(comp.SoundEntity, comp.Active ? comp.DefaultParams.Volume : 0f);
-        else if(comp.SoundEntity != null)
+        else if (comp.SoundEntity != null)
             _audio.SetGain(comp.SoundEntity, 0);
     }
 

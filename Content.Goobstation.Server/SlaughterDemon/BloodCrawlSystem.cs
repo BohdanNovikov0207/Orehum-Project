@@ -15,12 +15,12 @@ namespace Content.Goobstation.Server.SlaughterDemon;
 
 public sealed class BloodCrawlSystem : SharedBloodCrawlSystem
 {
-    [Dependency] private readonly PolymorphSystem _polymorph = default!;
     [Dependency] private readonly AudioSystem _audio = default!;
+    [Dependency] private readonly PolymorphSystem _polymorph = default!;
 
     private EntityQuery<PolymorphedEntityComponent> _polymorphedQuery;
 
-    /// <inheritdoc/>
+    /// <inheritdoc />
     public override void Initialize()
     {
         base.Initialize();
@@ -47,6 +47,7 @@ public sealed class BloodCrawlSystem : SharedBloodCrawlSystem
 
             return false;
         }
+
         return true;
     }
 
@@ -57,5 +58,3 @@ public sealed class BloodCrawlSystem : SharedBloodCrawlSystem
         _polymorph.PolymorphEntity(user, polymorph);
     }
 }
-
-

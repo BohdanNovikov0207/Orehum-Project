@@ -28,13 +28,9 @@ public sealed class DodgeEffectVisualsSystem : EntitySystem
         _overlayMan.RemoveOverlay(_overlay);
     }
 
-    private void OnStartup(Entity<DodgeEffectComponent> ent, ref ComponentStartup args)
-    {
+    private void OnStartup(Entity<DodgeEffectComponent> ent, ref ComponentStartup args) =>
         _overlay.AddEffect(ent.Owner, _timing.RealTime);
-    }
 
-    private void OnShutdown(Entity<DodgeEffectComponent> ent, ref ComponentShutdown args)
-    {
+    private void OnShutdown(Entity<DodgeEffectComponent> ent, ref ComponentShutdown args) =>
         _overlay.RemoveEffect(ent.Owner);
-    }
 }

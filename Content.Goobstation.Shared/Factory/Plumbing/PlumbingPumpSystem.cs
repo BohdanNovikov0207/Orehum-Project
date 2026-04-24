@@ -1,5 +1,4 @@
 using Content.Goobstation.Maths.FixedPoint;
-using Content.Goobstation.Shared.Factory.Slots;
 using Content.Shared.Chemistry.Components;
 using Content.Shared.Chemistry.EntitySystems;
 using Content.Shared.Power.EntitySystems;
@@ -10,10 +9,10 @@ namespace Content.Goobstation.Shared.Factory.Plumbing;
 public sealed class PlumbingPumpSystem : EntitySystem
 {
     [Dependency] private readonly ExclusiveSlotsSystem _exclusive = default!;
-    [Dependency] private readonly IGameTiming _timing = default!;
     [Dependency] private readonly PlumbingFilterSystem _filter = default!;
     [Dependency] private readonly SharedPowerReceiverSystem _power = default!;
     [Dependency] private readonly SharedSolutionContainerSystem _solution = default!;
+    [Dependency] private readonly IGameTiming _timing = default!;
 
     private EntityQuery<SolutionTransferComponent> _transferQuery;
 
@@ -45,8 +44,8 @@ public sealed class PlumbingPumpSystem : EntitySystem
             return;
 
         // pump does nothing unless both slots are linked
-        if (_exclusive.GetInputSlot(ent)?.GetSolution() is not {} inputEnt
-            || _exclusive.GetOutputSlot(ent)?.GetSolution() is not {} outputEnt)
+        if (_exclusive.GetInputSlot(ent)?.GetSolution() is not { } inputEnt
+            || _exclusive.GetOutputSlot(ent)?.GetSolution() is not { } outputEnt)
             return;
 
         var input = inputEnt.Comp.Solution;
@@ -59,10 +58,11 @@ public sealed class PlumbingPumpSystem : EntitySystem
         if (amount <= FixedPoint2.Zero)
             return;
 
-        var split = _filter.GetFilteredReagent(ent) is {} filter
+        var split = _filter.GetFilteredReagent(ent) is { } filter
             ? input.SplitSolutionWithOnly(amount, filter)
             : input.SplitSolution(amount);
-        _solution.UpdateChemicals(inputEnt, false); // removing reagents should never cause reactions? don't waste cpu updating it
+        _solution.UpdateChemicals(inputEnt,
+            false); // removing reagents should never cause reactions? don't waste cpu updating it
         _solution.ForceAddSolution(outputEnt, split);
     }
 }

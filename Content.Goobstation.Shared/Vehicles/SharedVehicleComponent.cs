@@ -8,7 +8,6 @@
 //
 // SPDX-License-Identifier: AGPL-3.0-or-later
 
-using System.Numerics;
 using Robust.Shared.Audio;
 using Robust.Shared.GameStates;
 using Robust.Shared.Prototypes;
@@ -16,34 +15,26 @@ using Robust.Shared.Serialization;
 
 namespace Content.Goobstation.Shared.Vehicles;
 
-[RegisterComponent, NetworkedComponent]
+[RegisterComponent] [NetworkedComponent]
 public sealed partial class VehicleComponent : Component
 {
+    /// <summary>
+    /// The currently active overlay entity, so we can delete it on unbuckle.
+    /// </summary>
+    [ViewVariables]
+    public EntityUid? ActiveOverlay;
+
     [ViewVariables]
     public EntityUid? Driver;
-
-    [ViewVariables]
-    public EntityUid? HornAction;
-
-    [ViewVariables]
-    public EntityUid? SirenAction;
-
-    public bool SirenEnabled = false;
-
-    public EntityUid? SirenStream;
-
-    /// <summary>
-    /// If non-zero how many virtual items to spawn on the driver
-    /// unbuckles them if they dont have enough
-    /// </summary>
-    [DataField]
-    public int RequiredHands = 1;
 
     /// <summary>
     /// Will the vehicle move when a driver buckles
     /// </summary>
     [DataField]
     public bool EngineRunning;
+
+    [ViewVariables]
+    public EntityUid? HornAction;
 
     /// <summary>
     /// What sound to play when the driver presses the horn action (plays once)
@@ -52,16 +43,10 @@ public sealed partial class VehicleComponent : Component
     public SoundSpecifier? HornSound;
 
     /// <summary>
-    /// What sound to play when the driver presses the siren action (loops)
+    /// if the Vehicle is broken
     /// </summary>
     [DataField]
-    public SoundSpecifier? SirenSound;
-
-    /// <summary>
-    /// If they should be rendered ontop of the vehicle if true or behind
-    /// </summary>
-    [DataField]
-    public VehicleRenderOver RenderOver = VehicleRenderOver.None;
+    public bool IsBroken;
 
     /// <summary>
     /// name of the key container
@@ -70,38 +55,52 @@ public sealed partial class VehicleComponent : Component
     public string KeySlot = "key_slot";
 
     /// <summary>
-    /// prevent removal of the key when there is a driver
-    /// </summary>
-    [DataField]
-    public bool PreventEjectOfKey = true;
-
-    /// <summary>
-    /// if the Vehicle is broken
-    /// </summary>
-    [DataField]
-    public bool IsBroken;
-
-    /// <summary>
     /// The entity prototype to spawn as an overlay on the driver.
     /// </summary>
     [DataField]
     public EntProtoId? OverlayPrototype;
 
     /// <summary>
-    /// The currently active overlay entity, so we can delete it on unbuckle.
+    /// prevent removal of the key when there is a driver
     /// </summary>
+    [DataField]
+    public bool PreventEjectOfKey = true;
+
+    /// <summary>
+    /// If they should be rendered ontop of the vehicle if true or behind
+    /// </summary>
+    [DataField]
+    public VehicleRenderOver RenderOver = VehicleRenderOver.None;
+
+    /// <summary>
+    /// If non-zero how many virtual items to spawn on the driver
+    /// unbuckles them if they dont have enough
+    /// </summary>
+    [DataField]
+    public int RequiredHands = 1;
+
     [ViewVariables]
-    public EntityUid? ActiveOverlay;
+    public EntityUid? SirenAction;
+
+    public bool SirenEnabled = false;
+
+    /// <summary>
+    /// What sound to play when the driver presses the siren action (loops)
+    /// </summary>
+    [DataField]
+    public SoundSpecifier? SirenSound;
+
+    public EntityUid? SirenStream;
 }
 
-[Serializable, NetSerializable]
+[Serializable] [NetSerializable]
 public enum VehicleState : byte
 {
     Animated,
     DrawOver,
 }
 
-[Serializable, NetSerializable, Flags]
+[Serializable] [NetSerializable] [Flags]
 public enum VehicleRenderOver
 {
     None = 0,

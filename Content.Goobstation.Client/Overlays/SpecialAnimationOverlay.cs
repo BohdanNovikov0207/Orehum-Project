@@ -18,19 +18,19 @@ namespace Content.Goobstation.Client.Overlays;
 
 public sealed class SpecialAnimationOverlay : Overlay
 {
+    [Dependency] private readonly IResourceCache _cache = default!;
+    [Dependency] private readonly IClyde _clyde = default!;
     [Dependency] private readonly IEntityManager _entity = default!;
     [Dependency] private readonly IPlayerManager _player = default!;
-    [Dependency] private readonly IResourceCache _cache = default!;
     [Dependency] private readonly IGameTiming _timing = default!;
-    [Dependency] private readonly IClyde _clyde = default!;
-
-    public Queue<SpecialAnimationData> AnimationQueue = new();
 
     private SpecialAnimationData? _currentAnimation;
 
+    private (Font Font, string Path, int Size)? _font;
+
     private IRenderTexture? _target;
 
-    private (Font Font, string Path, int Size)? _font;
+    public Queue<SpecialAnimationData> AnimationQueue = new();
 
     public SpecialAnimationOverlay()
     {
@@ -61,7 +61,8 @@ public sealed class SpecialAnimationOverlay : Overlay
 
         var curTime = _timing.CurTime;
 
-        DebugTools.Assert(_currentAnimation.TotalDuration > _currentAnimation.FadeInDuration + _currentAnimation.FadeOutDuration);
+        DebugTools.Assert(_currentAnimation.TotalDuration >
+                          _currentAnimation.FadeInDuration + _currentAnimation.FadeOutDuration);
 
         var endTime = _currentAnimation.StartTime + TimeSpan.FromSeconds(_currentAnimation.TotalDuration);
 
@@ -100,16 +101,16 @@ public sealed class SpecialAnimationOverlay : Overlay
 
         screen.RenderInRenderTarget(_target,
             () =>
-        {
-            screen.DrawEntity(
-                anime,
-                center + _currentAnimation.Position,
-                Vector2.One * uiScale * _currentAnimation.Scale,
-                Angle.Zero,
-                Angle.Zero,
-                Direction.South,
-                sprite);
-        },
+            {
+                screen.DrawEntity(
+                    anime,
+                    center + _currentAnimation.Position,
+                    Vector2.One * uiScale * _currentAnimation.Scale,
+                    Angle.Zero,
+                    Angle.Zero,
+                    Direction.South,
+                    sprite);
+            },
             Color.Transparent);
 
         var opacity = _currentAnimation.Opacity;
@@ -136,17 +137,15 @@ public sealed class SpecialAnimationOverlay : Overlay
             _currentAnimation.TextOverrideColor.WithAlpha(opacity));
     }
 
-    private IRenderTexture CreateRenderTarget(Vector2i size, string name)
-    {
-        return _clyde.CreateRenderTarget(
+    private IRenderTexture CreateRenderTarget(Vector2i size, string name) =>
+        _clyde.CreateRenderTarget(
             size,
             new RenderTargetFormatParameters(RenderTargetColorFormat.Rgba8Srgb, true),
             new TextureSampleParameters
             {
-                Filter = true
+                Filter = true,
             },
             name);
-    }
 
     protected override void DisposeBehavior()
     {
@@ -181,7 +180,8 @@ public sealed class SpecialAnimationOverlay : Overlay
         var curTime = _timing.CurTime;
         var frameTime = (float) (curTime - animation.LastTime).TotalSeconds;
         var fadeInEndTime = animation.StartTime + TimeSpan.FromSeconds(animation.FadeInDuration);
-        var fadeOutStartTime = animation.StartTime + TimeSpan.FromSeconds(animation.TotalDuration) - TimeSpan.FromSeconds(animation.FadeOutDuration);
+        var fadeOutStartTime = animation.StartTime + TimeSpan.FromSeconds(animation.TotalDuration) -
+                               TimeSpan.FromSeconds(animation.FadeOutDuration);
 
         // Move the sprite
         var distanceVec = animation.EndPosition - animation.StartPosition;
@@ -207,8 +207,5 @@ public sealed class SpecialAnimationOverlay : Overlay
         animation.LastTime = curTime;
     }
 
-    private void KillAnimation(SpecialAnimationData animation)
-    {
-        _entity.QueueDeleteEntity(animation.AnimationEntity);
-    }
+    private void KillAnimation(SpecialAnimationData animation) => _entity.QueueDeleteEntity(animation.AnimationEntity);
 }

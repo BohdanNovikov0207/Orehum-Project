@@ -20,6 +20,21 @@ namespace Content.Goobstation.Shared.Devil.Condemned;
 [RegisterComponent]
 public sealed partial class CondemnedComponent : Component
 {
+    [DataField]
+    public ProtoId<PolymorphPrototype> BanishProto = "ShadowJaunt180";
+
+    /// <summary>
+    /// Should this entity be banished (sent to limbo for several minutes) or should they just be deleted?
+    /// </summary>
+    [DataField]
+    public CondemnedBehavior CondemnedBehavior = CondemnedBehavior.Delete;
+
+    /// <summary>
+    /// Should this entity be sent to hell on death?
+    /// </summary>
+    [DataField]
+    public bool CondemnOnDeath;
+
     /// <summary>
     /// The current phase of the condemnation animation.
     /// </summary>
@@ -27,10 +42,22 @@ public sealed partial class CondemnedComponent : Component
     public CondemnedPhase CurrentPhase = CondemnedPhase.Waiting;
 
     /// <summary>
-    /// Who owns this entities soul
+    /// Should movement be locked during the animation?
     /// </summary>
     [DataField]
-    public EntityUid? SoulOwner;
+    public bool FreezeDuringCondemnation;
+
+    /// <summary>
+    /// How long the hand effect will last
+    /// </summary>
+    [DataField]
+    public float HandDuration;
+
+    [DataField]
+    public EntProtoId HandProto = "HellHand";
+
+    [DataField]
+    public EntProtoId PentagramProto = "Pentagram";
 
     /// <summary>
     /// The elapsed time of the phase.
@@ -39,10 +66,10 @@ public sealed partial class CondemnedComponent : Component
     public float PhaseTimer;
 
     /// <summary>
-    /// How long the hand effect will last
+    /// If true, scrambles the targets DNA after banishing them.
     /// </summary>
     [DataField]
-    public float HandDuration;
+    public bool ScrambleAfterBanish = true;
 
     /// <summary>
     /// Should the examine message show when examining someone with this component?
@@ -57,46 +84,19 @@ public sealed partial class CondemnedComponent : Component
     public bool SoulOwnedNotDevil;
 
     /// <summary>
-    /// Should this entity be sent to hell on death?
+    /// Who owns this entities soul
     /// </summary>
     [DataField]
-    public bool CondemnOnDeath;
+    public EntityUid? SoulOwner;
+
+    [DataField]
+    public SoundPathSpecifier SoundEffect = new("/Audio/_Goobstation/Effects/earth_quake.ogg");
 
     /// <summary>
     /// Was this target already weak to holy before becoming condemned?
     /// </summary>
     [DataField]
     public bool WasWeakToHoly;
-
-    /// <summary>
-    /// Should movement be locked during the animation?
-    /// </summary>
-    [DataField]
-    public bool FreezeDuringCondemnation;
-
-    /// <summary>
-    /// If true, scrambles the targets DNA after banishing them.
-    /// </summary>
-    [DataField]
-    public bool ScrambleAfterBanish = true;
-
-    /// <summary>
-    /// Should this entity be banished (sent to limbo for several minutes) or should they just be deleted?
-    /// </summary>
-    [DataField]
-    public CondemnedBehavior CondemnedBehavior = CondemnedBehavior.Delete;
-
-    [DataField]
-    public EntProtoId PentagramProto = "Pentagram";
-
-    [DataField]
-    public EntProtoId HandProto = "HellHand";
-
-    [DataField]
-    public SoundPathSpecifier SoundEffect = new("/Audio/_Goobstation/Effects/earth_quake.ogg");
-
-    [DataField]
-    public ProtoId<PolymorphPrototype> BanishProto = "ShadowJaunt180";
 }
 
 public enum CondemnedPhase : byte
@@ -104,7 +104,7 @@ public enum CondemnedPhase : byte
     Waiting,
     PentagramActive,
     HandActive,
-    Complete
+    Complete,
 }
 
 public enum CondemnedBehavior : byte

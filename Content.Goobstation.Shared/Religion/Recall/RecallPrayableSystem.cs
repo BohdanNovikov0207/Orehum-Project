@@ -13,14 +13,14 @@ using Robust.Shared.Network;
 
 namespace Content.Goobstation.Shared.Religion.Recall;
 
-public sealed partial class RecallPrayableSystem : EntitySystem
+public sealed class RecallPrayableSystem : EntitySystem
 {
     [Dependency] private readonly SharedDoAfterSystem _doAfterSystem = default!;
     [Dependency] private readonly SharedHandsSystem _hands = default!;
-    [Dependency] private readonly SharedPopupSystem _popup = default!;
     [Dependency] private readonly INetManager _net = default!;
-    [Dependency] private readonly EntityWhitelistSystem _whitelist = default!;
+    [Dependency] private readonly SharedPopupSystem _popup = default!;
     [Dependency] private readonly SharedProjectileSystem _projectile = default!;
+    [Dependency] private readonly EntityWhitelistSystem _whitelist = default!;
 
     public override void Initialize()
     {
@@ -48,6 +48,7 @@ public sealed partial class RecallPrayableSystem : EntitySystem
                     _popup.PopupClient(Loc.GetString("chaplain-recall-no-nullrod"), user.User, user.User);
                     return;
                 }
+
                 StartRecallPrayDoAfter(user, altar);
             },
         };
@@ -57,10 +58,14 @@ public sealed partial class RecallPrayableSystem : EntitySystem
 
     private void StartRecallPrayDoAfter(Entity<BibleUserComponent> user, Entity<RecallPrayableComponent> altar)
     {
-        var doAfterArgs = new DoAfterArgs(EntityManager, user, altar.Comp.DoAfterDuration, new RecallPrayDoAfterEvent(), altar.Owner)
+        var doAfterArgs = new DoAfterArgs(EntityManager,
+            user,
+            altar.Comp.DoAfterDuration,
+            new RecallPrayDoAfterEvent(),
+            altar.Owner)
         {
             BreakOnMove = true,
-            NeedHand = true
+            NeedHand = true,
         };
 
         _doAfterSystem.TryStartDoAfter(doAfterArgs);
@@ -76,7 +81,7 @@ public sealed partial class RecallPrayableSystem : EntitySystem
             return;
 
         //If there is no empty hand then do nothing
-        if (!_hands.TryGetEmptyHand(args.User, out var _))
+        if (!_hands.TryGetEmptyHand(args.User, out _))
         {
             _popup.PopupEntity(Loc.GetString("chaplain-recall-hands-full"), args.User, args.User);
             return;
@@ -94,14 +99,18 @@ public sealed partial class RecallPrayableSystem : EntitySystem
 
         if (TerminatingOrDeleted(nullrod.Value))
         {
-            _popup.PopupEntity(Loc.GetString("chaplain-recall-nullrod-gone", ("nullrod", nullrod.Value)), args.User, args.User);
+            _popup.PopupEntity(Loc.GetString("chaplain-recall-nullrod-gone", ("nullrod", nullrod.Value)),
+                args.User,
+                args.User);
             return;
         }
 
         //If nullrod already in user hands and it is not a dual wield nullrod then do nothing
         if (_hands.IsHolding(args.User, nullrod.Value) && !HasComp<RequiresDualWieldComponent>(nullrod.Value))
         {
-            _popup.PopupEntity(Loc.GetString("chaplain-recall-nullrod-already-in-hand", ("nullrod", nullrod.Value)), args.User, args.User);
+            _popup.PopupEntity(Loc.GetString("chaplain-recall-nullrod-already-in-hand", ("nullrod", nullrod.Value)),
+                args.User,
+                args.User);
             return;
         }
 
@@ -133,10 +142,10 @@ public sealed partial class RecallPrayableSystem : EntitySystem
                 break;
         }
     }
+
     private void RecallNone(Entity<NullrodComponent> nullrod, EntityUid user)
     {
         _popup.PopupEntity(Loc.GetString("chaplain-recall-none", ("nullrod", nullrod.Owner)), user, user);
-        return;
     }
 
     private void RecallNormal(Entity<NullrodComponent> nullrod, EntityUid user)

@@ -6,12 +6,12 @@ namespace Content.Goobstation.Shared.Wraith.Actions;
 /// <summary>
 /// Checks whitelist/blacklist against the user. If they don't pass, the action cancels.
 /// </summary>
-[RegisterComponent, NetworkedComponent]
+[RegisterComponent] [NetworkedComponent]
 public sealed partial class ActionUserWhitelistComponent : Component
 {
     [DataField]
-    public EntityWhitelist? Whitelist = new();
+    public LocId? Popup = "whitelist-action-generic-fail";
 
     [DataField]
-    public LocId? Popup = "whitelist-action-generic-fail";
+    public EntityWhitelist? Whitelist = new();
 }

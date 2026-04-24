@@ -5,7 +5,7 @@ namespace Content.Goobstation.Server.Wraith;
 
 public sealed class WraithPossessedSystem : EntitySystem
 {
-    /// <inheritdoc/>
+    /// <inheritdoc />
     public override void Initialize()
     {
         base.Initialize();

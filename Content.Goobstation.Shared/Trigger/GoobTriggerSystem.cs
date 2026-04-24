@@ -1,4 +1,3 @@
-using Content.Shared.DoAfter;
 using Content.Shared.Ensnaring;
 using Content.Shared.Ensnaring.Components;
 using Content.Shared.Movement.Pulling.Components;
@@ -9,8 +8,8 @@ namespace Content.Goobstation.Shared.Trigger;
 
 public sealed class GoobTriggerSystem : EntitySystem
 {
-    [Dependency] private readonly SharedStunSystem _stun = default!;
     [Dependency] private readonly SharedEnsnareableSystem _snare = default!;
+    [Dependency] private readonly SharedStunSystem _stun = default!;
 
 
     public override void Initialize()

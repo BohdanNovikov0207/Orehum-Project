@@ -19,10 +19,10 @@ using Content.Shared.GameTicking.Components;
 
 namespace Content.Goobstation.Server.StationEvents;
 
-public sealed partial class ChristmasEventSchedulerRule : GameRuleSystem<ChristmasEventSchedulerComponent>
+public sealed class ChristmasEventSchedulerRule : GameRuleSystem<ChristmasEventSchedulerComponent>
 {
-    [Dependency] private readonly GameTicker _gameTicker = default!;
     [Dependency] private readonly ISharedAdminLogManager _adminLog = default!;
+    [Dependency] private readonly GameTicker _gameTicker = default!;
 
     public override void Update(float frameTime)
     {
@@ -39,18 +39,23 @@ public sealed partial class ChristmasEventSchedulerRule : GameRuleSystem<Christm
         }
     }
 
-    private void ResetTimer(ChristmasEventSchedulerComponent component)
-    {
-        component.EventClock = RobustRandom.NextFloat(component.Delays.Min, component.Delays.Max);
-    }
+    private void ResetTimer(ChristmasEventSchedulerComponent component) => component.EventClock =
+        RobustRandom.NextFloat(component.Delays.Min, component.Delays.Max);
 
-    protected override void Started(EntityUid uid, ChristmasEventSchedulerComponent component, GameRuleComponent gameRule, GameRuleStartedEvent args)
+    protected override void Started(EntityUid uid,
+        ChristmasEventSchedulerComponent component,
+        GameRuleComponent gameRule,
+        GameRuleStartedEvent args)
     {
         base.Started(uid, component, gameRule, args);
 
         ResetTimer(component);
     }
-    protected override void Ended(EntityUid uid, ChristmasEventSchedulerComponent component, GameRuleComponent gameRule, GameRuleEndedEvent args)
+
+    protected override void Ended(EntityUid uid,
+        ChristmasEventSchedulerComponent component,
+        GameRuleComponent gameRule,
+        GameRuleEndedEvent args)
     {
         base.Ended(uid, component, gameRule, args);
 

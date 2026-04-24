@@ -11,7 +11,7 @@ public sealed class DamageUnholyEvent(EntityUid target, EntityUid? origin = null
 {
     public readonly EntityUid Target = target;
 
-    public bool ShouldTakeHoly = false;
-
     public EntityUid? Origin = origin;
+
+    public bool ShouldTakeHoly = false;
 }

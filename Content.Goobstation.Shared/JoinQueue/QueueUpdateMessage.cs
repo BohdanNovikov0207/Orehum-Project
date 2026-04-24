@@ -5,8 +5,8 @@ using Robust.Shared.Serialization;
 namespace Content.Goobstation.Shared.JoinQueue;
 
 /// <summary>
-///     Sent from server to client with queue state for player
-///     Also initiates queue state on client
+/// Sent from server to client with queue state for player
+/// Also initiates queue state on client
 /// </summary>
 public sealed class QueueUpdateMessage : NetMessage
 {

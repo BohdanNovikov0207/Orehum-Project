@@ -12,6 +12,9 @@ namespace Content.Goobstation.Shared.Weapons.DelayedKnockdown;
 public sealed partial class DelayedKnockdownOnHitComponent : Component
 {
     [DataField]
+    public bool ApplyOnHeavyAttack;
+
+    [DataField]
     public float Delay = 2f;
 
     [DataField]
@@ -19,9 +22,6 @@ public sealed partial class DelayedKnockdownOnHitComponent : Component
 
     [DataField]
     public bool Refresh = true;
-
-    [DataField]
-    public bool ApplyOnHeavyAttack;
 
     [DataField]
     public string UseDelay = "default";

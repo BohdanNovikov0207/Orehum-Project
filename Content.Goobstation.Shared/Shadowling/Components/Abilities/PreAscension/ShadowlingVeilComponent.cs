@@ -7,14 +7,14 @@ namespace Content.Goobstation.Shared.Shadowling.Components.Abilities.PreAscensio
 /// <summary>
 /// This is used for Veil Ability
 /// </summary>
-[RegisterComponent, NetworkedComponent]
+[RegisterComponent] [NetworkedComponent]
 public sealed partial class ShadowlingVeilComponent : Component
 {
     [DataField]
-    public EntProtoId ActionId = "ActionVeil";
+    public EntityUid? ActionEnt;
 
     [DataField]
-    public EntityUid? ActionEnt;
+    public EntProtoId ActionId = "ActionVeil";
 
     /// <summary>
     /// Indicates the range radius which the ability will search for, once used.

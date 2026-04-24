@@ -1,16 +1,16 @@
-using Content.Shared.StatusEffectNew;
-using Robust.Shared.Prototypes;
-using Content.Shared.NPC.Systems;
 using Content.Shared.NPC.Components;
 using Content.Shared.NPC.Prototypes;
+using Content.Shared.NPC.Systems;
+using Content.Shared.StatusEffectNew;
+using Robust.Shared.Prototypes;
 
 namespace Content.Goobstation.Shared.NPC;
-public sealed partial class ChangeFactionStatusEffectSystem : EntitySystem
-{
-    [Dependency] private readonly StatusEffectsSystem _status = default!;
-    [Dependency] private readonly NpcFactionSystem _npc = default!;
 
+public sealed class ChangeFactionStatusEffectSystem : EntitySystem
+{
     public static readonly EntProtoId ChangeFactionStatusEffect = "ChangeFactionStatusEffect";
+    [Dependency] private readonly NpcFactionSystem _npc = default!;
+    [Dependency] private readonly StatusEffectsSystem _status = default!;
 
     public override void Initialize()
     {
@@ -20,7 +20,10 @@ public sealed partial class ChangeFactionStatusEffectSystem : EntitySystem
         SubscribeLocalEvent<ChangeFactionStatusEffectComponent, StatusEffectRemovedEvent>(OnStatusRemoved);
     }
 
-    public void TryChangeFaction(EntityUid uid, ProtoId<NpcFactionPrototype> newFaction, out EntityUid? statusEffect, float durationInSeconds)
+    public void TryChangeFaction(EntityUid uid,
+        ProtoId<NpcFactionPrototype> newFaction,
+        out EntityUid? statusEffect,
+        float durationInSeconds)
     {
         statusEffect = default;
         if (!TryComp<NpcFactionMemberComponent>(uid, out var npc))
@@ -32,7 +35,10 @@ public sealed partial class ChangeFactionStatusEffectSystem : EntitySystem
             return;
         }
 
-        _status.TryAddStatusEffect(uid, ChangeFactionStatusEffect, out statusEffect, TimeSpan.FromSeconds(durationInSeconds));
+        _status.TryAddStatusEffect(uid,
+            ChangeFactionStatusEffect,
+            out statusEffect,
+            TimeSpan.FromSeconds(durationInSeconds));
         if (statusEffect.HasValue && TryComp<ChangeFactionStatusEffectComponent>(statusEffect, out var f))
         {
             f.NewFaction = newFaction;

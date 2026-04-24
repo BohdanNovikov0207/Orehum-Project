@@ -12,7 +12,7 @@ using Robust.Shared.Serialization;
 
 namespace Content.Goobstation.Shared.Supermatter.Components;
 
-[RegisterComponent, NetworkedComponent]
+[RegisterComponent] [NetworkedComponent]
 [Access(typeof(SharedSupermatterConsoleSystem))]
 public sealed partial class SupermatterConsoleComponent : Component
 {
@@ -23,7 +23,7 @@ public sealed partial class SupermatterConsoleComponent : Component
     public NetEntity? FocusSupermatter;
 }
 
-[Serializable, NetSerializable]
+[Serializable] [NetSerializable]
 public struct SupermatterNavMapData
 {
     /// <summary>
@@ -46,7 +46,7 @@ public struct SupermatterNavMapData
     }
 }
 
-[Serializable, NetSerializable]
+[Serializable] [NetSerializable]
 public struct SupermatterFocusData
 {
     /// <summary>
@@ -103,8 +103,7 @@ public struct SupermatterFocusData
     /// <summary>
     /// Populates the supermatter console focus entry with supermatter data
     /// </summary>
-    public SupermatterFocusData
-        (NetEntity netEntity,
+    public SupermatterFocusData(NetEntity netEntity,
         float integrity,
         float power,
         float radiation,
@@ -128,30 +127,31 @@ public struct SupermatterFocusData
     }
 }
 
-[Serializable, NetSerializable]
+[Serializable] [NetSerializable]
 public sealed class SupermatterConsoleBoundInterfaceState : BoundUserInterfaceState
 {
-    /// <summary>
-    /// A list of all supermatters
-    /// </summary>
-    public SupermatterConsoleEntry[] Supermatters;
-
     /// <summary>
     /// Data for the UI focus (if applicable)
     /// </summary>
     public SupermatterFocusData? FocusData;
 
     /// <summary>
+    /// A list of all supermatters
+    /// </summary>
+    public SupermatterConsoleEntry[] Supermatters;
+
+    /// <summary>
     /// Sends data from the server to the client to populate the atmos monitoring console UI
     /// </summary>
-    public SupermatterConsoleBoundInterfaceState(SupermatterConsoleEntry[] supermatters, SupermatterFocusData? focusData)
+    public SupermatterConsoleBoundInterfaceState(SupermatterConsoleEntry[] supermatters,
+        SupermatterFocusData? focusData)
     {
         Supermatters = supermatters;
         FocusData = focusData;
     }
 }
 
-[Serializable, NetSerializable]
+[Serializable] [NetSerializable]
 public struct SupermatterConsoleEntry
 {
     /// <summary>
@@ -172,8 +172,7 @@ public struct SupermatterConsoleEntry
     /// <summary>
     /// Used to populate the supermatter console UI with data from a single supermatter
     /// </summary>
-    public SupermatterConsoleEntry
-        (NetEntity entity,
+    public SupermatterConsoleEntry(NetEntity entity,
         string entityName,
         SupermatterStatusType status)
     {
@@ -183,7 +182,7 @@ public struct SupermatterConsoleEntry
     }
 }
 
-[Serializable, NetSerializable]
+[Serializable] [NetSerializable]
 public sealed class SupermatterConsoleFocusChangeMessage : BoundUserInterfaceMessage
 {
     public NetEntity? FocusSupermatter;
@@ -197,7 +196,7 @@ public sealed class SupermatterConsoleFocusChangeMessage : BoundUserInterfaceMes
     }
 }
 
-[NetSerializable, Serializable]
+[NetSerializable] [Serializable]
 public enum SupermatterConsoleVisuals
 {
     ComputerLayerScreen,
@@ -206,8 +205,8 @@ public enum SupermatterConsoleVisuals
 /// <summary>
 /// UI key associated with the supermatter monitoring console
 /// </summary>
-[Serializable, NetSerializable]
+[Serializable] [NetSerializable]
 public enum SupermatterConsoleUiKey
 {
-    Key
+    Key,
 }

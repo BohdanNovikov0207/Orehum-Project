@@ -16,10 +16,10 @@ namespace Content.Goobstation.Shared.TapeRecorder;
 public sealed partial class TapeCassetteRecordedMessage : IComparable<TapeCassetteRecordedMessage>
 {
     /// <summary>
-    /// Number of seconds since the start of the tape that this event was recorded at
+    /// What was spoken
     /// </summary>
-    [DataField(required: true)]
-    public float Timestamp = 0;
+    [DataField]
+    public string Message = string.Empty;
 
     /// <summary>
     /// The name of the entity that spoke
@@ -28,16 +28,16 @@ public sealed partial class TapeCassetteRecordedMessage : IComparable<TapeCasset
     public string? Name;
 
     /// <summary>
+    /// Number of seconds since the start of the tape that this event was recorded at
+    /// </summary>
+    [DataField(required: true)]
+    public float Timestamp;
+
+    /// <summary>
     /// The verb used for this message.
     /// </summary>
     [DataField]
     public ProtoId<SpeechVerbPrototype>? Verb;
-
-    /// <summary>
-    /// What was spoken
-    /// </summary>
-    [DataField]
-    public string Message = string.Empty;
 
     public TapeCassetteRecordedMessage(float timestamp, string name, ProtoId<SpeechVerbPrototype> verb, string message)
     {

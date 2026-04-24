@@ -12,13 +12,12 @@ namespace Content.Goobstation.Server.MisandryBox.JobObjective;
 
 public sealed class JobObjectiveSystem : EntitySystem
 {
+    private const string Rule = "JobObjectiveRule";
     [Dependency] private readonly MindSystem _mind = default!;
     [Dependency] private readonly ObjectivesSystem _obj = default!;
-    [Dependency] private readonly GameTicker _ticker = default!;
-
-    private const string Rule = "JobObjectiveRule";
 
     private readonly List<QueuedObjective> _queuedObjectives = [];
+    [Dependency] private readonly GameTicker _ticker = default!;
     private EntityUid? _jobObjectiveRule;
 
     public override void Initialize()
@@ -49,10 +48,8 @@ public sealed class JobObjectiveSystem : EntitySystem
         }
     }
 
-    public void QueueObjectives(EntityUid mob, List<string> objectives)
-    {
+    public void QueueObjectives(EntityUid mob, List<string> objectives) =>
         _queuedObjectives.Add(new QueuedObjective(mob, objectives));
-    }
 
     private void OnSpawnComplete(PlayerSpawnCompleteEvent ev)
     {
@@ -82,7 +79,8 @@ public sealed class JobObjectiveSystem : EntitySystem
 
     private void AddTrackedMind(EntityUid mind, MindComponent mindComp)
     {
-        if (!_jobObjectiveRule.HasValue || !TryComp<JobObjectiveRuleComponent>(_jobObjectiveRule.Value, out var ruleComp))
+        if (!_jobObjectiveRule.HasValue ||
+            !TryComp<JobObjectiveRuleComponent>(_jobObjectiveRule.Value, out var ruleComp))
             return;
 
         ruleComp.TrackedMinds.Add((mind, mindComp));

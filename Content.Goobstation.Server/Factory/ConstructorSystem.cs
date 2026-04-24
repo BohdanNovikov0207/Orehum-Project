@@ -7,7 +7,6 @@ using Content.Goobstation.Shared.Factory;
 using Content.Server.Construction;
 using Content.Shared.Construction.Prototypes;
 using Content.Shared.DoAfter;
-using Robust.Shared.Maths;
 
 namespace Content.Goobstation.Server.Factory;
 
@@ -40,7 +39,7 @@ public sealed class ConstructorSystem : SharedConstructorSystem
     private async void Construct(Entity<ConstructorComponent> ent)
     {
         var uid = ent.Owner;
-        if (ent.Comp.Construction is not {} id)
+        if (ent.Comp.Construction is not { } id)
         {
             _machine.Failed(uid);
             return;
@@ -51,8 +50,11 @@ public sealed class ConstructorSystem : SharedConstructorSystem
         var proto = Proto.Index(id);
         var completed = proto.Type switch
         {
-            ConstructionType.Structure => await _construction.TryStartStructureConstruction(uid, id, OutputPosition(ent), Angle.Zero),
-            ConstructionType.Item => await _construction.TryStartItemConstruction(id, uid)
+            ConstructionType.Structure => await _construction.TryStartStructureConstruction(uid,
+                id,
+                OutputPosition(ent),
+                Angle.Zero),
+            ConstructionType.Item => await _construction.TryStartItemConstruction(id, uid),
         };
 
         if (completed)

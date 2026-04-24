@@ -7,24 +7,24 @@
 
 namespace Content.Goobstation.Server.StationEvents.Metric.Components;
 
-[RegisterComponent, Access(typeof(AnomalyMetric))]
+[RegisterComponent] [Access(typeof(AnomalyMetric))]
 public sealed partial class AnomalyMetricComponent : Component
 {
     /// <summary>
-    ///   Cost of a growing anomaly
+    /// Cost of any anomaly
+    /// </summary>
+    [DataField("dangerCost")]
+    public float BaseCost = 10.0f;
+
+    /// <summary>
+    /// Cost of a growing anomaly
     /// </summary>
     [DataField]
     public float GrowingCost = 40.0f;
 
     /// <summary>
-    ///   Cost of a dangerous anomaly
+    /// Cost of a dangerous anomaly
     /// </summary>
     [DataField]
     public float SeverityCost = 20.0f;
-
-    /// <summary>
-    ///   Cost of any anomaly
-    /// </summary>
-    [DataField("dangerCost")]
-    public float BaseCost = 10.0f;
 }

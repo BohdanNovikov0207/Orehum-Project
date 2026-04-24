@@ -41,6 +41,8 @@ public sealed class WraithWeakenedSystem : EntitySystem
             return;
 
         foreach (var action in actions.Actions)
+        {
             _actions.SetEnabled(action, enabled);
+        }
     }
 }

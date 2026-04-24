@@ -4,24 +4,21 @@
 // SPDX-License-Identifier: AGPL-3.0-or-later
 
 using Content.Goobstation.Common.Solutions;
-using Content.Shared.Fluids.EntitySystems;
 using Content.Shared.Chemistry.EntitySystems;
 using Content.Shared.Fluids;
 using Content.Shared.Fluids.Components;
 using Content.Shared.Weapons.Melee;
-using Robust.Shared.GameObjects;
 using Robust.Shared.Map;
 
 namespace Content.Goobstation.Shared.Chemistry;
 
 public sealed class SpillableMeleePuddleSystem : EntitySystem
 {
-    [Dependency] private readonly IMapManager _mapMan = default!;
-
     [Dependency] private readonly SharedMapSystem _map = default!;
-    [Dependency] private readonly SharedTransformSystem _transform = default!;
-    [Dependency] private readonly SharedSolutionContainerSystem _solution = default!;
+    [Dependency] private readonly IMapManager _mapMan = default!;
     [Dependency] private readonly SharedPuddleSystem _puddle = default!;
+    [Dependency] private readonly SharedSolutionContainerSystem _solution = default!;
+    [Dependency] private readonly SharedTransformSystem _transform = default!;
 
     public override void Initialize()
     {
@@ -54,7 +51,7 @@ public sealed class SpillableMeleePuddleSystem : EntitySystem
         if (range < length)
         {
             dir *= range / length;
-            coords = new MapCoordinates( userCoords.Position + dir, coords.MapId);
+            coords = new MapCoordinates(userCoords.Position + dir, coords.MapId);
         }
 
         var splitSolution = _solution.SplitSolution(soln.Value, args.Amount);

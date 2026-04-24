@@ -19,22 +19,22 @@ public sealed class BaseSwitchableOverlay<TComp> : Overlay where TComp : Switcha
     [Dependency] private readonly IEyeManager _eyeManager = default!;
     [Dependency] private readonly IPrototypeManager _prototype = default!;
 
-    public override bool RequestScreenTexture => true;
-    public override OverlaySpace Space => OverlaySpace.WorldSpace;
-
     private readonly ShaderInstance _shader;
 
     public TComp? Comp = null;
 
     public bool IsActive = true;
 
-    public bool RestrictToPlayerViewport { get; set; } = false;
-
     public BaseSwitchableOverlay()
     {
         IoCManager.InjectDependencies(this);
         _shader = _prototype.Index<ShaderPrototype>("NightVision").InstanceUnique();
     }
+
+    public override bool RequestScreenTexture => true;
+    public override OverlaySpace Space => OverlaySpace.WorldSpace;
+
+    public bool RestrictToPlayerViewport { get; set; } = false;
 
     protected override bool BeforeDraw(in OverlayDrawArgs args)
     {

@@ -6,10 +6,8 @@
 using System.Diagnostics.CodeAnalysis;
 using System.Numerics;
 using Content.Goobstation.UIKit.UserInterface.Controls;
-using Robust.Client.GameObjects;
 using Robust.Client.Graphics;
 using Robust.Client.UserInterface;
-using Robust.Shared.Prototypes;
 
 namespace Content.Goobstation.UIKit.UserInterface.RichText;
 
@@ -32,10 +30,12 @@ public abstract class BaseTextureTag
         return true;
     }
 
-    protected static bool TryDrawIconEntity(NetEntity netEntity, long spriteSize, [NotNullWhen(true)] out Control? control)
+    protected static bool TryDrawIconEntity(NetEntity netEntity,
+        long spriteSize,
+        [NotNullWhen(true)] out Control? control)
     {
         control = null;
-        var spriteView = new StaticSpriteView()
+        var spriteView = new StaticSpriteView
         {
             OverrideDirection = Direction.South,
             SetSize = new Vector2(spriteSize * 2, spriteSize * 2),

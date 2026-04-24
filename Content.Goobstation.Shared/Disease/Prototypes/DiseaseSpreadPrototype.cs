@@ -1,23 +1,22 @@
 using Robust.Shared.Prototypes;
 
-namespace Content.Goobstation.Shared.Disease
+namespace Content.Goobstation.Shared.Disease;
+
+/// <summary>
+/// A type of disease spread.
+/// </summary>
+[Prototype]
+public sealed class DiseaseSpreadPrototype : IPrototype
 {
-    /// <summary>
-    ///     A type of disease spread.
-    /// </summary>
-    [Prototype]
-    public sealed partial class DiseaseSpreadPrototype : IPrototype
-    {
-        [IdDataField]
-        public string ID { get; private set; } = default!;
+    [DataField]
+    public bool BlockedByInternals; // TODO: not implemented in the system
 
-        [DataField(required: true)]
-        private string Name { get; set; } = default!;
+    [DataField(required: true)]
+    private string Name { get; } = default!;
 
-        [ViewVariables(VVAccess.ReadOnly)]
-        public string LocalizedName => Loc.GetString("disease-spread-" + Name.ToLower());
+    [ViewVariables(VVAccess.ReadOnly)]
+    public string LocalizedName => Loc.GetString("disease-spread-" + Name.ToLower());
 
-        [DataField]
-        public bool BlockedByInternals; // TODO: not implemented in the system
-         }
+    [IdDataField]
+    public string ID { get; } = default!;
 }

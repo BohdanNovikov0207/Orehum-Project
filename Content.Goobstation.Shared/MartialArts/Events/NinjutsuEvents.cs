@@ -8,7 +8,7 @@ using Robust.Shared.Serialization;
 
 namespace Content.Goobstation.Shared.MartialArts.Events;
 
-[Serializable, NetSerializable, ImplicitDataDefinitionForInheritors]
+[Serializable] [NetSerializable] [ImplicitDataDefinitionForInheritors]
 public abstract partial class BaseNinjutsuEvent : EntityEventArgs
 {
     [DataField]

@@ -9,10 +9,11 @@ using Robust.Shared.GameStates;
 namespace Content.Goobstation.Shared.Factory;
 
 /// <summary>
-/// Adds slots to an entity that can be controlled by automation machines if it also has <see cref="AutomationComponent"/>.
-/// Slots using <see cref="AutomationSlot"/> can provide or accept items.
+/// Adds slots to an entity that can be controlled by automation machines if it also has <see cref="AutomationComponent" />
+/// .
+/// Slots using <see cref="AutomationSlot" /> can provide or accept items.
 /// </summary>
-[RegisterComponent, NetworkedComponent, Access(typeof(AutomationSystem))]
+[RegisterComponent] [NetworkedComponent] [Access(typeof(AutomationSystem))]
 public sealed partial class AutomationSlotsComponent : Component
 {
     /// <summary>

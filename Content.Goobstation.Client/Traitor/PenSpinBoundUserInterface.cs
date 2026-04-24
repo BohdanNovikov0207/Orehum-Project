@@ -25,28 +25,18 @@ public sealed class PenSpinBoundUserInterface : BoundUserInterface
         _menu.SubmitButtonPressed += OnSubmitPressed;
 
         if (EntMan.TryGetComponent<PenComponent>(Owner, out var comp))
-        {
             _menu.SetDegreeRange(comp.MinDegree, comp.MaxDegree);
-        }
     }
 
-    private void OnResetPressed()
-    {
-        SendPredictedMessage(new PenSpinResetMessage());
-    }
+    private void OnResetPressed() => SendPredictedMessage(new PenSpinResetMessage());
 
-    private void OnSubmitPressed(int degree)
-    {
-        SendPredictedMessage(new PenSpinSubmitDegreeMessage(degree));
-    }
+    private void OnSubmitPressed(int degree) => SendPredictedMessage(new PenSpinSubmitDegreeMessage(degree));
 
     protected override void Dispose(bool disposing)
     {
         base.Dispose(disposing);
 
         if (disposing)
-        {
             _menu?.Dispose();
-        }
     }
 }

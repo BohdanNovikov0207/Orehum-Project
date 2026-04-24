@@ -3,13 +3,12 @@ using Robust.Shared.GameStates;
 
 namespace Content.Goobstation.Shared.CustomLawboard;
 
-
-[RegisterComponent, NetworkedComponent, AutoGenerateComponentState]
+[RegisterComponent] [NetworkedComponent] [AutoGenerateComponentState]
 public sealed partial class CustomLawboardComponent : Component
 {
     /// <summary>
     /// The laws of this custom lawboard.
     /// </summary>
-    [DataField, AutoNetworkedField]
+    [DataField] [AutoNetworkedField]
     public List<SiliconLaw> Laws = new();
 }

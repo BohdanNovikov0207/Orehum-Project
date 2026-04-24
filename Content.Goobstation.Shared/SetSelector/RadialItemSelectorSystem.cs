@@ -1,15 +1,14 @@
 using System.Linq;
 using Content.Shared._White.RadialSelector;
 using Content.Shared.UserInterface;
-using Robust.Shared.GameObjects;
 using Robust.Shared.Prototypes;
 
 namespace Content.Goobstation.Shared.SetSelector;
 
 public sealed class RadialItemSelectorSystem : EntitySystem
 {
-    [Dependency] private readonly SharedUserInterfaceSystem _ui = default!;
     [Dependency] private readonly IPrototypeManager _proto = default!;
+    [Dependency] private readonly SharedUserInterfaceSystem _ui = default!;
 
     public override void Initialize()
     {
@@ -19,10 +18,8 @@ public sealed class RadialItemSelectorSystem : EntitySystem
         SubscribeLocalEvent<RadialItemSelectorComponent, BeforeActivatableUIOpenEvent>(OnBeforeOpen);
     }
 
-    private void OnBeforeOpen(Entity<RadialItemSelectorComponent> ent, ref BeforeActivatableUIOpenEvent args)
-    {
+    private void OnBeforeOpen(Entity<RadialItemSelectorComponent> ent, ref BeforeActivatableUIOpenEvent args) =>
         _ui.SetUiState(ent.Owner, RadialSelectorUiKey.Key, new RadialSelectorState(ent.Comp.Entries));
-    }
 
     private void OnSelected(Entity<RadialItemSelectorComponent> ent, ref RadialSelectorSelectedMessage args)
     {

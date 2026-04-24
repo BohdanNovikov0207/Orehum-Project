@@ -3,12 +3,11 @@ using Robust.Shared.Serialization;
 
 namespace Content.Goobstation.Shared.Hastur.Components;
 
-[RegisterComponent, NetworkedComponent]
+[RegisterComponent] [NetworkedComponent]
 public sealed partial class HasturDevouringComponent : Component;
 
-[NetSerializable, Serializable]
+[NetSerializable] [Serializable]
 public enum DevourVisuals : byte
 {
     Devouring,
 }
-

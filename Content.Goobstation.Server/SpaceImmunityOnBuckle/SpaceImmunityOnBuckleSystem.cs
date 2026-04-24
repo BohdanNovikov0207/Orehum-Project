@@ -8,12 +8,10 @@ using Content.Goobstation.Common.Temperature.Components;
 using Content.Server.Atmos.Components;
 using Content.Shared.Buckle.Components;
 
-
 namespace Content.Goobstation.Server.SpaceImmunityOnBuckle;
 
 public sealed class SpaceImmunityOnBuckleSystem : EntitySystem
 {
-
     public override void Initialize()
     {
         base.Initialize();

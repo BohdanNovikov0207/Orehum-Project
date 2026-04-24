@@ -25,13 +25,14 @@ namespace Content.Goobstation.Server.Shadowling.Systems.Abilities.PreAscension;
 /// </summary>
 public sealed class ShadowlingIcyVeinsSystem : EntitySystem
 {
-    [Dependency] private readonly SharedStunSystem _stun = default!;
-    [Dependency] private readonly EntityLookupSystem _lookup = default!;
     [Dependency] private readonly SharedActionsSystem _actions = default!;
-    [Dependency] private readonly SharedTransformSystem _transform = default!;
-    [Dependency] private readonly SharedPopupSystem _popup = default!;
-    [Dependency] private readonly IGameTiming _timing = default!;
     [Dependency] private readonly SharedAudioSystem _audio = default!;
+    [Dependency] private readonly EntityLookupSystem _lookup = default!;
+    [Dependency] private readonly SharedPopupSystem _popup = default!;
+    [Dependency] private readonly SharedStunSystem _stun = default!;
+    [Dependency] private readonly IGameTiming _timing = default!;
+    [Dependency] private readonly SharedTransformSystem _transform = default!;
+
     public override void Initialize()
     {
         base.Initialize();
@@ -80,7 +81,8 @@ public sealed class ShadowlingIcyVeinsSystem : EntitySystem
         if (args.Handled)
             return;
 
-        foreach (var target in _lookup.GetEntitiesInRange(_transform.GetMapCoordinates(args.Performer), component.Range))
+        foreach (var target in
+                 _lookup.GetEntitiesInRange(_transform.GetMapCoordinates(args.Performer), component.Range))
         {
             TryIcyVeins(target, component);
         }

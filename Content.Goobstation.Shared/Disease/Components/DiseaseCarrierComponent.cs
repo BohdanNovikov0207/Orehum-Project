@@ -5,7 +5,7 @@ using Robust.Shared.Prototypes;
 
 namespace Content.Goobstation.Shared.Disease.Components;
 
-[RegisterComponent, NetworkedComponent, AutoGenerateComponentState]
+[RegisterComponent] [NetworkedComponent] [AutoGenerateComponentState]
 [Access(typeof(SharedDiseaseSystem))] // add/remove diseases using the system's methods
 public sealed partial class DiseaseCarrierComponent : Component
 {
@@ -19,12 +19,6 @@ public sealed partial class DiseaseCarrierComponent : Component
     public Container Diseases = default!;
 
     /// <summary>
-    /// Diseases to add on component startup
-    /// </summary>
-    [DataField("diseases")]
-    public List<EntProtoId> StartingDiseases = new();
-
-    /// <summary>
     /// Whether to be immune to disease effects
     /// For entities that need to carry disease but not have their effects happen
     /// </summary>
@@ -32,20 +26,26 @@ public sealed partial class DiseaseCarrierComponent : Component
     public bool EffectImmune = false;
 
     /// <summary>
+    /// Icon to show on HUDs if total disease severity is high.
+    /// </summary>
+    [DataField] [AutoNetworkedField]
+    public ProtoId<DiseaseIconPrototype> HighIcon = "DiseaseIconHigh";
+
+    /// <summary>
     /// Icon to show on HUDs if total disease severity is low.
     /// </summary>
-    [DataField, AutoNetworkedField]
+    [DataField] [AutoNetworkedField]
     public ProtoId<DiseaseIconPrototype> LowIcon = "DiseaseIconLow";
 
     /// <summary>
     /// Icon to show on HUDs if total disease severity is medium.
     /// </summary>
-    [DataField, AutoNetworkedField]
+    [DataField] [AutoNetworkedField]
     public ProtoId<DiseaseIconPrototype> MediumIcon = "DiseaseIconMedium";
 
     /// <summary>
-    /// Icon to show on HUDs if total disease severity is high.
+    /// Diseases to add on component startup
     /// </summary>
-    [DataField, AutoNetworkedField]
-    public ProtoId<DiseaseIconPrototype> HighIcon = "DiseaseIconHigh";
+    [DataField("diseases")]
+    public List<EntProtoId> StartingDiseases = new();
 }

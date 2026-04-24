@@ -21,16 +21,16 @@ using Robust.Shared.Audio.Systems;
 
 namespace Content.Goobstation.Server.Religion.OnPray.HealNearOnPray;
 
-public sealed partial class HealNearOnPraySystem : EntitySystem
+public sealed class HealNearOnPraySystem : EntitySystem
 {
+    [Dependency] private readonly SharedAudioSystem _audio = default!;
     [Dependency] private readonly DamageableSystem _damageable = default!;
     [Dependency] private readonly EntityLookupSystem _lookup = default!;
-    [Dependency] private readonly SharedAudioSystem _audio = default!;
     [Dependency] private readonly MobStateSystem _mobState = default!;
     [Dependency] private readonly ExamineSystemShared _occlusion = default!;
+    private EntityQuery<CorporealComponent> _corporealQuery;
 
     private EntityQuery<SpectralComponent> _spectralQuery;
-    private EntityQuery<CorporealComponent> _corporealQuery;
 
     public override void Initialize()
     {
@@ -64,16 +64,38 @@ public sealed partial class HealNearOnPraySystem : EntitySystem
 
             if (ev.ShouldTakeHoly)
             {
-                _damageable.TryChangeDamage(entity, comp.Damage, targetPart: TargetBodyPart.All, splitDamage: SplitDamageBehavior.SplitEnsureAll);
+                _damageable.TryChangeDamage(entity,
+                    comp.Damage,
+                    targetPart: TargetBodyPart.All,
+                    splitDamage: SplitDamageBehavior.SplitEnsureAll);
                 Spawn(comp.DamageEffect, Transform(entity).Coordinates);
-                _audio.PlayPvs(comp.SizzleSoundPath, entity, new AudioParams(-2f, 1f, SharedAudioSystem.DefaultSoundRange, 1f, false, 0f)); //This should be safe to keep in the loop as this sound will never consistently play on multiple entities.
+                _audio.PlayPvs(comp.SizzleSoundPath,
+                    entity,
+                    new AudioParams(-2f,
+                        1f,
+                        SharedAudioSystem.DefaultSoundRange,
+                        1f,
+                        false,
+                        0f)); //This should be safe to keep in the loop as this sound will never consistently play on multiple entities.
             }
             else
             {
-                _damageable.TryChangeDamage(entity, comp.Healing, targetPart: TargetBodyPart.All, ignoreBlockers: true, splitDamage: SplitDamageBehavior.SplitEnsureAll);
+                _damageable.TryChangeDamage(entity,
+                    comp.Healing,
+                    targetPart: TargetBodyPart.All,
+                    ignoreBlockers: true,
+                    splitDamage: SplitDamageBehavior.SplitEnsureAll);
                 Spawn(comp.HealEffect, Transform(entity).Coordinates);
             }
         }
-        _audio.PlayPvs(comp.HealSoundPath, uid, new AudioParams(-2f, 1f, SharedAudioSystem.DefaultSoundRange, 1f, false, 0f)); //Played outside the loop once at the source of the damage to prevent repeated sound-stacking.
+
+        _audio.PlayPvs(comp.HealSoundPath,
+            uid,
+            new AudioParams(-2f,
+                1f,
+                SharedAudioSystem.DefaultSoundRange,
+                1f,
+                false,
+                0f)); //Played outside the loop once at the source of the damage to prevent repeated sound-stacking.
     }
 }

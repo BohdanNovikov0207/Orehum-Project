@@ -10,13 +10,13 @@ using Robust.Shared.Serialization;
 
 namespace Content.Goobstation.Shared.IntrinsicVoiceModulator;
 
-[Serializable, NetSerializable]
+[Serializable] [NetSerializable]
 public enum IntrinsicVoiceModulatorUiKey : byte
 {
     Key,
 }
 
-[Serializable, NetSerializable]
+[Serializable] [NetSerializable]
 public sealed class IntrinsicVoiceModulatorBoundUserInterfaceState(
     string currentName,
     ProtoId<SpeechVerbPrototype>? currentVerb,
@@ -28,20 +28,20 @@ public sealed class IntrinsicVoiceModulatorBoundUserInterfaceState(
     public ProtoId<JobIconPrototype>? JobIcon { get; } = jobIcon;
 }
 
-[NetSerializable, Serializable]
+[NetSerializable] [Serializable]
 public sealed class IntrinsicVoiceModulatorNameChangedMessage(string name) : BoundUserInterfaceMessage
 {
     public string Name { get; } = name;
 }
 
-[NetSerializable, Serializable]
+[NetSerializable] [Serializable]
 public sealed class IntrinsicVoiceModulatorJobIconChangedMessage(ProtoId<JobIconPrototype> jobIconProtoId)
     : BoundUserInterfaceMessage
 {
     public ProtoId<JobIconPrototype> JobIconProtoId { get; } = jobIconProtoId;
 }
 
-[NetSerializable, Serializable]
+[NetSerializable] [Serializable]
 public sealed class IntrinsicVoicemodulatorVerbChangedMessage(ProtoId<SpeechVerbPrototype>? speechProtoId)
     : BoundUserInterfaceMessage
 {

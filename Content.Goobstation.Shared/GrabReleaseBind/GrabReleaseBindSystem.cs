@@ -18,14 +18,12 @@ public sealed class GrabReleaseBindSystem : EntitySystem
 {
     [Dependency] private readonly PullingSystem _pullingSystem = default!;
 
-    /// <inheritdoc/>
-    public override void Initialize()
-    {
+    /// <inheritdoc />
+    public override void Initialize() =>
         CommandBinds.Builder
             .Bind(ContentKeyFunctions.ResistGrab,
                 InputCmdHandler.FromDelegate(HandleResistGrab, handle: false, outsidePrediction: false))
             .Register<GrabReleaseBindSystem>();
-    }
 
     private void HandleResistGrab(ICommonSession? session)
     {

@@ -6,9 +6,10 @@ namespace Content.Goobstation.Shared.Wraith.Collisions;
 
 public abstract class SharedStatusEffectOnCollideGhostSystem : EntitySystem
 {
-    [Dependency] private readonly StatusEffectsSystem _statusEffectsSystem = default!;
     [Dependency] private readonly EntityWhitelistSystem _entityWhitelist = default!;
-    /// <inheritdoc/>
+    [Dependency] private readonly StatusEffectsSystem _statusEffectsSystem = default!;
+
+    /// <inheritdoc />
     public override void Initialize()
     {
         base.Initialize();
@@ -18,7 +19,7 @@ public abstract class SharedStatusEffectOnCollideGhostSystem : EntitySystem
 
     private void OnCollide(Entity<StatusEffectOnCollideGhostComponent> ent, ref StartCollideEvent args)
     {
-        if (ent.Comp.Whitelist is {} whitelist
+        if (ent.Comp.Whitelist is { } whitelist
             && !_entityWhitelist.IsValid(whitelist, args.OtherEntity))
             return;
 

@@ -1,4 +1,4 @@
-﻿using Content.Goobstation.Shared.Disease;
+﻿using Content.Goobstation.Shared.Disease.Components;
 using Content.Goobstation.Shared.Disease.Systems;
 using Content.Shared.DoAfter;
 using Content.Shared.Interaction;
@@ -8,8 +8,8 @@ namespace Content.Goobstation.Shared.Virology;
 
 public sealed class SharedDiseasePenSystem : EntitySystem
 {
-    [Dependency] private readonly SharedAudioSystem _audio = default!;
     [Dependency] private readonly SharedAppearanceSystem _appearance = default!;
+    [Dependency] private readonly SharedAudioSystem _audio = default!;
     [Dependency] private readonly SharedDiseaseSystem _disease = default!;
     [Dependency] private readonly SharedDoAfterSystem _doAfter = default!;
 
@@ -45,7 +45,13 @@ public sealed class SharedDiseasePenSystem : EntitySystem
         if (args.Target == null || ent.Comp.DiseaseUid == null || ent.Comp.Used)
             return;
 
-        var doAfterArgs = new DoAfterArgs(EntityManager, args.User, ent.Comp.InjectTime, new DiseasePenInjectEvent(), ent, target: args.Target, used: ent)
+        var doAfterArgs = new DoAfterArgs(EntityManager,
+            args.User,
+            ent.Comp.InjectTime,
+            new DiseasePenInjectEvent(),
+            ent,
+            args.Target,
+            ent)
         {
             BreakOnDamage = true,
             BreakOnMove = true,
@@ -57,7 +63,7 @@ public sealed class SharedDiseasePenSystem : EntitySystem
 
     private void TryVaccinate(Entity<DiseasePenComponent> ent, AfterInteractEvent args)
     {
-        if (!TryComp<Disease.Components.ImmunityComponent>(args.Target, out var immunity)
+        if (!TryComp<ImmunityComponent>(args.Target, out var immunity)
             || ent.Comp.Genotype == null
             || ent.Comp.Used
             || args.Target == null)

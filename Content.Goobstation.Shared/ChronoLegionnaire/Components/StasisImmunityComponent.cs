@@ -6,18 +6,17 @@
 //
 // SPDX-License-Identifier: AGPL-3.0-or-later
 
-namespace Content.Goobstation.Shared.ChronoLegionnaire.Components
+namespace Content.Goobstation.Shared.ChronoLegionnaire.Components;
+
+/// <summary>
+/// Marks an entity that cannot be affect by stasis
+/// </summary>
+[RegisterComponent]
+public sealed partial class StasisImmunityComponent : Component
 {
     /// <summary>
-    /// Marks an entity that cannot be affect by stasis
+    /// Will the stasis immunity go away with stasis protection?
     /// </summary>
-    [RegisterComponent]
-    public sealed partial class StasisImmunityComponent : Component
-    {
-        /// <summary>
-        /// Will the stasis immunity go away with stasis protection?
-        /// </summary>
-        [DataField]
-        public bool DependsOnProtection = true;
-    }
+    [DataField]
+    public bool DependsOnProtection = true;
 }

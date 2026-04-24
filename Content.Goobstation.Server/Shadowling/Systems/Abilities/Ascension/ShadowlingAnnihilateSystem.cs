@@ -24,10 +24,12 @@ namespace Content.Goobstation.Server.Shadowling.Systems.Abilities.Ascension;
 /// </summary>
 public sealed class ShadowlingAnnihilateSystem : EntitySystem
 {
-    [Dependency] private readonly BodySystem _body = default!;
     [Dependency] private readonly SharedActionsSystem _actions = default!;
-    [Dependency] private readonly ExplosionSystem _explosionSystem = default!;
+    [Dependency] private readonly BodySystem _body = default!;
     [Dependency] private readonly ChatSystem _chat = default!;
+    [Dependency] private readonly ExplosionSystem _explosionSystem = default!;
+
+    public ProtoId<ExplosionPrototype> ExplosionId = "Corpse";
 
     public override void Initialize()
     {
@@ -38,17 +40,12 @@ public sealed class ShadowlingAnnihilateSystem : EntitySystem
         SubscribeLocalEvent<ShadowlingAnnihilateComponent, ComponentShutdown>(OnShutdown);
     }
 
-    private void OnStartup(Entity<ShadowlingAnnihilateComponent> ent, ref MapInitEvent args)
-    {
+    private void OnStartup(Entity<ShadowlingAnnihilateComponent> ent, ref MapInitEvent args) =>
         _actions.AddAction(ent.Owner, ref ent.Comp.ActionEnt, ent.Comp.ActionId);
-    }
 
-    private void OnShutdown(Entity<ShadowlingAnnihilateComponent> ent, ref ComponentShutdown args)
-    {
+    private void OnShutdown(Entity<ShadowlingAnnihilateComponent> ent, ref ComponentShutdown args) =>
         _actions.RemoveAction(ent.Owner, ent.Comp.ActionEnt);
-    }
 
-    public ProtoId<ExplosionPrototype> ExplosionId = "Corpse";
     private void OnAnnihilate(EntityUid uid, ShadowlingAnnihilateComponent component, AnnihilateEvent args)
     {
         if (args.Handled
@@ -63,10 +60,10 @@ public sealed class ShadowlingAnnihilateSystem : EntitySystem
 
         _explosionSystem.QueueExplosion(
             target,
-            typeId: ExplosionId,
-            totalIntensity: 1,
-            slope: 1,
-            maxTileIntensity: 1,
+            ExplosionId,
+            1,
+            1,
+            1,
             canCreateVacuum: false);
 
         _body.GibBody(target, contents: GibContentsOption.Gib);

@@ -3,7 +3,7 @@ using Robust.Shared.Prototypes;
 
 namespace Content.Goobstation.Shared.Wraith.Components;
 
-[RegisterComponent, NetworkedComponent]
+[RegisterComponent] [NetworkedComponent]
 public sealed partial class SummonVoidCreatureComponent : Component
 {
     /// <summary>
@@ -19,7 +19,7 @@ public sealed partial class SummonVoidCreatureComponent : Component
     public EntProtoId ActionId = "ActionSummonVoidCreature";
 
     /// <summary>
-    ///  The ghost entity to summon for the players to take over
+    /// The ghost entity to summon for the players to take over
     /// </summary>
     [DataField]
     public EntProtoId SummonId = "SummonVoidGhost";

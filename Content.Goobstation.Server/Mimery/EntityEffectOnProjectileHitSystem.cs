@@ -1,4 +1,3 @@
-using Content.Goobstation.Shared.Mimery;
 using Content.Shared.EntityEffects;
 using Content.Shared.Projectiles;
 using Robust.Shared.Random;

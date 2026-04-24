@@ -18,10 +18,8 @@ public sealed class LatheAutomationSystem : EntitySystem
         SubscribeLocalEvent<LatheAutomationComponent, SignalReceivedEvent>(OnSignalReceived);
     }
 
-    private void OnStartPrinting(Entity<LatheAutomationComponent> ent, ref LatheStartPrintingEvent args)
-    {
+    private void OnStartPrinting(Entity<LatheAutomationComponent> ent, ref LatheStartPrintingEvent args) =>
         ent.Comp.LastRecipe = args.Recipe;
-    }
 
     private void OnSignalReceived(Entity<LatheAutomationComponent> ent, ref SignalReceivedEvent args)
     {
@@ -31,7 +29,7 @@ public sealed class LatheAutomationSystem : EntitySystem
         if (args.Port != ent.Comp.PrintPort)
             return;
 
-        if (ent.Comp.LastRecipe is not {} recipe)
+        if (ent.Comp.LastRecipe is not { } recipe)
             return;
 
         _lathe.TryAddToQueue(ent.Owner, recipe);

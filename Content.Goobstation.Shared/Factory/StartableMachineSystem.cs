@@ -50,18 +50,16 @@ public sealed class StartableMachineSystem : EntitySystem
     private void OnSignalReceived(Entity<StartableMachineComponent> ent, ref SignalReceivedEvent args)
     {
         if (args.Port == ent.Comp.StartPort)
-        {
             TryStart((ent, ent.Comp));
-        }
         else if (args.Port == ent.Comp.AutoStartPort)
         {
             var state = SignalState.Momentary;
-            args.Data?.TryGetValue<SignalState>("logic_state", out state);
+            args.Data?.TryGetValue("logic_state", out state);
             ent.Comp.AutoStart = state switch
             {
                 SignalState.Momentary => !ent.Comp.AutoStart,
                 SignalState.High => true,
-                SignalState.Low => false
+                SignalState.Low => false,
             };
         }
     }

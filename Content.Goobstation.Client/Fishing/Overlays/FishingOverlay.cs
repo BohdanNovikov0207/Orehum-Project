@@ -9,21 +9,14 @@ using Content.Client.UserInterface.Systems;
 using Content.Goobstation.Shared.Fishing.Components;
 using Robust.Client.GameObjects;
 using Robust.Client.Graphics;
-using Robust.Shared.Enums;
 using Robust.Client.Player;
+using Robust.Shared.Enums;
 using Robust.Shared.Utility;
 
 namespace Content.Goobstation.Client.Fishing.Overlays;
 
 public sealed class FishingOverlay : Overlay
 {
-    private readonly IEntityManager _entManager;
-    private readonly IPlayerManager _player;
-    private readonly SharedTransformSystem _transform;
-    private readonly ProgressColorSystem _progressColor;
-
-    private readonly Texture _barTexture;
-
     // Fractional positions for progress bar fill (relative to texture height/width)
     private const float StartYFraction = 0.09375f; // 3/32
     private const float EndYFraction = 0.90625f; // 29/32
@@ -33,7 +26,11 @@ public sealed class FishingOverlay : Overlay
     // We dont want to do this because muh pixel consistency, but i'll keep it here as an option
     private const float BarScale = 1f;
 
-    public override OverlaySpace Space => OverlaySpace.WorldSpaceBelowFOV;
+    private readonly Texture _barTexture;
+    private readonly IEntityManager _entManager;
+    private readonly IPlayerManager _player;
+    private readonly ProgressColorSystem _progressColor;
+    private readonly SharedTransformSystem _transform;
 
     public FishingOverlay(IEntityManager entManager, IPlayerManager player)
     {
@@ -43,9 +40,11 @@ public sealed class FishingOverlay : Overlay
         _progressColor = _entManager.System<ProgressColorSystem>();
 
         // Load the progress bar texture
-        var sprite = new SpriteSpecifier.Rsi(new("/Textures/_Goobstation/Interface/Misc/fish_bar.rsi"), "icon");
+        var sprite = new SpriteSpecifier.Rsi(new ResPath("/Textures/_Goobstation/Interface/Misc/fish_bar.rsi"), "icon");
         _barTexture = _entManager.EntitySysManager.GetEntitySystem<SpriteSystem>().Frame0(sprite);
     }
+
+    public override OverlaySpace Space => OverlaySpace.WorldSpaceBelowFOV;
 
     protected override void Draw(in OverlayDrawArgs args)
     {
@@ -70,7 +69,8 @@ public sealed class FishingOverlay : Overlay
         var barWidth = scaledTextureSize.X * BarWidthFraction;
 
         // Iterate through all entities with ActiveFisherComponent
-        var enumerator = _entManager.AllEntityQueryEnumerator<ActiveFisherComponent, SpriteComponent, TransformComponent>();
+        var enumerator =
+            _entManager.AllEntityQueryEnumerator<ActiveFisherComponent, SpriteComponent, TransformComponent>();
         while (enumerator.MoveNext(out var uid, out var comp, out var sprite, out var xform))
         {
             // Skip if the entity is not on the current map, has invalid progress, or is not the local player
@@ -130,8 +130,6 @@ public sealed class FishingOverlay : Overlay
     /// <summary>
     /// Gets the color for the progress bar based on the progress value.
     /// </summary>
-    public Color GetProgressColor(float progress, float alpha = 1f)
-    {
-        return _progressColor.GetProgressColor(progress).WithAlpha(alpha);
-    }
+    public Color GetProgressColor(float progress, float alpha = 1f) =>
+        _progressColor.GetProgressColor(progress).WithAlpha(alpha);
 }

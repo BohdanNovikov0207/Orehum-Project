@@ -5,7 +5,6 @@ using Content.Shared.GameTicking.Components;
 using Content.Shared.Random;
 using Content.Shared.Random.Helpers;
 using Robust.Shared.Prototypes;
-using Robust.Shared.Random;
 
 namespace Content.Goobstation.Server.StationEvents.GameDirector;
 
@@ -29,6 +28,7 @@ public sealed partial class GameDirectorSystem
         else
             SpawnDualAntags(weightList, playerCount);
     }
+
     /// <summary>
     /// Spawns a single antag game mode
     /// </summary>

@@ -19,12 +19,12 @@ namespace Content.Goobstation.Shared.Religion;
 /// </summary>
 public sealed class DivineInterventionSystem : EntitySystem
 {
-    [Dependency] private readonly InventorySystem _inventory = default!;
     [Dependency] private readonly SharedAudioSystem _audio = default!;
-    [Dependency] private readonly SharedPopupSystem _popupSystem = default!;
     [Dependency] private readonly SharedHandsSystem _hands = default!;
+    [Dependency] private readonly InventorySystem _inventory = default!;
 
     [Dependency] private readonly INetManager _net = default!;
+    [Dependency] private readonly SharedPopupSystem _popupSystem = default!;
 
     public override void Initialize()
     {
@@ -67,10 +67,12 @@ public sealed class DivineInterventionSystem : EntitySystem
 
         return false;
     }
+
     //Overload Method
     public bool ShouldDeny(EntityUid target) => ShouldDeny(target, out _);
 
     #region Flavour
+
     /// <summary>
     /// Handles denial flavour (VFX/SFX/POPUPS)
     /// </summary>
@@ -85,9 +87,11 @@ public sealed class DivineInterventionSystem : EntitySystem
         _audio.PlayPvs(comp.DenialSound, ent);
         Spawn(comp.EffectProto, Transform(ent).Coordinates);
     }
+
     #endregion
 
     #region EntityTargetActionEvent Spells
+
     /// <summary>
     /// Handles EntityTargetActionEvent spells.
     /// </summary>
@@ -130,7 +134,4 @@ public sealed class DivineInterventionSystem : EntitySystem
     }
 
     #endregion
-
-
-
 }

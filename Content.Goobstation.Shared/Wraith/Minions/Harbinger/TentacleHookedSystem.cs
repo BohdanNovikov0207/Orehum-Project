@@ -8,10 +8,11 @@ namespace Content.Goobstation.Shared.Wraith.Minions.Harbinger;
 /// </summary>
 public sealed class TentacleHookedSystem : EntitySystem
 {
+    [Dependency] private readonly ThrowingSystem _throwing = default!;
     [Dependency] private readonly IGameTiming _timing = default!;
     [Dependency] private readonly SharedTransformSystem _transform = default!;
-    [Dependency] private readonly ThrowingSystem _throwing = default!;
-    /// <inheritdoc/>
+
+    /// <inheritdoc />
     public override void Initialize()
     {
         base.Initialize();
@@ -46,7 +47,7 @@ public sealed class TentacleHookedSystem : EntitySystem
 
     private bool CheckDistance(Entity<TentacleHookedComponent> target)
     {
-        if (target.Comp.ThrowTowards is not {} throwTowards)
+        if (target.Comp.ThrowTowards is not { } throwTowards)
             return false;
 
         var throwToPos = _transform.GetWorldPosition(throwTowards);
@@ -64,7 +65,7 @@ public sealed class TentacleHookedSystem : EntitySystem
 
     private void Yeet(Entity<TentacleHookedComponent> target)
     {
-        if (target.Comp.ThrowTowards is not {} throwTowards)
+        if (target.Comp.ThrowTowards is not { } throwTowards)
             return;
 
         var targetPos = _transform.GetWorldPosition(target.Owner);

@@ -25,10 +25,8 @@ public sealed class SharedMechSystem : EntitySystem
         _faction.AddFactions((args.mechUid, null), ent.Comp.Factions);
     }
 
-    private void OnFactionPilotEjected(Entity<NpcFactionMemberComponent> ent, ref MechEjectedEvent args)
-    {
+    private void OnFactionPilotEjected(Entity<NpcFactionMemberComponent> ent, ref MechEjectedEvent args) =>
         // as-is this will break for mechs that for whatever reason also have a faction
         // but mechs shouldn't generally have a faction so
         _faction.ClearFactions((args.mechUid, null));
-    }
 }

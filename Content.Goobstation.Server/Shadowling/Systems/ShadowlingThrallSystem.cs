@@ -21,6 +21,9 @@ public sealed class ShadowlingThrallSystem : EntitySystem
     [Dependency] private readonly MindSystem _mind = default!;
     [Dependency] private readonly RoleSystem _roles = default!;
     [Dependency] private readonly ShadowlingSystem _shadowling = default!;
+
+    public ProtoId<CollectiveMindPrototype> ShadowMind = "Shadowmind";
+
     public override void Initialize()
     {
         base.Initialize();
@@ -30,7 +33,6 @@ public sealed class ShadowlingThrallSystem : EntitySystem
         SubscribeLocalEvent<ThrallComponent, ExaminedEvent>(OnExamined);
     }
 
-    public ProtoId<CollectiveMindPrototype> ShadowMind = "Shadowmind";
     private void OnStartup(EntityUid uid, ThrallComponent component, ComponentStartup args)
     {
         // antag stuff
@@ -70,7 +72,8 @@ public sealed class ShadowlingThrallSystem : EntitySystem
     {
         if (HasComp<ShadowlingComponent>(args.Examiner)
             && component.Converter == args.Examiner)
-            args.PushMarkup($"[color=red]{Loc.GetString("shadowling-thrall-examined")}[/color]"); // Indicates that it is your Thrall
+            args.PushMarkup(
+                $"[color=red]{Loc.GetString("shadowling-thrall-examined")}[/color]"); // Indicates that it is your Thrall
 
         var ev = new IsEyesCoveredCheckEvent();
         RaiseLocalEvent(uid, ev);
@@ -78,6 +81,7 @@ public sealed class ShadowlingThrallSystem : EntitySystem
         if (ev.IsEyesProtected)
             return;
 
-        args.PushMarkup($"[color=pink]{Loc.GetString("shadowling-thrall-other-examined", ("target", Identity.Entity(uid, EntityManager)))}[/color]");
+        args.PushMarkup(
+            $"[color=pink]{Loc.GetString("shadowling-thrall-other-examined", ("target", Identity.Entity(uid, EntityManager)))}[/color]");
     }
 }

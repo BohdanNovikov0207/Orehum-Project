@@ -12,7 +12,7 @@ using Robust.Shared.Prototypes;
 
 namespace Content.Goobstation.Shared.Overlays;
 
-[RegisterComponent, NetworkedComponent]
+[RegisterComponent] [NetworkedComponent]
 public sealed partial class NightVisionComponent : SwitchableVisionOverlayComponent
 {
     public override EntProtoId? ToggleAction { get; set; } = "ToggleNightVision";

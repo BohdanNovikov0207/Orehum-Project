@@ -9,16 +9,15 @@ using Content.Goobstation.Server.Implants.Components;
 using Content.Shared.Implants.Components;
 using Content.Shared.Nutrition.Components;
 using Content.Shared.Nutrition.EntitySystems;
-using Robust.Shared.Containers;
 using Robust.Shared.Timing;
 
 namespace Content.Goobstation.Server.Implants.Systems;
 
 public sealed class NutrimentPumpImplantSystem : EntitySystem
 {
+    [Dependency] private readonly IGameTiming _gameTiming = default!;
     [Dependency] private readonly HungerSystem _hunger = default!;
     [Dependency] private readonly ThirstSystem _thirst = default!;
-    [Dependency] private readonly IGameTiming _gameTiming = default!;
 
     public override void Update(float frameTime)
     {
@@ -39,7 +38,9 @@ public sealed class NutrimentPumpImplantSystem : EntitySystem
                     _hunger.ModifyHunger(uid, pumpImplant.FoodRate, hungerComponent);
 
                 if (TryComp<ThirstComponent>(uid, out var thirstComponent))
-                    _thirst.ModifyThirst(uid, thirstComponent, pumpImplant.DrinkRate); // why the fuck is the order of arguments different for ModifyThirst????
+                    _thirst.ModifyThirst(uid,
+                        thirstComponent,
+                        pumpImplant.DrinkRate); // why the fuck is the order of arguments different for ModifyThirst????
 
                 pumpImplant.NextExecutionTime = _gameTiming.CurTime + pumpImplant.ExecutionInterval;
             }

@@ -6,8 +6,7 @@
 // SPDX-License-Identifier: AGPL-3.0-or-later
 
 using Content.Goobstation.Common.Weapons.MeleeDash;
-using Content.Shared.Emoting;
-using Content.Shared.Hands.Components;
+using Content.Goobstation.Shared.Emoting;
 using Content.Shared.Hands.EntitySystems;
 using Content.Shared.Mobs.Components;
 using Content.Shared.Physics;
@@ -27,16 +26,15 @@ namespace Content.Goobstation.Shared.Weapons.MeleeDash;
 
 public sealed class MeleeDashSystem : EntitySystem
 {
-    [Dependency] private readonly UseDelaySystem _useDelay = default!;
-    [Dependency] private readonly SharedContainerSystem _container = default!;
-    [Dependency] private readonly ThrowingSystem _throwing = default!;
-    [Dependency] private readonly SharedMeleeWeaponSystem _melee = default!;
-    [Dependency] private readonly SharedAudioSystem _audio = default!;
-    [Dependency] private readonly StandingStateSystem _standing = default!;
-    [Dependency] private readonly SharedPhysicsSystem _physics = default!;
-    [Dependency] private readonly SharedHandsSystem _hands = default!;
-
     private const int DashCollisionLayer = (int) CollisionGroup.MidImpassable;
+    [Dependency] private readonly SharedAudioSystem _audio = default!;
+    [Dependency] private readonly SharedContainerSystem _container = default!;
+    [Dependency] private readonly SharedHandsSystem _hands = default!;
+    [Dependency] private readonly SharedMeleeWeaponSystem _melee = default!;
+    [Dependency] private readonly SharedPhysicsSystem _physics = default!;
+    [Dependency] private readonly StandingStateSystem _standing = default!;
+    [Dependency] private readonly ThrowingSystem _throwing = default!;
+    [Dependency] private readonly UseDelaySystem _useDelay = default!;
 
     public override void Initialize()
     {
@@ -137,7 +135,7 @@ public sealed class MeleeDashSystem : EntitySystem
                     key,
                     fixture,
                     fixture.CollisionMask & ~DashCollisionLayer,
-                    manager: fixtureComponent);
+                    fixtureComponent);
             }
         }
 
@@ -147,7 +145,7 @@ public sealed class MeleeDashSystem : EntitySystem
         _throwing.TryThrow(user, dir, dash.DashForce, null, 0f, null, false, false, false, false, false);
         _audio.PlayPredicted(dash.DashSound, user, user);
 
-        if (dash.EmoteOnDash == null || !TryComp(user, out Emoting.AnimatedEmotesComponent? emotes))
+        if (dash.EmoteOnDash == null || !TryComp(user, out AnimatedEmotesComponent? emotes))
             return;
 
         emotes.Emote = dash.EmoteOnDash;

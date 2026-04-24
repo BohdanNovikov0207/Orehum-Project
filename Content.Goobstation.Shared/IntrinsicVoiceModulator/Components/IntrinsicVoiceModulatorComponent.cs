@@ -13,14 +13,14 @@ namespace Content.Goobstation.Shared.IntrinsicVoiceModulator.Components;
 public sealed partial class IntrinsicVoiceModulatorComponent : Component
 {
     [DataField]
-    public string VoiceName = "";
+    public ProtoId<JobIconPrototype>? JobIconProtoId;
+
+    [DataField]
+    public string? JobName;
 
     [DataField]
     public ProtoId<SpeechVerbPrototype>? SpeechVerbProtoId;
 
     [DataField]
-    public ProtoId<JobIconPrototype>? JobIconProtoId;
-
-    [DataField]
-    public string? JobName;
+    public string VoiceName = "";
 }

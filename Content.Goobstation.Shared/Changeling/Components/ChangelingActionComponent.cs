@@ -2,33 +2,33 @@ using Robust.Shared.GameStates;
 
 namespace Content.Goobstation.Shared.Changeling.Components;
 
-[RegisterComponent, NetworkedComponent, AutoGenerateComponentState]
+[RegisterComponent] [NetworkedComponent] [AutoGenerateComponentState]
 public sealed partial class ChangelingActionComponent : Component
 {
     [DataField]
-    public LocId OnFirePopup = "changeling-action-fail-onfire";
-
-    [DataField]
-    public LocId LesserFormPopup = "changeling-action-fail-lesserform";
+    public LocId InsufficientAbsorbsPopup = "changeling-action-fail-absorbed";
 
     [DataField]
     public LocId InvalidChemicalsPopup = "changeling-chemicals-deficit";
 
     [DataField]
-    public LocId InsufficientAbsorbsPopup = "changeling-action-fail-absorbed";
+    public LocId LesserFormPopup = "changeling-action-fail-lesserform";
 
     [DataField]
     public LocId NotChangelingPopup = "changeling-action-fail-not-changeling";
 
-    [DataField, AutoNetworkedField]
-    public bool UseOnFire = false;
+    [DataField]
+    public LocId OnFirePopup = "changeling-action-fail-onfire";
 
-    [DataField, AutoNetworkedField]
+    [DataField] [AutoNetworkedField]
+    public float RequireAbsorbed = 0;
+
+    [DataField] [AutoNetworkedField]
     public bool UseInLastResort = false;
 
-    [DataField, AutoNetworkedField]
+    [DataField] [AutoNetworkedField]
     public bool UseInLesserForm = false;
 
-    [DataField, AutoNetworkedField]
-    public float RequireAbsorbed = 0;
+    [DataField] [AutoNetworkedField]
+    public bool UseOnFire = false;
 }

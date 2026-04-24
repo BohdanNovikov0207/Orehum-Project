@@ -17,14 +17,14 @@ public sealed partial class WeldingSparksComponent : Component
     public EntProtoId EffectProto = "EffectWeldingSparks";
 
     /// <summary>
-    /// Dictionary of currently active welding spark effects spawned by this component,
-    /// indexed by the <see cref="DoAfterId"/> of the DoAfter that triggered them.
-    /// </summary>
-    [ViewVariables(VVAccess.ReadOnly)]
-    public Dictionary<DoAfterId, EntityUid> SpawnedEffects = [];
-
-    /// <summary>
     /// The last recorded click location by a user of the tool.
     /// </summary>
     public EntityCoordinates? LastClickLocation;
+
+    /// <summary>
+    /// Dictionary of currently active welding spark effects spawned by this component,
+    /// indexed by the <see cref="DoAfterId" /> of the DoAfter that triggered them.
+    /// </summary>
+    [ViewVariables(VVAccess.ReadOnly)]
+    public Dictionary<DoAfterId, EntityUid> SpawnedEffects = [];
 }

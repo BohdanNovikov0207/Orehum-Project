@@ -14,15 +14,15 @@ namespace Content.Goobstation.Shared.Factory;
 
 public sealed class AutomationSystem : EntitySystem
 {
-    [Dependency] private readonly IPrototypeManager _proto = default!;
+    private readonly List<EntProtoId> _automatable = new();
     [Dependency] private readonly SharedPhysicsSystem _physics = default!;
-
-    private EntityQuery<AutomationSlotsComponent> _slotsQuery;
+    [Dependency] private readonly IPrototypeManager _proto = default!;
     private EntityQuery<AutomatedComponent> _automatedQuery;
 
-    private List<EntProtoId> _automatable = new();
+    private EntityQuery<AutomationSlotsComponent> _slotsQuery;
+
     /// <summary>
-    /// All entities with <see cref="AutomationSlotsComponent"/>, maintained on prototype reload.
+    /// All entities with <see cref="AutomationSlotsComponent" />, maintained on prototype reload.
     /// </summary>
     public IReadOnlyList<EntProtoId> Automatable => _automatable;
 
@@ -128,10 +128,8 @@ public sealed class AutomationSystem : EntitySystem
 
     public bool IsAutomated(EntityUid uid) => _automatedQuery.HasComp(uid);
 
-    public bool HasSlot(Entity<AutomationSlotsComponent?> ent, string port, bool input)
-    {
-        return GetSlot(ent, port, input) != null;
-    }
+    public bool HasSlot(Entity<AutomationSlotsComponent?> ent, string port, bool input) =>
+        GetSlot(ent, port, input) != null;
 
     #endregion
 }

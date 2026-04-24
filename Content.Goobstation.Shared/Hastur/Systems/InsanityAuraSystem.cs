@@ -14,13 +14,13 @@ namespace Content.Goobstation.Shared.Hastur.Systems;
 
 public sealed class InsanityAuraSystem : EntitySystem
 {
-    [Dependency] private readonly SharedPopupSystem _popup = default!;
-    [Dependency] private readonly SharedSolutionContainerSystem _solution = default!;
-    [Dependency] private readonly EntityLookupSystem _lookup = default!;
     [Dependency] private readonly SharedAudioSystem _audio = default!;
     [Dependency] private readonly SharedInteractionSystem _interact = default!;
+    [Dependency] private readonly EntityLookupSystem _lookup = default!;
 
     private readonly HashSet<Entity<MobStateComponent>> _mobCache = new();
+    [Dependency] private readonly SharedPopupSystem _popup = default!;
+    [Dependency] private readonly SharedSolutionContainerSystem _solution = default!;
 
     public override void Initialize()
     {

@@ -11,10 +11,11 @@ using Robust.Server.Audio;
 
 namespace Content.Goobstation.Server.Religion.OnPray.ReloadOnPray;
 
-public sealed partial class ReloadOnPraySystem : EntitySystem
+public sealed class ReloadOnPraySystem : EntitySystem
 {
     [Dependency] private readonly AudioSystem _audioSystem = default!;
     [Dependency] private readonly SharedGunSystem _gun = default!;
+
     public override void Initialize()
     {
         base.Initialize();

@@ -3,6 +3,7 @@ using Content.Shared.EntityEffects.Effects.PlantMetabolism;
 using Robust.Shared.Prototypes;
 
 namespace Content.Goobstation.Shared.EntityEffects;
+
 public sealed partial class MutateNearbyPlantsEntityEffect : EntityEffect
 {
     [DataField] public float Radius = 5f;
@@ -15,7 +16,9 @@ public sealed partial class MutateNearbyPlantsEntityEffect : EntityEffect
 
         // should only work on plants in theorem
         foreach (var entity in lookupSys.GetEntitiesInRange(args.TargetEntity, Radius))
-            entityEffects.Effect(new PlantAdjustMutationLevel(), new(entity, entityManager));
+        {
+            entityEffects.Effect(new PlantAdjustMutationLevel(), new EntityEffectBaseArgs(entity, entityManager));
+        }
     }
 
     protected override string? ReagentEffectGuidebookText(IPrototypeManager prototype, IEntitySystemManager entSys)

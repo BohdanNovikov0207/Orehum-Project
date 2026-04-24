@@ -10,12 +10,12 @@ namespace Content.Goobstation.Server.Augments;
 
 public sealed class AugmentToolPanelSystem : SharedAugmentToolPanelSystem
 {
-    [Dependency] private readonly AugmentPowerCellSystem _augmentPowerCell = default!;
     [Dependency] private readonly AugmentSystem _augment = default!;
-    [Dependency] private readonly ItemToggleSystem _toggle = default!;
+    [Dependency] private readonly AugmentPowerCellSystem _augmentPowerCell = default!;
     [Dependency] private readonly SharedHandsSystem _hands = default!;
     [Dependency] private readonly SharedPopupSystem _popup = default!;
     [Dependency] private readonly SharedStorageSystem _storage = default!;
+    [Dependency] private readonly ItemToggleSystem _toggle = default!;
 
     private EntityQuery<HandsComponent> _handsQuery;
     private EntityQuery<BodyPartComponent> _partQuery;
@@ -30,20 +30,18 @@ public sealed class AugmentToolPanelSystem : SharedAugmentToolPanelSystem
         SubscribeLocalEvent<AugmentToolPanelComponent, AugmentLostPowerEvent>(OnLostPower);
         Subs.BuiEvents<AugmentToolPanelComponent>(AugmentToolPanelUiKey.Key,
             subs =>
-        {
-            subs.Event<AugmentToolPanelSwitchMessage>(OnSwitchTool);
-        });
+            {
+                subs.Event<AugmentToolPanelSwitchMessage>(OnSwitchTool);
+            });
     }
 
-    private void OnLostPower(Entity<AugmentToolPanelComponent> augment, ref AugmentLostPowerEvent args)
-    {
+    private void OnLostPower(Entity<AugmentToolPanelComponent> augment, ref AugmentLostPowerEvent args) =>
         // items automatically retract if you lose power
         SwitchTool(augment, null, args.Body);
-    }
 
     private void OnSwitchTool(Entity<AugmentToolPanelComponent> augment, ref AugmentToolPanelSwitchMessage args)
     {
-        if (_augment.GetBody(augment) is not {} body ||
+        if (_augment.GetBody(augment) is not { } body ||
             !_augmentPowerCell.TryUseChargeBody(body, augment.Comp.SwitchCharge))
             return;
 
@@ -86,9 +84,12 @@ public sealed class AugmentToolPanelSystem : SharedAugmentToolPanelSystem
     /// <summary>
     /// Switches to a tool using the specified hand.
     /// </summary>
-    public void SwitchTool(Entity<AugmentToolPanelComponent> augment, EntityUid? desiredTool, EntityUid body, string hand)
+    public void SwitchTool(Entity<AugmentToolPanelComponent> augment,
+        EntityUid? desiredTool,
+        EntityUid body,
+        string hand)
     {
-        if (_hands.GetHeldItem(body, hand) is {} item)
+        if (_hands.GetHeldItem(body, hand) is { } item)
         {
             // if we have a tool that's currently out, deposit it back into the storage
             if (RemComp<AugmentToolPanelActiveItemComponent>(item))
@@ -110,10 +111,10 @@ public sealed class AugmentToolPanelSystem : SharedAugmentToolPanelSystem
             }
 
             // no longer holding a tool, stop drawing power
-            _toggle.TryDeactivate(augment.Owner, user: body);
+            _toggle.TryDeactivate(augment.Owner, body);
         }
 
-        if (desiredTool is not {} tool)
+        if (desiredTool is not { } tool)
             return;
 
         if (!_hands.TryPickup(body, tool, hand))
@@ -123,7 +124,7 @@ public sealed class AugmentToolPanelSystem : SharedAugmentToolPanelSystem
         }
 
         EnsureComp<AugmentToolPanelActiveItemComponent>(tool);
-        _toggle.TryActivate(augment.Owner, user: body);
+        _toggle.TryActivate(augment.Owner, body);
         _popup.PopupEntity(Loc.GetString("augment-tool-panel-selected", ("item", tool)), body, body);
     }
 }

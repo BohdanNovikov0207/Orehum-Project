@@ -13,21 +13,30 @@ using Robust.Shared.Utility;
 namespace Content.Goobstation.Shared.SpecialPassives.Fleshmend.Components;
 
 /// <summary>
-///     Entities with this will rapidly heal physical injuries. This component holds the relevant data.
+/// Entities with this will rapidly heal physical injuries. This component holds the relevant data.
 /// </summary>
-[RegisterComponent, NetworkedComponent]
+[RegisterComponent] [NetworkedComponent]
 public sealed partial class FleshmendComponent : Component
 {
-    /// <summary>
-    /// Applies slowdown on the component
-    /// </summary>
-    [ViewVariables(VVAccess.ReadWrite)]
-    public float MovementSpeedDebuff = 0.75f;
-
     /// <summary>
     /// The alert id of the component (if one should exist)
     /// </summary>
     public ProtoId<AlertPrototype>? AlertId;
+
+    [DataField]
+    public float AsphyxHeal = -3f;
+
+    [DataField]
+    public float BleedingAdjust = -2.5f;
+
+    [DataField]
+    public float BloodLevelAdjust = 10f;
+
+    [DataField]
+    public float BruteHeal = -6f;
+
+    [DataField]
+    public float BurnHeal = -4f;
 
     /// <summary>
     /// How long should the effect go on for?
@@ -35,24 +44,30 @@ public sealed partial class FleshmendComponent : Component
     [DataField]
     public float? Duration;
 
+    /// <summary>
+    /// The state for the effect's ResPath
+    /// </summary>
+    [DataField]
+    public string? EffectState;
+
+    /// <summary>
+    /// Should the ability continue while on fire?
+    /// </summary>
+    [DataField]
+    public bool IgnoreFire = false;
+
     public TimeSpan MaxDuration = TimeSpan.Zero;
-
-    public TimeSpan UpdateTimer = default!;
-
-    /// <summary>
-    /// Delay between healing ticks.
-    /// </summary>
-    public TimeSpan UpdateDelay = TimeSpan.FromSeconds(1);
-
-    /// <summary>
-    /// Stores the sound source to be used in stopping the passive sound.
-    /// </summary>
-    public EntityUid? SoundSource;
 
     /// <summary>
     /// Current mobstate of the entity.
     /// </summary>
     public MobState Mobstate;
+
+    /// <summary>
+    /// Applies slowdown on the component
+    /// </summary>
+    [ViewVariables(VVAccess.ReadWrite)]
+    public float MovementSpeedDebuff = 0.75f;
 
     /// <summary>
     /// The passive sound to be played.
@@ -67,35 +82,20 @@ public sealed partial class FleshmendComponent : Component
     public ResPath ResPath;
 
     /// <summary>
-    /// The state for the effect's ResPath
+    /// Stores the sound source to be used in stopping the passive sound.
     /// </summary>
-    [DataField]
-    public string? EffectState;
+    public EntityUid? SoundSource;
 
     /// <summary>
-    /// Should the ability continue while on fire?
+    /// Delay between healing ticks.
     /// </summary>
-    [DataField]
-    public bool IgnoreFire = false;
+    public TimeSpan UpdateDelay = TimeSpan.FromSeconds(1);
+
+    public TimeSpan UpdateTimer = default!;
 
     /// <summary>
     /// Should the ability continue while dead?
     /// </summary>
     [DataField]
     public bool WorkWhileDead = false;
-
-    [DataField]
-    public float BruteHeal = -6f;
-
-    [DataField]
-    public float BurnHeal = -4f;
-
-    [DataField]
-    public float AsphyxHeal = -3f;
-
-    [DataField]
-    public float BleedingAdjust = -2.5f;
-
-    [DataField]
-    public float BloodLevelAdjust = 10f;
 }

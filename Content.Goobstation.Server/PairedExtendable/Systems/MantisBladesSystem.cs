@@ -18,8 +18,9 @@ public sealed class MantisBladesSystem : EntitySystem
 {
     [Dependency] private readonly SharedActionsSystem _actions = default!;
     [Dependency] private readonly SharedAudioSystem _audio = default!;
-    [Dependency] private readonly SharedPopupSystem _popup = default!;
     [Dependency] private readonly PairedExtendableSystem _pairedExtendable = default!;
+    [Dependency] private readonly SharedPopupSystem _popup = default!;
+
     public override void Initialize()
     {
         base.Initialize();
@@ -48,7 +49,7 @@ public sealed class MantisBladesSystem : EntitySystem
     private void OnToggle(Entity<MantisBladeArmComponent> ent, ref ToggleMantisBladeEvent args)
     {
         if (!TryComp<BodyPartComponent>(ent, out var part)
-        || part.Body == null)
+            || part.Body == null)
             return;
 
         if (HasComp<EmpDisabledComponent>(ent))
@@ -92,5 +93,4 @@ public sealed class MantisBladesSystem : EntitySystem
         args.Affected = true;
         args.Disabled = true;
     }
-
 }

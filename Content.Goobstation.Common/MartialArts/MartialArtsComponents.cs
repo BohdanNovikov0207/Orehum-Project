@@ -25,6 +25,7 @@ public sealed partial class MartialArtBlockedComponent : Component
     [DataField]
     public MartialArtsForms Form;
 }
+
 public abstract partial class GrabStagesOverrideComponent : Component
 {
     public readonly GrabStage StartingStage = GrabStage.Soft;
@@ -37,11 +38,11 @@ public sealed partial class MartialArtsKnowledgeComponent : GrabStagesOverrideCo
 {
     [DataField]
     [AutoNetworkedField]
-    public MartialArtsForms MartialArtsForm = MartialArtsForms.CloseQuartersCombat;
+    public bool Blocked;
 
     [DataField]
     [AutoNetworkedField]
-    public bool Blocked;
+    public MartialArtsForms MartialArtsForm = MartialArtsForms.CloseQuartersCombat;
 
     [DataField]
     [AutoNetworkedField]
@@ -50,7 +51,6 @@ public sealed partial class MartialArtsKnowledgeComponent : GrabStagesOverrideCo
     [DataField]
     [AutoNetworkedField]
     public string OriginalFistDamageType;
-
 }
 
 public enum MartialArtsForms

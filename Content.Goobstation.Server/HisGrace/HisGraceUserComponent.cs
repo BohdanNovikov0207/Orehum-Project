@@ -10,16 +10,13 @@ namespace Content.Goobstation.Server.HisGrace;
 public sealed partial class HisGraceUserComponent : Component
 {
     /// <summary>
-    ///  The current speed modifier of His Grace.
-    /// </summary>
-    [DataField]
-    public float SpeedMultiplier = 1.2f;
-
-    /// <summary>
     /// The initial speed modifier of His Grace.
     /// </summary>
     [DataField]
     public float BaseSpeedMultiplier = 1.2f;
+
+    [ViewVariables]
+    public float BaseStamCritThreshold;
 
     /// <summary>
     /// The UID of the His Grace this entity is linked to.
@@ -33,6 +30,9 @@ public sealed partial class HisGraceUserComponent : Component
     [DataField]
     public float HoldingStamCritThreshold = 1000f;
 
-    [ViewVariables]
-    public float BaseStamCritThreshold;
+    /// <summary>
+    /// The current speed modifier of His Grace.
+    /// </summary>
+    [DataField]
+    public float SpeedMultiplier = 1.2f;
 }

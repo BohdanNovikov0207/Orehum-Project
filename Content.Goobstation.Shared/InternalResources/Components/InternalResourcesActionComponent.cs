@@ -7,11 +7,11 @@ namespace Content.Goobstation.Shared.InternalResources.Components;
 /// <summary>
 /// Component for action that need to use internal resources
 /// </summary>
-[RegisterComponent, NetworkedComponent]
+[RegisterComponent] [NetworkedComponent]
 public sealed partial class InternalResourcesActionComponent : Component
 {
-    [DataField(required: true)]
-    public ProtoId<InternalResourcesPrototype> ResourceProto;
+    [DataField]
+    public float AltUseAmount;
 
     /// <summary>
     /// Used instead of the DeficitPopup in ResourceProto when not null.
@@ -19,9 +19,9 @@ public sealed partial class InternalResourcesActionComponent : Component
     [DataField]
     public LocId? DeficitPopup;
 
-    [DataField]
-    public float UseAmount;
+    [DataField(required: true)]
+    public ProtoId<InternalResourcesPrototype> ResourceProto;
 
     [DataField]
-    public float AltUseAmount;
+    public float UseAmount;
 }

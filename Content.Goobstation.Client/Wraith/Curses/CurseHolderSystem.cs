@@ -7,7 +7,8 @@ namespace Content.Goobstation.Client.Wraith.Curses;
 public sealed class CurseHolderSystem : SharedCurseHolderSystem
 {
     [Dependency] private readonly IPrototypeManager _proto = default!;
-    /// <inheritdoc/>
+
+    /// <inheritdoc />
     public override void Initialize()
     {
         base.Initialize();

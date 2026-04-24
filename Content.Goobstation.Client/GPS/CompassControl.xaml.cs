@@ -12,13 +12,6 @@ namespace Content.Goobstation.Client.GPS;
 [GenerateTypedNameReferences]
 public sealed partial class CompassControl : LayoutContainer
 {
-    [Dependency] private readonly IEyeManager _eyeManager = default!;
-
-    private MapCoordinates _gpsCoordinates;
-    private NetEntity? _trackedEntity;
-    private List<GpsEntry> _gpsEntries = new();
-    private float _zoom = 6f;
-
     private const float GridLinesPerMeter = 4f;
     private const int GridMetersPerZoom = 16; // GridMetersPerZoom * MaxZoom = 160, an actual maximum range of a compass
     private const float DotRadius = 3f;
@@ -26,10 +19,14 @@ public sealed partial class CompassControl : LayoutContainer
     private const float DistressDotRadius = 5f;
 
     private const float ScrollSensitivity = 8f;
-    public float MinZoom = 1f;
-    public float MaxZoom = 10f;
+    [Dependency] private readonly IEyeManager _eyeManager = default!;
 
-    private float GridLines => GridMetersPerZoom * _zoom;
+    private MapCoordinates _gpsCoordinates;
+    private List<GpsEntry> _gpsEntries = new();
+    private NetEntity? _trackedEntity;
+    private float _zoom = 6f;
+    public float MaxZoom = 10f;
+    public float MinZoom = 1f;
 
     public CompassControl()
     {
@@ -39,6 +36,8 @@ public sealed partial class CompassControl : LayoutContainer
         MouseFilter = MouseFilterMode.Pass;
     }
 
+    private float GridLines => GridMetersPerZoom * _zoom;
+
     public void SetState(MapCoordinates gpsCoords, NetEntity? trackedEntity, List<GpsEntry> gpsEntries)
     {
         _trackedEntity = trackedEntity;
@@ -46,10 +45,7 @@ public sealed partial class CompassControl : LayoutContainer
         _gpsCoordinates = gpsCoords;
     }
 
-    public void UpdatePosition(MapCoordinates gpsCoords)
-    {
-        _gpsCoordinates = gpsCoords;
-    }
+    public void UpdatePosition(MapCoordinates gpsCoords) => _gpsCoordinates = gpsCoords;
 
     protected override void Draw(DrawingHandleScreen handle)
     {

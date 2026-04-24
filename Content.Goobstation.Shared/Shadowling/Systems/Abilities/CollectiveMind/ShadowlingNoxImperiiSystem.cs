@@ -23,11 +23,11 @@ namespace Content.Goobstation.Shared.Shadowling.Systems.Abilities.CollectiveMind
 /// </summary>
 public sealed class ShadowlingNoxImperiiSystem : EntitySystem
 {
-    [Dependency] private readonly SharedDoAfterSystem _doAfter = default!;
     [Dependency] private readonly SharedActionsSystem _actions = default!;
-    [Dependency] private readonly SharedPopupSystem _popups = default!;
     [Dependency] private readonly SharedAudioSystem _audio = default!;
+    [Dependency] private readonly SharedDoAfterSystem _doAfter = default!;
     [Dependency] private readonly INetManager _net = default!;
+    [Dependency] private readonly SharedPopupSystem _popups = default!;
 
     public override void Initialize()
     {
@@ -66,7 +66,9 @@ public sealed class ShadowlingNoxImperiiSystem : EntitySystem
         args.Handled = true;
     }
 
-    private void OnNoxImperiiDoAfter(EntityUid uid, ShadowlingNoxImperiiComponent component, NoxImperiiDoAfterEvent args)
+    private void OnNoxImperiiDoAfter(EntityUid uid,
+        ShadowlingNoxImperiiComponent component,
+        NoxImperiiDoAfterEvent args)
     {
         if (args.Handled
             || args.Cancelled
@@ -83,7 +85,10 @@ public sealed class ShadowlingNoxImperiiSystem : EntitySystem
 
         // Indicates that the crew should start caring more since the Shadowling is close to ascension
         if (_net.IsServer)
-            _audio.PlayGlobal(new SoundPathSpecifier("/Audio/_EinsteinEngines/Effects/ghost.ogg"), Filter.Broadcast(), false, AudioParams.Default.WithVolume(-4f));
+            _audio.PlayGlobal(new SoundPathSpecifier("/Audio/_EinsteinEngines/Effects/ghost.ogg"),
+                Filter.Broadcast(),
+                false,
+                AudioParams.Default.WithVolume(-4f));
 
         _popups.PopupPredicted(Loc.GetString("shadowling-nox-imperii-done"), uid, uid, PopupType.Medium);
 

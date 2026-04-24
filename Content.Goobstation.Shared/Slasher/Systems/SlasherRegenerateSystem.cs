@@ -16,11 +16,11 @@ namespace Content.Goobstation.Shared.Slasher.Systems;
 
 public sealed class SlasherRegenerateSystem : EntitySystem
 {
-    [Dependency] private readonly SharedSolutionContainerSystem _solutions = default!;
-    [Dependency] private readonly SharedCuffableSystem _cuffs = default!;
     [Dependency] private readonly SharedActionsSystem _actions = default!;
-    [Dependency] private readonly SharedPopupSystem _popup = default!;
     [Dependency] private readonly SharedAudioSystem _audio = default!;
+    [Dependency] private readonly SharedCuffableSystem _cuffs = default!;
+    [Dependency] private readonly SharedPopupSystem _popup = default!;
+    [Dependency] private readonly SharedSolutionContainerSystem _solutions = default!;
     [Dependency] private readonly SharedTransformSystem _transform = default!;
 
     public override void Initialize()
@@ -33,15 +33,11 @@ public sealed class SlasherRegenerateSystem : EntitySystem
         SubscribeLocalEvent<SlasherRegenerateComponent, SlasherRegenerateEvent>(OnRegenerate);
     }
 
-    private void OnMapInit(Entity<SlasherRegenerateComponent> ent, ref MapInitEvent args)
-    {
+    private void OnMapInit(Entity<SlasherRegenerateComponent> ent, ref MapInitEvent args) =>
         _actions.AddAction(ent.Owner, ref ent.Comp.ActionEnt, ent.Comp.ActionId);
-    }
 
-    private void OnShutdown(Entity<SlasherRegenerateComponent> ent, ref ComponentShutdown args)
-    {
+    private void OnShutdown(Entity<SlasherRegenerateComponent> ent, ref ComponentShutdown args) =>
         _actions.RemoveAction(ent.Comp.ActionEnt);
-    }
 
     private void OnActionAttempt(EntityUid uid, SlasherRegenerateComponent comp, ref ActionAttemptEvent args)
     {
@@ -102,7 +98,10 @@ public sealed class SlasherRegenerateSystem : EntitySystem
         if (!_solutions.ResolveSolution(target, bloodstream.ChemicalSolutionName, ref bloodstream.ChemicalSolution))
             return;
 
-        _solutions.TryAddReagent(bloodstream.ChemicalSolution.Value, new ReagentId(comp.Reagent, null), FixedPoint2.New(comp.ReagentAmount), out _);
+        _solutions.TryAddReagent(bloodstream.ChemicalSolution.Value,
+            new ReagentId(comp.Reagent, null),
+            FixedPoint2.New(comp.ReagentAmount),
+            out _);
     }
 
     /// <summary>

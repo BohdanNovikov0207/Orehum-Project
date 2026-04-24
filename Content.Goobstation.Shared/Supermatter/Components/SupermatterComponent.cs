@@ -16,29 +16,31 @@
 //
 // SPDX-License-Identifier: AGPL-3.0-or-later
 
-using System;
-using System.Collections.Generic;
-using Content.Goobstation.Shared.Supermatter.Systems;
 using Content.Goobstation.Shared.Supermatter.Monitor;
+using Content.Goobstation.Shared.Supermatter.Systems;
 using Content.Shared.Atmos;
 using Content.Shared.DoAfter;
 using Content.Shared.Whitelist;
 using Robust.Shared.Audio;
-using Robust.Shared.GameObjects;
 using Robust.Shared.GameStates;
 using Robust.Shared.Serialization;
-using Robust.Shared.Serialization.Manager.Attributes;
-using Robust.Shared.ViewVariables;
 
 namespace Content.Goobstation.Shared.Supermatter.Components;
 
-[RegisterComponent, NetworkedComponent]
+[RegisterComponent] [NetworkedComponent]
 public sealed partial class SupermatterComponent : Component
 {
+    #region EE
+
+    [DataField]
+    public SupermatterStatusType Status = SupermatterStatusType.Inactive;
+
+    #endregion EE
+
     #region SM Base
 
     /// <summary>
-    ///     The SM will only cycle if activated.
+    /// The SM will only cycle if activated.
     /// </summary>
     [DataField("activated")]
     [ViewVariables(VVAccess.ReadWrite)]
@@ -48,7 +50,7 @@ public sealed partial class SupermatterComponent : Component
     public string SliverPrototypeId = "SupermatterSliver";
 
     /// <summary>
-    ///     Affects delamination timer. If removed - delamination timer is divided by 2.
+    /// Affects delamination timer. If removed - delamination timer is divided by 2.
     /// </summary>
     [DataField("sliverRemoved")]
     [ViewVariables(VVAccess.ReadWrite)]
@@ -56,6 +58,7 @@ public sealed partial class SupermatterComponent : Component
 
     [DataField("whitelist")]
     public EntityWhitelist Whitelist = new();
+
     public string IdTag = "EmitterBolt";
 
     public string[] LightningPrototypes =
@@ -63,7 +66,7 @@ public sealed partial class SupermatterComponent : Component
         "Lightning",
         "ChargedLightning",
         "SuperchargedLightning",
-        "HyperchargedLightning"
+        "HyperchargedLightning",
     };
 
     [DataField("singularitySpawnPrototype")]
@@ -117,9 +120,11 @@ public sealed partial class SupermatterComponent : Component
     [DataField("radiationOutputFactor")]
     [ViewVariables(VVAccess.ReadWrite)]
     public float RadiationOutputFactor = 0.03f;
+
     #endregion SM Base
 
     #region SM Sound
+
     /// <summary>
     /// Current stream of SM audio.
     /// </summary>
@@ -229,20 +234,20 @@ public sealed partial class SupermatterComponent : Component
     public float YellAccumulator = 60f;
 
     /// <summary>
-    ///     Timer for delam
+    /// Timer for delam
     /// </summary>
     [ViewVariables(VVAccess.ReadOnly)]
     public float DelamTimerAccumulator;
 
     /// <summary>
-    ///     Time until delam
+    /// Time until delam
     /// </summary>
     [ViewVariables(VVAccess.ReadWrite)]
     [DataField("delamTimer")]
     public float DelamTimer = 120f;
 
     /// <summary>
-    ///     The message timer
+    /// The message timer
     /// </summary>
     [ViewVariables(VVAccess.ReadWrite)]
     public float SpeakAccumulator = 60f;
@@ -258,6 +263,7 @@ public sealed partial class SupermatterComponent : Component
 
     [ViewVariables(VVAccess.ReadWrite)]
     public float ZapTimer = 10f;
+
     #endregion SM Timer
 
     #region SM Threshold
@@ -381,59 +387,55 @@ public sealed partial class SupermatterComponent : Component
     #endregion SM Delamm
 
     #region SM Gas
+
     /// <summary>
     /// Is used to store gas
     /// </summary>
     [ViewVariables(VVAccess.ReadOnly)]
     [DataField("gasStorage")]
-    public Dictionary<Gas, float> GasStorage = new Dictionary<Gas, float>()
+    public Dictionary<Gas, float> GasStorage = new()
     {
-        {Gas.Oxygen, 0f},
-        {Gas.Nitrogen, 0f},
-        {Gas.CarbonDioxide, 0f},
-        {Gas.Plasma, 0f},
-        {Gas.Tritium, 0f},
-        {Gas.WaterVapor, 0f},
-        {Gas.Frezon, 0f }, // EE Compatibility
-        {Gas.Ammonia, 0f }, // EE Compatibility
-        {Gas.NitrousOxide, 0f }, // EE Compatibility
-        {Gas.Nitrium, 0f }, // EE Compatibility
-        {Gas.BZ, 0f}, // Assmos - /tg/ gases
-        {Gas.Healium, 0f}, // Assmos - /tg/ gases
-        {Gas.Pluoxium, 0f} // Assmos - /tg/ gases
+        { Gas.Oxygen, 0f },
+        { Gas.Nitrogen, 0f },
+        { Gas.CarbonDioxide, 0f },
+        { Gas.Plasma, 0f },
+        { Gas.Tritium, 0f },
+        { Gas.WaterVapor, 0f },
+        { Gas.Frezon, 0f }, // EE Compatibility
+        { Gas.Ammonia, 0f }, // EE Compatibility
+        { Gas.NitrousOxide, 0f }, // EE Compatibility
+        { Gas.Nitrium, 0f }, // EE Compatibility
+        { Gas.BZ, 0f }, // Assmos - /tg/ gases
+        { Gas.Healium, 0f }, // Assmos - /tg/ gases
+        { Gas.Pluoxium, 0f }, // Assmos - /tg/ gases
     };
 
     /// <summary>
-    ///     Stores each gas facts
+    /// Stores each gas facts
     /// </summary>
-    public readonly Dictionary<Gas, (float TransmitModifier, float HeatPenalty, float PowerMixRatio)> GasDataFields = new()
-    {
-        [Gas.Oxygen] = (TransmitModifier: 1.5f, HeatPenalty: 1f, PowerMixRatio: 1f),
-        [Gas.Nitrogen] = (TransmitModifier: 0f, HeatPenalty: -1.5f, PowerMixRatio: -1f),
-        [Gas.CarbonDioxide] = (TransmitModifier: 0f, HeatPenalty: 0.1f, PowerMixRatio: 1f),
-        [Gas.Plasma] = (TransmitModifier: 4f, HeatPenalty: 15f, PowerMixRatio: 1f),
-        [Gas.Tritium] = (TransmitModifier: 30f, HeatPenalty: 10f, PowerMixRatio: 1f),
-        [Gas.WaterVapor] = (TransmitModifier: 2f, HeatPenalty: 12f, PowerMixRatio: 1f),
-        [Gas.Frezon] = (TransmitModifier: 3f, HeatPenalty: -10f, PowerMixRatio: -1f),
-        [Gas.Ammonia] = (TransmitModifier: 0f, HeatPenalty: .5f, PowerMixRatio: 1f),
-        [Gas.NitrousOxide] = (TransmitModifier: 0f, HeatPenalty: -5f, PowerMixRatio: -1f),
-        [Gas.Nitrium] = (TransmitModifier: 0f, HeatPenalty: -5f, PowerMixRatio: -1f), // EE Gas compatibility (Need to Change)
-        [Gas.BZ] = (TransmitModifier: 0f, HeatPenalty: 5f, PowerMixRatio: 1f), // Assmos - /tg/ gases
-        [Gas.Healium] = (TransmitModifier: 2.4f, HeatPenalty: 4f, PowerMixRatio: 1f), // Assmos - /tg/ gases
-        [Gas.Pluoxium] = (TransmitModifier: 0f, HeatPenalty: -2.5f, PowerMixRatio: -1f), // Assmos - /tg/ gases
-    };
+    public readonly Dictionary<Gas, (float TransmitModifier, float HeatPenalty, float PowerMixRatio)> GasDataFields =
+        new()
+        {
+            [Gas.Oxygen] = (TransmitModifier: 1.5f, HeatPenalty: 1f, PowerMixRatio: 1f),
+            [Gas.Nitrogen] = (TransmitModifier: 0f, HeatPenalty: -1.5f, PowerMixRatio: -1f),
+            [Gas.CarbonDioxide] = (TransmitModifier: 0f, HeatPenalty: 0.1f, PowerMixRatio: 1f),
+            [Gas.Plasma] = (TransmitModifier: 4f, HeatPenalty: 15f, PowerMixRatio: 1f),
+            [Gas.Tritium] = (TransmitModifier: 30f, HeatPenalty: 10f, PowerMixRatio: 1f),
+            [Gas.WaterVapor] = (TransmitModifier: 2f, HeatPenalty: 12f, PowerMixRatio: 1f),
+            [Gas.Frezon] = (TransmitModifier: 3f, HeatPenalty: -10f, PowerMixRatio: -1f),
+            [Gas.Ammonia] = (TransmitModifier: 0f, HeatPenalty: .5f, PowerMixRatio: 1f),
+            [Gas.NitrousOxide] = (TransmitModifier: 0f, HeatPenalty: -5f, PowerMixRatio: -1f),
+            [Gas.Nitrium] =
+                (TransmitModifier: 0f, HeatPenalty: -5f, PowerMixRatio: -1f), // EE Gas compatibility (Need to Change)
+            [Gas.BZ] = (TransmitModifier: 0f, HeatPenalty: 5f, PowerMixRatio: 1f), // Assmos - /tg/ gases
+            [Gas.Healium] = (TransmitModifier: 2.4f, HeatPenalty: 4f, PowerMixRatio: 1f), // Assmos - /tg/ gases
+            [Gas.Pluoxium] = (TransmitModifier: 0f, HeatPenalty: -2.5f, PowerMixRatio: -1f), // Assmos - /tg/ gases
+        };
 
     #endregion SM Gas
-
-    #region EE
-
-    [DataField]
-    public SupermatterStatusType Status = SupermatterStatusType.Inactive;
-    #endregion EE
 }
 
-[Serializable, NetSerializable]
+[Serializable] [NetSerializable]
 public sealed partial class SupermatterDoAfterEvent : SimpleDoAfterEvent
 {
-
 }

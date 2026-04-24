@@ -3,7 +3,7 @@ using Robust.Shared.GameStates;
 
 namespace Content.Goobstation.Shared.SetSelector;
 
-[RegisterComponent, NetworkedComponent]
+[RegisterComponent] [NetworkedComponent]
 public sealed partial class RadialItemSelectorComponent : Component
 {
     [DataField(required: true)]

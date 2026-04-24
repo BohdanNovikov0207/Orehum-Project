@@ -1,3 +1,4 @@
+using System.Linq;
 using Content.Goobstation.Common.Temperature;
 using Content.Goobstation.Shared.Atmos.Events;
 using Content.Goobstation.Shared.Body;
@@ -9,7 +10,6 @@ using Content.Shared.Atmos;
 using Content.Shared.Atmos.Components;
 using Content.Shared.Popups;
 using Robust.Shared.Prototypes;
-using System.Linq;
 
 namespace Content.Goobstation.Shared.Changeling.Systems;
 
@@ -43,17 +43,16 @@ public abstract class SharedVoidAdaptionSystem : EntitySystem
         Dirty(ent);
     }
 
-    private void OnShutdown(Entity<VoidAdaptionComponent> ent, ref ComponentShutdown args)
-    {
+    private void OnShutdown(Entity<VoidAdaptionComponent> ent, ref ComponentShutdown args) =>
         // incase something removes the component
         _alerts.ClearAlert(
             ent,
             ent.Comp.Alert);
-    }
 
     #region Event Handlers
 
     public readonly float LowP = Atmospherics.HazardLowPressure;
+
     private void OnGetDangerousPressure(Entity<VoidAdaptionComponent> ent, ref ResistPressureEvent args)
     {
         if (!FireValidCheck(ent))
@@ -111,8 +110,8 @@ public abstract class SharedVoidAdaptionSystem : EntitySystem
             DirtyField(ent, ent.Comp, nameof(VoidAdaptionComponent.AdaptingLowTemp));
         }
         else if (newTemp > compareT
-            && lastTemp > safeT + diff
-            && ent.Comp.AdaptingLowTemp)
+                 && lastTemp > safeT + diff
+                 && ent.Comp.AdaptingLowTemp)
         {
             ent.Comp.AdaptingLowTemp = false;
             DirtyField(ent, ent.Comp, nameof(VoidAdaptionComponent.AdaptingLowTemp));
@@ -141,7 +140,8 @@ public abstract class SharedVoidAdaptionSystem : EntitySystem
         args.Cancelled = true;
     }
 
-    private void OnChangelingChemicalRegenEvent(Entity<VoidAdaptionComponent> ent, ref InternalResourcesRegenModifierEvent args)
+    private void OnChangelingChemicalRegenEvent(Entity<VoidAdaptionComponent> ent,
+        ref InternalResourcesRegenModifierEvent args)
     {
         if (args.Data.InternalResourcesType != ent.Comp.ResourceType
             || ent.Comp is { AdaptingLowPressure: false, AdaptingLowTemp: false })
@@ -156,6 +156,7 @@ public abstract class SharedVoidAdaptionSystem : EntitySystem
 
     public readonly ProtoId<AlertPrototype> LowPressureAlert = "LowPressure";
     public readonly ProtoId<AlertPrototype> LowTempAlert = "Cold";
+
     private bool FireValidCheck(Entity<VoidAdaptionComponent> ent)
     {
         if (!OnFire(ent))
@@ -164,12 +165,12 @@ public abstract class SharedVoidAdaptionSystem : EntitySystem
 
             // void adaption recovering from fire can have these alerts show up (mainly when in space/vacuum)
             _alerts.ClearAlert(
-            ent,
-            LowPressureAlert);
+                ent,
+                LowPressureAlert);
 
             _alerts.ClearAlert(
-            ent,
-            LowTempAlert);
+                ent,
+                LowTempAlert);
 
             return true;
         }
@@ -192,10 +193,7 @@ public abstract class SharedVoidAdaptionSystem : EntitySystem
         return false;
     }
 
-    private bool OnFire(Entity<VoidAdaptionComponent> ent)
-    {
-        return HasComp<OnFireComponent>(ent);
-    }
+    private bool OnFire(Entity<VoidAdaptionComponent> ent) => HasComp<OnFireComponent>(ent);
 
     private float GetTempThreshold(Entity<VoidAdaptionComponent> ent)
     {
@@ -233,9 +231,8 @@ public abstract class SharedVoidAdaptionSystem : EntitySystem
             ent.Comp.Alert);
     }
 
-    private void DoSituationPopup(Entity<VoidAdaptionComponent> ent, LocId id)
-    {
+    private void DoSituationPopup(Entity<VoidAdaptionComponent> ent, LocId id) =>
         _popup.PopupEntity(Loc.GetString(id), ent, ent);
-    }
+
     #endregion
 }

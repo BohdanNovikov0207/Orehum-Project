@@ -9,7 +9,6 @@
 using System.Linq;
 using Content.Goobstation.Shared.Devil;
 using Content.Server.Body.Components;
-using Content.Shared._Shitmed.Body.Events;
 using Content.Shared._Shitmed.Medical.Surgery.Wounds.Components;
 using Content.Shared.Body.Components;
 using Content.Shared.Body.Part;
@@ -27,6 +26,7 @@ public sealed partial class DevilContractSystem
         SubscribeLocalEvent<DevilContractLoseOrganEvent>(OnLoseOrgan);
         SubscribeLocalEvent<DevilContractChanceEvent>(OnChance);
     }
+
     private void OnSoulOwnership(DevilContractSoulOwnershipEvent args)
     {
         if (args.Contract?.ContractOwner is not { } contractOwner)
@@ -100,8 +100,5 @@ public sealed partial class DevilContractSystem
     }
 
     // LETS GO GAMBLING!!!!!
-    private void OnChance(DevilContractChanceEvent args)
-    {
-        AddRandomClause(args.Target);
-    }
+    private void OnChance(DevilContractChanceEvent args) => AddRandomClause(args.Target);
 }

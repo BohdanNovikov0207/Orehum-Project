@@ -1,3 +1,5 @@
+using System.Linq;
+using System.Numerics;
 using Content.Goobstation.Shared.Wraith.Events;
 using Content.Shared.Damage;
 using Content.Shared.Maps;
@@ -9,23 +11,21 @@ using Robust.Shared.Map.Components;
 using Robust.Shared.Network;
 using Robust.Shared.Random;
 using Robust.Shared.Utility;
-using System.Linq;
-using System.Numerics;
 
 namespace Content.Goobstation.Shared.Wraith.Revenant;
 
 public sealed class RevenantShockwaveSystem : EntitySystem
 {
-    [Dependency] private readonly SharedMapSystem _mapSystem = default!;
-    [Dependency] private readonly SharedTransformSystem _transform = default!;
-    [Dependency] private readonly IRobustRandom _random = default!;
-    [Dependency] private readonly INetManager _net = default!;
-    [Dependency] private readonly TileSystem _tile = default!;
-    [Dependency] private readonly EntityLookupSystem _lookup = default!;
-    [Dependency] private readonly TagSystem _tag = default!;
-    [Dependency] private readonly DamageableSystem _damageable = default!;
-    [Dependency] private readonly SharedStunSystem _stun = default!;
     [Dependency] private readonly SharedAudioSystem _audio = default!;
+    [Dependency] private readonly DamageableSystem _damageable = default!;
+    [Dependency] private readonly EntityLookupSystem _lookup = default!;
+    [Dependency] private readonly SharedMapSystem _mapSystem = default!;
+    [Dependency] private readonly INetManager _net = default!;
+    [Dependency] private readonly IRobustRandom _random = default!;
+    [Dependency] private readonly SharedStunSystem _stun = default!;
+    [Dependency] private readonly TagSystem _tag = default!;
+    [Dependency] private readonly TileSystem _tile = default!;
+    [Dependency] private readonly SharedTransformSystem _transform = default!;
 
     private EntityQuery<StatusEffectsComponent> _statusEffectsQuery;
 
@@ -58,7 +58,7 @@ public sealed class RevenantShockwaveSystem : EntitySystem
             if (!_statusEffectsQuery.TryComp(entity, out var statusEffect))
                 continue;
 
-            _stun.KnockdownOrStun(entity, ent.Comp.KnockdownDuration, true);
+            _stun.KnockdownOrStun(entity, ent.Comp.KnockdownDuration);
         }
 
         _audio.PlayPredicted(ent.Comp.ShockSound, ent.Owner, null);

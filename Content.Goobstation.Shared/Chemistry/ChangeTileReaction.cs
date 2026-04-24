@@ -5,11 +5,10 @@
 //
 // SPDX-License-Identifier: AGPL-3.0-or-later
 
+using Content.Goobstation.Maths.FixedPoint;
 using Content.Shared.Chemistry.Reaction;
 using Content.Shared.Chemistry.Reagent;
-using Content.Goobstation.Maths.FixedPoint;
 using Content.Shared.Maps;
-using Robust.Shared.GameObjects;
 using Robust.Shared.Map;
 using Robust.Shared.Map.Components;
 using Robust.Shared.Prototypes;
@@ -20,7 +19,7 @@ namespace Content.Goobstation.Shared.Chemistry;
 public sealed partial class ChangeTileReaction : ITileReaction
 {
     [DataField]
-    public FixedPoint2 ChangeTileCost { get; private set; } = 4.5f;
+    public EntProtoId? Effect = "TileHereticRustRune";
 
     [DataField]
     public string NewTileId = "PlatingRust";
@@ -29,7 +28,7 @@ public sealed partial class ChangeTileReaction : ITileReaction
     public string? OldTileId;
 
     [DataField]
-    public EntProtoId? Effect = "TileHereticRustRune";
+    public FixedPoint2 ChangeTileCost { get; private set; } = 4.5f;
 
     public FixedPoint2 TileReact(TileRef tile,
         ReagentPrototype reagent,

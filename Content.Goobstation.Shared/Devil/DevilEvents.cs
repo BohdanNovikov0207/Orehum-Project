@@ -6,7 +6,6 @@
 
 using Content.Goobstation.Shared.Devil.Contract;
 using Content.Shared.Inventory;
-using Robust.Shared.Serialization;
 
 namespace Content.Goobstation.Shared.Devil;
 
@@ -34,14 +33,13 @@ public record struct SoulAmountChangedEvent(EntityUid User, EntityUid Victim, in
 /// <param name="Target"></param>
 public sealed class IsEyesCoveredCheckEvent : EntityEventArgs, IInventoryRelayEvent
 {
-    public SlotFlags TargetSlots => SlotFlags.EYES | SlotFlags.MASK | SlotFlags.HEAD;
-
     public bool IsEyesProtected;
+    public SlotFlags TargetSlots => SlotFlags.EYES | SlotFlags.MASK | SlotFlags.HEAD;
 }
 
 // Contract Events
 
-[ImplicitDataDefinitionForInheritors, DataDefinition]
+[ImplicitDataDefinitionForInheritors] [DataDefinition]
 public abstract partial class BaseDevilContractEvent : EntityEventArgs
 {
     /// <summary>
@@ -55,17 +53,17 @@ public abstract partial class BaseDevilContractEvent : EntityEventArgs
     public EntityUid Target;
 }
 
-[DataDefinition, Serializable]
+[DataDefinition] [Serializable]
 public sealed partial class DevilContractSoulOwnershipEvent : BaseDevilContractEvent;
 
-[DataDefinition, Serializable]
+[DataDefinition] [Serializable]
 public sealed partial class DevilContractLoseHandEvent : BaseDevilContractEvent;
 
-[DataDefinition, Serializable]
+[DataDefinition] [Serializable]
 public sealed partial class DevilContractLoseLegEvent : BaseDevilContractEvent;
 
-[DataDefinition, Serializable]
+[DataDefinition] [Serializable]
 public sealed partial class DevilContractLoseOrganEvent : BaseDevilContractEvent;
 
-[DataDefinition, Serializable]
+[DataDefinition] [Serializable]
 public sealed partial class DevilContractChanceEvent : BaseDevilContractEvent;

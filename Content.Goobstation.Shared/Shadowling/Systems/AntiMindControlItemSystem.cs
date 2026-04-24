@@ -17,12 +17,12 @@ namespace Content.Goobstation.Shared.Shadowling.Systems;
 /// </summary>
 public sealed class AntiMindControlItemSystem : EntitySystem
 {
-    [Dependency] private readonly SharedDoAfterSystem _doAfter = default!;
-    [Dependency] private readonly SharedPopupSystem _popupSystem = default!;
     [Dependency] private readonly SharedAudioSystem _audioSystem = default!;
     [Dependency] private readonly SharedChargesSystem _charges = default!;
+    [Dependency] private readonly SharedDoAfterSystem _doAfter = default!;
+    [Dependency] private readonly SharedPopupSystem _popupSystem = default!;
 
-    /// <inheritdoc/>
+    /// <inheritdoc />
     public override void Initialize()
     {
         base.Initialize();
@@ -33,10 +33,8 @@ public sealed class AntiMindControlItemSystem : EntitySystem
         SubscribeLocalEvent<AntiMindControlItemComponent, ExaminedEvent>(AntiMindControlExamined);
     }
 
-    private void AntiMindControlExamined(EntityUid uid, AntiMindControlItemComponent component, ExaminedEvent args)
-    {
-        args.PushMarkup(Loc.GetString("anti-mind-examine-charges", ("charges",  _charges.GetCurrentCharges(uid))));
-    }
+    private void AntiMindControlExamined(EntityUid uid, AntiMindControlItemComponent component, ExaminedEvent args) =>
+        args.PushMarkup(Loc.GetString("anti-mind-examine-charges", ("charges", _charges.GetCurrentCharges(uid))));
 
     private void AfterInteract(EntityUid uid, AntiMindControlItemComponent component, ref AfterInteractEvent args)
     {
@@ -81,7 +79,9 @@ public sealed class AntiMindControlItemSystem : EntitySystem
         args.Handled = true;
     }
 
-    private void AntiMindControlDoAfter(EntityUid uid, AntiMindControlItemComponent component, AntiMindControlItemDoAfterEvent args)
+    private void AntiMindControlDoAfter(EntityUid uid,
+        AntiMindControlItemComponent component,
+        AntiMindControlItemDoAfterEvent args)
     {
         if (args.Used == null
             || args.Cancelled
@@ -95,7 +95,10 @@ public sealed class AntiMindControlItemSystem : EntitySystem
 
         if (HasComp<LesserShadowlingComponent>(target))
         {
-            _popupSystem.PopupPredicted(Loc.GetString("mind-control-lesser-shadowling"), user, user, PopupType.MediumCaution);
+            _popupSystem.PopupPredicted(Loc.GetString("mind-control-lesser-shadowling"),
+                user,
+                user,
+                PopupType.MediumCaution);
             return;
         }
 
@@ -109,7 +112,10 @@ public sealed class AntiMindControlItemSystem : EntitySystem
             var enthrallRes = EntityManager.GetComponent<EnthrallResistanceComponent>(target);
             enthrallRes.ExtraTime += enthrallRes.ExtraTimeUpdate;
 
-            _popupSystem.PopupPredicted(Loc.GetString("mind-control-thrall-done"), target, target, PopupType.MediumCaution);
+            _popupSystem.PopupPredicted(Loc.GetString("mind-control-thrall-done"),
+                target,
+                target,
+                PopupType.MediumCaution);
         }
 
         _audioSystem.PlayPredicted(

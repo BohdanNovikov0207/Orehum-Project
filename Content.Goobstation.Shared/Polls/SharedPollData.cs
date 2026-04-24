@@ -2,7 +2,7 @@ using Robust.Shared.Serialization;
 
 namespace Content.Goobstation.Shared.Polls;
 
-[Serializable, NetSerializable]
+[Serializable] [NetSerializable]
 public sealed class PollData
 {
     public int PollId { get; set; }
@@ -16,7 +16,7 @@ public sealed class PollData
     public string? CreatedByName { get; set; }
 }
 
-[Serializable, NetSerializable]
+[Serializable] [NetSerializable]
 public sealed class PollOptionData
 {
     public int OptionId { get; set; }
@@ -25,7 +25,7 @@ public sealed class PollOptionData
     public int VoteCount { get; set; }
 }
 
-[Serializable, NetSerializable]
+[Serializable] [NetSerializable]
 public sealed class PollVoteData
 {
     public int PollId { get; set; }

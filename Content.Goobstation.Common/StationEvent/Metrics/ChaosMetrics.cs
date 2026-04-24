@@ -5,14 +5,9 @@
 //
 // SPDX-License-Identifier: AGPL-3.0-or-later
 
-using System;
-using System.Collections.Generic;
 using System.Linq;
-using Robust.Shared.GameObjects;
-using Robust.Shared.Serialization.Manager.Attributes;
 using Robust.Shared.Serialization.TypeSerializers.Implementations.Generic;
 using Robust.Shared.Utility;
-using Robust.Shared.ViewVariables;
 
 namespace Content.Goobstation.Server.StationEvents.Metric;
 
@@ -24,8 +19,8 @@ public enum ChaosMetric
 
     Anomaly,
 
-    Friend,   // Negative score for how many friendlies on station
-    Hostile,  // Increases with hostiles
+    Friend, // Negative score for how many friendlies on station
+    Hostile, // Increases with hostiles
 
     Death,
     Medical,
@@ -36,86 +31,77 @@ public enum ChaosMetric
     Mess,
 
     // Metrics calculated from above by Game Director:
-    Combat,   // Friend + Hostile - <0 if crew is strong. 0 if balanced (fighting). >0 indicates crew is losing.
+    Combat, // Friend + Hostile - <0 if crew is strong. 0 if balanced (fighting). >0 indicates crew is losing.
 }
 
 /// <summary>
-///   Raised to request metrics to calculate and sum their statistics
+/// Raised to request metrics to calculate and sum their statistics
 /// </summary>
 [ByRefEvent]
 public record struct CalculateChaosEvent(ChaosMetrics Metrics);
 
 /// <summary>
-///   This class represents a collection of chaos
+/// This class represents a collection of chaos
 /// </summary>
 /// <remarks>
-///   This is similar to the DamageSpecifier class.
+/// This is similar to the DamageSpecifier class.
 /// </remarks>
 [DataDefinition]
 public sealed partial class ChaosMetrics : IEquatable<ChaosMetrics>
 {
     /// <summary>
-    ///   Main chaos dictionary. Most ChaosMetrics functions exist to somehow modifying this.
+    /// Main chaos dictionary. Most ChaosMetrics functions exist to somehow modifying this.
     /// </summary>
-    [IncludeDataField(customTypeSerializer:typeof(DictionarySerializer<ChaosMetric, double>)), ViewVariables(VVAccess.ReadWrite)]
+    [IncludeDataField(customTypeSerializer: typeof(DictionarySerializer<ChaosMetric, double>))]
+    [ViewVariables(VVAccess.ReadWrite)]
     public Dictionary<ChaosMetric, double> ChaosDict { get; set; } = new();
 
     /// <summary>
-    ///   Whether this chaos specifier has any entries.
+    /// Whether this chaos specifier has any entries.
     /// </summary>
     public bool Empty => ChaosDict.Count == 0;
 
+    public bool Equals(ChaosMetrics? other)
+    {
+        if (other == null || ChaosDict.Count != other.ChaosDict.Count)
+            return false;
+
+        foreach (var (key, value) in ChaosDict)
+        {
+            if (!other.ChaosDict.TryGetValue(key, out var otherValue) || value != otherValue)
+                return false;
+        }
+
+        return true;
+    }
+
     /// <summary>
-    ///   True if any of our values are greater than other, i.e worse.
+    /// True if any of our values are greater than other, i.e worse.
     /// </summary>
     public bool AnyWorseThan(ChaosMetrics other) => ChaosDict.Any(kvp =>
         other.ChaosDict.TryGetValue(kvp.Key, out var otherV)
         && kvp.Value > otherV);
 
     /// <summary>
-    ///   True if all of our values are less than other, i.e better.
+    /// True if all of our values are less than other, i.e better.
     /// </summary>
     public bool AllBetterThan(ChaosMetrics other) => ChaosDict.All(kvp =>
         !other.ChaosDict.TryGetValue(kvp.Key, out var otherV)
         || kvp.Value < otherV);
 
-    #region constructors
-    /// <summary>
-    ///   Constructor that just results in an empty dictionary.
-    /// </summary>
-    public ChaosMetrics() { }
-
-    /// <summary>
-    ///   Constructor that takes another ChaosMetrics instance and copies it.
-    /// </summary>
-    public ChaosMetrics(ChaosMetrics chaos)
-    {
-        ChaosDict = new(chaos.ChaosDict);
-    }
-
-    /// <summary>
-    ///   Constructor that takes another ChaosMetrics instance and copies it.
-    /// </summary>
-    public ChaosMetrics(Dictionary<ChaosMetric, double> chaos)
-    {
-        ChaosDict = new(chaos);
-    }
-    #endregion
-
-    public override string? ToString()
-    {
-        return String.Join(
+    public override string? ToString() =>
+        string.Join(
             ", ",
-            ChaosDict.Select(p => String.Format(
+            ChaosDict.Select(p => string.Format(
                 "{0}: {1}",
-                p.Key, p.Value)));
-    }
+                p.Key,
+                p.Value)));
 
     /// <summary>
-    ///   Sets all chaos values to be at least as large as the given number.
+    /// Sets all chaos values to be at least as large as the given number.
     /// </summary>
     /// <remarks>
-    ///   Note that this only acts on chaos types present in the dictionary. It will not add new chaos types.
+    /// Note that this only acts on chaos types present in the dictionary. It will not add new chaos types.
     /// </remarks>
     public void ClampMin(double minValue)
     {
@@ -127,8 +113,8 @@ public sealed partial class ChaosMetrics : IEquatable<ChaosMetrics>
     }
 
     /// <summary>
-    ///   Sets all chaos values to be at most some number. Note that if a chaos type is not present in the
-    ///   dictionary, these will not be added.
+    /// Sets all chaos values to be at most some number. Note that if a chaos type is not present in the
+    /// dictionary, these will not be added.
     /// </summary>
     public void ClampMax(double maxValue)
     {
@@ -140,8 +126,8 @@ public sealed partial class ChaosMetrics : IEquatable<ChaosMetrics>
     }
 
     /// <summary>
-    ///   This subtracts the chaos values of some other <see cref="ChaosMetrics"/> without
-    ///   adding any new chaos types.
+    /// This subtracts the chaos values of some other <see cref="ChaosMetrics" /> without
+    /// adding any new chaos types.
     /// </summary>
     public ChaosMetrics ExclusiveSubtract(ChaosMetrics other)
     {
@@ -168,6 +154,7 @@ public sealed partial class ChaosMetrics : IEquatable<ChaosMetrics>
                 // Key already exists, add values
                 newDamage.ChaosDict[entry.Key] += entry.Value;
         }
+
         return newDamage;
     }
 
@@ -181,21 +168,33 @@ public sealed partial class ChaosMetrics : IEquatable<ChaosMetrics>
         {
             if (!newDamage.ChaosDict.TryAdd(entry.Key, -entry.Value))
                 newDamage.ChaosDict[entry.Key] -= entry.Value;
-
         }
+
         return newDamage;
     }
-    public bool Equals(ChaosMetrics? other)
+
+    #region constructors
+
+    /// <summary>
+    /// Constructor that just results in an empty dictionary.
+    /// </summary>
+    public ChaosMetrics() { }
+
+    /// <summary>
+    /// Constructor that takes another ChaosMetrics instance and copies it.
+    /// </summary>
+    public ChaosMetrics(ChaosMetrics chaos)
     {
-        if (other == null || ChaosDict.Count != other.ChaosDict.Count)
-            return false;
-
-        foreach (var (key, value) in ChaosDict)
-        {
-            if (!other.ChaosDict.TryGetValue(key, out var otherValue) || value != otherValue)
-                return false;
-        }
-
-        return true;
+        ChaosDict = new Dictionary<ChaosMetric, double>(chaos.ChaosDict);
     }
+
+    /// <summary>
+    /// Constructor that takes another ChaosMetrics instance and copies it.
+    /// </summary>
+    public ChaosMetrics(Dictionary<ChaosMetric, double> chaos)
+    {
+        ChaosDict = new Dictionary<ChaosMetric, double>(chaos);
+    }
+
+    #endregion
 }

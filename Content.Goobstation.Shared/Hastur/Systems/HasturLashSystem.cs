@@ -10,10 +10,10 @@ namespace Content.Goobstation.Shared.Hastur.Systems;
 
 public sealed class HasturLashSystem : EntitySystem
 {
-    [Dependency] private readonly SharedStunSystem _stunSystem = default!;
+    [Dependency] private readonly SharedAudioSystem _audio = default!;
     [Dependency] private readonly SharedBloodstreamSystem _bloodstream = default!;
     [Dependency] private readonly SharedPopupSystem _popup = default!;
-    [Dependency] private readonly SharedAudioSystem _audio = default!;
+    [Dependency] private readonly SharedStunSystem _stunSystem = default!;
 
     public override void Initialize()
     {
@@ -26,9 +26,11 @@ public sealed class HasturLashSystem : EntitySystem
     {
         _popup.PopupPredicted(
             Loc.GetString("hastur-lash-target", ("user", ent.Owner), ("target", args.Target)),
-            ent.Owner, args.Target, PopupType.MediumCaution);
+            ent.Owner,
+            args.Target,
+            PopupType.MediumCaution);
         _audio.PlayPredicted(ent.Comp.LashSound, ent.Owner, ent.Owner);
-        _stunSystem.TryKnockdown(args.Target, ent.Comp.KnockdownDuration, true);
+        _stunSystem.TryKnockdown(args.Target, ent.Comp.KnockdownDuration);
 
         if (!TryComp<BloodstreamComponent>(args.Target, out var blood))
             return;

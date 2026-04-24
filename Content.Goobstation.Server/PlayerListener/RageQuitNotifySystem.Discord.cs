@@ -17,18 +17,15 @@ public sealed partial class RageQuitNotifySystem
     [Dependency] private readonly GameTicker _ticker = default!;
     private WebhookData? _webhook;
 
-    private void InitializeDiscord()
-    {
-        Subs.CVar(_cfg, GoobCVars.PlayerRageQuitDiscordWebhook,
+    private void InitializeDiscord() =>
+        Subs.CVar(_cfg,
+            GoobCVars.PlayerRageQuitDiscordWebhook,
             value =>
             {
                 if (!string.IsNullOrEmpty(value))
-                {
                     _discord.TryGetWebhook(value, val => _webhook = val);
-                }
             },
             true);
-    }
 
     // Inform of a ragequit on discord
     private async void NotifyWebhook(INetChannel channel)

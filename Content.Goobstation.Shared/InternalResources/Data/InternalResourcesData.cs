@@ -6,7 +6,7 @@ namespace Content.Goobstation.Shared.InternalResources.Data;
 /// <summary>
 /// Data structure for storing and changing inner resource in entities
 /// </summary>
-[Serializable, NetSerializable]
+[Serializable] [NetSerializable]
 [DataDefinition]
 public sealed partial class InternalResourcesData
 {
@@ -14,7 +14,13 @@ public sealed partial class InternalResourcesData
     /// Current amount of resources
     /// </summary>
     [DataField]
-    public float CurrentAmount = 0;
+    public float CurrentAmount;
+
+    /// <summary>
+    /// Prototype with visual information of internal resources
+    /// </summary>
+    [DataField(required: true)]
+    public ProtoId<InternalResourcesPrototype> InternalResourcesType;
 
     /// <summary>
     /// Maximum amount of resources
@@ -33,12 +39,6 @@ public sealed partial class InternalResourcesData
     /// </summary>
     [DataField]
     public Dictionary<string, (float, bool)>? Thresholds;
-
-    /// <summary>
-    /// Prototype with visual information of internal resources
-    /// </summary>
-    [DataField(required: true)]
-    public ProtoId<InternalResourcesPrototype> InternalResourcesType;
 
     public InternalResourcesData(
         float maxAmount,

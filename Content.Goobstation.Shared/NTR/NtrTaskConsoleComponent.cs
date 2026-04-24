@@ -13,21 +13,21 @@
 
 using Robust.Shared.Audio;
 using Robust.Shared.GameStates;
-using Robust.Shared.Prototypes;
 using Robust.Shared.Serialization;
-using Robust.Shared.Serialization.TypeSerializers.Implementations.Custom;
-using Robust.Shared.Serialization.TypeSerializers.Implementations.Custom.Prototype;
 
 namespace Content.Goobstation.Shared.NTR;
 
-[RegisterComponent, NetworkedComponent]
+[RegisterComponent] [NetworkedComponent]
 public sealed partial class NtrTaskConsoleComponent : Component
 {
+    [DataField]
+    public HashSet<string> ActiveTaskIds = new();
+
     /// <summary>
-    /// The sound made when the bounty is skipped.
+    /// The time between prints.
     /// </summary>
     [DataField]
-    public SoundSpecifier SkipSound = new SoundPathSpecifier("/Audio/Effects/Cargo/ping.ogg");
+    public TimeSpan Delay = TimeSpan.FromSeconds(5);
 
     /// <summary>
     /// The sound made when bounty skipping is denied due to lacking access.
@@ -48,31 +48,28 @@ public sealed partial class NtrTaskConsoleComponent : Component
     public TimeSpan NextSoundTime = TimeSpan.Zero;
 
     /// <summary>
-    /// The id of the label entity spawned by the print label button.
-    /// </summary>
-    [DataField]
-    public string TaskLabelId = "Paper";
-
-    /// <summary>
-    /// The time between prints.
-    /// </summary>
-    [DataField]
-    public TimeSpan Delay = TimeSpan.FromSeconds(5);
-
-    /// <summary>
     /// The time between various triggeable things.
     /// </summary>
     [DataField]
     public SoundSpecifier PrintSound = new SoundPathSpecifier("/Audio/Machines/printer.ogg");
 
+    /// <summary>
+    /// The sound made when the bounty is skipped.
+    /// </summary>
     [DataField]
-    public HashSet<string> ActiveTaskIds = new();
+    public SoundSpecifier SkipSound = new SoundPathSpecifier("/Audio/Effects/Cargo/ping.ogg");
 
     [DataField]
     public string SlotId = "taskSlot";
+
+    /// <summary>
+    /// The id of the label entity spawned by the print label button.
+    /// </summary>
+    [DataField]
+    public string TaskLabelId = "Paper";
 }
 
-[NetSerializable, Serializable]
+[NetSerializable] [Serializable]
 public sealed class NtrTaskConsoleState(
     List<NtrTaskData> available,
     List<NtrTaskHistoryData> history,
@@ -86,19 +83,20 @@ public sealed class NtrTaskConsoleState(
     public HashSet<string> LockedTasks { get; } = locked ?? new HashSet<string>();
 }
 
-[Serializable, NetSerializable]
+[Serializable] [NetSerializable]
 public sealed class TaskSkipMessage(string taskId) : BoundUserInterfaceMessage
 {
     public string TaskId = taskId;
 }
-[Serializable, NetSerializable]
+
+[Serializable] [NetSerializable]
 public sealed class TaskPrintLabelMessage(string taskId) : BoundUserInterfaceMessage
 {
     public string TaskId = taskId;
 }
 
-[Serializable, NetSerializable]
+[Serializable] [NetSerializable]
 public enum NtrTaskUiKey
 {
-    Key
+    Key,
 }

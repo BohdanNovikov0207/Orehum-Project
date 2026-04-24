@@ -8,8 +8,8 @@ namespace Content.Goobstation.UIKit.UserInterface.Controls;
 
 public sealed class TooltipTextureRect : TextureRect
 {
-    public string? TooltipText;
     public Vector2 Offset;
+    public string? TooltipText;
 
     public TooltipTextureRect(string? tooltip, Vector2 offset)
     {
@@ -40,8 +40,5 @@ public sealed class TooltipTextureRect : TextureRect
         handle.SetTransform(Matrix3x2.Identity);
     }
 
-    protected override bool HasPoint(Vector2 point)
-    {
-        return base.HasPoint(point - Offset * UIScale);
-    }
+    protected override bool HasPoint(Vector2 point) => base.HasPoint(point - Offset * UIScale);
 }

@@ -32,7 +32,6 @@ using Content.Goobstation.Shared.GrabIntent;
 using Content.Goobstation.Shared.MartialArts.Components;
 using Content.Goobstation.Shared.Sprinting;
 using Content.Goobstation.Shared.Stealth;
-using Content.Shared._Goobstation.Heretic.Components;
 using Content.Shared._Shitmed.Medical.Surgery.Traumas.Systems;
 using Content.Shared._Shitmed.Targeting;
 using Content.Shared._White.BackStab;
@@ -59,13 +58,11 @@ using Content.Shared.Popups;
 using Content.Shared.Speech;
 using Content.Shared.Standing;
 using Content.Shared.StatusEffect;
-using Content.Shared.StatusEffectNew;
 using Content.Shared.StatusEffectNew.Components;
 using Content.Shared.Stunnable;
 using Content.Shared.Weapons.Melee;
 using Content.Shared.Weapons.Melee.Events;
 using Content.Shared.Weapons.Ranged.Events;
-using Robust.Shared.Audio;
 using Robust.Shared.Audio.Systems;
 using Robust.Shared.Network;
 using Robust.Shared.Physics.Components;
@@ -80,40 +77,39 @@ namespace Content.Goobstation.Shared.MartialArts;
 /// </summary>
 public abstract partial class SharedMartialArtsSystem : EntitySystem
 {
+    public static readonly EntProtoId MartsGenericSlow = "MartialArtsGenericSlowdownEffect";
+    [Dependency] private readonly SharedActionsSystem _actions = default!;
+    [Dependency] private readonly AlertsSystem _alerts = default!;
+    [Dependency] private readonly SharedAudioSystem _audio = default!;
+    [Dependency] private readonly BackStabSystem _backstab = default!;
+    [Dependency] private readonly ActionBlockerSystem _blocker = default!;
+    [Dependency] private readonly SharedBodySystem _body = default!;
+    [Dependency] private readonly DamageableSystem _damageable = default!;
+    [Dependency] private readonly NpcFactionSystem _faction = default!;
+    [Dependency] private readonly GrabIntentSystem _grab = default!;
+    [Dependency] private readonly GrabThrownSystem _grabThrowing = default!;
+    [Dependency] private readonly SharedHandsSystem _hands = default!;
+    [Dependency] private readonly EntityLookupSystem _lookup = default!;
+    [Dependency] private readonly SharedMeleeWeaponSystem _melee = default!;
+    [Dependency] private readonly MobStateSystem _mobState = default!;
+    [Dependency] private readonly MobThresholdSystem _mobThreshold = default!;
+    [Dependency] private readonly MovementSpeedModifierSystem _modifier = default!;
+    [Dependency] private readonly MovementModStatusSystem _movementMod = default!;
+    [Dependency] private readonly INetManager _netManager = default!;
+    [Dependency] private readonly Content.Shared.StatusEffectNew.StatusEffectsSystem _newStatus = default!;
     [Dependency] private readonly SharedPopupSystem _popupSystem = default!;
-    [Dependency] private readonly IGameTiming _timing = default!;
     [Dependency] private readonly IPrototypeManager _proto = default!;
     [Dependency] private readonly PullingSystem _pulling = default!;
-    [Dependency] private readonly Content.Shared.StatusEffect.StatusEffectsSystem _status = default!;
-    [Dependency] private readonly Content.Shared.StatusEffectNew.StatusEffectsSystem _newStatus = default!;
-    [Dependency] private readonly DamageableSystem _damageable = default!;
-    [Dependency] private readonly GrabIntentSystem _grab = default!;
-    [Dependency] private readonly SharedStaminaSystem _stamina = default!;
-    [Dependency] private readonly GrabThrownSystem _grabThrowing = default!;
-    [Dependency] private readonly SharedTransformSystem _transform = default!;
-    [Dependency] private readonly SharedStunSystem _stun = default!;
-    [Dependency] private readonly MovementModStatusSystem _movementMod = default!;
-    [Dependency] private readonly SharedAudioSystem _audio = default!;
-    [Dependency] private readonly EntityLookupSystem _lookup = default!;
     [Dependency] private readonly IRobustRandom _random = default!;
-    [Dependency] private readonly SharedHandsSystem _hands = default!;
-    [Dependency] private readonly SharedActionsSystem _actions = default!;
-    [Dependency] private readonly INetManager _netManager = default!;
-    [Dependency] private readonly StandingStateSystem _standingState = default!;
-    [Dependency] private readonly ActionBlockerSystem _blocker = default!;
-    [Dependency] private readonly MovementSpeedModifierSystem _modifier = default!;
-    [Dependency] private readonly AlertsSystem _alerts = default!;
-    [Dependency] private readonly SharedMeleeWeaponSystem _melee = default!;
-    [Dependency] private readonly BackStabSystem _backstab = default!;
-    [Dependency] private readonly SharedGoobStealthSystem _stealth = default!;
-    [Dependency] private readonly MobStateSystem _mobState = default!;
-    [Dependency] private readonly NpcFactionSystem _faction = default!;
-    [Dependency] private readonly SharedBodySystem _body = default!;
-    [Dependency] private readonly TraumaSystem _trauma = default!;
-    [Dependency] private readonly MobThresholdSystem _mobThreshold = default!;
     [Dependency] private readonly SharedSprintingSystem _sprinting = default!;
-
-    public static readonly EntProtoId MartsGenericSlow = "MartialArtsGenericSlowdownEffect";
+    [Dependency] private readonly SharedStaminaSystem _stamina = default!;
+    [Dependency] private readonly StandingStateSystem _standingState = default!;
+    [Dependency] private readonly Content.Shared.StatusEffect.StatusEffectsSystem _status = default!;
+    [Dependency] private readonly SharedGoobStealthSystem _stealth = default!;
+    [Dependency] private readonly SharedStunSystem _stun = default!;
+    [Dependency] private readonly IGameTiming _timing = default!;
+    [Dependency] private readonly SharedTransformSystem _transform = default!;
+    [Dependency] private readonly TraumaSystem _trauma = default!;
 
     public override void Initialize()
     {
@@ -226,7 +222,8 @@ public abstract partial class SharedMartialArtsSystem : EntitySystem
             return;
 
         var dragonQuery =
-            EntityQueryEnumerator<DragonKungFuTimerComponent, StatusEffectsComponent, MobStateComponent, PhysicsComponent>();
+            EntityQueryEnumerator<DragonKungFuTimerComponent, StatusEffectsComponent, MobStateComponent,
+                PhysicsComponent>();
         while (dragonQuery.MoveNext(out var uid, out var timer, out var status, out var mobState, out var physics))
         {
             if (mobState.CurrentState != MobState.Alive)
@@ -308,9 +305,8 @@ public abstract partial class SharedMartialArtsSystem : EntitySystem
         args.ModifySpeed(mult, mult);
     }
 
-    private DamageModifierSet GetDamageModifierSet(DamageSpecifier specifier, float multiplier, float modifier)
-    {
-        return new()
+    private DamageModifierSet GetDamageModifierSet(DamageSpecifier specifier, float multiplier, float modifier) =>
+        new()
         {
             Coefficients = specifier.DamageDict
                 .Select(x => KeyValuePair.Create(x.Key, multiplier))
@@ -319,7 +315,6 @@ public abstract partial class SharedMartialArtsSystem : EntitySystem
                 .Select(x => KeyValuePair.Create(x.Key, -modifier)) // Minus mod because it subtracts values from damage
                 .ToDictionary(),
         };
-    }
 
     private void OnGetMeleeAttackRate(Entity<MartialArtModifiersComponent> ent, ref GetMeleeAttackRateEvent args)
     {
@@ -348,6 +343,7 @@ public abstract partial class SharedMartialArtsSystem : EntitySystem
                     && (data.Type & MartialArtModifierType.Armed) != 0)
                     continue;
             }
+
             mult *= data.Multiplier;
             mod += data.Modifier;
         }
@@ -396,7 +392,8 @@ public abstract partial class SharedMartialArtsSystem : EntitySystem
         if (!martialArtsPrototype.RandomDamageModifier)
             return;
 
-        var randomDamage = _random.Next(martialArtsPrototype.MinRandomDamageModifier, martialArtsPrototype.MaxRandomDamageModifier + 1);
+        var randomDamage = _random.Next(martialArtsPrototype.MinRandomDamageModifier,
+            martialArtsPrototype.MaxRandomDamageModifier + 1);
         var bonusDamageSpec = new DamageSpecifier();
         bonusDamageSpec.DamageDict.Add(martialArtsPrototype.DamageModifierType, randomDamage);
         args.BonusDamage += bonusDamageSpec;
@@ -407,7 +404,7 @@ public abstract partial class SharedMartialArtsSystem : EntitySystem
         if (TerminatingOrDeleted(ent))
             return;
 
-        if(TryComp<CanPerformComboComponent>(ent, out var comboComponent))
+        if (TryComp<CanPerformComboComponent>(ent, out var comboComponent))
             comboComponent.AllowedCombos.Clear();
 
         RemCompDeferred<DragonKungFuTimerComponent>(ent);
@@ -443,13 +440,13 @@ public abstract partial class SharedMartialArtsSystem : EntitySystem
         var userName = Identity.Entity(user, EntityManager);
         var targetName = Identity.Entity(target, EntityManager);
         _popupSystem.PopupEntity(Loc.GetString("martial-arts-action-sender",
-            ("name", targetName),
-            ("move", comboName)),
+                ("name", targetName),
+                ("move", comboName)),
             user,
             user);
         _popupSystem.PopupEntity(Loc.GetString("martial-arts-action-receiver",
-            ("name", userName),
-            ("move", comboName)),
+                ("name", userName),
+                ("move", comboName)),
             target,
             target);
     }
@@ -482,9 +479,7 @@ public abstract partial class SharedMartialArtsSystem : EntitySystem
         }
 
         if (!HasComp<CanPerformComboComponent>(user))
-        {
             return GrantMartialArt(comp, user);
-        }
 
         if (!TryComp<MartialArtsKnowledgeComponent>(user, out var cqc))
         {
@@ -527,22 +522,22 @@ public abstract partial class SharedMartialArtsSystem : EntitySystem
             case MartialArtsForms.CloseQuartersCombat:
                 var itcryeverytime =
                     new CanDoCQCEvent();
-                  /*
-                var riposte = EnsureComp<RiposteeComponent>(user);
-                riposte.Data.TryAdd("CQC",
-                    new(0.1f,
-                    false,
-                    null,
-                    true,
-                    new SoundPathSpecifier("/Audio/Weapons/genhit1.ogg"),
-                    TimeSpan.Zero,
-                    TimeSpan.FromSeconds(4),
-                    false,
-                    0.75f,
-                    null,
-                    null,
-                    new CanDoCQCEvent()));
-                    */
+                /*
+              var riposte = EnsureComp<RiposteeComponent>(user);
+              riposte.Data.TryAdd("CQC",
+                  new(0.1f,
+                  false,
+                  null,
+                  true,
+                  new SoundPathSpecifier("/Audio/Weapons/genhit1.ogg"),
+                  TimeSpan.Zero,
+                  TimeSpan.FromSeconds(4),
+                  false,
+                  0.75f,
+                  null,
+                  null,
+                  new CanDoCQCEvent()));
+                  */
                 break;
         }
 
@@ -630,7 +625,7 @@ public abstract partial class SharedMartialArtsSystem : EntitySystem
         TargetBodyPart? targetBodyPart = null)
     {
         damage = new DamageSpecifier();
-        if(!TryComp<TargetingComponent>(ent, out var targetingComponent))
+        if (!TryComp<TargetingComponent>(ent, out var targetingComponent))
             return;
         damage.DamageDict.Add(damageType, damageAmount);
         if (TryComp(ent, out MartialArtModifiersComponent? modifiers))
@@ -639,6 +634,7 @@ public abstract partial class SharedMartialArtsSystem : EntitySystem
             var modifierSet = GetDamageModifierSet(damage, mult, mod);
             damage = DamageSpecifier.ApplyModifierSet(damage, modifierSet);
         }
+
         _damageable.TryChangeDamage(target,
             damage,
             origin: ent,

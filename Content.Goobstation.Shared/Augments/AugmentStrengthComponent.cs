@@ -5,7 +5,7 @@ namespace Content.Goobstation.Shared.Augments;
 /// <summary>
 /// Multiplies melee damage, armed and unarmed, when activated.
 /// </summary>
-[RegisterComponent, NetworkedComponent, Access(typeof(AugmentStrengthSystem))]
+[RegisterComponent] [NetworkedComponent] [Access(typeof(AugmentStrengthSystem))]
 public sealed partial class AugmentStrengthComponent : Component
 {
     /// <summary>

@@ -1,35 +1,34 @@
+using System.Numerics;
 using Content.Goobstation.Shared.Wraith.Events;
 using Content.Shared.Body.Components;
+using Content.Shared.Movement.Systems;
 using Content.Shared.Physics;
 using Content.Shared.Projectiles;
+using Content.Shared.Stunnable;
 using Content.Shared.Weapons.Ranged.Systems;
 using Robust.Shared.Audio.Systems;
 using Robust.Shared.Network;
 using Robust.Shared.Physics;
 using Robust.Shared.Physics.Systems;
-using Robust.Shared.Timing;
-using System.Numerics;
-using Content.Shared.Movement.Systems;
-using Content.Shared.Stunnable;
 using Robust.Shared.Prototypes;
 using Robust.Shared.Spawners;
+using Robust.Shared.Timing;
 
 namespace Content.Goobstation.Shared.Wraith.Minions.Harbinger;
 
 public sealed class TentacleHookSystem : EntitySystem
 {
-    [Dependency] private readonly SharedGunSystem _gun = default!;
-    [Dependency] private readonly SharedTransformSystem _transform = default!;
-    [Dependency] private readonly INetManager _netManager = default!;
-    [Dependency] private readonly IGameTiming _timing = default!;
-    [Dependency] private readonly SharedJointSystem _joints = default!;
-    [Dependency] private readonly SharedStunSystem _stun = default!;
-    [Dependency] private readonly SharedAudioSystem _audio = default!;
-    [Dependency] private readonly MovementModStatusSystem _movementMod = default!;
-
     private const string TentacleJoint = "grappling";
 
     public static readonly EntProtoId EffectId = "TentacleSlowdownStatusEffect";
+    [Dependency] private readonly SharedAudioSystem _audio = default!;
+    [Dependency] private readonly SharedGunSystem _gun = default!;
+    [Dependency] private readonly SharedJointSystem _joints = default!;
+    [Dependency] private readonly MovementModStatusSystem _movementMod = default!;
+    [Dependency] private readonly INetManager _netManager = default!;
+    [Dependency] private readonly SharedStunSystem _stun = default!;
+    [Dependency] private readonly IGameTiming _timing = default!;
+    [Dependency] private readonly SharedTransformSystem _transform = default!;
 
     public override void Initialize()
     {
@@ -77,12 +76,12 @@ public sealed class TentacleHookSystem : EntitySystem
         if (!_timing.IsFirstTimePredicted)
             return;
 
-        if (args.Shooter is not {} shooter
+        if (args.Shooter is not { } shooter
             || !HasComp<BodyComponent>(args.Embedded))
             return;
 
         EnsureComp<JointComponent>(ent.Owner);
-        var joint = _joints.CreateDistanceJoint(ent.Owner, shooter, anchorA: new Vector2(0f, 0.5f), id: TentacleJoint);
+        var joint = _joints.CreateDistanceJoint(ent.Owner, shooter, new Vector2(0f, 0.5f), id: TentacleJoint);
         joint.MaxLength = joint.Length + 0.2f;
         joint.Stiffness = 1f;
         joint.MinLength = 0.35f;
@@ -99,7 +98,11 @@ public sealed class TentacleHookSystem : EntitySystem
 
         ent.Comp.Target = args.Target;
         Dirty(ent);
-        _movementMod.TryUpdateMovementSpeedModDuration(args.Target, EffectId, ent.Comp.DurationSlow, ent.Comp.SlowMultiplier, ent.Comp.SlowMultiplier);
+        _movementMod.TryUpdateMovementSpeedModDuration(args.Target,
+            EffectId,
+            ent.Comp.DurationSlow,
+            ent.Comp.SlowMultiplier,
+            ent.Comp.SlowMultiplier);
 
         var tentacle = EnsureComp<TentacleHookedComponent>(args.Target);
         tentacle.ThrowTowards = args.Shooter;

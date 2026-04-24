@@ -13,13 +13,12 @@ namespace Content.Goobstation.Server.Singularity;
 
 public sealed class RadCollectorSignalSystem : EntitySystem
 {
-    [Dependency] private readonly AutomationSystem _automation = default!;
-    [Dependency] private readonly DeviceLinkSystem _device = default!;
-    [Dependency] private readonly SharedAppearanceSystem _appearance = default!;
-
     public static readonly ProtoId<SourcePortPrototype> EmptyPort = "RadEmpty";
     public static readonly ProtoId<SourcePortPrototype> LowPort = "RadLow";
     public static readonly ProtoId<SourcePortPrototype> FullPort = "RadFull";
+    [Dependency] private readonly SharedAppearanceSystem _appearance = default!;
+    [Dependency] private readonly AutomationSystem _automation = default!;
+    [Dependency] private readonly DeviceLinkSystem _device = default!;
 
     public override void Update(float frameTime)
     {
@@ -37,7 +36,7 @@ public sealed class RadCollectorSignalSystem : EntitySystem
             {
                 3 => RadCollectorState.Full,
                 2 => RadCollectorState.Low,
-                _ => RadCollectorState.Empty
+                _ => RadCollectorState.Empty,
             };
 
             // nothing changed
@@ -54,6 +53,6 @@ public sealed class RadCollectorSignalSystem : EntitySystem
     {
         RadCollectorState.Empty => EmptyPort,
         RadCollectorState.Low => LowPort,
-        RadCollectorState.Full => FullPort
+        RadCollectorState.Full => FullPort,
     };
 }

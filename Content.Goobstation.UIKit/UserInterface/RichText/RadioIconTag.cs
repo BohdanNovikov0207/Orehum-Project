@@ -4,7 +4,6 @@ using Robust.Client.ResourceManagement;
 using Robust.Client.UserInterface;
 using Robust.Client.UserInterface.Controls;
 using Robust.Client.UserInterface.RichText;
-using Robust.Shared.Configuration;
 using Robust.Shared.Utility;
 
 namespace Content.Goobstation.UIKit.UserInterface.RichText;
@@ -43,5 +42,4 @@ public sealed class RadioIconTag : BaseTextureTag, IMarkupTagHandler
 
         return label;
     }
-
 }

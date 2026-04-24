@@ -13,8 +13,8 @@ namespace Content.Goobstation.Server.Voice;
 /// </summary>
 public interface IVoiceChatServerManager
 {
-    void Update();
     Dictionary<NetConnection, VoiceClientData> Clients { get; }
+    void Update();
 
     void Shutdown();
 }

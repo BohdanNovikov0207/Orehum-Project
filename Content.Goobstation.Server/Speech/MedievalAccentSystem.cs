@@ -48,4 +48,4 @@ public sealed class MedievalAccentSystem : EntitySystem
 
         args.Message = message;
     }
-};
+}

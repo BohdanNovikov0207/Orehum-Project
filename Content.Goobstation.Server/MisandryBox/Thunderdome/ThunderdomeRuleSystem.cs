@@ -10,23 +10,22 @@ using Content.Server.Ghost;
 using Content.Server.Mind;
 using Content.Server.Popups;
 using Content.Server.Power.Components;
+using Content.Server.Preferences.Managers;
 using Content.Server.Spawners.Components;
 using Content.Server.Station.Systems;
 using Content.Server.Weapons.Ranged.Systems;
-using Content.Shared.GameTicking;
-using Content.Shared.Ghost;
-using Content.Shared.Fluids.Components;
-using Content.Shared.Item;
-using Content.Server.Preferences.Managers;
 using Content.Shared.Damage;
 using Content.Shared.Examine;
+using Content.Shared.Fluids.Components;
+using Content.Shared.GameTicking;
+using Content.Shared.Ghost;
 using Content.Shared.Humanoid;
 using Content.Shared.IdentityManagement;
 using Content.Shared.Interaction.Events;
+using Content.Shared.Item;
 using Content.Shared.Mind;
 using Content.Shared.Mobs;
 using Content.Shared.Mobs.Components;
-using Content.Shared.Mind.Components;
 using Content.Shared.Popups;
 using Content.Shared.Preferences;
 using Content.Shared.Weapons.Ranged.Components;
@@ -34,11 +33,11 @@ using Robust.Server.Audio;
 using Robust.Server.Player;
 using Robust.Shared.Audio;
 using Robust.Shared.Configuration;
-using Robust.Shared.Map;
+using Robust.Shared.Containers;
 using Robust.Shared.Enums;
+using Robust.Shared.Map;
 using Robust.Shared.Player;
 using Robust.Shared.Random;
-using Robust.Shared.Containers;
 using Robust.Shared.Spawners;
 using Robust.Shared.Timing;
 
@@ -46,29 +45,28 @@ namespace Content.Goobstation.Server.MisandryBox.Thunderdome;
 
 public sealed class ThunderdomeRuleSystem : EntitySystem
 {
-    [Dependency] private readonly IConfigurationManager _cfg = default!;
-    [Dependency] private readonly IPlayerManager _playerManager = default!;
-    [Dependency] private readonly IRobustRandom _random = default!;
-    [Dependency] private readonly IGameTiming _timing = default!;
-    [Dependency] private readonly IServerPreferencesManager _prefs = default!;
-    [Dependency] private readonly EuiManager _euiManager = default!;
-    [Dependency] private readonly GameTicker _ticker = default!;
-    [Dependency] private readonly MindSystem _mind = default!;
-    [Dependency] private readonly SharedTransformSystem _transform = default!;
-    [Dependency] private readonly SharedContainerSystem _container = default!;
-    [Dependency] private readonly EntityLookupSystem _lookup = default!;
-    [Dependency] private readonly StationSpawningSystem _stationSpawning = default!;
-    [Dependency] private readonly PopupSystem _popup = default!;
-    [Dependency] private readonly AudioSystem _audio = default!;
-    [Dependency] private readonly TemporaryMindSystem _tempMind = default!;
-    [Dependency] private readonly ILocalizationManager _loc = default!;
-    [Dependency] private readonly GunSystem _gun = default!;
-
     private const string RulePrototype = "ThunderdomeRule";
-    private EntityUid? _ruleEntity;
-    private bool _refillOnKill;
 
     private readonly Dictionary<ICommonSession, ThunderdomeLoadoutEui> _activeEuis = new();
+    [Dependency] private readonly AudioSystem _audio = default!;
+    [Dependency] private readonly IConfigurationManager _cfg = default!;
+    [Dependency] private readonly SharedContainerSystem _container = default!;
+    [Dependency] private readonly EuiManager _euiManager = default!;
+    [Dependency] private readonly GunSystem _gun = default!;
+    [Dependency] private readonly ILocalizationManager _loc = default!;
+    [Dependency] private readonly EntityLookupSystem _lookup = default!;
+    [Dependency] private readonly MindSystem _mind = default!;
+    [Dependency] private readonly IPlayerManager _playerManager = default!;
+    [Dependency] private readonly PopupSystem _popup = default!;
+    [Dependency] private readonly IServerPreferencesManager _prefs = default!;
+    [Dependency] private readonly IRobustRandom _random = default!;
+    [Dependency] private readonly StationSpawningSystem _stationSpawning = default!;
+    [Dependency] private readonly TemporaryMindSystem _tempMind = default!;
+    [Dependency] private readonly GameTicker _ticker = default!;
+    [Dependency] private readonly IGameTiming _timing = default!;
+    [Dependency] private readonly SharedTransformSystem _transform = default!;
+    private bool _refillOnKill;
+    private EntityUid? _ruleEntity;
 
     public override void Initialize()
     {
@@ -126,6 +124,7 @@ public sealed class ThunderdomeRuleSystem : EntitySystem
             if (eui.Player.Status != SessionStatus.Disconnected)
                 eui.Close();
         }
+
         _activeEuis.Clear();
 
         if (_ruleEntity == null)
@@ -175,10 +174,8 @@ public sealed class ThunderdomeRuleSystem : EntitySystem
         }
     }
 
-    private static void OnArenaEntityDamage(Entity<ThunderdomeArenaProtectedComponent> ent, ref BeforeDamageChangedEvent args)
-    {
-        args.Cancelled = true;
-    }
+    private static void OnArenaEntityDamage(Entity<ThunderdomeArenaProtectedComponent> ent,
+        ref BeforeDamageChangedEvent args) => args.Cancelled = true;
 
     private void OnJoinRequest(ThunderdomeJoinRequestEvent ev, EntitySessionEventArgs args)
     {
@@ -227,14 +224,15 @@ public sealed class ThunderdomeRuleSystem : EntitySystem
             || !TryComp<ThunderdomeRuleComponent>(ent.Comp.RuleEntity.Value, out var rule))
             return;
 
-        if (args.NewMobState == MobState.Critical && args.Origin is { } attacker && HasComp<ThunderdomePlayerComponent>(attacker))
+        if (args.NewMobState == MobState.Critical && args.Origin is { } attacker &&
+            HasComp<ThunderdomePlayerComponent>(attacker))
             ent.Comp.LastAttacker = attacker;
 
         if (args.NewMobState != MobState.Dead)
             return;
 
         CreditKill(ent, rule, args.Origin);
-        GhostDomePlayer(ent, rule, playSound: false);
+        GhostDomePlayer(ent, rule, false);
     }
 
     public void SpawnPlayer(ICommonSession session, EntityUid ruleEntity, int weaponIdx)
@@ -251,7 +249,8 @@ public sealed class ThunderdomeRuleSystem : EntitySystem
 
         HumanoidCharacterProfile? profile = null;
         if (mindComp.UserId is { } userId && _prefs.TryGetCachedPreferences(userId, out var prefs))
-            profile = (prefs.SelectedCharacter as HumanoidCharacterProfile)?.WithSpecies(SharedHumanoidAppearanceSystem.DefaultSpecies);
+            profile = (prefs.SelectedCharacter as HumanoidCharacterProfile)?.WithSpecies(SharedHumanoidAppearanceSystem
+                .DefaultSpecies);
 
         var originalBody = mindComp.OwnedEntity != ghostEntity ? mindComp.OwnedEntity : null;
 
@@ -268,7 +267,6 @@ public sealed class ThunderdomeRuleSystem : EntitySystem
             var marker = EnsureComp<ThunderdomeOriginalBodyComponent>(body);
             if (mindComp.UserId is { } ownerId)
                 marker.Owner = ownerId;
-
         }
 
         if (!_tempMind.TrySwapTempMind(session, mob))
@@ -281,7 +279,10 @@ public sealed class ThunderdomeRuleSystem : EntitySystem
         BroadcastPlayerCount(rule);
     }
 
-    private void CleanUpPlayer(Entity<ThunderdomePlayerComponent> ent, ThunderdomeRuleComponent rule, bool playSound, SoundPathSpecifier sound)
+    private void CleanUpPlayer(Entity<ThunderdomePlayerComponent> ent,
+        ThunderdomeRuleComponent rule,
+        bool playSound,
+        SoundPathSpecifier sound)
     {
         rule.Players.Remove(GetNetEntity(ent));
 
@@ -307,7 +308,7 @@ public sealed class ThunderdomeRuleSystem : EntitySystem
         if (ent.Comp.RuleEntity == null
             || !TryComp<ThunderdomeRuleComponent>(ent.Comp.RuleEntity.Value, out var rule)
             || args.Victim != ent.Owner
-            )
+           )
             return;
 
         CreditKill(ent, rule);
@@ -329,7 +330,9 @@ public sealed class ThunderdomeRuleSystem : EntitySystem
         args.Result = true;
     }
 
-    private void CreditKill(Entity<ThunderdomePlayerComponent> victim, ThunderdomeRuleComponent rule, EntityUid? killer = null)
+    private void CreditKill(Entity<ThunderdomePlayerComponent> victim,
+        ThunderdomeRuleComponent rule,
+        EntityUid? killer = null)
     {
         victim.Comp.Deaths++;
         victim.Comp.CurrentStreak = 0;
@@ -410,8 +413,8 @@ public sealed class ThunderdomeRuleSystem : EntitySystem
 
         var originalBody = origMind.OwnedEntity;
         if (originalBody == null || !Exists(originalBody)
-            || !TryComp<MobStateComponent>(originalBody, out var mobState)
-            || mobState.CurrentState == MobState.Dead)
+                                 || !TryComp<MobStateComponent>(originalBody, out var mobState)
+                                 || mobState.CurrentState == MobState.Dead)
             return;
 
         if (tdPlayer.RuleEntity != null
@@ -434,18 +437,20 @@ public sealed class ThunderdomeRuleSystem : EntitySystem
         var items = new HashSet<Entity<ItemComponent>>();
         _lookup.GetEntitiesOnMap(map, items);
         foreach (var (uid, _) in items)
-            MarkForDespawn(uid, rule.SweepDespawnTime, checkContainer: true);
+        {
+            MarkForDespawn(uid, rule.SweepDespawnTime, true);
+        }
 
         var puddles = new HashSet<Entity<PuddleComponent>>();
         _lookup.GetEntitiesOnMap(map, puddles);
         foreach (var (uid, _) in puddles)
+        {
             MarkForDespawn(uid, rule.SweepDespawnTime);
+        }
     }
 
-    private static void OnAntagSelectionBlocker(Entity<ThunderdomePlayerComponent> ent, ref GetAntagSelectionBlockerEvent args)
-    {
-        args.Blocked = true;
-    }
+    private static void OnAntagSelectionBlocker(Entity<ThunderdomePlayerComponent> ent,
+        ref GetAntagSelectionBlockerEvent args) => args.Blocked = true;
 
     private void OnShouldLogStateChange(ref ShouldLogMobStateChangeEvent args)
     {
@@ -595,7 +600,9 @@ public sealed class ThunderdomeRuleSystem : EntitySystem
             {
                 Index = i,
                 Name = Loc.GetString(loadout.Name),
-                Description = string.IsNullOrEmpty(loadout.Description) ? string.Empty : Loc.GetString(loadout.Description),
+                Description = string.IsNullOrEmpty(loadout.Description)
+                    ? string.Empty
+                    : Loc.GetString(loadout.Description),
                 Category = Loc.GetString(loadout.Category),
                 SpritePrototype = loadout.Sprite,
             });
@@ -628,7 +635,7 @@ public sealed class ThunderdomeRuleSystem : EntitySystem
                         RefillBallistic((contained, ballistic));
 
                     if (!inGun && (HasComp<HitscanBatteryAmmoProviderComponent>(contained)
-                        || HasComp<ProjectileBatteryAmmoProviderComponent>(contained)))
+                                   || HasComp<ProjectileBatteryAmmoProviderComponent>(contained)))
                         RefillBattery(contained);
 
                     if (!inGun && TryComp<RevolverAmmoProviderComponent>(contained, out var revolver))
@@ -638,10 +645,7 @@ public sealed class ThunderdomeRuleSystem : EntitySystem
         }
     }
 
-    private void RefillBallistic(Entity<BallisticAmmoProviderComponent> ent)
-    {
-        _gun.RefillBallisticAmmo(ent);
-    }
+    private void RefillBallistic(Entity<BallisticAmmoProviderComponent> ent) => _gun.RefillBallisticAmmo(ent);
 
     private void RefillBattery(EntityUid uid)
     {

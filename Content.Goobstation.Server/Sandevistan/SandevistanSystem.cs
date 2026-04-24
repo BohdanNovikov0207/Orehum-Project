@@ -71,31 +71,37 @@ public sealed class SandevistanSystem : EntitySystem
 
             var stateActions = new Dictionary<int, Action>
             {
-                { 1, () => _jittering.DoJitter(uid, comp.StatusEffectTime, true)},
-                { 2, () => _stamina.TakeStaminaDamage(uid, comp.StaminaDamage * frameTime)},
-                { 3, () => _damageable.TryChangeDamage(uid, comp.Damage * frameTime, ignoreResistances: true)},
-                { 4, () => _stun.TryKnockdown(uid, comp.StatusEffectTime, true)},
-                { 5, () => Disable(uid, comp)},
-                { 6, () => _mobState.ChangeMobState(uid, MobState.Dead)},
+                { 1, () => _jittering.DoJitter(uid, comp.StatusEffectTime, true) },
+                { 2, () => _stamina.TakeStaminaDamage(uid, comp.StaminaDamage * frameTime) },
+                { 3, () => _damageable.TryChangeDamage(uid, comp.Damage * frameTime, true) },
+                { 4, () => _stun.TryKnockdown(uid, comp.StatusEffectTime) },
+                { 5, () => Disable(uid, comp) },
+                { 6, () => _mobState.ChangeMobState(uid, MobState.Dead) },
             };
 
             var filteredStates = new List<int>();
             foreach (var stateThreshold in comp.Thresholds)
+            {
                 if (comp.CurrentLoad >= stateThreshold.Value)
-                    filteredStates.Add((int)stateThreshold.Key);
+                    filteredStates.Add((int) stateThreshold.Key);
+            }
 
             filteredStates.Sort((a, b) => b.CompareTo(a));
             foreach (var state in filteredStates)
+            {
                 if (stateActions.TryGetValue(state, out var action))
                     action();
+            }
 
             if (comp.NextPopupTime > _timing.CurTime)
                 continue;
 
             var popup = -1;
             foreach (var state in filteredStates)
+            {
                 if (state > popup && state < 4) // Goida
                     popup = state;
+            }
 
             if (popup == -1)
                 continue;
@@ -121,7 +127,9 @@ public sealed class SandevistanSystem : EntitySystem
         }
 
         ent.Comp.Active = EnsureComp<ActiveSandevistanUserComponent>(ent);
-        ent.Comp.CurrentLoad = MathF.Max(0, ent.Comp.CurrentLoad + ent.Comp.LoadPerInactiveSecond * (float)(_timing.CurTime - ent.Comp.LastEnabled).TotalSeconds);
+        ent.Comp.CurrentLoad = MathF.Max(0,
+            ent.Comp.CurrentLoad + ent.Comp.LoadPerInactiveSecond *
+            (float) (_timing.CurTime - ent.Comp.LastEnabled).TotalSeconds);
         _speed.RefreshMovementSpeedModifiers(ent);
 
         if (!HasComp<TrailComponent>(ent))
@@ -159,7 +167,8 @@ public sealed class SandevistanSystem : EntitySystem
             || !TryComp<MeleeWeaponComponent>(args.Weapon, out var weapon))
             return;
 
-        var rate = weapon.NextAttack - _timing.CurTime; //weapon.AttackRate; breaks things when multiple systems modify NextAttack
+        var rate = weapon.NextAttack -
+                   _timing.CurTime; //weapon.AttackRate; breaks things when multiple systems modify NextAttack
         weapon.NextAttack -= rate - rate / ent.Comp.AttackSpeedModifier;
     }
 

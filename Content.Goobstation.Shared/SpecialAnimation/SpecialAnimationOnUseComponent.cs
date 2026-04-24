@@ -8,25 +8,25 @@ using Robust.Shared.Prototypes;
 
 namespace Content.Goobstation.Shared.SpecialAnimation;
 
-[RegisterComponent, NetworkedComponent, AutoGenerateComponentState]
+[RegisterComponent] [NetworkedComponent] [AutoGenerateComponentState]
 public sealed partial class SpecialAnimationOnUseComponent : Component
 {
     /// <summary>
     /// Animation to play when this entity is triggered.
     /// If not specified, will use default variation.
     /// </summary>
-    [DataField, AutoNetworkedField]
+    [DataField] [AutoNetworkedField]
     public ProtoId<SpecialAnimationPrototype>? AnimationDataId;
+
+    [DataField] [AutoNetworkedField]
+    public SpecialAnimationBroadcastType BroadcastType = SpecialAnimationBroadcastType.Pvs;
 
     /// <summary>
     /// If specified, will override existing text inside SpecialAnimationPrototype.
     /// Use this to not shitspam with prototypes on each name.
     /// </summary>
-    [DataField, AutoNetworkedField]
+    [DataField] [AutoNetworkedField]
     public string? OverrideText;
-
-    [DataField, AutoNetworkedField]
-    public SpecialAnimationBroadcastType BroadcastType = SpecialAnimationBroadcastType.Pvs;
 }
 
 public enum SpecialAnimationBroadcastType

@@ -3,17 +3,14 @@ using Robust.Shared.Prototypes;
 
 namespace Content.Goobstation.Shared.Shadowling.Components.Abilities.Ascension;
 
-[RegisterComponent, NetworkedComponent]
+[RegisterComponent] [NetworkedComponent]
 public sealed partial class ShadowlingLightningStormComponent : Component
 {
     [DataField]
-    public TimeSpan TimeBeforeActivation = TimeSpan.FromSeconds(10);
+    public EntityUid? ActionEnt;
 
-    /// <summary>
-    /// The search radius of this ability.
-    /// </summary>
     [DataField]
-    public float Range = 12f;
+    public EntProtoId ActionId = "ActionLightningStorm";
 
     /// <summary>
     /// The amount of lightning bolts it fires from the user
@@ -27,9 +24,12 @@ public sealed partial class ShadowlingLightningStormComponent : Component
     [DataField]
     public EntProtoId LightningProto = "HyperchargedLightning";
 
+    /// <summary>
+    /// The search radius of this ability.
+    /// </summary>
     [DataField]
-    public EntProtoId ActionId = "ActionLightningStorm";
+    public float Range = 12f;
 
     [DataField]
-    public EntityUid? ActionEnt;
+    public TimeSpan TimeBeforeActivation = TimeSpan.FromSeconds(10);
 }

@@ -8,9 +8,9 @@ namespace Content.Goobstation.Shared.Augments;
 public sealed class AugmentPowerDrawSystem : EntitySystem
 {
     [Dependency] private readonly AugmentSystem _augment = default!;
-    [Dependency] private readonly ItemToggleSystem _toggle = default!;
     [Dependency] private readonly SharedAugmentPowerCellSystem _augmentPower = default!;
     [Dependency] private readonly SharedPowerCellSystem _powerCell = default!;
+    [Dependency] private readonly ItemToggleSystem _toggle = default!;
 
     public override void Initialize()
     {
@@ -37,22 +37,18 @@ public sealed class AugmentPowerDrawSystem : EntitySystem
 
     private void OnActivateAttempt(Entity<AugmentPowerDrawComponent> ent, ref ItemToggleActivateAttemptEvent args)
     {
-        if (_augment.GetBody(ent) is not {} body ||
-            _augmentPower.GetBodyAugment(body) is not {} slot ||
+        if (_augment.GetBody(ent) is not { } body ||
+            _augmentPower.GetBodyAugment(body) is not { } slot ||
             !_powerCell.HasActivatableCharge(slot))
-        {
             args.Cancelled = true;
-        }
     }
 
     private void OnToggled(Entity<AugmentPowerDrawComponent> ent, ref ItemToggledEvent args)
     {
-        if (_augment.GetBody(ent) is {} body && _augmentPower.GetBodyAugment(body) is {} slot)
+        if (_augment.GetBody(ent) is { } body && _augmentPower.GetBodyAugment(body) is { } slot)
             _augmentPower.UpdateDrawRate(slot.Owner);
     }
 
-    private void OnLostPower(Entity<AugmentPowerDrawComponent> ent, ref AugmentLostPowerEvent args)
-    {
+    private void OnLostPower(Entity<AugmentPowerDrawComponent> ent, ref AugmentLostPowerEvent args) =>
         _toggle.TryDeactivate(ent.Owner);
-    }
 }

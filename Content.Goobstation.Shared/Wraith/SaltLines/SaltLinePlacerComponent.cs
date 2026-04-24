@@ -3,7 +3,7 @@ using Robust.Shared.Prototypes;
 
 namespace Content.Goobstation.Shared.Wraith.SaltLines;
 
-[RegisterComponent, NetworkedComponent]
+[RegisterComponent] [NetworkedComponent]
 public sealed partial class SaltLinePlacerComponent : Component
 {
     [DataField]

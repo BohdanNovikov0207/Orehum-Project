@@ -1,9 +1,13 @@
 using System.Linq;
+using Content.Goobstation.Common.CCVar;
+using Content.Goobstation.Common.JoinQueue;
+using Content.Goobstation.Shared.JoinQueue;
+using Content.Server._RMC14.LinkAccount;
 using Content.Server.Connection;
+using Content.Server.Database;
 using Content.Server.GameTicking;
 using Content.Server.Maps;
 using Content.Shared.CCVar;
-using Content.Goobstation.Shared.JoinQueue;
 using Prometheus;
 using Robust.Server.Player;
 using Robust.Shared.Configuration;
@@ -11,18 +15,21 @@ using Robust.Shared.Enums;
 using Robust.Shared.Network;
 using Robust.Shared.Player;
 using Robust.Shared.Timing;
-using Content.Goobstation.Common.CCVar;
-using Content.Server._RMC14.LinkAccount;
-using Content.Server.Database;
-using Content.Goobstation.Common.JoinQueue;
 
 namespace Content.Goobstation.Server.JoinQueue;
 
 /// <summary>
-///     Manages new player connections when the server is full and queues them up, granting access when a slot becomes free
+/// Manages new player connections when the server is full and queues them up, granting access when a slot becomes free
 /// </summary>
 public sealed class JoinQueueManager : IJoinQueueManager
 {
+    private const int MaxWaitTimeSamples = 20;
+
+    /// <summary>
+    /// Interval for queue info refreshes
+    /// </summary>
+    private const float InfoRefreshIntervalSeconds = 30f;
+
     private static readonly Gauge QueueCount = Metrics.CreateGauge(
         "join_queue_total_count",
         "Amount of players in queue.");
@@ -34,45 +41,42 @@ public sealed class JoinQueueManager : IJoinQueueManager
     private static readonly Histogram QueueTimings = Metrics.CreateHistogram(
         "join_queue_timings",
         "Timings of players in queue",
-        new HistogramConfiguration()
+        new HistogramConfiguration
         {
             LabelNames = new[] { "type" },
             Buckets = Histogram.ExponentialBuckets(1, 2, 14),
         });
 
-
-    [Dependency] private readonly IPlayerManager _player = default!;
-    [Dependency] private readonly IConnectionManager _connection = default!;
     [Dependency] private readonly IConfigurationManager _configuration = default!;
-    [Dependency] private readonly IServerNetManager _net = default!;
-    [Dependency] private readonly LinkAccountManager _linkAccount = default!;
-    [Dependency] private readonly UserDbDataManager _userDb = default!;
+    [Dependency] private readonly IConnectionManager _connection = default!;
     [Dependency] private readonly IEntityManager _entityManager = default!;
     [Dependency] private readonly IGameMapManager _gameMapManager = default!;
     [Dependency] private readonly IGameTiming _gameTiming = default!;
-
-    private readonly List<ICommonSession> _queue = new();
+    [Dependency] private readonly LinkAccountManager _linkAccount = default!;
+    [Dependency] private readonly IServerNetManager _net = default!;
     private readonly List<ICommonSession> _patronQueue = new();
 
-    /// <summary>
-    ///     Rolling window of recent wait times in seconds for estimating queue wait.
-    /// </summary>
-    private readonly Queue<double> _recentWaitTimes = new();
-    private const int MaxWaitTimeSamples = 20;
+
+    [Dependency] private readonly IPlayerManager _player = default!;
+
+    private readonly List<ICommonSession> _queue = new();
 
     /// <summary>
-    ///     Holds queue positions for players who disconnected, allowing them to reclaim their spot if they reconnect within the grace period.
+    /// Rolling window of recent wait times in seconds for estimating queue wait.
+    /// </summary>
+    private readonly Queue<double> _recentWaitTimes = new();
+
+    /// <summary>
+    /// Holds queue positions for players who disconnected, allowing them to reclaim their spot if they reconnect within the
+    /// grace period.
     /// </summary>
     private readonly Dictionary<NetUserId, QueueReservation> _reservations = new();
 
+    [Dependency] private readonly UserDbDataManager _userDb = default!;
+    private float _infoRefreshTimer;
+
     private bool _isEnabled;
     private bool _patreonIsEnabled = true;
-
-    /// <summary>
-    ///     Interval for queue info refreshes
-    /// </summary>
-    private const float InfoRefreshIntervalSeconds = 30f;
-    private float _infoRefreshTimer;
 
     public int PlayerInQueueCount => _queue.Count + _patronQueue.Count;
     public int ActualPlayersCount => _player.PlayerCount - PlayerInQueueCount;
@@ -109,9 +113,14 @@ public sealed class JoinQueueManager : IJoinQueueManager
         if (!value)
         {
             foreach (var session in _queue)
+            {
                 session.Channel.Disconnect("Queue was disabled");
+            }
+
             foreach (var session in _patronQueue)
+            {
                 session.Channel.Disconnect("Queue was disabled");
+            }
         }
     }
 
@@ -231,7 +240,9 @@ public sealed class JoinQueueManager : IJoinQueueManager
         var waitSeconds = (DateTime.UtcNow - session.ConnectedTime).TotalSeconds;
         _recentWaitTimes.Enqueue(waitSeconds);
         while (_recentWaitTimes.Count > MaxWaitTimeSamples)
+        {
             _recentWaitTimes.Dequeue();
+        }
     }
 
     private float GetEstimatedWaitForPosition(int position)
@@ -270,44 +281,51 @@ public sealed class JoinQueueManager : IJoinQueueManager
 
         var playerNames = new List<string>(totalInQueue);
         foreach (var session in _patronQueue)
+        {
             playerNames.Add(session.Name);
+        }
+
         foreach (var session in _queue)
+        {
             playerNames.Add(session.Name);
+        }
 
         for (var i = 0; i < _patronQueue.Count; i++, currentPosition++)
         {
-            _patronQueue[i].Channel.SendMessage(new QueueUpdateMessage
-            {
-                Total = totalInQueue,
-                Position = currentPosition,
-                IsPatron = true,
-                EstimatedWaitSeconds = GetEstimatedWaitForPosition(currentPosition),
-                MapName = mapName,
-                GameMode = gameMode,
-                ServerPlayerCount = serverPlayerCount,
-                MaxPlayerCount = maxPlayerCount,
-                RoundDurationMinutes = roundDurationMinutes,
-                YourName = _patronQueue[i].Name,
-                PlayerNames = playerNames,
-            });
+            _patronQueue[i]
+                .Channel.SendMessage(new QueueUpdateMessage
+                {
+                    Total = totalInQueue,
+                    Position = currentPosition,
+                    IsPatron = true,
+                    EstimatedWaitSeconds = GetEstimatedWaitForPosition(currentPosition),
+                    MapName = mapName,
+                    GameMode = gameMode,
+                    ServerPlayerCount = serverPlayerCount,
+                    MaxPlayerCount = maxPlayerCount,
+                    RoundDurationMinutes = roundDurationMinutes,
+                    YourName = _patronQueue[i].Name,
+                    PlayerNames = playerNames,
+                });
         }
 
         for (var i = 0; i < _queue.Count; i++, currentPosition++)
         {
-            _queue[i].Channel.SendMessage(new QueueUpdateMessage
-            {
-                Total = totalInQueue,
-                Position = currentPosition,
-                IsPatron = false,
-                EstimatedWaitSeconds = GetEstimatedWaitForPosition(currentPosition),
-                MapName = mapName,
-                GameMode = gameMode,
-                ServerPlayerCount = serverPlayerCount,
-                MaxPlayerCount = maxPlayerCount,
-                RoundDurationMinutes = roundDurationMinutes,
-                YourName = _queue[i].Name,
-                PlayerNames = playerNames,
-            });
+            _queue[i]
+                .Channel.SendMessage(new QueueUpdateMessage
+                {
+                    Total = totalInQueue,
+                    Position = currentPosition,
+                    IsPatron = false,
+                    EstimatedWaitSeconds = GetEstimatedWaitForPosition(currentPosition),
+                    MapName = mapName,
+                    GameMode = gameMode,
+                    ServerPlayerCount = serverPlayerCount,
+                    MaxPlayerCount = maxPlayerCount,
+                    RoundDurationMinutes = roundDurationMinutes,
+                    YourName = _queue[i].Name,
+                    PlayerNames = playerNames,
+                });
         }
     }
 
@@ -324,13 +342,12 @@ public sealed class JoinQueueManager : IJoinQueueManager
         }
 
         foreach (var userId in expired)
+        {
             _reservations.Remove(userId);
+        }
     }
 
-    private void SendToGame(ICommonSession session)
-    {
-        Timer.Spawn(0, () => _player.JoinGame(session));
-    }
+    private void SendToGame(ICommonSession session) => Timer.Spawn(0, () => _player.JoinGame(session));
 
     private sealed record QueueReservation(DateTime DisconnectTime, bool WasPatron);
 }

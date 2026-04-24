@@ -18,20 +18,17 @@ using System.Linq;
 using Content.Goobstation.Common.MartialArts;
 using Content.Goobstation.Shared.MartialArts.Components;
 using Content.Goobstation.Shared.MartialArts.Events;
+using Content.Shared._Shitmed.Medical.Surgery.Wounds.Components;
+using Content.Shared._Shitmed.Medical.Surgery.Wounds.Systems;
+using Content.Shared._Shitmed.Targeting;
+using Content.Shared.Body.Part;
 using Content.Shared.Damage;
 using Content.Shared.Damage.Events;
-using Content.Goobstation.Maths.FixedPoint;
-using Content.Shared.Movement.Pulling.Components;
-using Content.Shared.Weapons.Melee;
-using Robust.Shared.Audio;
-
-// Shitmed Change
-using Content.Shared.Body.Part;
-using Content.Shared._Shitmed.Medical.Surgery.Wounds.Systems;
-using Content.Shared._Shitmed.Medical.Surgery.Wounds.Components;
-using Content.Shared._Shitmed.Targeting;
 using Content.Shared.Interaction.Events;
 using Content.Shared.Mobs.Components;
+using Content.Shared.Movement.Pulling.Components;
+using Robust.Shared.Audio;
+// Shitmed Change
 
 namespace Content.Goobstation.Shared.MartialArts;
 
@@ -89,7 +86,7 @@ public partial class SharedMartialArtsSystem
         var damage = new DamageSpecifier();
         damage.DamageDict.Add("Blunt", 300);
         _damageable.TryChangeDamage(target, damage, true, origin: ent, targetPart: TargetBodyPart.Head);
-        var head = _body.GetBodyChildrenOfType(target , BodyPartType.Head).FirstOrDefault();
+        var head = _body.GetBodyChildrenOfType(target, BodyPartType.Head).FirstOrDefault();
         if (head != default
             && TryComp<WoundableComponent>(head.Id, out var woundable)
             && woundable.ParentWoundable.HasValue)
@@ -155,7 +152,7 @@ public partial class SharedMartialArtsSystem
     }
 
     private void OnHellRipTearDown(Entity<CanPerformComboComponent> ent,
-       ref HellRipTearDownPerformedEvent args)
+        ref HellRipTearDownPerformedEvent args)
     {
         if (!_proto.TryIndex(ent.Comp.BeingPerformed, out var proto)
             || !_proto.TryIndex<MartialArtPrototype>(proto.MartialArtsForm.ToString(), out var martialArtProto)
@@ -168,7 +165,7 @@ public partial class SharedMartialArtsSystem
         DoDamage(ent, target, proto.DamageType, proto.ExtraDamage, out _);
         _audio.PlayPvs(new SoundPathSpecifier("/Audio/Effects/Fluids/blood1.ogg"), target);
         _audio.PlayPvs(new SoundPathSpecifier("/Audio/Effects/demon_attack1.ogg"), ent);
-
     }
+
     #endregion
 }

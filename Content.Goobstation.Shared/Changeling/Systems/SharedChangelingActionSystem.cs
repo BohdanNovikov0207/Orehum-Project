@@ -57,26 +57,18 @@ public abstract class SharedChanglingActionSystem : EntitySystem
         {
             DoPopup(args.User, ent.Comp.LesserFormPopup);
             args.Cancelled = true;
-
-            return;
         }
     }
 
     #region Helper Methods
-    private void DoPopup(EntityUid user, LocId popup, PopupType popupType = PopupType.Small)
-    {
+
+    private void DoPopup(EntityUid user, LocId popup, PopupType popupType = PopupType.Small) =>
         _popup.PopupClient(Loc.GetString(popup), user, user, popupType);
-    }
 
-    private void DoPopup(EntityUid user, string popup, PopupType popupType = PopupType.Small)
-    {
+    private void DoPopup(EntityUid user, string popup, PopupType popupType = PopupType.Small) =>
         _popup.PopupClient(popup, user, user, popupType);
-    }
 
-    private bool OnFire(EntityUid user)
-    {
-        return HasComp<OnFireComponent>(user);
-    }
+    private bool OnFire(EntityUid user) => HasComp<OnFireComponent>(user);
 
     #endregion
 }

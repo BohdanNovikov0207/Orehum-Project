@@ -16,10 +16,9 @@ namespace Content.Goobstation.Client.Xenobiology.XenobiologyBountyConsole;
 [GenerateTypedNameReferences]
 public sealed partial class XenobiologyBountyMenu : FancyWindow
 {
+    private TimeSpan _untilNextRefresh;
     public Action<string>? OnFulfillButtonPressed;
     public Action<string>? OnSkipButtonPressed;
-
-    private TimeSpan _untilNextRefresh;
 
     public XenobiologyBountyMenu()
     {
@@ -29,7 +28,10 @@ public sealed partial class XenobiologyBountyMenu : FancyWindow
         MasterTabContainer.SetTabTitle(1, Loc.GetString("bounty-console-tab-history-label"));
     }
 
-    public void UpdateEntries(List<XenobiologyBountyData> bounties, List<XenobiologyBountyHistoryData> history, TimeSpan untilNextSkip, TimeSpan untilNextRefresh)
+    public void UpdateEntries(List<XenobiologyBountyData> bounties,
+        List<XenobiologyBountyHistoryData> history,
+        TimeSpan untilNextSkip,
+        TimeSpan untilNextRefresh)
     {
         _untilNextRefresh = untilNextRefresh;
 
@@ -42,6 +44,7 @@ public sealed partial class XenobiologyBountyMenu : FancyWindow
 
             BountyEntriesContainer.AddChild(entry);
         }
+
         BountyEntriesContainer.AddChild(new Control
         {
             MinHeight = 10,
@@ -49,16 +52,16 @@ public sealed partial class XenobiologyBountyMenu : FancyWindow
 
         BountyHistoryContainer.Children.Clear();
         if (history.Count == 0)
-        {
             NoHistoryLabel.Visible = true;
-        }
         else
         {
             NoHistoryLabel.Visible = false;
 
             // Show the history in reverse, so last entry is first in the list
             for (var i = history.Count - 1; i >= 0; i--)
+            {
                 BountyHistoryContainer.AddChild(new XenobiologyBountyHistoryEntry(history[i]));
+            }
         }
     }
 
@@ -66,7 +69,8 @@ public sealed partial class XenobiologyBountyMenu : FancyWindow
     {
         _untilNextRefresh -= TimeSpan.FromSeconds(deltaSeconds);
         if (_untilNextRefresh > TimeSpan.Zero)
-            GlobalRefreshTimer.SetMarkup(Loc.GetString("xenobiology-console-refresh-label", ("time", _untilNextRefresh.ToString("mm\\:ss"))));
+            GlobalRefreshTimer.SetMarkup(Loc.GetString("xenobiology-console-refresh-label",
+                ("time", _untilNextRefresh.ToString("mm\\:ss"))));
     }
 
     protected override void FrameUpdate(FrameEventArgs args)

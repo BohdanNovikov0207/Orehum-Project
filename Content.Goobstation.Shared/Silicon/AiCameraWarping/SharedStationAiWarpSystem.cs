@@ -4,16 +4,19 @@
 // SPDX-License-Identifier: AGPL-3.0-or-later
 
 using Content.Shared.Actions;
-using Content.Shared.Silicons.StationAi;
 using Robust.Shared.Serialization;
 
 namespace Content.Goobstation.Shared.Silicon.AiCameraWarping;
 
-public abstract class SharedStationAiWarpSystem : EntitySystem { }
+public abstract class SharedStationAiWarpSystem : EntitySystem
+{
+}
 
-public sealed partial class ToggleCameraWarpScreenEvent : InstantActionEvent { }
+public sealed partial class ToggleCameraWarpScreenEvent : InstantActionEvent
+{
+}
 
-[Serializable, NetSerializable]
+[Serializable] [NetSerializable]
 public sealed class CameraWarpActionEvent : EntityEventArgs
 {
     public NetEntity Target;
@@ -24,14 +27,14 @@ public sealed class CameraWarpActionEvent : EntityEventArgs
     }
 }
 
-[Serializable, NetSerializable]
+[Serializable] [NetSerializable]
 public record struct CameraWarpData()
 {
     public string DisplayName = string.Empty;
     public NetEntity NetEntityUid = NetEntity.Invalid;
 }
 
-[Serializable, NetSerializable]
+[Serializable] [NetSerializable]
 public sealed class CameraWarpBuiState : BoundUserInterfaceState
 {
     public List<CameraWarpData> CameraList;
@@ -42,21 +45,24 @@ public sealed class CameraWarpBuiState : BoundUserInterfaceState
     }
 }
 
-[Serializable, NetSerializable]
+[Serializable] [NetSerializable]
 public sealed class CameraWarpActionMessage : BoundUserInterfaceMessage
 {
     public readonly CameraWarpActionEvent? WarpAction;
+
     public CameraWarpActionMessage(CameraWarpActionEvent camWarpAction)
     {
         WarpAction = camWarpAction;
     }
 }
 
-[Serializable, NetSerializable]
-public sealed class CameraWarpRefreshActionMessage : BoundUserInterfaceMessage { }
+[Serializable] [NetSerializable]
+public sealed class CameraWarpRefreshActionMessage : BoundUserInterfaceMessage
+{
+}
 
-[Serializable, NetSerializable]
+[Serializable] [NetSerializable]
 public enum CamWarpUiKey : byte
 {
-    Key
+    Key,
 }

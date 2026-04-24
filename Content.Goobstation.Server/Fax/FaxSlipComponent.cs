@@ -13,10 +13,10 @@ namespace Content.Goobstation.Server.Fax;
 public sealed partial class FaxSlipComponent : Component
 {
     /// <summary>
-    /// Chance we get teleported to destination instead of normal behavior.
+    /// Whether to work if the destination and source faxes are on different grids.
     /// </summary>
     [DataField]
-    public float SlipChance = 0.3f;
+    public bool CrossGrid = true;
 
     /// <summary>
     /// If not null, chance override for lubed items.
@@ -26,8 +26,8 @@ public sealed partial class FaxSlipComponent : Component
     public float? LubedChance = 1f;
 
     /// <summary>
-    /// Whether to work if the destination and source faxes are on different grids.
+    /// Chance we get teleported to destination instead of normal behavior.
     /// </summary>
     [DataField]
-    public bool CrossGrid = true;
+    public float SlipChance = 0.3f;
 }

@@ -3,13 +3,13 @@ using Robust.Shared.Serialization;
 
 namespace Content.Goobstation.Shared.Vehicles;
 
-[Serializable, NetSerializable]
+[Serializable] [NetSerializable]
 public enum ForkliftVisuals : byte
 {
     CrateState,
 }
 
-[Serializable, NetSerializable]
+[Serializable] [NetSerializable]
 public enum ForkliftCrateState : byte
 {
     Empty,
@@ -20,4 +20,5 @@ public enum ForkliftCrateState : byte
 }
 
 public sealed partial class ForkliftActionEvent : EntityTargetActionEvent;
+
 public sealed partial class UnforkliftActionEvent : InstantActionEvent;

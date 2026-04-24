@@ -20,10 +20,10 @@ public sealed partial class XenoVacEvent : EntityTargetActionEvent;
 
 public sealed partial class XenoVacClearEvent : InstantActionEvent;
 
-[Serializable, NetSerializable]
+[Serializable] [NetSerializable]
 public sealed partial class SlimeLatchDoAfterEvent : SimpleDoAfterEvent;
 
 /// <summary>
 /// rised after mitosis completed, but before parent slime deletion, directed to parent slime
 /// </summary>
-public sealed partial class SlimeMitosisEvent : EntityEventArgs;
+public sealed class SlimeMitosisEvent : EntityEventArgs;

@@ -12,7 +12,6 @@
 // SPDX-License-Identifier: AGPL-3.0-or-later
 
 using Content.Shared._Starlight.CollectiveMind;
-using Content.Shared.Tag;
 using Robust.Shared.Audio;
 using Robust.Shared.Audio.Components;
 using Robust.Shared.GameStates;
@@ -20,9 +19,15 @@ using Robust.Shared.Prototypes;
 
 namespace Content.Goobstation.Shared.Blob.Components;
 
-[RegisterComponent, NetworkedComponent, AutoGenerateComponentState]
+[RegisterComponent] [NetworkedComponent] [AutoGenerateComponentState]
 public sealed partial class BlobPodComponent : Component
 {
+    [DataField]
+    public ProtoId<CollectiveMindPrototype> CollectiveMind = "Blobmind";
+
+    [ViewVariables(VVAccess.ReadOnly)]
+    public EntityUid? Core = null;
+
     [AutoNetworkedField]
     [ViewVariables(VVAccess.ReadOnly)]
     public bool IsZombifying = false;
@@ -31,21 +36,15 @@ public sealed partial class BlobPodComponent : Component
     [ViewVariables(VVAccess.ReadOnly)]
     public EntityUid? ZombifiedEntityUid = default!;
 
-    [ViewVariables(VVAccess.ReadWrite), DataField("zombifyDelay")]
+    [ViewVariables(VVAccess.ReadWrite)] [DataField("zombifyDelay")]
     public float ZombifyDelay = 5.00f;
 
-    [ViewVariables(VVAccess.ReadOnly)]
-    public EntityUid? Core = null;
-
-    [ViewVariables(VVAccess.ReadWrite), DataField("zombifySoundPath")]
-    public SoundSpecifier ZombifySoundPath = new SoundPathSpecifier("/Audio/Effects/Fluids/blood1.ogg");
-
-    [ViewVariables(VVAccess.ReadWrite), DataField("zombifyFinishSoundPath")]
+    [ViewVariables(VVAccess.ReadWrite)] [DataField("zombifyFinishSoundPath")]
     public SoundSpecifier ZombifyFinishSoundPath = new SoundPathSpecifier("/Audio/Effects/gib1.ogg");
+
+    [ViewVariables(VVAccess.ReadWrite)] [DataField("zombifySoundPath")]
+    public SoundSpecifier ZombifySoundPath = new SoundPathSpecifier("/Audio/Effects/Fluids/blood1.ogg");
 
     public Entity<AudioComponent>? ZombifyStingStream;
     public EntityUid? ZombifyTarget;
-
-    [DataField]
-    public ProtoId<CollectiveMindPrototype> CollectiveMind = "Blobmind";
 }

@@ -6,7 +6,7 @@ namespace Content.Goobstation.Shared.Augments;
 /// Increases power draw on a power cell augment for this one.
 /// If the augment has ItemToggleComponent then it will only apply when activated.
 /// </summary>
-[RegisterComponent, NetworkedComponent, Access(typeof(AugmentPowerDrawSystem))]
+[RegisterComponent] [NetworkedComponent] [Access(typeof(AugmentPowerDrawSystem))]
 public sealed partial class AugmentPowerDrawComponent : Component
 {
     [DataField(required: true)]

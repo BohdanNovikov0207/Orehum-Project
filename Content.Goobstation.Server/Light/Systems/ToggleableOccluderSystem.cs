@@ -1,16 +1,16 @@
-using Content.Server.DeviceLinking.Systems;
 using Content.Goobstation.Server.Light.Components;
+using Content.Server.DeviceLinking.Systems;
 using Content.Shared.DeviceLinking.Events;
 
 namespace Content.Goobstation.Server.Light.EntitySystems;
 
 /// <summary>
-///     Handles the logic between signals and toggling OccluderComponent, early upstream merge of #30743
+/// Handles the logic between signals and toggling OccluderComponent, early upstream merge of #30743
 /// </summary>
 public sealed class ToggleableOccluderSystem : EntitySystem
 {
-    [Dependency] private readonly DeviceLinkSystem _signalSystem = default!;
     [Dependency] private readonly OccluderSystem _occluder = default!;
+    [Dependency] private readonly DeviceLinkSystem _signalSystem = default!;
 
     public override void Initialize()
     {
@@ -19,10 +19,8 @@ public sealed class ToggleableOccluderSystem : EntitySystem
         SubscribeLocalEvent<ToggleableOccluderComponent, ComponentInit>(OnInit);
     }
 
-    private void OnInit(EntityUid uid, ToggleableOccluderComponent comp, ComponentInit args)
-    {
+    private void OnInit(EntityUid uid, ToggleableOccluderComponent comp, ComponentInit args) =>
         _signalSystem.EnsureSinkPorts(uid, comp.OnPort, comp.OffPort, comp.TogglePort);
-    }
 
     private void OnSignalReceived(EntityUid uid, ToggleableOccluderComponent comp, ref SignalReceivedEvent args)
     {
@@ -52,5 +50,4 @@ public sealed class ToggleableOccluderSystem : EntitySystem
 
         _occluder.SetEnabled(uid, state);
     }
-
 }

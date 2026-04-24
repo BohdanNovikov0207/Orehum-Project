@@ -1,3 +1,4 @@
+using System.Numerics;
 using Content.Goobstation.Shared.MisandryBox.Thunderdome;
 using Content.Goobstation.UIKit.UserInterface.Controls;
 using Robust.Client.UserInterface.Controls;
@@ -6,19 +7,18 @@ namespace Content.Goobstation.Client.MisandryBox.Thunderdome;
 
 public sealed class ThunderdomeLoadoutWindow : ThunderdomeWindow
 {
-    public event Action<int>? OnLoadoutConfirmed;
-
-    private int _weaponSelection = -1;
-    private ThunderdomeWeaponCard? _selectedCard;
-
-    private readonly Label _playerCountLabel;
     private readonly BoxContainer _categoriesContainer;
     private readonly ThunderdomeButton _confirmButton;
+
+    private readonly Label _playerCountLabel;
+    private ThunderdomeWeaponCard? _selectedCard;
+
+    private int _weaponSelection = -1;
 
     public ThunderdomeLoadoutWindow()
     {
         WindowTitle = Loc.GetString("thunderdome-loadout-title");
-        SetSize = new System.Numerics.Vector2(450, 500);
+        SetSize = new Vector2(450, 500);
 
         _playerCountLabel = new Label
         {
@@ -68,6 +68,8 @@ public sealed class ThunderdomeLoadoutWindow : ThunderdomeWindow
         Contents.AddChild(_confirmButton);
     }
 
+    public event Action<int>? OnLoadoutConfirmed;
+
     public void UpdateState(ThunderdomeLoadoutEuiState state)
     {
         _playerCountLabel.Text = Loc.GetString("thunderdome-loadout-players", ("count", state.PlayerCount));
@@ -88,6 +90,7 @@ public sealed class ThunderdomeLoadoutWindow : ThunderdomeWindow
                 categoryMap[option.Category] = list;
                 categories.Add((option.Category, list));
             }
+
             list.Add(option);
         }
 
@@ -103,7 +106,10 @@ public sealed class ThunderdomeLoadoutWindow : ThunderdomeWindow
 
             foreach (var option in options)
             {
-                var card = new ThunderdomeWeaponCard(option.Index, option.Name, option.SpritePrototype, option.Description);
+                var card = new ThunderdomeWeaponCard(option.Index,
+                    option.Name,
+                    option.SpritePrototype,
+                    option.Description);
                 card.OnSelected += OnCardSelected;
                 _categoriesContainer.AddChild(card);
             }

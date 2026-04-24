@@ -26,19 +26,20 @@ namespace Content.Goobstation.Shared.MartialArts.Components;
 public abstract partial class GrantMartialArtKnowledgeComponent : Component
 {
     [DataField]
-    public virtual MartialArtsForms MartialArtsForm { get; set; } = MartialArtsForms.CloseQuartersCombat;
-
-    [DataField]
-    public virtual LocId? LearnMessage { get; set; } = null;
-
-    [DataField]
     public bool MultiUse;
+
+    [DataField]
+    public SoundSpecifier? SoundOnUse =
+        new SoundPathSpecifier("/Audio/Effects/fire.ogg", AudioParams.Default.WithVolume(10));
 
     [DataField]
     public string? SpawnedProto = "Ash";
 
     [DataField]
-    public SoundSpecifier? SoundOnUse = new SoundPathSpecifier("/Audio/Effects/fire.ogg", AudioParams.Default.WithVolume(10));
+    public virtual MartialArtsForms MartialArtsForm { get; set; } = MartialArtsForms.CloseQuartersCombat;
+
+    [DataField]
+    public virtual LocId? LearnMessage { get; set; } = null;
 }
 
 [RegisterComponent]
@@ -87,34 +88,35 @@ public sealed partial class GrantNinjutsuComponent : GrantMartialArtKnowledgeCom
 [RegisterComponent]
 public sealed partial class GrantSleepingCarpComponent : GrantMartialArtKnowledgeComponent
 {
-    [DataField]
-    public override MartialArtsForms MartialArtsForm { get; set; } = MartialArtsForms.SleepingCarp;
+    public int CurrentUses = 0;
 
     [DataField]
-    public int MaximumUses = 1;
-    public int CurrentUses = 0;
+    public ProtoId<NpcFactionPrototype> FactionToAdd = "Dragon";
 
     [DataField]
     public ProtoId<FactionIconPrototype> IconToAdd = "SleepingCarpFaction";
 
     [DataField]
-    public ProtoId<NpcFactionPrototype> FactionToAdd = "Dragon";
+    public int MaximumUses = 1;
+
+    [DataField]
+    public override MartialArtsForms MartialArtsForm { get; set; } = MartialArtsForms.SleepingCarp;
 }
 
 [RegisterComponent]
 public sealed partial class SleepingCarpStudentComponent : Component
 {
     [DataField]
-    public int Stage = 1;
-
-    [ViewVariables(VVAccess.ReadOnly)]
-    public TimeSpan UseAgainTime = TimeSpan.Zero;
-
-    [DataField]
     public int MaxUseDelay = 90;
 
     [DataField]
     public int MinUseDelay = 30;
+
+    [DataField]
+    public int Stage = 1;
+
+    [ViewVariables(VVAccess.ReadOnly)]
+    public TimeSpan UseAgainTime = TimeSpan.Zero;
 }
 
 [RegisterComponent]

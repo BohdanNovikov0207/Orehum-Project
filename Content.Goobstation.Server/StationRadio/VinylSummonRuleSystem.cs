@@ -1,5 +1,7 @@
+using System.Linq;
 using Content.Goobstation.Shared.StationRadio.Components;
 using Content.Goobstation.Shared.StationRadio.Events;
+using Content.Server.Chat.Systems;
 using Content.Server.GameTicking;
 using Content.Server.Station.Systems;
 using Content.Shared.Communications;
@@ -15,9 +17,6 @@ using Robust.Shared.Containers;
 using Robust.Shared.Prototypes;
 using Robust.Shared.Random;
 using Robust.Shared.Timing;
-using System.Linq;
-using Content.Server.Radio.Components;
-using Content.Server.Chat.Systems;
 
 namespace Content.Goobstation.Server.StationRadio;
 
@@ -26,19 +25,17 @@ namespace Content.Goobstation.Server.StationRadio;
 /// </summary>
 public sealed class VinylSummonRuleSystem : EntitySystem
 {
-    [Dependency] private readonly IGameTiming _timing = default!;
     [Dependency] private readonly SharedAudioSystem _audio = default!;
-    [Dependency] private readonly GameTicker _gameTicker = default!;
+    [Dependency] private readonly ChatSystem _chat = default!;
     [Dependency] private readonly SharedContainerSystem _containers = default!;
+    [Dependency] private readonly GameTicker _gameTicker = default!;
+    [Dependency] private readonly ItemSlotsSystem _itemSlots = default!;
+    [Dependency] private readonly SharedPopupSystem _popups = default!;
+    [Dependency] private readonly SharedPowerReceiverSystem _power = default!;
     [Dependency] private readonly IPrototypeManager _prototypeManager = default!;
     [Dependency] private readonly IRobustRandom _random = default!;
     [Dependency] private readonly StationSystem _stationSystem = default!;
-    [Dependency] private readonly SharedPowerReceiverSystem _power = default!;
-    [Dependency] private readonly ItemSlotsSystem _itemSlots = default!;
-    [Dependency] private readonly SharedPopupSystem _popups = default!;
-    [Dependency] private readonly ChatSystem _chat = default!;
-
-    private record struct TrackingData(EntityUid VinylPlayerUid, TimeSpan EndTime);
+    [Dependency] private readonly IGameTiming _timing = default!;
     private readonly Dictionary<EntityUid, TrackingData> _trackingVinyls = new();
 
     public override void Initialize()
@@ -84,7 +81,10 @@ public sealed class VinylSummonRuleSystem : EntitySystem
         // Check if vinyl player is connected to the radio system
         if (!CheckForRadioConnection(playerUid))
         {
-            _popups.PopupPredicted(Loc.GetString("vinyl-popout-no-radio-connection"), playerUid, null, PopupType.Medium);
+            _popups.PopupPredicted(Loc.GetString("vinyl-popout-no-radio-connection"),
+                playerUid,
+                null,
+                PopupType.Medium);
             QueueSafeEject();
             return;
         }
@@ -98,11 +98,9 @@ public sealed class VinylSummonRuleSystem : EntitySystem
         _trackingVinyls[vinylUid] = new TrackingData(playerUid, endTime);
     }
 
-    private void OnVinylRemoved(EntityUid uid, VinylPlayerComponent player, ref VinylRemovedEvent args)
-    {
+    private void OnVinylRemoved(EntityUid uid, VinylPlayerComponent player, ref VinylRemovedEvent args) =>
         // Stop tracking if the vinyl is removed
         _trackingVinyls.Remove(args.Vinyl);
-    }
 
     public override void Update(float frameTime)
     {
@@ -124,7 +122,10 @@ public sealed class VinylSummonRuleSystem : EntitySystem
             if (_stationSystem.GetOwningStation(data.VinylPlayerUid) == null)
             {
                 _trackingVinyls.Remove(vinylUid);
-                _popups.PopupPredicted(Loc.GetString("vinyl-popout-no-station"), data.VinylPlayerUid, null, PopupType.Medium);
+                _popups.PopupPredicted(Loc.GetString("vinyl-popout-no-station"),
+                    data.VinylPlayerUid,
+                    null,
+                    PopupType.Medium);
                 EjectVinyl(data.VinylPlayerUid, vinylUid);
                 continue;
             }
@@ -133,7 +134,10 @@ public sealed class VinylSummonRuleSystem : EntitySystem
             if (!_power.IsPowered(data.VinylPlayerUid))
             {
                 _trackingVinyls.Remove(vinylUid);
-                _popups.PopupPredicted(Loc.GetString("vinyl-popout-no-power"), data.VinylPlayerUid, null, PopupType.Medium);
+                _popups.PopupPredicted(Loc.GetString("vinyl-popout-no-power"),
+                    data.VinylPlayerUid,
+                    null,
+                    PopupType.Medium);
                 EjectVinyl(data.VinylPlayerUid, vinylUid);
                 continue;
             }
@@ -142,7 +146,10 @@ public sealed class VinylSummonRuleSystem : EntitySystem
             if (!CheckForRadioConnection(data.VinylPlayerUid))
             {
                 _trackingVinyls.Remove(vinylUid);
-                _popups.PopupPredicted(Loc.GetString("vinyl-popout-no-radio-connection"), data.VinylPlayerUid, null, PopupType.Medium);
+                _popups.PopupPredicted(Loc.GetString("vinyl-popout-no-radio-connection"),
+                    data.VinylPlayerUid,
+                    null,
+                    PopupType.Medium);
                 EjectVinyl(data.VinylPlayerUid, vinylUid);
                 continue;
             }
@@ -165,11 +172,13 @@ public sealed class VinylSummonRuleSystem : EntitySystem
 
         // Find the slot containing the vinyl
         foreach (var (_, slot) in itemSlots.Slots)
+        {
             if (slot.Item == vinylUid)
             {
                 _itemSlots.TryEject(playerUid, slot, null, out _);
                 return;
             }
+        }
     }
 
     private void HandleVinylFinished(EntityUid vinylUid)
@@ -186,7 +195,9 @@ public sealed class VinylSummonRuleSystem : EntitySystem
 
             // If we have a threat prototype with an announcement, send it
             if (threat != null)
-                _chat.DispatchGlobalAnnouncement(Loc.GetString(threat.Announcement), playSound: true, colorOverride: Color.Red);
+                _chat.DispatchGlobalAnnouncement(Loc.GetString(threat.Announcement),
+                    playSound: true,
+                    colorOverride: Color.Red);
         }
 
         var vinylXform = Transform(vinylUid);
@@ -217,7 +228,7 @@ public sealed class VinylSummonRuleSystem : EntitySystem
             var threatId = weightedPool.Pick(_random);
 
             // Look up the threat prototype to get the actual game rule ID
-            if (_prototypeManager.TryIndex<NinjaHackingThreatPrototype>(threatId, out threat))
+            if (_prototypeManager.TryIndex(threatId, out threat))
                 return threat.Rule;
 
             return null;
@@ -242,7 +253,7 @@ public sealed class VinylSummonRuleSystem : EntitySystem
             // Check if the radio server is connected.
             foreach (var linkedServer in sink.LinkedSources)
             {
-                if (!TryComp<StationRadioServerComponent>(linkedServer, out var _)
+                if (!TryComp<StationRadioServerComponent>(linkedServer, out _)
                     || !_power.IsPowered(linkedServer))
                     continue;
 
@@ -252,4 +263,6 @@ public sealed class VinylSummonRuleSystem : EntitySystem
 
         return false;
     }
+
+    private record struct TrackingData(EntityUid VinylPlayerUid, TimeSpan EndTime);
 }

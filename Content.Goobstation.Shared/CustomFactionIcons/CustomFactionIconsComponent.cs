@@ -4,9 +4,9 @@ using Robust.Shared.Prototypes;
 
 namespace Content.Goobstation.Shared.CustomFactionIcons;
 
-[RegisterComponent, NetworkedComponent, AutoGenerateComponentState]
+[RegisterComponent] [NetworkedComponent] [AutoGenerateComponentState]
 public sealed partial class CustomFactionIconsComponent : Component
 {
-    [DataField, AutoNetworkedField]
+    [DataField] [AutoNetworkedField]
     public List<ProtoId<FactionIconPrototype>> FactionIcons = [];
 }

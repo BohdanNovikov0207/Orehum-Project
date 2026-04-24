@@ -16,21 +16,20 @@ namespace Content.Goobstation.Client.ChronoLegionnaire.Overlays;
 
 public sealed class StasisOverlay : Overlay
 {
-    [Dependency] private readonly IPrototypeManager _prototypeManager = default!;
+    private readonly ShaderInstance _coloredScreenBorder;
     [Dependency] private readonly IEntityManager _entityManager = default!;
     [Dependency] private readonly IPlayerManager _playerManager = default!;
-
-    public override bool RequestScreenTexture => true;
-
-    public override OverlaySpace Space => OverlaySpace.WorldSpace;
-
-    private readonly ShaderInstance _coloredScreenBorder;
+    [Dependency] private readonly IPrototypeManager _prototypeManager = default!;
 
     public StasisOverlay()
     {
         IoCManager.InjectDependencies(this);
         _coloredScreenBorder = _prototypeManager.Index<ShaderPrototype>("WideColoredScreenBorder").InstanceUnique();
     }
+
+    public override bool RequestScreenTexture => true;
+
+    public override OverlaySpace Space => OverlaySpace.WorldSpace;
 
     protected override bool BeforeDraw(in OverlayDrawArgs args)
     {

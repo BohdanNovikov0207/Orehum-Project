@@ -7,8 +7,8 @@ namespace Content.Goobstation.Shared.Body;
 
 public sealed class OrganInsertOnUseSystem : EntitySystem
 {
-    [Dependency] private readonly SharedContainerSystem _container = default!;
     [Dependency] private readonly SharedBodySystem _body = default!;
+    [Dependency] private readonly SharedContainerSystem _container = default!;
 
     public override void Initialize()
     {

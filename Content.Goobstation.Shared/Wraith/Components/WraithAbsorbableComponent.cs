@@ -2,13 +2,13 @@ using Robust.Shared.GameStates;
 
 namespace Content.Goobstation.Shared.Wraith.Components;
 
-[RegisterComponent, NetworkedComponent]
+[RegisterComponent] [NetworkedComponent]
 [AutoGenerateComponentState]
 public sealed partial class WraithAbsorbableComponent : Component
 {
     /// <summary>
-    ///  Whether the user has been absorbed
+    /// Whether the user has been absorbed
     /// </summary>
-    [DataField, AutoNetworkedField]
+    [DataField] [AutoNetworkedField]
     public bool Absorbed;
 }

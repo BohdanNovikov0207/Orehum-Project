@@ -20,8 +20,8 @@ namespace Content.Goobstation.Server.Teleportation.Systems;
 public sealed class RandomTeleportSystem : EntitySystem
 {
     [Dependency] private readonly IAdminLogManager _alog = default!;
-    [Dependency] private readonly StackSystem _stack = default!;
     [Dependency] private readonly SharedRandomTeleportSystem _sharedRtp = default!;
+    [Dependency] private readonly StackSystem _stack = default!;
 
     public override void Initialize()
     {
@@ -50,6 +50,8 @@ public sealed class RandomTeleportSystem : EntitySystem
             QueueDel(uid);
         }
 
-        _alog.Add(LogType.Action, LogImpact.Low, $"{ToPrettyString(args.User):actor} randomly teleported to {wp!} using {ToPrettyString(uid)}");
+        _alog.Add(LogType.Action,
+            LogImpact.Low,
+            $"{ToPrettyString(args.User):actor} randomly teleported to {wp!} using {ToPrettyString(uid)}");
     }
 }

@@ -15,7 +15,7 @@ using Content.Shared.Objectives.Components;
 
 namespace Content.Goobstation.Server.Changeling.Objectives.Systems;
 
-public sealed partial class ChangelingObjectiveSystem : EntitySystem
+public sealed class ChangelingObjectiveSystem : EntitySystem
 {
     [Dependency] private readonly NumberObjectiveSystem _number = default!;
 
@@ -25,7 +25,8 @@ public sealed partial class ChangelingObjectiveSystem : EntitySystem
 
         SubscribeLocalEvent<AbsorbConditionComponent, ObjectiveGetProgressEvent>(OnAbsorbGetProgress);
         SubscribeLocalEvent<StealDNAConditionComponent, ObjectiveGetProgressEvent>(OnStealDNAGetProgress);
-        SubscribeLocalEvent<AbsorbChangelingConditionComponent, ObjectiveGetProgressEvent>(OnAbsorbChangelingGetProgress);
+        SubscribeLocalEvent<AbsorbChangelingConditionComponent, ObjectiveGetProgressEvent>(
+            OnAbsorbChangelingGetProgress);
     }
 
     private void OnAbsorbGetProgress(EntityUid uid, AbsorbConditionComponent comp, ref ObjectiveGetProgressEvent args)
@@ -33,16 +34,24 @@ public sealed partial class ChangelingObjectiveSystem : EntitySystem
         var target = _number.GetTarget(uid);
         if (target != 0)
             args.Progress = MathF.Min(comp.Absorbed / target, 1f);
-        else args.Progress = 1f;
+        else
+            args.Progress = 1f;
     }
-    private void OnStealDNAGetProgress(EntityUid uid, StealDNAConditionComponent comp, ref ObjectiveGetProgressEvent args)
+
+    private void OnStealDNAGetProgress(EntityUid uid,
+        StealDNAConditionComponent comp,
+        ref ObjectiveGetProgressEvent args)
     {
         var target = _number.GetTarget(uid);
         if (target != 0)
             args.Progress = MathF.Min(comp.DNAStolen / target, 1f);
-        else args.Progress = 1f;
+        else
+            args.Progress = 1f;
     }
-    private void OnAbsorbChangelingGetProgress(EntityUid uid, AbsorbChangelingConditionComponent comp, ref ObjectiveGetProgressEvent args)
+
+    private void OnAbsorbChangelingGetProgress(EntityUid uid,
+        AbsorbChangelingConditionComponent comp,
+        ref ObjectiveGetProgressEvent args)
     {
         var target = _number.GetTarget(uid);
         if (target != 0)

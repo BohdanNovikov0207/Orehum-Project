@@ -12,7 +12,7 @@ using Robust.Shared.Timing;
 
 namespace Content.Goobstation.Shared.DragDrop;
 
-public abstract partial class SharedGoobDragDropSystem : EntitySystem
+public abstract class SharedGoobDragDropSystem : EntitySystem
 {
     [Dependency] private readonly SharedInteractionSystem _interaction = default!;
     [Dependency] private readonly IGameTiming _timing = default!;
@@ -26,15 +26,9 @@ public abstract partial class SharedGoobDragDropSystem : EntitySystem
 
     // so you can drag-drop items
     // doesn't need CanDragDrop check
-    private void CanDragItem(Entity<ItemComponent> ent, ref CanDragEvent args)
-    {
-        args.Handled = true;
-    }
+    private void CanDragItem(Entity<ItemComponent> ent, ref CanDragEvent args) => args.Handled = true;
 
-    public bool CanDragDrop(EntityUid uid)
-    {
-        return HasComp<HandsComponent>(uid);
-    }
+    public bool CanDragDrop(EntityUid uid) => HasComp<HandsComponent>(uid);
 
     // copypaste avoidance methods
     protected void OnDragDrop(EntityUid uid, ref DragDropTargetEvent args)

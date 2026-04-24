@@ -17,7 +17,6 @@
 using System.Linq;
 using Content.Goobstation.Common.Weapons.Multishot;
 using Content.Goobstation.Shared.Weapons.MissChance;
-using Content.Shared._Shitmed.Targeting;
 using Content.Shared.Body.Part;
 using Content.Shared.Body.Systems;
 using Content.Shared.CombatMode;
@@ -40,12 +39,12 @@ public sealed class SharedMultishotSystem : EntitySystem
 {
     [Dependency] private readonly SharedBodySystem _bodySystem = default!;
     [Dependency] private readonly SharedCombatModeSystem _combatSystem = default!;
+    [Dependency] private readonly DamageableSystem _damageableSystem = default!;
     [Dependency] private readonly SharedGunSystem _gunSystem = default!;
     [Dependency] private readonly SharedHandsSystem _handsSystem = default!;
     [Dependency] private readonly MissChanceSystem _miss = default!;
     [Dependency] private readonly IPrototypeManager _proto = default!;
     [Dependency] private readonly SharedStaminaSystem _staminaSystem = default!;
-    [Dependency] private readonly DamageableSystem _damageableSystem = default!;
 
     public override void Initialize()
     {
@@ -72,7 +71,7 @@ public sealed class SharedMultishotSystem : EntitySystem
         var shootCoords = GetCoordinates(msg.Coordinates);
         var target = GetEntity(msg.Target);
 
-        foreach(var gun in gunsEnumerator)
+        foreach (var gun in gunsEnumerator)
         {
             var (gunEnt, gunComp, _) = gun;
 
@@ -130,7 +129,8 @@ public sealed class SharedMultishotSystem : EntitySystem
 
         var bodyPart = _bodySystem.GetTargetBodyPart(BodyPartType.Hand, bodySymmetry);
 
-        var damage = new DamageSpecifier(_proto.Index<DamageTypePrototype>(component.HandDamageType), component.HandDamageAmount);
+        var damage = new DamageSpecifier(_proto.Index<DamageTypePrototype>(component.HandDamageType),
+            component.HandDamageAmount);
         _damageableSystem.TryChangeDamage(target, damage, targetPart: bodyPart);
     }
 
@@ -180,7 +180,7 @@ public sealed class SharedMultishotSystem : EntitySystem
     private void OnExamined(Entity<MultishotComponent> ent, ref ExaminedEvent args)
     {
         var message = new FormattedMessage();
-        var chance = (MathF.Round(ent.Comp.MissChance * 100f)).ToString();
+        var chance = MathF.Round(ent.Comp.MissChance * 100f).ToString();
         message.AddText(Loc.GetString(ent.Comp.ExamineMessage, ("chance", chance)));
         args.PushMessage(message);
     }
@@ -198,7 +198,8 @@ public sealed class SharedMultishotSystem : EntitySystem
 
         foreach (var item in handsItems)
         {
-            if (TryComp<GunComponent>(item, out var gunComp) && TryComp<MultishotComponent>(item, out var multishotComp))
+            if (TryComp<GunComponent>(item, out var gunComp) &&
+                TryComp<MultishotComponent>(item, out var multishotComp))
                 itemList.Add((item, gunComp, multishotComp));
         }
 

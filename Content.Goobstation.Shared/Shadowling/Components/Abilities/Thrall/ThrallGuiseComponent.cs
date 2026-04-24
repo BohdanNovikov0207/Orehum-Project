@@ -6,17 +6,19 @@ namespace Content.Goobstation.Shared.Shadowling.Components.Abilities.Thrall;
 /// <summary>
 /// This is used for the Guise Ability.
 /// </summary>
-[RegisterComponent, NetworkedComponent]
+[RegisterComponent] [NetworkedComponent]
 public sealed partial class ThrallGuiseComponent : Component
 {
-    [DataField]
-    public EntProtoId ActionId = "ActionGuise";
-
     [DataField]
     public EntityUid? ActionEnt;
 
     [DataField]
-    public TimeSpan NextUpdate = TimeSpan.Zero;
+    public EntProtoId ActionId = "ActionGuise";
+
+    /// <summary>
+    /// Indicates whether the ability is active, or not.
+    /// </summary>
+    public bool Active;
 
     /// <summary>
     /// How long the effect lasts.
@@ -24,8 +26,6 @@ public sealed partial class ThrallGuiseComponent : Component
     [DataField]
     public TimeSpan GuiseDuration = TimeSpan.FromSeconds(10);
 
-    /// <summary>
-    /// Indicates whether the ability is active, or not.
-    /// </summary>
-    public bool Active;
+    [DataField]
+    public TimeSpan NextUpdate = TimeSpan.Zero;
 }

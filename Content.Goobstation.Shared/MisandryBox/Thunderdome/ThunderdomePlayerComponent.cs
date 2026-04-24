@@ -1,25 +1,22 @@
-using Robust.Shared.GameObjects;
-using Robust.Shared.Serialization.Manager.Attributes;
-
 namespace Content.Goobstation.Shared.MisandryBox.Thunderdome;
 
 [RegisterComponent]
 public sealed partial class ThunderdomePlayerComponent : Component
 {
     [DataField]
-    public EntityUid? RuleEntity;
-
-    [DataField]
-    public int Kills;
+    public int CurrentStreak;
 
     [DataField]
     public int Deaths;
 
     [DataField]
-    public int CurrentStreak;
+    public int Kills;
+
+    public EntityUid? LastAttacker;
+
+    [DataField]
+    public EntityUid? RuleEntity;
 
     [DataField]
     public int WeaponSelection;
-
-    public EntityUid? LastAttacker;
 }

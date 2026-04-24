@@ -17,14 +17,16 @@ internal sealed class AddPatronTierCommand : LocalizedCommands
 
     public override string Description => "Create a debug patron tier for testing";
 
-    public override string Help => "Usage: addpatrontier <tierId> <tierName> <icon?> <credits?> <ghostcolor?> <lobbymessage?> <shoutout?>\n" +
-                                    "Example: addpatrontier captain Captain JobIconCaptain true true true true";
+    public override string Help =>
+        "Usage: addpatrontier <tierId> <tierName> <icon?> <credits?> <ghostcolor?> <lobbymessage?> <shoutout?>\n" +
+        "Example: addpatrontier captain Captain JobIconCaptain true true true true";
 
     public override void Execute(IConsoleShell shell, string argStr, string[] args)
     {
         if (args.Length < 2)
         {
-            shell.WriteError("Usage: addpatrontier <tierId> <tierName> <icon?> <credits?> <ghostcolor?> <lobbymessage?> <shoutout?>");
+            shell.WriteError(
+                "Usage: addpatrontier <tierId> <tierName> <icon?> <credits?> <ghostcolor?> <lobbymessage?> <shoutout?>");
             shell.WriteError("Example: addpatrontier captain \"Captain\" JobIconCaptain true true true true");
             return;
         }
@@ -38,12 +40,12 @@ internal sealed class AddPatronTierCommand : LocalizedCommands
         var roundEndShoutout = args.Length > 6 && bool.TryParse(args[6], out var shoutout) && shoutout;
 
         var tier = new SharedRMCPatronTier(
-            ShowOnCredits: showOnCredits,
-            GhostColor: ghostColor,
-            LobbyMessage: lobbyMessage,
-            RoundEndShoutout: roundEndShoutout,
-            Tier: tierName,
-            Icon: icon
+            showOnCredits,
+            ghostColor,
+            lobbyMessage,
+            roundEndShoutout,
+            tierName,
+            icon
         );
 
         _linkAccount.AddFauxTier(tierId, tier);
@@ -57,9 +59,8 @@ internal sealed class AddPatronTierCommand : LocalizedCommands
         shell.WriteLine($"  Shoutout: {roundEndShoutout}");
     }
 
-    public override CompletionResult GetCompletion(IConsoleShell shell, string[] args)
-    {
-        return args.Length switch
+    public override CompletionResult GetCompletion(IConsoleShell shell, string[] args) =>
+        args.Length switch
         {
             1 => CompletionResult.FromHint("<tierId>"),
             2 => CompletionResult.FromHint("<tierName>"),
@@ -68,7 +69,6 @@ internal sealed class AddPatronTierCommand : LocalizedCommands
             5 => CompletionResult.FromHintOptions(BoolOptions, "<ghostcolor?>"),
             6 => CompletionResult.FromHintOptions(BoolOptions, "<lobbymessage?>"),
             7 => CompletionResult.FromHintOptions(BoolOptions, "<shoutout?>"),
-            _ => CompletionResult.Empty
+            _ => CompletionResult.Empty,
         };
-    }
 }

@@ -15,8 +15,8 @@ namespace Content.Goobstation.Shared.Security.ContrabandIcons;
 /// </summary>
 public abstract class SharedContrabandIconsSystem : EntitySystem
 {
-    [Dependency] private readonly SharedContrabandDetectorSystem _detectorSystem = default!;
     [Dependency] private readonly IConfigurationManager _configuration = default!;
+    [Dependency] private readonly SharedContrabandDetectorSystem _detectorSystem = default!;
     private bool _isEnabled = true;
 
     public override void Initialize()
@@ -27,11 +27,13 @@ public abstract class SharedContrabandIconsSystem : EntitySystem
 
         SubscribeLocalEvent<VisibleContrabandComponent, DidEquipHandEvent>(OnEquipHands);
         SubscribeLocalEvent<VisibleContrabandComponent, DidUnequipHandEvent>(OnUnequipHands);
-        
+
         Subs.CVar(_configuration, GoobCVars.ContrabandIconsEnabled, value => _isEnabled = value);
     }
 
-    protected void ContrabandDetect(EntityUid inventory, VisibleContrabandComponent component, SlotFlags slotFlags = SlotFlags.WITHOUT_POCKET)
+    protected void ContrabandDetect(EntityUid inventory,
+        VisibleContrabandComponent component,
+        SlotFlags slotFlags = SlotFlags.WITHOUT_POCKET)
     {
         if (!_isEnabled)
             return;
@@ -42,33 +44,24 @@ public abstract class SharedContrabandIconsSystem : EntitySystem
         component.StatusIcon = StatusToIcon(isDetected ? ContrabandStatus.Contraband : ContrabandStatus.None);
         Dirty(inventory, component);
     }
-    
-    private string StatusToIcon(ContrabandStatus status)
-    {
-        return status switch
+
+    private string StatusToIcon(ContrabandStatus status) =>
+        status switch
         {
             ContrabandStatus.None => "ContrabandIconNone",
             ContrabandStatus.Contraband => "ContrabandIconContraband",
-            _ => "ContrabandIconNone"
+            _ => "ContrabandIconNone",
         };
-    }
 
-    private void OnEquip(EntityUid uid, VisibleContrabandComponent component, DidEquipEvent args)
-    {
+    private void OnEquip(EntityUid uid, VisibleContrabandComponent component, DidEquipEvent args) =>
         ContrabandDetect(uid, component, args.SlotFlags);
-    }
 
-    private void OnUnequip(EntityUid uid, VisibleContrabandComponent component, DidUnequipEvent args)
-    {
+    private void OnUnequip(EntityUid uid, VisibleContrabandComponent component, DidUnequipEvent args) =>
         ContrabandDetect(uid, component, args.SlotFlags);
-    }
 
-    private void OnUnequipHands(EntityUid uid, VisibleContrabandComponent component, DidUnequipHandEvent args)
-    {
+    private void OnUnequipHands(EntityUid uid, VisibleContrabandComponent component, DidUnequipHandEvent args) =>
         ContrabandDetect(uid, component, SlotFlags.NONE);
-    }
-    private void OnEquipHands(EntityUid uid, VisibleContrabandComponent component, DidEquipHandEvent args)
-    {
+
+    private void OnEquipHands(EntityUid uid, VisibleContrabandComponent component, DidEquipHandEvent args) =>
         ContrabandDetect(uid, component, SlotFlags.NONE);
-    }
 }

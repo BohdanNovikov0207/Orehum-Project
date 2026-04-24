@@ -4,4 +4,6 @@ namespace Content.Goobstation.Shared.MobCall;
 /// Marker component for entities that can be affected by MobCallSourceComponent.
 /// </summary>
 [RegisterComponent]
-public sealed partial class MobCallableComponent : Component {}
+public sealed partial class MobCallableComponent : Component
+{
+}

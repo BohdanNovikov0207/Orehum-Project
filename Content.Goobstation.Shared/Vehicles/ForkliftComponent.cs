@@ -5,22 +5,22 @@ namespace Content.Goobstation.Shared.Vehicles;
 [RegisterComponent]
 public sealed partial class ForkliftComponent : Component
 {
-    [ViewVariables(VVAccess.ReadOnly)]
-    public EntityUid? LiftAction;
-
-
-    [ViewVariables(VVAccess.ReadOnly)]
-    public EntityUid? UnliftAction;
-
     [DataField]
     public int ForkliftCapacity = 4;
+
+    [ViewVariables(VVAccess.ReadOnly)]
+    public EntityUid? LiftAction;
 
     [DataField]
     public SoundSpecifier LiftSound;
 
     [ViewVariables(VVAccess.ReadOnly)]
-    public EntityUid? LiftSoundUid;
+    public TimeSpan? LiftSoundEndTime;
 
     [ViewVariables(VVAccess.ReadOnly)]
-    public TimeSpan? LiftSoundEndTime;
+    public EntityUid? LiftSoundUid;
+
+
+    [ViewVariables(VVAccess.ReadOnly)]
+    public EntityUid? UnliftAction;
 }

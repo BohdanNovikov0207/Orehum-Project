@@ -23,27 +23,15 @@ namespace Content.Goobstation.Shared.Bloodtrak;
 /// <summary>
 /// Allows an item to track another entity based on DNA from a solution.
 /// </summary>
-[RegisterComponent, NetworkedComponent]
+[RegisterComponent] [NetworkedComponent]
 [AutoGenerateComponentState]
 public sealed partial class BloodtrakComponent : Component
 {
     /// <summary>
-    /// The maximum time the pinpointer will work from given puddle freshness.
+    /// The current angle of the trackers arrow.
     /// </summary>
-    [DataField]
-    public TimeSpan MaximumTrackingDuration = TimeSpan.FromSeconds(480f);
-
-    /// <summary>
-    /// Maximum tracking distance. If target further - shows Unknown.
-    /// </summary>
-    [DataField]
-    public float MaxDistance = 128f;
-
-    /// <summary>
-    /// The distance defined as being a medium distance away.
-    /// </summary>
-    [DataField]
-    public float MediumDistance = 16f;
+    [ViewVariables] [AutoNetworkedField]
+    public Angle ArrowAngle;
 
     /// <summary>
     /// The distance defined as being a short distance away.
@@ -52,13 +40,61 @@ public sealed partial class BloodtrakComponent : Component
     public float CloseDistance = 8f;
 
     /// <summary>
-    /// The distance defined as being close.
+    /// How long until the next execution.
     /// </summary>
-    [DataField]
-    public float ReachedDistance = 1f;
+    [ViewVariables]
+    public TimeSpan CooldownDuration = TimeSpan.FromSeconds(10f);
 
     /// <summary>
-    ///     Pinpointer arrow precision in radians.
+    /// When cooldown ends
+    /// </summary>
+    [ViewVariables]
+    public TimeSpan CooldownEndTime = TimeSpan.Zero;
+
+    /// <summary>
+    /// The current distance to the target.
+    /// </summary>
+    [ViewVariables] [AutoNetworkedField]
+    public Distance DistanceToTarget = Distance.Unknown;
+
+    /// <summary>
+    /// When active tracking ends
+    /// </summary>
+    [ViewVariables]
+    public TimeSpan ExpirationTime;
+
+    [DataField]
+    public TimeSpan Freshness;
+
+    /// <summary>
+    /// Whether the tracker is currently active.
+    /// </summary>
+    [ViewVariables] [AutoNetworkedField]
+    public bool IsActive = false;
+
+    [ViewVariables]
+    public EntityUid? LastScannedTarget = null;
+
+    /// <summary>
+    /// Maximum tracking distance. If target further - shows Unknown.
+    /// </summary>
+    [DataField]
+    public float MaxDistance = 128f;
+
+    /// <summary>
+    /// The maximum time the pinpointer will work from given puddle freshness.
+    /// </summary>
+    [DataField]
+    public TimeSpan MaximumTrackingDuration = TimeSpan.FromSeconds(480f);
+
+    /// <summary>
+    /// The distance defined as being a medium distance away.
+    /// </summary>
+    [DataField]
+    public float MediumDistance = 16f;
+
+    /// <summary>
+    /// Pinpointer arrow precision in radians.
     /// </summary>
     /// <remarks>
     /// 0.09 radians ≈ 5.16 degrees
@@ -67,55 +103,10 @@ public sealed partial class BloodtrakComponent : Component
     public double Precision = 0.09;
 
     /// <summary>
-    /// The current target of the tracker.
+    /// The distance defined as being close.
     /// </summary>
-    [ViewVariables]
-    public EntityUid? Target = null;
-
-    /// <summary>
-    /// Whether the tracker is currently active.
-    /// </summary>
-    [ViewVariables, AutoNetworkedField]
-    public bool IsActive = false;
-
-    /// <summary>
-    /// The current angle of the trackers arrow.
-    /// </summary>
-    [ViewVariables, AutoNetworkedField]
-    public Angle ArrowAngle;
-
-    /// <summary>
-    /// The current distance to the target.
-    /// </summary>
-    [ViewVariables, AutoNetworkedField]
-    public Distance DistanceToTarget = Distance.Unknown;
-
-    /// <summary>
-    /// How long until the next execution.
-    /// </summary>
-    [ViewVariables]
-    public TimeSpan CooldownDuration = TimeSpan.FromSeconds(10f);
-
-    /// <summary>
-    /// When active tracking ends
-    /// </summary>
-    [ViewVariables]
-    public TimeSpan ExpirationTime;
-
-    /// <summary>
-    /// When cooldown ends
-    /// </summary>
-    [ViewVariables]
-    public TimeSpan CooldownEndTime = TimeSpan.Zero;
-
-    [ViewVariables]
-    public bool HasTarget => DistanceToTarget != Distance.Unknown;
-
     [DataField]
-    public TimeSpan Freshness;
-
-    [ViewVariables]
-    public EntityUid? LastScannedTarget = null;
+    public float ReachedDistance = 1f;
 
     [ViewVariables]
     public List<(string, TimeSpan, EntityUid)> ResultList = new();
@@ -123,14 +114,22 @@ public sealed partial class BloodtrakComponent : Component
     [ViewVariables]
     public int ResultListOffset = 0;
 
+    /// <summary>
+    /// The current target of the tracker.
+    /// </summary>
+    [ViewVariables]
+    public EntityUid? Target = null;
+
+    [ViewVariables]
+    public bool HasTarget => DistanceToTarget != Distance.Unknown;
 }
 
-[Serializable, NetSerializable]
+[Serializable] [NetSerializable]
 public enum Distance : byte
 {
     Unknown,
     Reached,
     Close,
     Medium,
-    Far
+    Far,
 }

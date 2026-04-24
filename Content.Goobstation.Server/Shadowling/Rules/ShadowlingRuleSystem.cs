@@ -24,19 +24,21 @@ namespace Content.Goobstation.Server.Shadowling.Rules;
 
 public sealed class ShadowlingRuleSystem : GameRuleSystem<ShadowlingRuleComponent>
 {
-    [Dependency] private readonly SharedRoleSystem _role = default!;
     [Dependency] private readonly AntagSelectionSystem _antag = default!;
-    [Dependency] private readonly MindSystem _mind = default!;
-    [Dependency] private readonly MobStateSystem _mob = default!;
-    [Dependency] private readonly NpcFactionSystem _npc = default!;
 
-    private readonly SoundSpecifier _briefingSound = new SoundPathSpecifier("/Audio/_EinsteinEngines/Shadowling/shadowling.ogg");
+    private readonly SoundSpecifier _briefingSound =
+        new SoundPathSpecifier("/Audio/_EinsteinEngines/Shadowling/shadowling.ogg");
+
+    [Dependency] private readonly MindSystem _mind = default!;
 
     private readonly EntProtoId _mindRole = "MindRoleShadowling";
-
-    private readonly ProtoId<NpcFactionPrototype> _shadowlingFactionId = "Shadowling";
+    [Dependency] private readonly MobStateSystem _mob = default!;
 
     private readonly ProtoId<NpcFactionPrototype> _nanotrasenFactionId = "NanoTrasen";
+    [Dependency] private readonly NpcFactionSystem _npc = default!;
+    [Dependency] private readonly SharedRoleSystem _role = default!;
+
+    private readonly ProtoId<NpcFactionPrototype> _shadowlingFactionId = "Shadowling";
 
     public override void Initialize()
     {
@@ -87,10 +89,8 @@ public sealed class ShadowlingRuleSystem : GameRuleSystem<ShadowlingRuleComponen
         args.Briefing = Loc.GetString(sling ? "shadowling-briefing" : "thrall-briefing");
     }
 
-    private void OnSelectAntag(EntityUid uid, ShadowlingRuleComponent comp, ref AfterAntagEntitySelectedEvent args)
-    {
+    private void OnSelectAntag(EntityUid uid, ShadowlingRuleComponent comp, ref AfterAntagEntitySelectedEvent args) =>
         MakeShadowling(args.EntityUid);
-    }
 
     public bool MakeShadowling(EntityUid target)
     {

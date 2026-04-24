@@ -8,7 +8,7 @@ namespace Content.Goobstation.Server.Lathe;
 /// Lets a lathe produce the last made recipe, controlled by signal port.
 /// The port must be added by something else e.g. AutomationSlots
 /// </summary>
-[RegisterComponent, Access(typeof(LatheAutomationSystem))]
+[RegisterComponent] [Access(typeof(LatheAutomationSystem))]
 public sealed partial class LatheAutomationComponent : Component
 {
     [ViewVariables]

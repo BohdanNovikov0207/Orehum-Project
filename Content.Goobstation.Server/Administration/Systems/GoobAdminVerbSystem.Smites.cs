@@ -3,9 +3,7 @@
 //
 // SPDX-License-Identifier: AGPL-3.0-or-later
 
-using System.Threading;
 using Content.Goobstation.Shared.MisandryBox.Smites;
-using Content.Server.Explosion.EntitySystems;
 using Content.Shared.Administration;
 using Content.Shared.Database;
 using Content.Shared.Verbs;
@@ -27,11 +25,11 @@ public sealed partial class GoobAdminVerbSystem
         {
             Text = thunderstrike,
             Category = VerbCategory.Smite,
-            Icon = new SpriteSpecifier.Texture(new ("/Textures/Interface/VerbIcons/smite.svg.192dpi.png")),
+            Icon = new SpriteSpecifier.Texture(new ResPath("/Textures/Interface/VerbIcons/smite.svg.192dpi.png")),
             Act = () =>
             {
                 var ogun = EntityManager.System<ThunderstrikeSystem>();
-                ogun.Smite(args.Target, kill: true);
+                ogun.Smite(args.Target);
             },
             Impact = LogImpact.Extreme,
             Message = Loc.GetString("admin-smite-thunderstrike-desc"),

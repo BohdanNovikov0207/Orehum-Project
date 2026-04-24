@@ -13,12 +13,10 @@ namespace Content.Goobstation.Shared.ChronoLegionnaire.Components;
 /// <summary>
 /// Marks an entity that is under a stasis effect at the moment
 /// </summary>
-[RegisterComponent, NetworkedComponent, Access(typeof(SharedStasisSystem))]
+[RegisterComponent] [NetworkedComponent] [Access(typeof(SharedStasisSystem))]
 public sealed partial class InsideStasisComponent : Component
 {
-    public SoundSpecifier StasisSound = new SoundPathSpecifier("/Audio/Effects/Grenades/Supermatter/whitehole_start.ogg");
-
-    public SoundSpecifier StasisEndSound = new SoundPathSpecifier("/Audio/_Goobstation/Effects/ChronoLegionnaire/stasis_reversed.ogg");
+    public EntityUid Effect = new();
 
     /// <summary>
     /// Stasis effect on contanmend player
@@ -26,7 +24,11 @@ public sealed partial class InsideStasisComponent : Component
     [DataField("effectProto")]
     public string EffectEntityProto = "EffectStasis";
 
-    public EntityUid Effect = new();
+    public SoundSpecifier StasisEndSound =
+        new SoundPathSpecifier("/Audio/_Goobstation/Effects/ChronoLegionnaire/stasis_reversed.ogg");
+
+    public SoundSpecifier StasisSound =
+        new SoundPathSpecifier("/Audio/Effects/Grenades/Supermatter/whitehole_start.ogg");
 }
 
 /// <summary>

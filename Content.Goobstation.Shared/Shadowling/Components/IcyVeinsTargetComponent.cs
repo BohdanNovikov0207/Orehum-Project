@@ -5,7 +5,7 @@ namespace Content.Goobstation.Shared.Shadowling.Components;
 /// <summary>
 /// Marks target as affected by Icy Veins and applies its effects
 /// </summary>
-[RegisterComponent, NetworkedComponent]
+[RegisterComponent] [NetworkedComponent]
 public sealed partial class IcyVeinsTargetComponent : Component
 {
     [DataField]
@@ -15,8 +15,8 @@ public sealed partial class IcyVeinsTargetComponent : Component
     public float MinTargetTemperature = 200.0f;
 
     [DataField]
-    public float TimeUntilNextDecrease = 0.6f;
+    public float Timer = 0.6f;
 
     [DataField]
-    public float Timer = 0.6f;
+    public float TimeUntilNextDecrease = 0.6f;
 }

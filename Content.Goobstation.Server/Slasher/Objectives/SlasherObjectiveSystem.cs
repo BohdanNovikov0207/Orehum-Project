@@ -18,8 +18,9 @@ public sealed class SlasherObjectiveSystem : EntitySystem
         SubscribeLocalEvent<SlasherAbsorbSoulsConditionComponent, ObjectiveGetProgressEvent>(OnGetAbsorbSoulsProgress);
     }
 
-    private void OnGetAbsorbSoulsProgress(EntityUid uid, SlasherAbsorbSoulsConditionComponent comp, ref ObjectiveGetProgressEvent args)
-    {
-        args.Progress = _number.GetTarget(uid) != 0 ? MathF.Min(comp.Absorbed / (float) _number.GetTarget(uid), 1f) : 1f;
-    }
+    private void OnGetAbsorbSoulsProgress(EntityUid uid,
+        SlasherAbsorbSoulsConditionComponent comp,
+        ref ObjectiveGetProgressEvent args) => args.Progress = _number.GetTarget(uid) != 0
+        ? MathF.Min(comp.Absorbed / (float) _number.GetTarget(uid), 1f)
+        : 1f;
 }

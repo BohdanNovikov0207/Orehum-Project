@@ -10,13 +10,13 @@ namespace Content.Goobstation.Shared.Interaction.GunBlock;
 /// </summary>
 public sealed class SlasherGunBlockedSystem : EntitySystem
 {
-    [Dependency] private readonly SharedPopupSystem _popup = default!;
-    [Dependency] private readonly INetManager _net = default!;
-    [Dependency] private readonly IGameTiming _timing = default!;
+    private static readonly TimeSpan PopupCooldown = TimeSpan.FromSeconds(1);
 
     // Server-side cooldown to avoid popup spam while holding fire
     private readonly Dictionary<EntityUid, TimeSpan> _lastPopup = new();
-    private static readonly TimeSpan PopupCooldown = TimeSpan.FromSeconds(1);
+    [Dependency] private readonly INetManager _net = default!;
+    [Dependency] private readonly SharedPopupSystem _popup = default!;
+    [Dependency] private readonly IGameTiming _timing = default!;
 
     public override void Initialize()
     {

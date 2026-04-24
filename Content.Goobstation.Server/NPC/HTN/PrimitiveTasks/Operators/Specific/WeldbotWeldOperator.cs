@@ -6,6 +6,7 @@
 //
 // SPDX-License-Identifier: AGPL-3.0-or-later
 
+using System.Linq;
 using Content.Goobstation.Shared.Silicon.Bots;
 using Content.Server.Chat.Systems;
 using Content.Server.NPC;
@@ -16,11 +17,10 @@ using Content.Shared.Damage;
 using Content.Shared.Emag.Components;
 using Content.Shared.Interaction;
 using Content.Shared.Popups;
+using Content.Shared.Repairable;
 using Content.Shared.Tag;
 using Robust.Shared.Audio.Systems;
 using Robust.Shared.Prototypes;
-using System.Linq;
-using Content.Shared.Repairable;
 
 namespace Content.Goobstation.Server.NPC.HTN.PrimitiveTasks.Operators.Specific;
 
@@ -28,14 +28,14 @@ public sealed partial class WeldbotWeldOperator : HTNOperator
 {
     [Dependency] private readonly IEntityManager _entMan = default!;
     [Dependency] private readonly IPrototypeManager _prototypeManager = default!;
-    private RepairableSystem _repairableSystem = default!;
-    private ChatSystem _chat = default!;
-    private WeldbotSystem _weldbot = default!;
     private SharedAudioSystem _audio = default!;
+    private ChatSystem _chat = default!;
+    private DamageableSystem _damageableSystem = default!;
     private SharedInteractionSystem _interaction = default!;
     private SharedPopupSystem _popup = default!;
-    private DamageableSystem _damageableSystem = default!;
+    private RepairableSystem _repairableSystem = default!;
     private TagSystem _tagSystem = default!;
+    private WeldbotSystem _weldbot = default!;
 
     /// <summary>
     /// Target entity to inject.
@@ -73,23 +73,25 @@ public sealed partial class WeldbotWeldOperator : HTNOperator
             || !_entMan.TryGetComponent<WeldbotComponent>(owner, out var botComp)
             || !_entMan.TryGetComponent<DamageableComponent>(target, out var damage)
             || !_interaction.InRangeUnobstructed(owner, target)
-            || damage.Damage.DamageDict.Keys.Intersect(botComp.DamageAmount.DamageDict.Keys).All(key => damage.Damage.DamageDict[key] == 0)
+            || damage.Damage.DamageDict.Keys.Intersect(botComp.DamageAmount.DamageDict.Keys)
+                .All(key => damage.Damage.DamageDict[key] == 0)
             && !_entMan.HasComponent<EmaggedComponent>(owner))
             return HTNOperatorStatus.Failed;
 
         if (botComp.IsEmagged)
-        {
             _damageableSystem.TryChangeDamage(target, -botComp.DamageAmount, true, false, damage);
-        }
         else
-        {
             _repairableSystem.ApplyRepairs((target, repairComp), owner);
-        }
 
         _audio.PlayPvs(botComp.WeldSound, target);
 
-        if (damage.Damage.DamageDict.Keys.Intersect(botComp.DamageAmount.DamageDict.Keys).All(key => damage.Damage.DamageDict[key] == 0)) //only say "all done if we're actually done!"
-            _chat.TrySendInGameICMessage(owner, Loc.GetString("weldbot-finish-weld"), InGameICChatType.Speak, hideChat: true, hideLog: true);
+        if (damage.Damage.DamageDict.Keys.Intersect(botComp.DamageAmount.DamageDict.Keys)
+            .All(key => damage.Damage.DamageDict[key] == 0)) //only say "all done if we're actually done!"
+            _chat.TrySendInGameICMessage(owner,
+                Loc.GetString("weldbot-finish-weld"),
+                InGameICChatType.Speak,
+                true,
+                true);
 
         return HTNOperatorStatus.Finished;
     }

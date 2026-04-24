@@ -4,10 +4,11 @@
 // SPDX-License-Identifier: AGPL-3.0-or-later
 
 using Content.Goobstation.Common.DoAfter;
+using Content.Goobstation.Maths.FixedPoint;
 using Content.Shared.Chemistry;
 using Content.Shared.Chemistry.Components;
+using Content.Shared.Damage;
 using Content.Shared.Ensnaring.Components;
-using Content.Goobstation.Maths.FixedPoint;
 using Content.Shared.Mobs.Components;
 using Content.Shared.Throwing;
 using Content.Shared.Weapons.Melee.Events;
@@ -28,10 +29,8 @@ public sealed partial class CombatDoAfterSystem
         SubscribeLocalEvent<EnsnaringKnockdownComponent, StopThrowEvent>(OnStopThrow);
     }
 
-    private void OnStopThrow(Entity<EnsnaringKnockdownComponent> ent, ref StopThrowEvent args)
-    {
+    private void OnStopThrow(Entity<EnsnaringKnockdownComponent> ent, ref StopThrowEvent args) =>
         RemCompDeferred(ent.Owner, ent.Comp);
-    }
 
     private void OnEnsnared(Entity<EnsnaringKnockdownComponent> ent, ref EnsnaredEvent args)
     {
@@ -39,10 +38,8 @@ public sealed partial class CombatDoAfterSystem
         RemCompDeferred(ent.Owner, ent.Comp);
     }
 
-    private void OnEnsnaringThrow(Entity<EnsnaringComponent> ent, ref CombatDoAfterThrownEvent args)
-    {
+    private void OnEnsnaringThrow(Entity<EnsnaringComponent> ent, ref CombatDoAfterThrownEvent args) =>
         EnsureComp<EnsnaringKnockdownComponent>(ent);
-    }
 
     private void OnCombatSyringeHit(Entity<InjectorComponent> ent, ref CombatSyringeTriggerEvent args)
     {
@@ -102,7 +99,7 @@ public sealed partial class CombatDoAfterSystem
         if (CheckDoAfter(ent, args.User, args.HitEntities))
         {
             hitEvent.Targets = args.HitEntities;
-            hitEvent.BonusDamage = new();
+            hitEvent.BonusDamage = new DamageSpecifier();
             RaiseLocalEvent(ent, (object) hitEvent);
             args.BonusDamage = hitEvent.BonusDamage;
         }

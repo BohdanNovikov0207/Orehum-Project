@@ -25,11 +25,11 @@ namespace Content.Goobstation.Shared.Waddle;
 public abstract class SharedWaddleAnimationSystem : EntitySystem
 {
     [Dependency] private readonly ActionBlockerSystem _actionBlocker = default!;
-    [Dependency] private readonly IGameTiming _timing = default!;
-    [Dependency] private readonly MobStateSystem _mob = default!;
     [Dependency] private readonly SharedBuckleSystem _buckle = default!;
     [Dependency] private readonly SharedGravitySystem _gravity = default!;
+    [Dependency] private readonly MobStateSystem _mob = default!;
     [Dependency] private readonly StandingStateSystem _standing = default!;
+    [Dependency] private readonly IGameTiming _timing = default!;
 
     public override void Initialize()
     {
@@ -64,11 +64,9 @@ public abstract class SharedWaddleAnimationSystem : EntitySystem
             SetWaddling(ent, true);
     }
 
-    private void OnMovementInput(Entity<WaddleAnimationComponent> ent, ref MoveInputEvent args)
-    {
+    private void OnMovementInput(Entity<WaddleAnimationComponent> ent, ref MoveInputEvent args) =>
         // Only start waddling if we're actually moving.
         SetWaddling(ent, args.HasDirectionalMovement);
-    }
 
     private void OnStood(Entity<WaddleAnimationComponent> ent, ref StoodEvent args)
     {
@@ -82,14 +80,11 @@ public abstract class SharedWaddleAnimationSystem : EntitySystem
         SetWaddling(ent, true);
     }
 
-    private void StopWaddling(Entity<WaddleAnimationComponent> ent)
-    {
-        SetWaddling(ent, false);
-    }
+    private void StopWaddling(Entity<WaddleAnimationComponent> ent) => SetWaddling(ent, false);
 
     /// <summary>
     /// Enables or disables waddling for a entity, including the animation.
-    /// Unless force is true, prevents dead people etc from waddling using <see cref="CanWaddle"/>.
+    /// Unless force is true, prevents dead people etc from waddling using <see cref="CanWaddle" />.
     /// </summary>
     public void SetWaddling(Entity<WaddleAnimationComponent> ent, bool waddling, bool force = false)
     {
@@ -111,21 +106,19 @@ public abstract class SharedWaddleAnimationSystem : EntitySystem
     /// <summary>
     /// Returns true if an entity is allowed to waddle at all.
     /// </summary>
-    public bool CanWaddle(EntityUid uid)
-    {
+    public bool CanWaddle(EntityUid uid) =>
         // can't waddle when dead
-        return _mob.IsAlive(uid)
-            // bouncy shoes should make you spin in 0G really but definitely not bounce up and down
-            && !_gravity.IsWeightless(uid)
-            // can't waddle if your legs are broken etc
-            && _actionBlocker.CanMove(uid)
-            // can't waddle when buckled, if you are really strong/on meth the chair/bed should waddle instead
-            && !_buckle.IsBuckled(uid)
-            // animation doesn't take being downed into account :(
-            && !_standing.IsDown(uid)
-            // can't waddle in space... 1984
-            && Transform(uid).GridUid != null;
-    }
+        _mob.IsAlive(uid)
+        // bouncy shoes should make you spin in 0G really but definitely not bounce up and down
+        && !_gravity.IsWeightless(uid)
+        // can't waddle if your legs are broken etc
+        && _actionBlocker.CanMove(uid)
+        // can't waddle when buckled, if you are really strong/on meth the chair/bed should waddle instead
+        && !_buckle.IsBuckled(uid)
+        // animation doesn't take being downed into account :(
+        && !_standing.IsDown(uid)
+        // can't waddle in space... 1984
+        && Transform(uid).GridUid != null;
 
     /// <summary>
     /// Updates the waddling animation on the client.

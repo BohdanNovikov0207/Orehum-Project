@@ -7,6 +7,6 @@ public record struct SendSafePressureEvent(
 [ByRefEvent]
 public record struct ResistPressureEvent
 {
-    public float Pressure;
     public bool Cancelled;
+    public float Pressure;
 }

@@ -5,10 +5,10 @@
 //
 // SPDX-License-Identifier: AGPL-3.0-or-later
 
+using Content.Goobstation.Maths.FixedPoint;
 using Content.Shared.Damage;
 using Content.Shared.Damage.Prototypes;
 using Content.Shared.Dataset;
-using Content.Goobstation.Maths.FixedPoint;
 using Content.Shared.Polymorph;
 using Robust.Shared.Audio;
 using Robust.Shared.Prototypes;
@@ -19,6 +19,9 @@ namespace Content.Goobstation.Shared.Devil;
 public sealed partial class DevilComponent : Component
 {
     [DataField]
+    public List<EntityUid>? ActionEntities;
+
+    [DataField]
     public List<EntProtoId> BaseDevilActions = new()
     {
         "ActionCreateContract",
@@ -26,42 +29,14 @@ public sealed partial class DevilComponent : Component
         "ActionDevilGrip",
     };
 
-    [DataField]
-    public List<EntityUid>? ActionEntities;
-
     /// <summary>
-    /// The amount of souls or successful contracts the entity has.
+    /// Holy action damage multiplier if done by the chaplain. Also effects stums.
     /// </summary>
     [DataField]
-    public int Souls;
+    public float BibleUserDamageMultiplier = 2f;
 
     [DataField]
-    public ProtoId<DevilBranchPrototype> DevilBranchPrototype = "BaseDevilBranch";
-
-    /// <summary>
-    /// The true name of the devil.
-    /// This is auto-generated from a list in the system.
-    /// </summary>
-    [DataField]
-    public string TrueName = string.Empty;
-
-    /// <summary>
-    /// The current power level of the devil.
-    /// </summary>
-    [DataField]
-    public DevilPowerLevel PowerLevel = 0;
-
-    /// <summary>
-    /// Sound effect played when summoning a contract.
-    /// </summary>
-    [DataField]
-    public SoundPathSpecifier FwooshPath = new ("/Audio/_Goobstation/Effects/fwoosh.ogg");
-
-    /// <summary>
-    /// When the true-name stun was last triggered
-    /// </summary>
-    [ViewVariables(VVAccess.ReadWrite)]
-    public TimeSpan LastTriggeredTime;
+    public EntProtoId ContractPrototype = "PaperDevilContract";
 
     /// <summary>
     /// Minimum time between true-name triggers
@@ -69,52 +44,36 @@ public sealed partial class DevilComponent : Component
     [DataField]
     public TimeSpan CooldownDuration = TimeSpan.FromSeconds(30);
 
-    [DataField]
-    public ProtoId<DatasetPrototype> FirstNameTrue = new("names_devil_first");
-
-    [DataField]
-    public ProtoId<DatasetPrototype> LastNameTrue = new("names_devil_last");
-
     /// <summary>
     /// How much damage taken when a true name is spoken. Doubled if spoken by the chaplain.
     /// </summary>
     [DataField]
-    public DamageSpecifier DamageOnTrueName = new() {DamageDict = new Dictionary<string, FixedPoint2>() {{ "Holy", 15 }}};
+    public DamageSpecifier DamageOnTrueName = new()
+        { DamageDict = new Dictionary<string, FixedPoint2> { { "Holy", 15 } } };
 
-    /// <summary>
-    /// Holy action damage multiplier if done by the chaplain. Also effects stums.
-    /// </summary>
     [DataField]
-    public float BibleUserDamageMultiplier = 2f;
+    public ProtoId<DevilBranchPrototype> DevilBranchPrototype = "BaseDevilBranch";
 
-    /// <summary>
-    /// How long the Devil is stunned when their true name is spoken. Doubled if spoken by the chaplain.
-    /// </summary>
     [DataField]
-    public TimeSpan ParalyzeDurationOnTrueName = TimeSpan.FromSeconds(4);
+    public ProtoId<DamageModifierSetPrototype> DevilDamageModifierSet = "DevilDealPositive";
 
     [ViewVariables(VVAccess.ReadOnly)]
     public EntityUid? DevilGrip;
 
-    // abandom all hope, all ye who enter
+    [DataField]
+    public EntProtoId FireEffectProto = "FireEffect";
 
     [DataField]
-    public TimeSpan PossessionDuration = TimeSpan.FromSeconds(30);
+    public ProtoId<DatasetPrototype> FirstNameTrue = new("names_devil_first");
+
+    /// <summary>
+    /// Sound effect played when summoning a contract.
+    /// </summary>
+    [DataField]
+    public SoundPathSpecifier FwooshPath = new("/Audio/_Goobstation/Effects/fwoosh.ogg");
 
     [DataField]
     public EntProtoId GripPrototype = "DevilGrip";
-
-    [DataField]
-    public EntProtoId ContractPrototype = "PaperDevilContract";
-
-    [DataField]
-    public EntProtoId RevivalContractPrototype = "PaperDevilContractRevival";
-
-    [DataField]
-    public EntProtoId PentagramEffectProto = "Pentagram";
-
-    [DataField]
-    public EntProtoId FireEffectProto = "FireEffect";
 
     [DataField]
     public EntProtoId JauntAnimationProto = "PolymorphShadowJauntAnimation";
@@ -123,5 +82,47 @@ public sealed partial class DevilComponent : Component
     public ProtoId<PolymorphPrototype> JauntEntityProto = "ShadowJaunt";
 
     [DataField]
-    public ProtoId<DamageModifierSetPrototype> DevilDamageModifierSet = "DevilDealPositive";
+    public ProtoId<DatasetPrototype> LastNameTrue = new("names_devil_last");
+
+    /// <summary>
+    /// When the true-name stun was last triggered
+    /// </summary>
+    [ViewVariables(VVAccess.ReadWrite)]
+    public TimeSpan LastTriggeredTime;
+
+    /// <summary>
+    /// How long the Devil is stunned when their true name is spoken. Doubled if spoken by the chaplain.
+    /// </summary>
+    [DataField]
+    public TimeSpan ParalyzeDurationOnTrueName = TimeSpan.FromSeconds(4);
+
+    [DataField]
+    public EntProtoId PentagramEffectProto = "Pentagram";
+
+    // abandom all hope, all ye who enter
+
+    [DataField]
+    public TimeSpan PossessionDuration = TimeSpan.FromSeconds(30);
+
+    /// <summary>
+    /// The current power level of the devil.
+    /// </summary>
+    [DataField]
+    public DevilPowerLevel PowerLevel = 0;
+
+    [DataField]
+    public EntProtoId RevivalContractPrototype = "PaperDevilContractRevival";
+
+    /// <summary>
+    /// The amount of souls or successful contracts the entity has.
+    /// </summary>
+    [DataField]
+    public int Souls;
+
+    /// <summary>
+    /// The true name of the devil.
+    /// This is auto-generated from a list in the system.
+    /// </summary>
+    [DataField]
+    public string TrueName = string.Empty;
 }

@@ -22,15 +22,16 @@ using Robust.Shared.Prototypes;
 
 namespace Content.Goobstation.Server.Pirates.GameTicking.Rules;
 
-public sealed partial class ActivePirateRuleSystem : GameRuleSystem<ActivePirateRuleComponent>
+public sealed class ActivePirateRuleSystem : GameRuleSystem<ActivePirateRuleComponent>
 {
-    [Dependency] private readonly MindSystem _mind = default!;
-    [Dependency] private readonly RoleSystem _role = default!;
-    [Dependency] private readonly AntagSelectionSystem _antag = default!;
-    [Dependency] private readonly NpcFactionSystem _npcFaction = default!;
+    private static readonly SoundSpecifier BriefingSound =
+        new SoundPathSpecifier("/Audio/Ambience/Antag/pirate_start.ogg");
 
-    private static readonly SoundSpecifier BriefingSound = new SoundPathSpecifier("/Audio/Ambience/Antag/pirate_start.ogg");
     private static readonly EntProtoId MindRole = "MindRolePirate";
+    [Dependency] private readonly AntagSelectionSystem _antag = default!;
+    [Dependency] private readonly MindSystem _mind = default!;
+    [Dependency] private readonly NpcFactionSystem _npcFaction = default!;
+    [Dependency] private readonly RoleSystem _role = default!;
 
     public override void Initialize()
     {
@@ -52,11 +53,14 @@ public sealed partial class ActivePirateRuleSystem : GameRuleSystem<ActivePirate
         args.Briefing = briefingShort;
     }
 
-    protected override void AppendRoundEndText(EntityUid uid, ActivePirateRuleComponent component, GameRuleComponent gameRule, ref RoundEndTextAppendEvent args)
+    protected override void AppendRoundEndText(EntityUid uid,
+        ActivePirateRuleComponent component,
+        GameRuleComponent gameRule,
+        ref RoundEndTextAppendEvent args)
     {
         if (component.BoundSiphon != null
-        && TryComp<ResourceSiphonComponent>(component.BoundSiphon, out var siphon)
-        && siphon.Active)
+            && TryComp<ResourceSiphonComponent>(component.BoundSiphon, out var siphon)
+            && siphon.Active)
             args.AddLine(Loc.GetString("pirate-roundend-append-siphon", ("num", siphon.Credits)));
 
         args.AddLine(Loc.GetString("pirate-roundend-append", ("num", component.Credits)));

@@ -1,6 +1,5 @@
 using Robust.Shared.GameStates;
 using Robust.Shared.Serialization;
-using Robust.Shared.Prototypes;
 
 namespace Content.Goobstation.Shared.Augments;
 
@@ -9,7 +8,7 @@ namespace Content.Goobstation.Shared.Augments;
 /// The storage must be filled before installation or you can't do anything with it.
 /// An accessed item replaces a hand while in use and cannot be removed when stunned etc.
 /// <summary>
-[RegisterComponent, NetworkedComponent]
+[RegisterComponent] [NetworkedComponent]
 public sealed partial class AugmentToolPanelComponent : Component
 {
     /// <summary>
@@ -22,16 +21,16 @@ public sealed partial class AugmentToolPanelComponent : Component
 /// <summary>
 /// Marker component to indicate that an entity is the active tool of an augment tool panel
 /// <summary>
-[RegisterComponent, NetworkedComponent]
+[RegisterComponent] [NetworkedComponent]
 public sealed partial class AugmentToolPanelActiveItemComponent : Component;
 
-[Serializable, NetSerializable]
+[Serializable] [NetSerializable]
 public enum AugmentToolPanelUiKey : byte
 {
-    Key
+    Key,
 }
 
-[Serializable, NetSerializable]
+[Serializable] [NetSerializable]
 public sealed class AugmentToolPanelSwitchMessage(NetEntity? tool) : BoundUserInterfaceMessage
 {
     public NetEntity? DesiredTool = tool;

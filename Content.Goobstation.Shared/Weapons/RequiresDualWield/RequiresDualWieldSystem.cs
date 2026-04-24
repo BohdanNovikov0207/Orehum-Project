@@ -25,9 +25,9 @@ namespace Content.Goobstation.Shared.Weapons.RequiresDualWield;
 
 public sealed class RequiresDualWieldSystem : EntitySystem
 {
+    [Dependency] private readonly SharedGunSystem _gun = default!;
     [Dependency] private readonly SharedHandsSystem _handsSystem = default!;
     [Dependency] private readonly SharedPopupSystem _popupSystem = default!;
-    [Dependency] private readonly SharedGunSystem _gun = default!;
     [Dependency] private readonly IGameTiming _timing = default!;
     [Dependency] private readonly EntityWhitelistSystem _whitelistSystem = default!;
 
@@ -64,7 +64,7 @@ public sealed class RequiresDualWieldSystem : EntitySystem
 
             if (HasComp<MultishotComponent>(held))
             {
-                if (CheckGun(held,component.Whitelist))
+                if (CheckGun(held, component.Whitelist))
                     continue;
             }
 
@@ -93,8 +93,6 @@ public sealed class RequiresDualWieldSystem : EntitySystem
         }
     }
 
-    private bool CheckGun(EntityUid target, EntityWhitelist? whitelist)
-    {
-        return _whitelistSystem.IsWhitelistPassOrNull(whitelist, target);
-    }
+    private bool CheckGun(EntityUid target, EntityWhitelist? whitelist) =>
+        _whitelistSystem.IsWhitelistPassOrNull(whitelist, target);
 }

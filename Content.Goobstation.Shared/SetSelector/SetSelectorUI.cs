@@ -8,7 +8,7 @@ using Robust.Shared.Utility;
 
 namespace Content.Goobstation.Shared.SetSelector;
 
-[Serializable, NetSerializable]
+[Serializable] [NetSerializable]
 public sealed class SetSelectorBoundUserInterfaceState(Dictionary<int, SelectableSetInfo> sets, int max)
     : BoundUserInterfaceState
 {
@@ -16,24 +16,24 @@ public sealed class SetSelectorBoundUserInterfaceState(Dictionary<int, Selectabl
     public int MaxSelectedSets = max;
 }
 
-[Serializable, NetSerializable]
+[Serializable] [NetSerializable]
 public sealed class SetSelectorChangeSetMessage(int setNumber) : BoundUserInterfaceMessage
 {
     public readonly int SetNumber = setNumber;
 }
 
-[Serializable, NetSerializable]
+[Serializable] [NetSerializable]
 public sealed class SetSelectorApproveMessage : BoundUserInterfaceMessage
 {
 }
 
-[Serializable, NetSerializable]
+[Serializable] [NetSerializable]
 public enum SetSelectorUIKey : byte
 {
-    Key
-};
+    Key,
+}
 
-[Serializable, NetSerializable, DataDefinition]
+[Serializable] [NetSerializable] [DataDefinition]
 public partial struct SelectableSetInfo
 {
     [DataField]

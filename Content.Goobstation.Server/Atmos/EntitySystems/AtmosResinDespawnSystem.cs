@@ -3,22 +3,22 @@
 //
 // SPDX-License-Identifier: AGPL-3.0-or-later
 
-using Robust.Shared.Spawners;
-using Content.Shared.Atmos;
-using Content.Server.Atmos.EntitySystems;
 using Content.Goobstation.Server.Atmos.Components;
+using Content.Server.Atmos.EntitySystems;
+using Content.Shared.Atmos;
+using Robust.Shared.Spawners;
 
 namespace Content.Goobstation.Server.Atmos.EntitySystems;
 
-
 /// <summary>
 /// Assmos - Extinguisher Nozzle
-/// Sets atmospheric temperature to 20C and removes all toxins. 
+/// Sets atmospheric temperature to 20C and removes all toxins.
 /// </summary>
 public sealed class AtmosResinDespawnSystem : EntitySystem
 {
     [Dependency] private readonly AtmosphereSystem _atmo = default!;
     [Dependency] private readonly GasTileOverlaySystem _gasOverlaySystem = default!;
+
     public override void Initialize()
     {
         base.Initialize();
@@ -34,7 +34,8 @@ public sealed class AtmosResinDespawnSystem : EntitySystem
         var mix = _atmo.GetContainingMixture(uid, true);
         GasMixture newMix = new();
 
-        if (mix is null) return;
+        if (mix is null)
+            return;
         newMix.AdjustMoles(0, mix.GetMoles(0));
         newMix.AdjustMoles(1, mix.GetMoles(1));
 

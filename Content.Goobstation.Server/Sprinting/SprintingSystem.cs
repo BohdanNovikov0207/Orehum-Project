@@ -7,14 +7,12 @@
 using Content.Goobstation.Server.Sandevistan;
 using Content.Goobstation.Shared.Sprinting;
 using Content.Server.Stunnable;
-using Content.Shared.CombatMode;
 using Robust.Shared.Physics.Events;
 
 namespace Content.Goobstation.Server.Sprinting;
 
 public sealed class SprintingSystem : SharedSprintingSystem
 {
-
     [Dependency] private readonly StunSystem _stunSystem = default!;
 
     public override void Initialize()
@@ -31,21 +29,16 @@ public sealed class SprintingSystem : SharedSprintingSystem
             return;
 
         if (!sprinter.IsSprinting)
-        {
             return;
-        }
 
         if (!TryComp(otherUid, out SprinterComponent? otherSprinter)
             || !otherSprinter.IsSprinting
             || !HasComp<ActiveSandevistanUserComponent>(otherUid))
-        {
             return;
-        }
 
-        _stunSystem.TryKnockdown(uid, sprinter.KnockdownDurationOnInterrupt, false, true);
+        _stunSystem.TryKnockdown(uid, sprinter.KnockdownDurationOnInterrupt, false);
         _stunSystem.TryKnockdown(otherUid,
             otherSprinter.KnockdownDurationOnInterrupt,
-            false,
-            true);
+            false);
     }
 }

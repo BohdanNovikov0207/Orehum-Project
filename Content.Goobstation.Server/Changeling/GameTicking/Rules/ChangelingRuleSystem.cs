@@ -32,25 +32,26 @@ namespace Content.Goobstation.Server.Changeling.GameTicking.Rules;
 
 public sealed class ChangelingRuleSystem : GameRuleSystem<ChangelingRuleComponent>
 {
-    [Dependency] private readonly MindSystem _mind = default!;
     [Dependency] private readonly AntagSelectionSystem _antag = default!;
-    [Dependency] private readonly SharedRoleSystem _role = default!;
+    [Dependency] private readonly MindSystem _mind = default!;
     [Dependency] private readonly NpcFactionSystem _npcFaction = default!;
     [Dependency] private readonly ObjectivesSystem _objective = default!;
+    [Dependency] private readonly SharedRoleSystem _role = default!;
 
-    public readonly SoundSpecifier BriefingSound = new SoundPathSpecifier("/Audio/_Goobstation/Ambience/Antag/changeling_start.ogg");
-
-    public readonly ProtoId<AntagPrototype> ChangelingPrototypeId = "Changeling";
+    public readonly SoundSpecifier BriefingSound =
+        new SoundPathSpecifier("/Audio/_Goobstation/Ambience/Antag/changeling_start.ogg");
 
     public readonly ProtoId<NpcFactionPrototype> ChangelingFactionId = "Changeling";
 
-    public readonly ProtoId<NpcFactionPrototype> NanotrasenFactionId = "NanoTrasen";
+    public readonly ProtoId<AntagPrototype> ChangelingPrototypeId = "Changeling";
 
     public readonly ProtoId<CurrencyPrototype> Currency = "EvolutionPoint";
 
-    public readonly int StartingCurrency = 12;
+    [ValidatePrototypeId<EntityPrototype>] private readonly EntProtoId mindRole = "MindRoleChangeling";
 
-    [ValidatePrototypeId<EntityPrototype>] EntProtoId mindRole = "MindRoleChangeling";
+    public readonly ProtoId<NpcFactionPrototype> NanotrasenFactionId = "NanoTrasen";
+
+    public readonly int StartingCurrency = 12;
 
     public override void Initialize()
     {
@@ -60,10 +61,9 @@ public sealed class ChangelingRuleSystem : GameRuleSystem<ChangelingRuleComponen
         SubscribeLocalEvent<ChangelingRuleComponent, ObjectivesTextPrependEvent>(OnTextPrepend);
     }
 
-    private void OnSelectAntag(EntityUid uid, ChangelingRuleComponent comp, ref AfterAntagEntitySelectedEvent args)
-    {
+    private void OnSelectAntag(EntityUid uid, ChangelingRuleComponent comp, ref AfterAntagEntitySelectedEvent args) =>
         MakeChangeling(args.EntityUid, comp);
-    }
+
     public bool MakeChangeling(EntityUid target, ChangelingRuleComponent rule)
     {
         if (HasComp<SiliconComponent>(target))
@@ -79,13 +79,15 @@ public sealed class ChangelingRuleSystem : GameRuleSystem<ChangelingRuleComponen
         if (TryComp<MetaDataComponent>(target, out var metaData))
         {
             var briefing = Loc.GetString("changeling-role-greeting", ("name", metaData?.EntityName ?? "Unknown"));
-            var briefingShort = Loc.GetString("changeling-role-greeting-short", ("name", metaData?.EntityName ?? "Unknown"));
+            var briefingShort = Loc.GetString("changeling-role-greeting-short",
+                ("name", metaData?.EntityName ?? "Unknown"));
 
             _antag.SendBriefing(target, briefing, Color.Yellow, BriefingSound);
 
             if (_role.MindHasRole<ChangelingRoleComponent>(mindId, out var mr))
-                AddComp(mr.Value, new RoleBriefingComponent { Briefing = briefingShort }, overwrite: true);
+                AddComp(mr.Value, new RoleBriefingComponent { Briefing = briefingShort }, true);
         }
+
         // hivemind stuff
         _npcFaction.RemoveFaction(target, NanotrasenFactionId, false);
         _npcFaction.AddFaction(target, ChangelingFactionId);
@@ -96,7 +98,10 @@ public sealed class ChangelingRuleSystem : GameRuleSystem<ChangelingRuleComponen
         // add store
         var store = EnsureComp<StoreComponent>(target);
         foreach (var category in rule.StoreCategories)
+        {
             store.Categories.Add(category);
+        }
+
         store.CurrencyWhitelist.Add(Currency);
         store.Balance.Add(Currency, StartingCurrency);
 
@@ -112,7 +117,8 @@ public sealed class ChangelingRuleSystem : GameRuleSystem<ChangelingRuleComponen
         var mostAbsorbed = 0f;
         var mostStolen = 0f;
 
-        foreach (var ling in EntityQuery<ChangelingIdentityComponent>()) // TODO make a ChangelingAbsorbComponent to store data about absorbed DNA and entities
+        foreach (var ling in
+                 EntityQuery<ChangelingIdentityComponent>()) // TODO make a ChangelingAbsorbComponent to store data about absorbed DNA and entities
         {
             if (!_mind.TryGetMind(ling.Owner, out var mindId, out var mind))
                 continue;
@@ -125,6 +131,7 @@ public sealed class ChangelingRuleSystem : GameRuleSystem<ChangelingRuleComponen
                 mostAbsorbed = ling.TotalAbsorbedEntities;
                 mostAbsorbedName = _objective.GetTitle((mindId, mind), metaData.EntityName);
             }
+
             if (ling.TotalStolenDNA > mostStolen)
             {
                 mostStolen = ling.TotalStolenDNA;
@@ -133,8 +140,14 @@ public sealed class ChangelingRuleSystem : GameRuleSystem<ChangelingRuleComponen
         }
 
         var sb = new StringBuilder();
-        sb.AppendLine(Loc.GetString($"roundend-prepend-changeling-absorbed{(!string.IsNullOrWhiteSpace(mostAbsorbedName) ? "-named" : "")}", ("name", mostAbsorbedName), ("number", mostAbsorbed)));
-        sb.AppendLine(Loc.GetString($"roundend-prepend-changeling-stolen{(!string.IsNullOrWhiteSpace(mostStolenName) ? "-named" : "")}", ("name", mostStolenName), ("number", mostStolen)));
+        sb.AppendLine(Loc.GetString(
+            $"roundend-prepend-changeling-absorbed{(!string.IsNullOrWhiteSpace(mostAbsorbedName) ? "-named" : "")}",
+            ("name", mostAbsorbedName),
+            ("number", mostAbsorbed)));
+        sb.AppendLine(Loc.GetString(
+            $"roundend-prepend-changeling-stolen{(!string.IsNullOrWhiteSpace(mostStolenName) ? "-named" : "")}",
+            ("name", mostStolenName),
+            ("number", mostStolen)));
 
         args.Text = sb.ToString();
     }

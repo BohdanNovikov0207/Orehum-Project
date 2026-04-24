@@ -10,7 +10,6 @@ using Content.Shared.CombatMode.Pacification;
 using Content.Shared.Damage;
 using Content.Shared.Damage.Systems;
 using Content.Shared.Effects;
-using Content.Shared.Hands;
 using Content.Shared.Hands.EntitySystems;
 using Content.Shared.Inventory.VirtualItem;
 using Content.Shared.Item;
@@ -21,7 +20,6 @@ using Content.Shared.Movement.Pulling.Events;
 using Content.Shared.Movement.Pulling.Systems;
 using Content.Shared.Movement.Systems;
 using Content.Shared.Popups;
-using Content.Shared.Speech;
 using Content.Shared.Standing;
 using Content.Shared.Throwing;
 using Robust.Shared.Audio;
@@ -33,25 +31,25 @@ namespace Content.Goobstation.Shared.GrabIntent;
 
 public sealed partial class GrabIntentSystem : EntitySystem
 {
-    [Dependency] private readonly ContestsSystem _contests = default!;
-    [Dependency] private readonly StandingStateSystem _standing = default!;
-    [Dependency] private readonly SharedVirtualItemSystem _virtualSystem = default!;
     [Dependency] private readonly AlertsSystem _alertsSystem = default!;
-    [Dependency] private readonly SharedPopupSystem _popup = default!;
     [Dependency] private readonly SharedAudioSystem _audio = default!;
-    [Dependency] private readonly SharedStaminaSystem _stamina = default!;
-    [Dependency] private readonly SharedColorFlashEffectSystem _color = default!;
-    [Dependency] private readonly IGameTiming _timing = default!;
-    [Dependency] private readonly SharedCombatModeSystem _combatMode = default!;
     [Dependency] private readonly ActionBlockerSystem _blocker = default!;
-    [Dependency] private readonly MovementSpeedModifierSystem _modifierSystem = default!;
-    [Dependency] private readonly SharedHandsSystem _handsSystem = default!;
     [Dependency] private readonly HeldSpeedModifierSystem _clothingMoveSpeed = default!;
-    [Dependency] private readonly PullingSystem _pulling = default!;
-    [Dependency] private readonly ThrowingSystem _throwing = default!;
+    [Dependency] private readonly SharedColorFlashEffectSystem _color = default!;
+    [Dependency] private readonly SharedCombatModeSystem _combatMode = default!;
+    [Dependency] private readonly ContestsSystem _contests = default!;
     [Dependency] private readonly GrabThrownSystem _grabThrown = default!;
+    [Dependency] private readonly SharedHandsSystem _handsSystem = default!;
+    [Dependency] private readonly MovementSpeedModifierSystem _modifierSystem = default!;
+    [Dependency] private readonly SharedPopupSystem _popup = default!;
+    [Dependency] private readonly PullingSystem _pulling = default!;
+    [Dependency] private readonly SharedStaminaSystem _stamina = default!;
+    [Dependency] private readonly StandingStateSystem _standing = default!;
+    [Dependency] private readonly ThrowingSystem _throwing = default!;
 
     private readonly SoundPathSpecifier _thudswoosh = new("/Audio/Effects/thudswoosh.ogg");
+    [Dependency] private readonly IGameTiming _timing = default!;
+    [Dependency] private readonly SharedVirtualItemSystem _virtualSystem = default!;
 
     #region Initialization
 
@@ -106,10 +104,8 @@ public sealed partial class GrabIntentSystem : EntitySystem
         Dirty(uid, component);
     }
 
-    private void OnCheckGrabbed(EntityUid uid, GrabbableComponent component, ref CheckGrabbedEvent args)
-    {
+    private void OnCheckGrabbed(EntityUid uid, GrabbableComponent component, ref CheckGrabbedEvent args) =>
         args.IsGrabbed = component.GrabStage != GrabStage.No;
-    }
 
     private void OnGrabAttempt(Entity<GrabbableComponent> ent, ref GrabAttemptEvent args)
     {
@@ -134,17 +130,15 @@ public sealed partial class GrabIntentSystem : EntitySystem
         if (!_blocker.CanMove(args.Entity))
             return;
 
-        _pulling.TryStopPull(uid, pullable, user: uid);
+        _pulling.TryStopPull(uid, pullable, uid);
     }
 
     #endregion
 
     #region Public API
 
-    public bool CanGrab(EntityUid puller, EntityUid pullable)
-    {
-        return !HasComp<PacifiedComponent>(puller) && HasComp<MobStateComponent>(pullable);
-    }
+    public bool CanGrab(EntityUid puller, EntityUid pullable) =>
+        !HasComp<PacifiedComponent>(puller) && HasComp<MobStateComponent>(pullable);
 
     public void ThrowGrabbedEntity(Entity<PullerComponent?, GrabIntentComponent?, PhysicsComponent?> ent, Vector2 dir)
     {

@@ -8,6 +8,8 @@
 //
 // SPDX-License-Identifier: AGPL-3.0-or-later
 
+using System.Numerics;
+using System.Text;
 using Content.Goobstation.Shared.Power.PTL;
 using Content.Server.Flash;
 using Content.Server.Popups;
@@ -15,46 +17,41 @@ using Content.Server.Power.Components;
 using Content.Server.Power.SMES;
 using Content.Server.Stack;
 using Content.Server.Weapons.Ranged.Systems;
-using Content.Shared.Emag.Components;
 using Content.Shared.Emag.Systems;
 using Content.Shared.Examine;
 using Content.Shared.Interaction;
+using Content.Shared.Popups;
 using Content.Shared.Radiation.Components;
 using Content.Shared.Stacks;
 using Content.Shared.Tag;
 using Content.Shared.Weapons.Ranged;
 using Content.Shared.Weapons.Ranged.Components;
-using Microsoft.CodeAnalysis.CSharp.Syntax;
 using Robust.Server.Audio;
-using Robust.Server.GameObjects;
 using Robust.Shared.Audio;
-using Robust.Shared.Map;
 using Robust.Shared.Prototypes;
 using Robust.Shared.Timing;
-using System.Numerics;
-using System.Text;
 
 namespace Content.Goobstation.Server.Power.PTL;
 
-public sealed partial class PTLSystem : EntitySystem
+public sealed class PTLSystem : EntitySystem
 {
-    [Dependency] private readonly GunSystem _gun = default!;
-    [Dependency] private readonly IGameTiming _time = default!;
-    [Dependency] private readonly IPrototypeManager _protMan = default!;
-    [Dependency] private readonly FlashSystem _flash = default!;
-    [Dependency] private readonly TagSystem _tag = default!;
-    [Dependency] private readonly PopupSystem _popup = default!;
-    [Dependency] private readonly StackSystem _stack = default!;
     [Dependency] private readonly AudioSystem _aud = default!;
     [Dependency] private readonly EmagSystem _emag = default!;
-
-    [ValidatePrototypeId<StackPrototype>] private readonly string _stackCredits = "Credit";
-    [ValidatePrototypeId<TagPrototype>] private readonly string _tagScrewdriver = "Screwdriver";
-    [ValidatePrototypeId<TagPrototype>] private readonly string _tagMultitool = "Multitool";
+    [Dependency] private readonly FlashSystem _flash = default!;
+    [Dependency] private readonly GunSystem _gun = default!;
+    [Dependency] private readonly PopupSystem _popup = default!;
+    [Dependency] private readonly IPrototypeManager _protMan = default!;
 
     private readonly SoundPathSpecifier _soundKaching = new("/Audio/Effects/kaching.ogg");
-    private readonly SoundPathSpecifier _soundSparks = new("/Audio/Effects/sparks4.ogg");
     private readonly SoundPathSpecifier _soundPower = new("/Audio/Effects/tesla_consume.ogg");
+    private readonly SoundPathSpecifier _soundSparks = new("/Audio/Effects/sparks4.ogg");
+    [Dependency] private readonly StackSystem _stack = default!;
+
+    [ValidatePrototypeId<StackPrototype>] private readonly string _stackCredits = "Credit";
+    [Dependency] private readonly TagSystem _tag = default!;
+    [ValidatePrototypeId<TagPrototype>] private readonly string _tagMultitool = "Multitool";
+    [ValidatePrototypeId<TagPrototype>] private readonly string _tagScrewdriver = "Screwdriver";
+    [Dependency] private readonly IGameTiming _time = default!;
 
     public override void Initialize()
     {
@@ -96,13 +93,15 @@ public sealed partial class PTLSystem : EntitySystem
     {
         if (TryComp<RadiationSourceComponent>(ent, out var rad)
             && rad.Intensity > 0)
-            rad.Intensity = MathF.Max(0, rad.Intensity - (rad.Intensity * 0.2f + 0.1f)); // Making sure the radition value doesn't go below
+            rad.Intensity =
+                MathF.Max(0,
+                    rad.Intensity - (rad.Intensity * 0.2f + 0.1f)); // Making sure the radition value doesn't go below
     }
 
     private void Tick(Entity<PTLComponent> ent)
     {
         if (!TryComp<BatteryComponent>(ent, out var battery)
-        || battery.CurrentCharge < ent.Comp.MinShootPower)
+            || battery.CurrentCharge < ent.Comp.MinShootPower)
             return;
 
         Shoot((ent, ent.Comp, battery));
@@ -168,7 +167,7 @@ public sealed partial class PTLSystem : EntitySystem
         if (TryComp<RadiationSourceComponent>(ent, out var rad))
             rad.Intensity = evil;
 
-        _flash.FlashArea(ent.Owner, ent, evil/2, TimeSpan.FromSeconds(evil / 2));
+        _flash.FlashArea(ent.Owner, ent, evil / 2, TimeSpan.FromSeconds(evil / 2));
 
         ent.Comp1.SpesosHeld += spesos;
     }
@@ -181,7 +180,7 @@ public sealed partial class PTLSystem : EntitySystem
         ent.Comp.Active = !ent.Comp.Active;
         var enloc = ent.Comp.Active ? Loc.GetString("ptl-enabled") : Loc.GetString("ptl-disabled");
         var enabled = Loc.GetString("ptl-interact-enabled", ("enabled", enloc));
-        _popup.PopupEntity(enabled, ent, Content.Shared.Popups.PopupType.SmallCaution);
+        _popup.PopupEntity(enabled, ent, PopupType.SmallCaution);
         _aud.PlayPvs(_soundPower, args.User);
 
         Dirty(ent);

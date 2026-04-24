@@ -8,7 +8,6 @@ SPDX-License-Identifier: AGPL-3.0-or-later
 <controls:FancyWindow xmlns="https://spacestation14.io"
                       xmlns:gfx="clr-namespace:Robust.Client.Graphics;assembly=Robust.Client"
                       xmlns:controls="clr-namespace:Content.Client.UserInterface.Controls;assembly=Content.Client"
-                      xmlns:customControls="clr-namespace:Content.Client.Administration.UI.CustomControls;assembly=Content.Client"
                       xmlns:goob="clr-namespace:Content.Goobstation.Client.Research.UI"
                       Title="{Loc 'research-console-menu-title'}"
                       SetSize="1260 850">
@@ -21,13 +20,14 @@ SPDX-License-Identifier: AGPL-3.0-or-later
                       MinHeight="60"
                       Margin="10">
             <BoxContainer Orientation="Vertical" VerticalExpand="True" HorizontalExpand="True">
-                <RichTextLabel Name="ResearchAmountLabel"/>
-                <Control VerticalExpand="True"/>
-                <BoxContainer Name="TierDisplayContainer" Orientation="Horizontal" HorizontalExpand="True" VerticalAlignment="Bottom"/>
+                <RichTextLabel Name="ResearchAmountLabel" />
+                <Control VerticalExpand="True" />
+                <BoxContainer Name="TierDisplayContainer" Orientation="Horizontal" HorizontalExpand="True"
+                              VerticalAlignment="Bottom" />
                 <!-- This is where we put all of the little graphics that display discipline tiers!-->
             </BoxContainer>
             <BoxContainer Orientation="Vertical" VerticalExpand="True" HorizontalAlignment="Right">
-                <Button Name="ServerButton" Text="{Loc 'research-console-menu-server-selection-button'}" MinHeight="40"/>
+                <Button Name="ServerButton" Text="{Loc 'research-console-menu-server-selection-button'}" MinHeight="40" />
             </BoxContainer>
         </BoxContainer>
         <BoxContainer Orientation="Horizontal"
@@ -43,8 +43,8 @@ SPDX-License-Identifier: AGPL-3.0-or-later
                         <gfx:StyleBoxFlat BackgroundColor="#000000FF" />
                     </PanelContainer.PanelOverride>
                     <AnimatedTextureRect Name="StaticSprite"
-                        HorizontalExpand="True"
-                        VerticalExpand="True">
+                                         HorizontalExpand="True"
+                                         VerticalExpand="True">
                         <goob:ResearchesContainerPanel
                             HorizontalExpand="True"
                             VerticalExpand="True"
@@ -54,7 +54,8 @@ SPDX-License-Identifier: AGPL-3.0-or-later
                             <!-- There lives all of technologies -->
                         </goob:ResearchesContainerPanel>
                     </AnimatedTextureRect>
-                    <Button Name="RecenterButton" Text="{Loc 'research-console-menu-recenter-button'}" MinHeight="40" HorizontalAlignment="Left" VerticalAlignment="Bottom" Margin="5 -5"/>
+                    <Button Name="RecenterButton" Text="{Loc 'research-console-menu-recenter-button'}" MinHeight="40"
+                            HorizontalAlignment="Left" VerticalAlignment="Bottom" Margin="5 -5" />
                 </PanelContainer>
             </BoxContainer>
             <PanelContainer SizeFlagsStretchRatio="2">
@@ -62,11 +63,11 @@ SPDX-License-Identifier: AGPL-3.0-or-later
                     <gfx:StyleBoxFlat BackgroundColor="#1B1B1E" />
                 </PanelContainer.PanelOverride>
                 <BoxContainer Name="InfoContainer"
-                    Orientation="Vertical"
-                    VerticalExpand="True"
-                    HorizontalExpand="True"
-                    SizeFlagsStretchRatio="1"
-                    Margin="0"/>
+                              Orientation="Vertical"
+                              VerticalExpand="True"
+                              HorizontalExpand="True"
+                              SizeFlagsStretchRatio="1"
+                              Margin="0" />
             </PanelContainer>
         </BoxContainer>
     </BoxContainer>

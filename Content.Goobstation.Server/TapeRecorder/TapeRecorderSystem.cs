@@ -4,16 +4,15 @@
 //
 // SPDX-License-Identifier: AGPL-3.0-or-later
 
+using System.Text;
+using Content.Goobstation.Shared.TapeRecorder;
 using Content.Server.Chat.Systems;
 using Content.Server.Hands.Systems;
-using Content.Server.Speech;
 using Content.Server.Speech.Components;
 using Content.Shared.Chat;
 using Content.Shared.Paper;
 using Content.Shared.Speech;
-using Content.Goobstation.Shared.TapeRecorder;
 using Robust.Shared.Prototypes;
-using System.Text;
 
 namespace Content.Goobstation.Server.TapeRecorder;
 
@@ -21,8 +20,8 @@ public sealed class TapeRecorderSystem : SharedTapeRecorderSystem
 {
     [Dependency] private readonly ChatSystem _chat = default!;
     [Dependency] private readonly HandsSystem _hands = default!;
-    [Dependency] private readonly IPrototypeManager _proto = default!;
     [Dependency] private readonly PaperSystem _paper = default!;
+    [Dependency] private readonly IPrototypeManager _proto = default!;
 
     public override void Initialize()
     {
@@ -36,7 +35,10 @@ public sealed class TapeRecorderSystem : SharedTapeRecorderSystem
     /// Given a time range, play all messages on a tape within said range, [start, end).
     /// Split into this system as shared does not have ChatSystem access
     /// </summary>
-    protected override void ReplayMessagesInSegment(Entity<TapeRecorderComponent> ent, TapeCassetteComponent tape, float segmentStart, float segmentEnd)
+    protected override void ReplayMessagesInSegment(Entity<TapeRecorderComponent> ent,
+        TapeCassetteComponent tape,
+        float segmentStart,
+        float segmentEnd)
     {
         var voice = EnsureComp<VoiceOverrideComponent>(ent);
         var speech = EnsureComp<SpeechComponent>(ent);
@@ -50,7 +52,7 @@ public sealed class TapeRecorderSystem : SharedTapeRecorderSystem
             voice.NameOverride = message.Name ?? ent.Comp.DefaultName;
             // TODO: mimic the exact string chosen when the message was recorded
             var verb = message.Verb ?? SharedChatSystem.DefaultSpeechVerb;
-            speech.SpeechVerb = _proto.Index<SpeechVerbPrototype>(verb);
+            speech.SpeechVerb = _proto.Index(verb);
             //Play the message
             _chat.TrySendInGameICMessage(ent, message.Message, InGameICChatType.Speak, false);
         }
@@ -81,7 +83,10 @@ public sealed class TapeRecorderSystem : SharedTapeRecorderSystem
         //Add a new entry to the tape
         var verb = _chat.GetSpeechVerb(args.Source, args.Message);
         var name = nameEv.VoiceName;
-        cassette.Comp.Buffer.Add(new TapeCassetteRecordedMessage(cassette.Comp.CurrentPosition, name, verb, args.Message));
+        cassette.Comp.Buffer.Add(new TapeCassetteRecordedMessage(cassette.Comp.CurrentPosition,
+            name,
+            verb,
+            args.Message));
     }
 
     private void OnPrintMessage(Entity<TapeRecorderComponent> ent, ref PrintTapeRecorderMessage args)
@@ -100,12 +105,12 @@ public sealed class TapeRecorderSystem : SharedTapeRecorderSystem
         // Sorting list by time for overwrite order
         // TODO: why is this needed? why wouldn't it be stored in order
         var data = cassette.Comp.RecordedData;
-        data.Sort((x,y) => x.Timestamp.CompareTo(y.Timestamp));
+        data.Sort((x, y) => x.Timestamp.CompareTo(y.Timestamp));
 
         // Looking if player's entity exists to give paper in its hand
         var player = args.Actor;
         if (Exists(player))
-            _hands.PickupOrDrop(player, paper, checkActionBlocker: false);
+            _hands.PickupOrDrop(player, paper, false);
 
         if (!TryComp<PaperComponent>(paper, out var paperComp))
             return;
@@ -117,13 +122,14 @@ public sealed class TapeRecorderSystem : SharedTapeRecorderSystem
         foreach (var message in cassette.Comp.RecordedData)
         {
             var name = message.Name ?? ent.Comp.DefaultName;
-            var time = TimeSpan.FromSeconds((double) message.Timestamp);
+            var time = TimeSpan.FromSeconds(message.Timestamp);
 
             text.AppendLine(Loc.GetString("tape-recorder-print-message-text",
                 ("time", time.ToString(@"hh\:mm\:ss")),
                 ("source", name),
                 ("message", message.Message)));
         }
+
         text.AppendLine();
         text.Append(Loc.GetString("tape-recorder-print-end-text"));
 

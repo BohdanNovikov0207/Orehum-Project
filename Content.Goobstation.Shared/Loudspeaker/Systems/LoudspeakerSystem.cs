@@ -13,13 +13,11 @@ namespace Content.Goobstation.Shared.Loudspeaker.Systems;
 
 public sealed class LoudSpeakerSystem : EntitySystem
 {
-
     [Dependency] private readonly SharedAudioSystem _audio = default!;
     [Dependency] private readonly SharedPopupSystem _popup = default!;
 
     public override void Initialize()
     {
-
         base.Initialize();
 
         SubscribeLocalEvent<LoudspeakerComponent, GotEquippedEvent>(OnEquipped);
@@ -33,7 +31,6 @@ public sealed class LoudSpeakerSystem : EntitySystem
 
         SubscribeLocalEvent<LoudspeakerComponent, ExaminedEvent>(OnExamined);
         SubscribeLocalEvent<LoudspeakerComponent, GetVerbsEvent<AlternativeVerb>>(OnGetVerbs);
-
     }
 
     private void OnEquipped(EntityUid uid, LoudspeakerComponent comp, GotEquippedEvent args)
@@ -72,10 +69,8 @@ public sealed class LoudSpeakerSystem : EntitySystem
         DoRemovalCheck(args.User, holder);
     }
 
-    private void GetLoudSpeakers(Entity<LoudspeakerHolderComponent> ent, ref GetLoudspeakerEvent args)
-    {
+    private void GetLoudSpeakers(Entity<LoudspeakerHolderComponent> ent, ref GetLoudspeakerEvent args) =>
         args.Loudspeakers = ent.Comp.Loudspeakers;
-    }
 
     private void OnGetLoudspeakerData(Entity<LoudspeakerComponent> ent, ref GetLoudspeakerDataEvent args)
     {
@@ -89,7 +84,6 @@ public sealed class LoudSpeakerSystem : EntitySystem
 
     private void OnGetSpeechSound(Entity<LoudspeakerHolderComponent> ent, ref GetSpeechSoundEvent args)
     {
-
         foreach (var loudspeaker in ent.Comp.Loudspeakers)
         {
             var speechEv = new GetLoudspeakerDataEvent();
@@ -100,7 +94,6 @@ public sealed class LoudSpeakerSystem : EntitySystem
                 args.SpeechSoundProtoId = speechEv.SpeechSounds;
                 return;
             }
-
         }
     }
 
@@ -132,7 +125,7 @@ public sealed class LoudSpeakerSystem : EntitySystem
                 Dirty(ent);
             },
             Text = Loc.GetString("loudspeaker-toggle"),
-            Icon = new SpriteSpecifier.Rsi(new("/Textures/Effects/text.rsi"), "exclamation"),
+            Icon = new SpriteSpecifier.Rsi(new ResPath("/Textures/Effects/text.rsi"), "exclamation"),
         };
 
         args.Verbs.Add(toggleLoudspeakerVerb);
@@ -143,10 +136,7 @@ public sealed class LoudSpeakerSystem : EntitySystem
     private void DoRemovalCheck(EntityUid equipee, LoudspeakerHolderComponent comp)
     {
         if (comp.Loudspeakers.Count == 0) // only remove when theres no loudspeakers
-        {
             RemComp<LoudspeakerHolderComponent>(equipee);
-            return;
-        }
     }
 
     private void ToggleLoudspeakerEffect(EntityUid user, Entity<LoudspeakerComponent> loudspeaker)

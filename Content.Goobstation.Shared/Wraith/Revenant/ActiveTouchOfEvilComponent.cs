@@ -5,10 +5,10 @@ namespace Content.Goobstation.Shared.Wraith.Revenant;
 /// <summary>
 /// Marks the user as using the ability
 /// </summary>
-[RegisterComponent, NetworkedComponent]
+[RegisterComponent] [NetworkedComponent]
 [AutoGenerateComponentState]
 public sealed partial class ActiveTouchOfEvilComponent : Component
 {
-    [ViewVariables, AutoNetworkedField]
+    [ViewVariables] [AutoNetworkedField]
     public float ThrowSpeed;
 }

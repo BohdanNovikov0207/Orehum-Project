@@ -3,6 +3,8 @@
 //
 // SPDX-License-Identifier: AGPL-3.0-or-later
 
+using System.Linq;
+using System.Numerics;
 using Content.Server.NPC;
 using Content.Server.NPC.Systems;
 using Content.Server.Power.EntitySystems;
@@ -13,21 +15,18 @@ using Robust.Shared.Physics;
 using Robust.Shared.Physics.Systems;
 using Robust.Shared.Random;
 using Robust.Shared.Timing;
-using System;
-using System.Linq;
-using System.Numerics;
 
 namespace Content.Goobstation.Server.MobCaller;
 
-public sealed partial class MobCallerSystem : EntitySystem
+public sealed class MobCallerSystem : EntitySystem
 {
+    [Dependency] private readonly IMapManager _map = default!;
     [Dependency] private readonly MobStateSystem _mobState = default!;
     [Dependency] private readonly NPCSystem _npc = default!;
-    [Dependency] private readonly PowerReceiverSystem _power = default!;
     [Dependency] private readonly SharedPhysicsSystem _physics = default!;
-    [Dependency] private readonly IGameTiming _timing = default!;
-    [Dependency] private readonly IMapManager _map = default!;
+    [Dependency] private readonly PowerReceiverSystem _power = default!;
     [Dependency] private readonly IRobustRandom _random = default!;
+    [Dependency] private readonly IGameTiming _timing = default!;
 
     public override void Initialize()
     {
@@ -41,15 +40,14 @@ public sealed partial class MobCallerSystem : EntitySystem
         var occluded = false;
         // prevent evil spam examine ddos even though GetSpawnDirections() takes 0.3ms or so worstcase
         if (ent.Comp.LastExamineRaycast + ent.Comp.ExamineRaycastSpacing > _timing.CurTime)
-        {
             occluded = ent.Comp.CachedExamineResult;
-        }
         else
         {
-            occluded = !(GetSpawnDirections((ent, ent.Comp, Transform(ent))).Any());
+            occluded = !GetSpawnDirections((ent, ent.Comp, Transform(ent))).Any();
             ent.Comp.CachedExamineResult = occluded;
             ent.Comp.LastExamineRaycast = _timing.CurTime;
         }
+
         // tell the user if we're not working due to not being exposed to space
         if (occluded)
             args.PushMarkup(Loc.GetString("mob-caller-occluded"));
@@ -65,7 +63,7 @@ public sealed partial class MobCallerSystem : EntitySystem
 
             if (caller.NeedPower && !_power.IsPowered(uid)
                 || caller.NeedAnchored && !xform.Anchored
-            )
+               )
                 continue;
 
             caller.SpawnAccumulator += TimeSpan.FromSeconds(frameTime);
@@ -83,9 +81,9 @@ public sealed partial class MobCallerSystem : EntitySystem
                 {
                     caller.SpawnedEntities.RemoveAt(i);
                     i--;
-                    continue;
                 }
             }
+
             // check happens after we increment accumulator, this is intentional
             if (caller.SpawnedEntities.Count >= caller.MaxAlive)
                 continue;
@@ -119,7 +117,7 @@ public sealed partial class MobCallerSystem : EntitySystem
         var candidates = new List<Angle>();
         for (var i = 0; i < ent.Comp1.SpawnDirections; i++)
         {
-            var dir = Angle.FromDegrees(360f * (float)i / ent.Comp1.SpawnDirections);
+            var dir = Angle.FromDegrees(360f * i / ent.Comp1.SpawnDirections);
             if (CheckDir(dir))
                 candidates.Add(dir);
 
@@ -129,7 +127,8 @@ public sealed partial class MobCallerSystem : EntitySystem
 
                 // raycast to ensure there's continuously space from OcclusionDistance to GridOcclusionDistance
                 var gridStepVec = stepVec * ent.Comp1.GridOcclusionFidelity;
-                var steps = (int)MathF.Ceiling((ent.Comp1.GridOcclusionDistance - ent.Comp1.OcclusionDistance) / ent.Comp1.GridOcclusionFidelity);
+                var steps = (int) MathF.Ceiling((ent.Comp1.GridOcclusionDistance - ent.Comp1.OcclusionDistance) /
+                                                ent.Comp1.GridOcclusionFidelity);
                 var checkPos = ent.Comp2.WorldPosition + stepVec * ent.Comp1.OcclusionDistance;
                 for (var j = 0; j < steps; j++)
                 {
@@ -141,7 +140,7 @@ public sealed partial class MobCallerSystem : EntitySystem
                 }
 
                 // now also check that there's no obstructions in that direction before the continuous space
-                var ray = new CollisionRay(ent.Comp2.WorldPosition, stepVec, (int)ent.Comp1.OcclusionMask);
+                var ray = new CollisionRay(ent.Comp2.WorldPosition, stepVec, (int) ent.Comp1.OcclusionMask);
                 var rayCastResults = _physics.IntersectRay(ent.Comp2.MapID, ray, ent.Comp1.OcclusionDistance, ent);
 
                 return !rayCastResults.Any();

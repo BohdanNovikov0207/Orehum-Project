@@ -17,21 +17,21 @@ namespace Content.Goobstation.Shared.SlaughterDemon.Systems;
 
 public abstract class SharedSlaughterDemonSystem : EntitySystem
 {
-    [Dependency] private readonly MovementSpeedModifierSystem _movementSpeedModifier = default!;
-    [Dependency] private readonly IGameTiming _timing = default!;
-    [Dependency] private readonly SlaughterDevourSystem _slaughterDevour = default!;
+    [Dependency] private readonly SharedActionsSystem _actions = default!;
     [Dependency] private readonly SharedAudioSystem _audio = default!;
     [Dependency] private readonly SharedContainerSystem _container = default!;
-    [Dependency] private readonly MobStateSystem _mobState = default!;
-    [Dependency] private readonly SharedActionsSystem _actions = default!;
-    [Dependency] private readonly IRobustRandom _random = default!;
     [Dependency] private readonly EntityLookupSystem _lookup = default!;
+    [Dependency] private readonly MobStateSystem _mobState = default!;
+    [Dependency] private readonly MovementSpeedModifierSystem _movementSpeedModifier = default!;
     [Dependency] private readonly INetManager _netManager = default!;
+    [Dependency] private readonly IRobustRandom _random = default!;
+    [Dependency] private readonly SlaughterDevourSystem _slaughterDevour = default!;
+    [Dependency] private readonly IGameTiming _timing = default!;
 
     private EntityQuery<ActorComponent> _actorQuery;
     private EntityQuery<MobStateComponent> _mobStateQuery;
 
-    /// <inheritdoc/>
+    /// <inheritdoc />
     public override void Initialize()
     {
         base.Initialize();
@@ -130,7 +130,6 @@ public abstract class SharedSlaughterDemonSystem : EntitySystem
         demon.Devoured++;
 
         Dirty(uid, demon);
-
     }
 
     private void RefreshMovement(EntityUid uid,
@@ -138,13 +137,9 @@ public abstract class SharedSlaughterDemonSystem : EntitySystem
         RefreshMovementSpeedModifiersEvent args)
     {
         if (component.ExitedBloodCrawl)
-        {
             args.ModifySpeed(component.SpeedModWalk, component.SpeedModRun);
-        }
         else
-        {
             args.ModifySpeed(1f, 1f);
-        }
     }
 
     private void OnBloodCrawlAttempt(Entity<SlaughterDemonComponent> ent, ref BloodCrawlAttemptEvent args)
@@ -158,7 +153,7 @@ public abstract class SharedSlaughterDemonSystem : EntitySystem
     private void OnPickup(Entity<SlaughterDemonComponent> ent, ref PickupAttemptEvent args) =>
         args.Cancel();
 
-    protected virtual void RemoveBlood(EntityUid uid) {}
+    protected virtual void RemoveBlood(EntityUid uid) { }
 
     #region Helper
 
@@ -168,7 +163,7 @@ public abstract class SharedSlaughterDemonSystem : EntitySystem
             return;
 
         if (!_random.Prob(ent.Comp.BloodCrawlSoundChance))
-          return;
+            return;
 
         var entities = _lookup.GetEntitiesInRange(ent.Owner, ent.Comp.BloodCrawlSoundLookup);
         foreach (var entity in entities)

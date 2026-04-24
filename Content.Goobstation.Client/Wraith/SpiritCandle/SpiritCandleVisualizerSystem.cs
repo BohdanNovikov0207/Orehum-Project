@@ -5,9 +5,10 @@ namespace Content.Goobstation.Client.Wraith.SpiritCandle;
 
 public sealed class SpiritCandleVisualizerSystem : EntitySystem
 {
-    [Dependency] private readonly SpriteSystem _sprite = default!;
     [Dependency] private readonly AppearanceSystem _appearance = default!;
-    /// <inheritdoc/>
+    [Dependency] private readonly SpriteSystem _sprite = default!;
+
+    /// <inheritdoc />
     public override void Initialize()
     {
         base.Initialize();

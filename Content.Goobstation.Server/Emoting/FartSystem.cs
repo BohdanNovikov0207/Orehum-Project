@@ -17,7 +17,6 @@ using Content.Goobstation.Shared.Emoting;
 using Content.Server.Atmos.EntitySystems;
 using Content.Server.Chat.Systems;
 using Content.Server.Popups;
-using Content.Shared.Atmos;
 using Content.Shared.Body.Systems;
 using Content.Shared.Camera;
 using Robust.Server.Audio;
@@ -30,38 +29,45 @@ using Timer = Robust.Shared.Timing.Timer;
 
 namespace Content.Goobstation.Server.Emoting;
 
-public sealed partial class FartSystem : SharedFartSystem
+public sealed class FartSystem : SharedFartSystem
 {
-    [Dependency] private readonly PopupSystem _popup = default!;
     [Dependency] private readonly AtmosphereSystem _atmos = default!;
     [Dependency] private readonly AudioSystem _audio = default!;
-    [Dependency] private readonly IRobustRandom _rng = default!;
-    [Dependency] private readonly IPlayerManager _playerManager = default!;
-    [Dependency] private readonly IEntityManager _entMan = default!;
-    [Dependency] private readonly SharedTransformSystem _transformSystem = default!;
-    [Dependency] private readonly SharedCameraRecoilSystem _recoilSystem = default!;
-    [Dependency] private readonly EntityLookupSystem _lookup = default!;
     [Dependency] private readonly SharedBodySystem _bodySystem = default!;
+    [Dependency] private readonly IEntityManager _entMan = default!;
 
-
-    private readonly string[] _fartSounds = [
-        "/Audio/Effects/Emotes/parp1.ogg",
-        "/Audio/_Goobstation/Voice/Human/fart2.ogg",
-        "/Audio/_Goobstation/Voice/Human/fart3.ogg",
-        "/Audio/_Goobstation/Voice/Human/fart4.ogg",
-    ];
-    private readonly string[] _fartInhaleSounds = [
+    private readonly string[] _fartInhaleSounds =
+    [
         "/Audio/_Goobstation/Voice/Human/fart2-reverse.ogg",
         "/Audio/_Goobstation/Voice/Human/fart3-reverse.ogg",
         "/Audio/_Goobstation/Voice/Human/fart4-reverse.ogg",
         "/Audio/_Goobstation/Voice/Human/parp1-reverse.ogg",
     ];
-    private readonly string[] _superFartSounds = [
+
+
+    private readonly string[] _fartSounds =
+    [
+        "/Audio/Effects/Emotes/parp1.ogg",
+        "/Audio/_Goobstation/Voice/Human/fart2.ogg",
+        "/Audio/_Goobstation/Voice/Human/fart3.ogg",
+        "/Audio/_Goobstation/Voice/Human/fart4.ogg",
+    ];
+
+    [Dependency] private readonly EntityLookupSystem _lookup = default!;
+    [Dependency] private readonly IPlayerManager _playerManager = default!;
+    [Dependency] private readonly PopupSystem _popup = default!;
+    [Dependency] private readonly SharedCameraRecoilSystem _recoilSystem = default!;
+    [Dependency] private readonly IRobustRandom _rng = default!;
+
+    private readonly string[] _superFartSounds =
+    [
         "/Audio/_Goobstation/Voice/Human/fart2-long.ogg",
         "/Audio/_Goobstation/Voice/Human/fart3-long.ogg",
         "/Audio/_Goobstation/Voice/Human/fart4-long.ogg",
         "/Audio/_Goobstation/Voice/Human/parp1-long.ogg",
     ];
+
+    [Dependency] private readonly SharedTransformSystem _transformSystem = default!;
 
     public override void Initialize()
     {
@@ -109,14 +115,15 @@ public sealed partial class FartSystem : SharedFartSystem
             _audio.PlayEntity(_fartSounds[0], Filter.Pvs(uid), uid, true);
 
             // Release ammonia into the air
-            var tileMix = _atmos.GetTileMixture(uid, excite: true);
+            var tileMix = _atmos.GetTileMixture(uid, true);
             tileMix?.AdjustMoles(component.GasToFart, component.MolesAmmoniaPerFart);
 
             // One minute timeout for ammonia release (60000MS = 60S)
-            Timer.Spawn(60000, () =>
-            {
-                component.FartTimeout = false;
-            });
+            Timer.Spawn(60000,
+                () =>
+                {
+                    component.FartTimeout = false;
+                });
             var ev = new PostFartEvent(uid);
             RaiseLocalEvent(uid, ev);
         }
@@ -131,9 +138,7 @@ public sealed partial class FartSystem : SharedFartSystem
             }
 
             if (component.FartInhale)
-            {
                 _popup.PopupEntity(Loc.GetString("emote-fart-already-loaded"), uid, uid);
-            }
 
             component.FartInhale = true;
 
@@ -177,7 +182,7 @@ public sealed partial class FartSystem : SharedFartSystem
             CameraShake(10f, xformSystem.GetMapCoordinates(uid), 0.75f);
 
             // Release ammonia into the air
-            var tileMix = _atmos.GetTileMixture(uid, excite: true);
+            var tileMix = _atmos.GetTileMixture(uid, true);
             tileMix?.AdjustMoles(component.GasToFart, component.MolesAmmoniaPerFart * 2);
 
             _entMan.SpawnEntity("Butt", xformSystem.GetMapCoordinates(uid));
@@ -185,10 +190,11 @@ public sealed partial class FartSystem : SharedFartSystem
             _popup.PopupEntity(Loc.GetString("emote-fart-super-fart"), uid, uid);
 
             // One minute timeout for ammonia release (60000MS = 60S)
-            Timer.Spawn(60000, () =>
-            {
-                component.FartTimeout = false;
-            });
+            Timer.Spawn(60000,
+                () =>
+                {
+                    component.FartTimeout = false;
+                });
             var ev = new PostFartEvent(uid, true);
             RaiseLocalEvent(uid, ev);
         }
@@ -208,7 +214,7 @@ public sealed partial class FartSystem : SharedFartSystem
             var delta = epicenter.Position - playerPos;
 
             if (delta.EqualsApprox(Vector2.Zero))
-                delta = new(0.01f, 0);
+                delta = new Vector2(0.01f, 0);
 
             var distance = delta.Length();
             var effect = 5 * MathF.Pow(totalIntensity, 0.5f) * (1 - distance / range);
@@ -218,12 +224,12 @@ public sealed partial class FartSystem : SharedFartSystem
     }
 
     /// <summary>
-    ///     Bible fart
+    /// Bible fart
     /// </summary>
     private void OnBibleFart(Entity<FartComponent> ent, ref PostFartEvent args)
     {
-        foreach (var near in _lookup.GetEntitiesInRange(ent, 0.4f, LookupFlags.Sundries | LookupFlags.Dynamic)){
-
+        foreach (var near in _lookup.GetEntitiesInRange(ent, 0.4f, LookupFlags.Sundries | LookupFlags.Dynamic))
+        {
             if (!HasComp<BibleComponent>(near))
                 continue;
 
@@ -234,13 +240,21 @@ public sealed partial class FartSystem : SharedFartSystem
             if (!ent.Comp.SuperFarted)
             {
                 _rng.Shuffle(_fartSounds);
-                _audio.PlayEntity(_fartSounds[0], Filter.Pvs(near), near, true); // Must replay it because gib body makes the original fart sound stop immediately
+                _audio.PlayEntity(_fartSounds[0],
+                    Filter.Pvs(near),
+                    near,
+                    true); // Must replay it because gib body makes the original fart sound stop immediately
             }
             else
             {
                 _rng.Shuffle(_superFartSounds);
-                _audio.PlayEntity(_superFartSounds[0], Filter.Pvs(near), near, true, AudioParams.Default.WithVolume(0f));
+                _audio.PlayEntity(_superFartSounds[0],
+                    Filter.Pvs(near),
+                    near,
+                    true,
+                    AudioParams.Default.WithVolume(0f));
             }
+
             var xformSystem = _entMan.System<SharedTransformSystem>();
             CameraShake(10f, xformSystem.GetMapCoordinates(near), 1.5f);
             return;

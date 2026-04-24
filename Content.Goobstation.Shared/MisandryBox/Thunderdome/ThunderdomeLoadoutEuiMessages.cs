@@ -3,20 +3,20 @@ using Robust.Shared.Serialization;
 
 namespace Content.Goobstation.Shared.MisandryBox.Thunderdome;
 
-[Serializable, NetSerializable]
+[Serializable] [NetSerializable]
 public sealed class ThunderdomeLoadoutEuiState : EuiStateBase
 {
-    public List<ThunderdomeLoadoutOption> Weapons { get; }
-    public int PlayerCount { get; }
-
     public ThunderdomeLoadoutEuiState(List<ThunderdomeLoadoutOption> weapons, int playerCount)
     {
         Weapons = weapons;
         PlayerCount = playerCount;
     }
+
+    public List<ThunderdomeLoadoutOption> Weapons { get; }
+    public int PlayerCount { get; }
 }
 
-[Serializable, NetSerializable]
+[Serializable] [NetSerializable]
 public sealed class ThunderdomeLoadoutOption
 {
     public int Index { get; set; }
@@ -26,13 +26,13 @@ public sealed class ThunderdomeLoadoutOption
     public string SpritePrototype { get; set; } = string.Empty;
 }
 
-[Serializable, NetSerializable]
+[Serializable] [NetSerializable]
 public sealed class ThunderdomeLoadoutSelectedMessage : EuiMessageBase
 {
-    public int WeaponIndex { get; }
-
     public ThunderdomeLoadoutSelectedMessage(int weaponIndex)
     {
         WeaponIndex = weaponIndex;
     }
+
+    public int WeaponIndex { get; }
 }

@@ -18,16 +18,16 @@ public sealed partial class TapeRecorderWindow : FancyWindow
 {
     [Dependency] private readonly IEntityManager _entMan = default!;
 
-    public EntityUid Owner;
-    private bool _onCooldown;
+    private readonly RadioOptions<TapeRecorderMode> _options = default!;
     private bool _hasCasette;
     private TapeRecorderMode _mode = TapeRecorderMode.Stopped;
-
-    private RadioOptions<TapeRecorderMode> _options = default!;
+    private bool _onCooldown;
     private bool _updating;
 
     public Action<TapeRecorderMode>? OnModeChanged;
     public Action? OnPrintTranscript;
+
+    public EntityUid Owner;
 
     public TapeRecorderWindow()
     {
@@ -105,10 +105,8 @@ public sealed partial class TapeRecorderWindow : FancyWindow
         _updating = false;
     }
 
-    private void SetEnabled(TapeRecorderMode mode, bool condition)
-    {
+    private void SetEnabled(TapeRecorderMode mode, bool condition) =>
         _options.SetItemDisabled((int) mode, !(_hasCasette && condition));
-    }
 
     protected override void FrameUpdate(FrameEventArgs args)
     {

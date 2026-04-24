@@ -10,13 +10,18 @@ using Robust.Shared.Prototypes;
 
 namespace Content.Goobstation.Shared.OfficeChair;
 
-[RegisterComponent, NetworkedComponent, AutoGenerateComponentState]
+[RegisterComponent] [NetworkedComponent] [AutoGenerateComponentState]
 public sealed partial class VehicleWallPushComponent : Component
 {
+    public const int KickMask = (int) (
+        CollisionGroup.Impassable |
+        CollisionGroup.BulletImpassable
+    );
+
     /// <summary>
     /// Action prototype granted to the strapped driver to perform a wall kick/push.
     /// </summary>
-    [DataField, AutoNetworkedField]
+    [DataField] [AutoNetworkedField]
     public EntProtoId? ActionProto;
 
     [DataField]
@@ -25,25 +30,20 @@ public sealed partial class VehicleWallPushComponent : Component
     /// <summary>
     /// Speed added to the vehicle in the direction opposite the hit surface when kicking.
     /// </summary>
-    [DataField, AutoNetworkedField]
+    [DataField] [AutoNetworkedField]
     public float KickSpeed = 7f;
-
-    /// <summary>
-    /// Minimum valid distance from the vehicle to the target surface for a kick to be considered.
-    /// </summary>
-    [DataField, AutoNetworkedField]
-    public float MinDistance = 0.2f;
 
     /// <summary>
     /// Maximum raycast distance to search for a blocking surface to push against.
     /// </summary>
-    [DataField, AutoNetworkedField]
+    [DataField] [AutoNetworkedField]
     public float MaxDistance = 1.5f;
 
-    public const int KickMask = (int) (
-        CollisionGroup.Impassable |
-        CollisionGroup.BulletImpassable
-    );
+    /// <summary>
+    /// Minimum valid distance from the vehicle to the target surface for a kick to be considered.
+    /// </summary>
+    [DataField] [AutoNetworkedField]
+    public float MinDistance = 0.2f;
 
     /// <summary>
     /// Sound played when the chair rolls

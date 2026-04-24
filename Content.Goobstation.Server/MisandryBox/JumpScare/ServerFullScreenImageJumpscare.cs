@@ -20,9 +20,11 @@ public sealed class ServerFullScreenImageJumpscare : IFullScreenImageJumpscare, 
         Jumpscare(session.Channel, image.TexturePath);
     }
 
+    public void PostInject() => RegisterNetMessages();
+
     private void Jumpscare(INetChannel channel, ResPath imagepath)
     {
-        var msg = new JumpscareMessage()
+        var msg = new JumpscareMessage
         {
             ImagePath = imagepath.CanonPath,
         };
@@ -30,13 +32,5 @@ public sealed class ServerFullScreenImageJumpscare : IFullScreenImageJumpscare, 
         _netManager.ServerSendMessage(msg, channel);
     }
 
-    public void PostInject()
-    {
-        RegisterNetMessages();
-    }
-
-    private void RegisterNetMessages()
-    {
-        _netManager.RegisterNetMessage<JumpscareMessage>();
-    }
+    private void RegisterNetMessages() => _netManager.RegisterNetMessage<JumpscareMessage>();
 }

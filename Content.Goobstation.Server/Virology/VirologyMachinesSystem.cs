@@ -1,30 +1,30 @@
+using System.Text;
+using Content.Goobstation.Shared.Disease.Components;
 using Content.Goobstation.Shared.Virology;
 using Content.Server.Power.EntitySystems;
 using Content.Shared.Containers.ItemSlots;
 using Content.Shared.Paper;
+using Content.Shared.Popups;
+using Content.Shared.Verbs;
 using Robust.Server.Audio;
+using Robust.Shared.Audio;
 using Robust.Shared.Containers;
 using Robust.Shared.Prototypes;
 using Robust.Shared.Timing;
-using System.Text;
-using Content.Goobstation.Shared.Disease.Components;
-using Content.Shared.Popups;
-using Content.Shared.Verbs;
-using Robust.Shared.Audio;
 using Robust.Shared.Utility;
 
 namespace Content.Goobstation.Server.Virology;
 
-public sealed partial class VirologyMachinesSystem : EntitySystem
+public sealed class VirologyMachinesSystem : EntitySystem
 {
+    [Dependency] private readonly SharedAppearanceSystem _appearance = default!;
     [Dependency] private readonly AudioSystem _audio = default!;
     [Dependency] private readonly ItemSlotsSystem _itemSlots = default!;
-    [Dependency] private readonly IPrototypeManager _proto = default!;
     [Dependency] private readonly PaperSystem _paper = default!;
-    [Dependency] private readonly IGameTiming _timing = default!;
-    [Dependency] private readonly PowerReceiverSystem _power = default!;
-    [Dependency] private readonly SharedAppearanceSystem _appearance = default!;
     [Dependency] private readonly SharedPopupSystem _popup = default!;
+    [Dependency] private readonly PowerReceiverSystem _power = default!;
+    [Dependency] private readonly IPrototypeManager _proto = default!;
+    [Dependency] private readonly IGameTiming _timing = default!;
 
     public override void Initialize()
     {
@@ -80,7 +80,9 @@ public sealed partial class VirologyMachinesSystem : EntitySystem
             return;
 
         EnsureComp<ActiveVirologyMachineComponent>(ent, out var active);
-        var audio = _audio.PlayPvs(ent.Comp.AnalysisSound, ent, AudioParams.Default.WithLoop(true).WithVariation(0.15f));
+        var audio = _audio.PlayPvs(ent.Comp.AnalysisSound,
+            ent,
+            AudioParams.Default.WithLoop(true).WithVariation(0.15f));
         if (audio.HasValue)
             ent.Comp.SoundEntity = audio.Value.Entity;
         active.EndTime = _timing.CurTime + ent.Comp.AnalysisDuration;
@@ -94,10 +96,9 @@ public sealed partial class VirologyMachinesSystem : EntitySystem
             _itemSlots.AddItemSlot(ent, VirologyMachineComponent.SwabSlotId, ent.Comp.SwabSlot);
     }
 
-    private void OnAnalyzerCheck(Entity<VirologyMachineComponent> ent, ref VirologyMachineCheckEvent args)
-    {
-        args.Cancelled = !_itemSlots.TryGetSlot(ent, VirologyMachineComponent.SwabSlotId, out var slot) || slot.Item == null;
-    }
+    private void OnAnalyzerCheck(Entity<VirologyMachineComponent> ent, ref VirologyMachineCheckEvent args) =>
+        args.Cancelled = !_itemSlots.TryGetSlot(ent, VirologyMachineComponent.SwabSlotId, out var slot) ||
+                         slot.Item == null;
 
     private void OnMachineDone(Entity<VirologyMachineComponent> ent, ref VirologyMachineDoneEvent args)
     {
@@ -113,7 +114,7 @@ public sealed partial class VirologyMachinesSystem : EntitySystem
             || slot.Item == null)
             return;
 
-        if(!ent.Comp.Vaccinator)
+        if (!ent.Comp.Vaccinator)
             AnalyzeSwab(ent, (slot.Item.Value, null));
         else
             CreatePen(ent, (slot.Item.Value, null));
@@ -147,7 +148,8 @@ public sealed partial class VirologyMachinesSystem : EntitySystem
         var report = new StringBuilder();
         report.AppendLine(Loc.GetString("disease-analyzer-report-title"));
         report.AppendLine(Loc.GetString("disease-analyzer-report-genotype", ("genotype", disease.Genotype)));
-        report.AppendLine(Loc.GetString("disease-analyzer-report-type", ("type", Loc.GetString(_proto.Index(disease.DiseaseType).LocalizedName))));
+        report.AppendLine(Loc.GetString("disease-analyzer-report-type",
+            ("type", Loc.GetString(_proto.Index(disease.DiseaseType).LocalizedName))));
         report.AppendLine(Loc.GetString("disease-analyzer-report-infection-rate", ("rate", disease.InfectionRate)));
         report.AppendLine(Loc.GetString("disease-analyzer-report-immunity-gain", ("rate", disease.ImmunityGainRate)));
         report.AppendLine(Loc.GetString("disease-analyzer-report-mutation-rate", ("rate", disease.MutationRate)));
@@ -165,6 +167,7 @@ public sealed partial class VirologyMachinesSystem : EntitySystem
                     ("severity", effectComp.Severity)));
             }
         }
+
         // print the report
         var printed = Spawn(ent.Comp.PaperPrototype, Transform(ent).Coordinates);
         _paper.SetContent((printed, EnsureComp<PaperComponent>(printed)), report.ToString());
@@ -173,10 +176,8 @@ public sealed partial class VirologyMachinesSystem : EntitySystem
         _audio.PlayPvs(ent.Comp.AnalyzedSound, ent);
     }
 
-    private void SetAppearance(EntityUid uid, bool state)
-    {
+    private void SetAppearance(EntityUid uid, bool state) =>
         _appearance.SetData(uid, DiseaseMachineVisuals.IsRunning, state);
-    }
 
     private void AddAltVerb(Entity<VirologyMachineComponent> ent, ref GetVerbsEvent<AlternativeVerb> args)
     {
@@ -205,7 +206,7 @@ public sealed partial class VirologyMachinesSystem : EntitySystem
             },
             Text = "Switch Mode",
             Priority = 25,
-            Icon = new SpriteSpecifier.Texture(new ResPath("/Textures/Interface/VerbIcons/dot.svg.192dpi.png"))
+            Icon = new SpriteSpecifier.Texture(new ResPath("/Textures/Interface/VerbIcons/dot.svg.192dpi.png")),
         };
 
         args.Verbs.Add(verb);

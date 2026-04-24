@@ -15,13 +15,19 @@ namespace Content.Goobstation.Shared.Overlays;
 public abstract partial class SwitchableVisionOverlayComponent : BaseVisionOverlayComponent
 {
     [DataField]
-    public bool IsActive;
+    public SoundSpecifier? ActivateSound = new SoundPathSpecifier("/Audio/_White/Items/Goggles/activate.ogg");
+
+    [DataField]
+    public SoundSpecifier? DeactivateSound = new SoundPathSpecifier("/Audio/_White/Items/Goggles/deactivate.ogg");
 
     [DataField]
     public bool DrawOverlay = true;
 
     [DataField]
-    public float OverlayOpacity = 0.5f;
+    public float FlashDurationMultiplier = 1f;
+
+    [DataField]
+    public bool IsActive;
 
     /// <summary>
     /// Whether it should grant equipment enhanced vision or is it mob vision
@@ -29,43 +35,37 @@ public abstract partial class SwitchableVisionOverlayComponent : BaseVisionOverl
     [DataField]
     public bool IsEquipment;
 
+    [DataField]
+    public float OverlayOpacity = 0.5f;
+
+    [ViewVariables(VVAccess.ReadOnly)]
+    public float PulseAccumulator;
+
     /// <summary>
     /// If it is greater than 0, overlay isn't toggled but pulsed instead
     /// </summary>
     [DataField]
     public float PulseTime;
 
-    [ViewVariables(VVAccess.ReadOnly)]
-    public float PulseAccumulator;
-
-    [DataField]
-    public float FlashDurationMultiplier = 1f;
-
-    [DataField]
-    public SoundSpecifier? ActivateSound = new SoundPathSpecifier("/Audio/_White/Items/Goggles/activate.ogg");
-
-    [DataField]
-    public SoundSpecifier? DeactivateSound = new SoundPathSpecifier("/Audio/_White/Items/Goggles/deactivate.ogg");
+    [ViewVariables]
+    public EntityUid? ToggleActionEntity;
 
     [DataField]
     public virtual EntProtoId? ToggleAction { get; set; }
-
-    [ViewVariables]
-    public EntityUid? ToggleActionEntity;
 }
 
-[Serializable, NetSerializable]
+[Serializable] [NetSerializable]
 public sealed class SwitchableVisionOverlayComponentState : IComponentState
 {
-    public Color Color;
-    public bool IsEquipment;
-    public bool IsActive;
-    public float FlashDurationMultiplier;
     public SoundSpecifier? ActivateSound;
+    public Color Color;
     public SoundSpecifier? DeactivateSound;
-    public EntProtoId? ToggleAction;
-    public float LightRadius;
-    public string? ThermalShader;
     public bool DrawOverlay;
+    public float FlashDurationMultiplier;
+    public bool IsActive;
+    public bool IsEquipment;
+    public float LightRadius;
     public float OverlayOpacity;
+    public string? ThermalShader;
+    public EntProtoId? ToggleAction;
 }

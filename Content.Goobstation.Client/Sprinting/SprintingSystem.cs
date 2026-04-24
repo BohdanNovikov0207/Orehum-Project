@@ -14,8 +14,10 @@ namespace Content.Goobstation.Client.Sprinting;
 
 public sealed class SprintingSystem : SharedSprintingSystem
 {
-    [Dependency] private readonly AnimationPlayerSystem _animationPlayer = default!;
-    [Dependency] private readonly IGameTiming _timing = default!;
+    public enum SprintVisualLayers : byte
+    {
+        Base,
+    }
 
     private static readonly Animation InitialAnimation = new()
     {
@@ -28,9 +30,9 @@ public sealed class SprintingSystem : SharedSprintingSystem
                 KeyFrames =
                 {
                     new AnimationTrackSpriteFlick.KeyFrame(new RSI.StateId("sprint_cloud"), 0f),
-                }
-            }
-        }
+                },
+            },
+        },
     };
 
     private static readonly Animation SmallAnimation = new()
@@ -48,11 +50,16 @@ public sealed class SprintingSystem : SharedSprintingSystem
             },
         },
     };
+
+    [Dependency] private readonly AnimationPlayerSystem _animationPlayer = default!;
+    [Dependency] private readonly IGameTiming _timing = default!;
+
     public override void Initialize()
     {
         base.Initialize();
         SubscribeLocalEvent<SprinterComponent, SprintStartEvent>(OnSprintStart);
     }
+
     public override void Update(float frameTime)
     {
         base.Update(frameTime);
@@ -73,6 +80,7 @@ public sealed class SprintingSystem : SharedSprintingSystem
             component.LastStep = _timing.CurTime;
         }
     }
+
     private void OnSprintStart(EntityUid uid, SprinterComponent component, ref SprintStartEvent args)
     {
         if (TerminatingOrDeleted(uid)
@@ -82,10 +90,4 @@ public sealed class SprintingSystem : SharedSprintingSystem
         var ent = Spawn(component.SprintAnimation, Transform(uid).Coordinates);
         _animationPlayer.Play(ent, InitialAnimation, "sprint_cloud");
     }
-
-    public enum SprintVisualLayers : byte
-    {
-        Base,
-    }
-
 }

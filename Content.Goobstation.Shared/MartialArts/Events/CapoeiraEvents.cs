@@ -13,9 +13,12 @@ using Robust.Shared.Serialization;
 
 namespace Content.Goobstation.Shared.MartialArts.Events;
 
-[Serializable, NetSerializable, ImplicitDataDefinitionForInheritors]
+[Serializable] [NetSerializable] [ImplicitDataDefinitionForInheritors]
 public abstract partial class BaseCapoeiraEvent : EntityEventArgs
 {
+    [DataField]
+    public float StaminaToHeal = -20f;
+
     [DataField]
     public virtual float VelocityPowerMultiplier { get; set; } = 0.6f;
 
@@ -36,18 +39,15 @@ public abstract partial class BaseCapoeiraEvent : EntityEventArgs
 
     [DataField]
     public virtual SoundSpecifier? Sound { get; set; } = new SoundPathSpecifier("/Audio/Weapons/genhit3.ogg");
-
-    [DataField]
-    public float StaminaToHeal = -20f;
 }
 
 public sealed partial class PushKickPerformedEvent : BaseCapoeiraEvent
 {
     [DataField]
-    public EntProtoId StatusEffectProto = "StatusEffectMeleeVulnerability";
+    public DamageModifierSet ModifierSet = default!;
 
     [DataField]
-    public DamageModifierSet ModifierSet = default!;
+    public EntProtoId StatusEffectProto = "StatusEffectMeleeVulnerability";
 
     [DataField]
     public float ThrowRange = 1f;

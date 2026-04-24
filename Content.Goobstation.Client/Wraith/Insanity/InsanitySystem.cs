@@ -7,11 +7,12 @@ namespace Content.Goobstation.Client.Wraith.Insanity;
 
 public sealed class InsanitySystem : EntitySystem
 {
-    private InsanityOverlay _overlay = default!;
+    [Dependency] private readonly IOverlayManager _overlayManager = default!;
 
     [Dependency] private readonly IPlayerManager _playerManager = default!;
-    [Dependency] private readonly IOverlayManager _overlayManager = default!;
-    /// <inheritdoc/>
+    private InsanityOverlay _overlay = default!;
+
+    /// <inheritdoc />
     public override void Initialize()
     {
         base.Initialize();
@@ -22,7 +23,7 @@ public sealed class InsanitySystem : EntitySystem
         SubscribeLocalEvent<WraithInsanityComponent, LocalPlayerAttachedEvent>(OnPlayerAttached);
         SubscribeLocalEvent<WraithInsanityComponent, LocalPlayerDetachedEvent>(OnPlayerDetached);
 
-        _overlay = new();
+        _overlay = new InsanityOverlay();
     }
 
     private void OnPlayerAttached(Entity<WraithInsanityComponent> ent, ref LocalPlayerAttachedEvent args) =>

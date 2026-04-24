@@ -10,26 +10,26 @@ namespace Content.Goobstation.Server.Devil.Contract.Revival;
 public sealed partial class PendingRevivalContractComponent : Component
 {
     /// <summary>
-    /// The entity being revived.
-    /// </summary>
-    [ViewVariables]
-    public EntityUid? Contractee;
-
-    /// <summary>
-    /// The entity offering revival
-    /// </summary>
-    [ViewVariables]
-    public EntityUid? Offerer;
-
-    /// <summary>
     /// The contract attached to this player.
     /// </summary>
     [ViewVariables]
     public EntityUid? Contract;
 
     /// <summary>
+    /// The entity being revived.
+    /// </summary>
+    [ViewVariables]
+    public EntityUid? Contractee;
+
+    /// <summary>
     /// The MindId of the player.
     /// </summary>
     [ViewVariables]
     public EntityUid MindId;
+
+    /// <summary>
+    /// The entity offering revival
+    /// </summary>
+    [ViewVariables]
+    public EntityUid? Offerer;
 }

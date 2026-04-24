@@ -19,11 +19,11 @@ namespace Content.Goobstation.Server.Shadowling.Systems.Abilities.CollectiveMind
 /// </summary>
 public sealed class ShadowlingNullChargeSystem : EntitySystem
 {
-    [Dependency] private readonly SharedDoAfterSystem _doAfter = default!;
-    [Dependency] private readonly SharedPopupSystem _popupSystem = default!;
-    [Dependency] private readonly EntityLookupSystem _lookup = default!;
-    [Dependency] private readonly SharedTransformSystem _transformSystem = default!;
     [Dependency] private readonly SharedActionsSystem _actions = default!;
+    [Dependency] private readonly SharedDoAfterSystem _doAfter = default!;
+    [Dependency] private readonly EntityLookupSystem _lookup = default!;
+    [Dependency] private readonly SharedPopupSystem _popupSystem = default!;
+    [Dependency] private readonly SharedTransformSystem _transformSystem = default!;
 
     public override void Initialize()
     {
@@ -67,7 +67,7 @@ public sealed class ShadowlingNullChargeSystem : EntitySystem
             || args.Handled)
             return;
 
-        bool apcAffected = false;
+        var apcAffected = false;
         foreach (var apc in _lookup.GetEntitiesInRange(uid, component.Range))
         {
             if (apcAffected)
@@ -101,6 +101,7 @@ public sealed class ShadowlingNullChargeSystem : EntitySystem
             if (HasComp<ApcComponent>(target))
                 return true;
         }
+
         return false;
     }
 }

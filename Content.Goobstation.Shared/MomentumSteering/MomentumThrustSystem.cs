@@ -14,7 +14,11 @@ public sealed class MomentumThrustSystem : CommonMomentumThrustSystem
         _jetpackUserQuery = GetEntityQuery<JetpackUserComponent>();
     }
 
-    public override void AdjustWishDir(EntityUid uid, MomentumSteeringComponent comp, Vector2 originalWishDir, ref Vector2 adjustedWishDir, float speed)
+    public override void AdjustWishDir(EntityUid uid,
+        MomentumSteeringComponent comp,
+        Vector2 originalWishDir,
+        ref Vector2 adjustedWishDir,
+        float speed)
     {
         if (!_jetpackUserQuery.HasComp(uid))
             return;

@@ -6,18 +6,20 @@
 //
 // SPDX-License-Identifier: AGPL-3.0-or-later
 
+using Content.Goobstation.Maths.FixedPoint;
 using Content.Goobstation.Shared.Xenobiology;
 using Content.Goobstation.Shared.Xenobiology.Components;
-using Content.Goobstation.Shared.Xenobiology.Components.Equipment;
 using Content.Shared._Shitmed.Targeting;
 using Content.Shared.ActionBlocker;
+using Content.Shared.Body.Components;
+using Content.Shared.Body.Systems;
+using Content.Shared.Chemistry.EntitySystems;
 using Content.Shared.Damage;
 using Content.Shared.DoAfter;
 using Content.Shared.Mobs;
 using Content.Shared.Mobs.Components;
 using Content.Shared.Mobs.Systems;
 using Content.Shared.Movement.Components;
-using Content.Shared.Movement.Pulling.Components;
 using Content.Shared.Movement.Pulling.Events;
 using Content.Shared.Nutrition.Components;
 using Content.Shared.Nutrition.EntitySystems;
@@ -25,29 +27,24 @@ using Content.Shared.Popups;
 using Robust.Shared.Audio.Systems;
 using Robust.Shared.Containers;
 using Robust.Shared.Timing;
-using Content.Shared.Body.Systems;
-using Content.Shared.Body.Components;
-using Content.Shared.Chemistry.EntitySystems;
-using Content.Goobstation.Maths.FixedPoint;
-using Content.Shared.Chemistry.Components;
 
 namespace Content.Goobstation.Server.Xenobiology;
 
 // This handles any actions that slime mobs may have.
-public sealed partial class SlimeLatchSystem : EntitySystem
+public sealed class SlimeLatchSystem : EntitySystem
 {
+    [Dependency] private readonly ActionBlockerSystem _actionBlocker = default!;
+    [Dependency] private readonly SharedAudioSystem _audio = default!;
+    [Dependency] private readonly SharedBodySystem _body = default!;
+    [Dependency] private readonly DamageableSystem _damageable = default!;
+    [Dependency] private readonly SharedDoAfterSystem _doAfter = default!;
     [Dependency] private readonly IGameTiming _gameTiming = default!;
     [Dependency] private readonly HungerSystem _hunger = default!;
     [Dependency] private readonly MobStateSystem _mobState = default!;
     [Dependency] private readonly SharedPopupSystem _popup = default!;
-    [Dependency] private readonly DamageableSystem _damageable = default!;
-    [Dependency] private readonly SharedAudioSystem _audio = default!;
-    [Dependency] private readonly ActionBlockerSystem _actionBlocker = default!;
-    [Dependency] private readonly SharedDoAfterSystem _doAfter = default!;
-    [Dependency] private readonly SharedTransformSystem _xform = default!;
-    [Dependency] private readonly SharedBodySystem _body = default!;
     [Dependency] private readonly SharedSolutionContainerSystem _solutionContainer = default!;
     [Dependency] private readonly StomachSystem _stomach = default!;
+    [Dependency] private readonly SharedTransformSystem _xform = default!;
 
     public override void Initialize()
     {
@@ -71,7 +68,9 @@ public sealed partial class SlimeLatchSystem : EntitySystem
 
         var sodQuery = EntityQueryEnumerator<SlimeDamageOvertimeComponent>();
         while (sodQuery.MoveNext(out var uid, out var dotComp))
+        {
             UpdateHunger((uid, dotComp));
+        }
     }
 
     private void UpdateHunger(Entity<SlimeDamageOvertimeComponent> ent)
@@ -80,7 +79,7 @@ public sealed partial class SlimeLatchSystem : EntitySystem
             return;
 
         ent.Comp.NextTickTime = _gameTiming.CurTime + ent.Comp.Interval;
-        _damageable.TryChangeDamage(ent, ent.Comp.Damage, ignoreResistances: true, targetPart: TargetBodyPart.All);
+        _damageable.TryChangeDamage(ent, ent.Comp.Damage, true, targetPart: TargetBodyPart.All);
 
         if (ent.Comp.SourceEntityUid is not { } source)
             return;
@@ -100,25 +99,40 @@ public sealed partial class SlimeLatchSystem : EntitySystem
         FixedPoint2 availabaleVolume = 0;
         foreach (var stomach in stomachList)
         {
-            if (_solutionContainer.ResolveSolution(stomach.Owner, StomachSystem.DefaultSolutionName, ref stomach.Comp1.Solution, out var sol))
+            if (_solutionContainer.ResolveSolution(stomach.Owner,
+                    StomachSystem.DefaultSolutionName,
+                    ref stomach.Comp1.Solution,
+                    out var sol))
                 availabaleVolume += sol.AvailableVolume;
         }
 
         if (TryComp<BloodstreamComponent>(ent, out var bloodstream)
-            && _solutionContainer.ResolveSolution(ent.Owner, bloodstream.BloodSolutionName, ref bloodstream.BloodSolution, out var blood)
-            && _solutionContainer.ResolveSolution(ent.Owner, bloodstream.ChemicalSolutionName, ref bloodstream.ChemicalSolution, out var chem))
+            && _solutionContainer.ResolveSolution(ent.Owner,
+                bloodstream.BloodSolutionName,
+                ref bloodstream.BloodSolution,
+                out var blood)
+            && _solutionContainer.ResolveSolution(ent.Owner,
+                bloodstream.ChemicalSolutionName,
+                ref bloodstream.ChemicalSolution,
+                out var chem))
         {
-            FixedPoint2 bloodProportion = blood.Volume/(chem.Volume + blood.Volume);
-            FixedPoint2 chemProportion = 1 - bloodProportion;
-            FixedPoint2 bloodTransfer = FixedPoint2.Min(ent.Comp.SuctionUnits * bloodProportion, availabaleVolume * bloodProportion);
-            FixedPoint2 chemTransfer = FixedPoint2.Min(ent.Comp.SuctionUnits * chemProportion, availabaleVolume * chemProportion);
+            var bloodProportion = blood.Volume / (chem.Volume + blood.Volume);
+            var chemProportion = 1 - bloodProportion;
+            var bloodTransfer =
+                FixedPoint2.Min(ent.Comp.SuctionUnits * bloodProportion, availabaleVolume * bloodProportion);
+            var chemTransfer =
+                FixedPoint2.Min(ent.Comp.SuctionUnits * chemProportion, availabaleVolume * chemProportion);
             foreach (var stomach in stomachList)
             {
-                var bloodSolution = blood.SplitSolutionWithout(bloodTransfer/FixedPoint2.New(stomachList.Count), ent.Comp.ToxinReagent); // we don't want slime sucking it's own toxin instad of drinking blood
-                _stomach.TryTransferSolution(stomach.Owner, bloodSolution, stomach); // blood first, other chemicals later
-                var chemSolution = blood.SplitSolution(chemTransfer/FixedPoint2.New(stomachList.Count));
+                var bloodSolution = blood.SplitSolutionWithout(bloodTransfer / FixedPoint2.New(stomachList.Count),
+                    ent.Comp.ToxinReagent); // we don't want slime sucking it's own toxin instad of drinking blood
+                _stomach.TryTransferSolution(stomach.Owner,
+                    bloodSolution,
+                    stomach); // blood first, other chemicals later
+                var chemSolution = blood.SplitSolution(chemTransfer / FixedPoint2.New(stomachList.Count));
                 _stomach.TryTransferSolution(stomach.Owner, chemSolution, stomach);
             }
+
             chem.AddReagent(ent.Comp.ToxinReagent, ent.Comp.ToxinUnits);
         }
     }
@@ -150,26 +164,20 @@ public sealed partial class SlimeLatchSystem : EntitySystem
         Unlatch(ent);
     }
 
-    private void OnEntGotRemovedFromContainer(Entity<SlimeComponent> ent, ref EntGotRemovedFromContainerMessage args)
-    {
+    private void OnEntGotRemovedFromContainer(Entity<SlimeComponent> ent, ref EntGotRemovedFromContainerMessage args) =>
         Unlatch(ent);
-    }
 
-    private void OnEntGotInsertedIntoContainer(Entity<SlimeComponent> ent, ref EntGotInsertedIntoContainerMessage args)
-    {
+    private void
+        OnEntGotInsertedIntoContainer(Entity<SlimeComponent> ent, ref EntGotInsertedIntoContainerMessage args) =>
         Unlatch(ent);
-    }
 
-    private void OnSlimeMitosis(Entity<SlimeComponent> ent, ref SlimeMitosisEvent args)
-    {
-        Unlatch(ent);
-    }
+    private void OnSlimeMitosis(Entity<SlimeComponent> ent, ref SlimeMitosisEvent args) => Unlatch(ent);
 
     private void OnLatchAttempt(SlimeLatchEvent args)
     {
         if (TerminatingOrDeleted(args.Target)
-        || TerminatingOrDeleted(args.Performer)
-        || !TryComp<SlimeComponent>(args.Performer, out var slime))
+            || TerminatingOrDeleted(args.Performer)
+            || !TryComp<SlimeComponent>(args.Performer, out var slime))
             return;
 
         var ent = new Entity<SlimeComponent>(args.Performer, slime);
@@ -181,10 +189,7 @@ public sealed partial class SlimeLatchSystem : EntitySystem
         }
 
         if (CanLatch((args.Performer, slime), args.Target))
-        {
             StartSlimeLatchDoAfter((args.Performer, slime), args.Target);
-            return;
-        }
 
         // improvement space (tm)
     }
@@ -215,7 +220,12 @@ public sealed partial class SlimeLatchSystem : EntitySystem
             return false;
         }
 
-        var doAfterArgs = new DoAfterArgs(EntityManager, ent, ent.Comp.LatchDoAfterDuration, new SlimeLatchDoAfterEvent(), ent, target)
+        var doAfterArgs = new DoAfterArgs(EntityManager,
+            ent,
+            ent.Comp.LatchDoAfterDuration,
+            new SlimeLatchDoAfterEvent(),
+            ent,
+            target)
         {
             BreakOnDamage = true,
             BreakOnMove = true,
@@ -230,7 +240,9 @@ public sealed partial class SlimeLatchSystem : EntitySystem
         return true;
     }
 
-    private void OnDoAfterAttempt(EntityUid uid, SlimeComponent comp, ref DoAfterAttemptEvent<SlimeLatchDoAfterEvent> args)
+    private void OnDoAfterAttempt(EntityUid uid,
+        SlimeComponent comp,
+        ref DoAfterAttemptEvent<SlimeLatchDoAfterEvent> args)
     {
         if (HasComp<BeingLatchedComponent>(args.Event.Target))
             args.Cancel();
@@ -256,13 +268,11 @@ public sealed partial class SlimeLatchSystem : EntitySystem
     public bool IsLatched(Entity<SlimeComponent> ent, EntityUid target)
         => IsLatched(ent) && ent.Comp.LatchedTarget!.Value == target;
 
-    public bool CanLatch(Entity<SlimeComponent> ent, EntityUid target)
-    {
-        return !(IsLatched(ent) // already latched
-            || _mobState.IsDead(target) // target dead
-            || !_actionBlocker.CanInteract(ent, target) // can't reach
-            || !HasComp<MobStateComponent>(target)); // make any mob work
-    }
+    public bool CanLatch(Entity<SlimeComponent> ent, EntityUid target) =>
+        !(IsLatched(ent) // already latched
+          || _mobState.IsDead(target) // target dead
+          || !_actionBlocker.CanInteract(ent, target) // can't reach
+          || !HasComp<MobStateComponent>(target)); // make any mob work
 
     public bool NpcTryLatch(Entity<SlimeComponent> ent, EntityUid target)
     {
@@ -289,7 +299,9 @@ public sealed partial class SlimeLatchSystem : EntitySystem
         comp.SourceEntityUid = ent;
 
         _audio.PlayEntity(ent.Comp.EatSound, ent, ent);
-        _popup.PopupEntity(Loc.GetString("slime-action-latch-success", ("slime", ent), ("target", target)), ent, PopupType.SmallCaution);
+        _popup.PopupEntity(Loc.GetString("slime-action-latch-success", ("slime", ent), ("target", target)),
+            ent,
+            PopupType.SmallCaution);
 
         Dirty(ent);
         Dirty(target, comp);

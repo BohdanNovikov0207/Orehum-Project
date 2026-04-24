@@ -8,10 +8,10 @@ using Robust.Shared.GameStates;
 namespace Content.Goobstation.Shared.Changeling.Components;
 
 /// <summary>
-///     Component that indicates that a person can be absorbed by a changeling, but will not give any objective progress or evolution points.
+/// Component that indicates that a person can be absorbed by a changeling, but will not give any objective progress or
+/// evolution points.
 /// </summary>
-[RegisterComponent, NetworkedComponent]
+[RegisterComponent] [NetworkedComponent]
 public sealed partial class PartialAbsorbableComponent : Component
 {
-
 }

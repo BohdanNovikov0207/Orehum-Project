@@ -14,14 +14,14 @@ namespace Content.Goobstation.Shared.Hastur.Systems;
 
 public sealed class HasturDevourSystem : EntitySystem
 {
-    [Dependency] private readonly SharedPopupSystem _popup = default!;
-    [Dependency] private readonly SharedAudioSystem _audio = default!;
-    [Dependency] private readonly SharedStunSystem _stun = default!;
-    [Dependency] private readonly SharedBodySystem _bodySystem = default!;
-    [Dependency] private readonly SharedDoAfterSystem _doAfter = default!;
-    [Dependency] private readonly SharedAppearanceSystem _appearance = default!;
-    [Dependency] private readonly DamageableSystem _damage = default!;
     [Dependency] private readonly ISharedAdminLogManager _admin = default!;
+    [Dependency] private readonly SharedAppearanceSystem _appearance = default!;
+    [Dependency] private readonly SharedAudioSystem _audio = default!;
+    [Dependency] private readonly SharedBodySystem _bodySystem = default!;
+    [Dependency] private readonly DamageableSystem _damage = default!;
+    [Dependency] private readonly SharedDoAfterSystem _doAfter = default!;
+    [Dependency] private readonly SharedPopupSystem _popup = default!;
+    [Dependency] private readonly SharedStunSystem _stun = default!;
 
     public override void Initialize()
     {
@@ -30,7 +30,6 @@ public sealed class HasturDevourSystem : EntitySystem
         SubscribeLocalEvent<HasturDevourComponent, HasturDevourEvent>(OnTryDevour);
 
         SubscribeLocalEvent<HasturDevourComponent, HasturDevourDoAfterEvent>(OnDevourDoAfter);
-
     }
 
     private void OnTryDevour(Entity<HasturDevourComponent> ent, ref HasturDevourEvent args)
@@ -38,7 +37,10 @@ public sealed class HasturDevourSystem : EntitySystem
         // Stun the target first
         _stun.TryUpdateStunDuration(args.Target, ent.Comp.StunDuration);
 
-        _popup.PopupPredicted(Loc.GetString("hastur-devour", ("user", ent.Owner), ("target", args.Target)),ent.Owner, args.Target, PopupType.LargeCaution);
+        _popup.PopupPredicted(Loc.GetString("hastur-devour", ("user", ent.Owner), ("target", args.Target)),
+            ent.Owner,
+            args.Target,
+            PopupType.LargeCaution);
 
         _audio.PlayPredicted(ent.Comp.DevourSound, ent.Owner, ent.Owner);
 
@@ -67,12 +69,15 @@ public sealed class HasturDevourSystem : EntitySystem
         if (args.Cancelled || args.Handled || args.Target is not { } target)
         {
             _appearance.SetData(ent.Owner, DevourVisuals.Devouring, false); // If cancelled, revert sprite.
-            _stun.TryUpdateStunDuration(ent.Owner, ent.Comp.StunDuration); // If it gets cancelled, Hastur gets stunned instead.
+            _stun.TryUpdateStunDuration(ent.Owner,
+                ent.Comp.StunDuration); // If it gets cancelled, Hastur gets stunned instead.
             return;
         }
 
         _bodySystem.GibBody(target); // Actually devour the target
-        _admin.Add(LogType.Action, LogImpact.High, $"{ToPrettyString(ent.Owner)} devoured {ToPrettyString(target)} as a Hastur, gibbing them in the process.");
+        _admin.Add(LogType.Action,
+            LogImpact.High,
+            $"{ToPrettyString(ent.Owner)} devoured {ToPrettyString(target)} as a Hastur, gibbing them in the process.");
 
         _damage.TryChangeDamage(ent.Owner, ent.Comp.Healing, targetPart: TargetBodyPart.All); // Shitmed Change
         _appearance.SetData(ent.Owner, DevourVisuals.Devouring, false); // Reverts the sprite on completion.

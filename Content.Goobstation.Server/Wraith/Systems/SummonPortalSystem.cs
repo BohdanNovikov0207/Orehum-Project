@@ -9,11 +9,11 @@ using Robust.Shared.Physics.Systems;
 
 namespace Content.Goobstation.Server.Wraith.Systems;
 
-public sealed partial class SummonPortalSystem : EntitySystem
+public sealed class SummonPortalSystem : EntitySystem
 {
-    [Dependency] private readonly SharedPopupSystem _popup = default!;
-    [Dependency] private readonly SharedPhysicsSystem _physics = default!;
     [Dependency] private readonly INetManager _netManager = default!;
+    [Dependency] private readonly SharedPhysicsSystem _physics = default!;
+    [Dependency] private readonly SharedPopupSystem _popup = default!;
     [Dependency] private readonly TransformSystem _transform = default!;
 
     public override void Initialize()
@@ -21,6 +21,7 @@ public sealed partial class SummonPortalSystem : EntitySystem
         base.Initialize();
         SubscribeLocalEvent<SummonPortalComponent, SummonPortalEvent>(OnSummonPortal);
     }
+
     public void OnSummonPortal(Entity<SummonPortalComponent> ent, ref SummonPortalEvent args)
     {
         var uid = ent.Owner;
@@ -31,7 +32,10 @@ public sealed partial class SummonPortalSystem : EntitySystem
 
         if (_physics.GetEntitiesIntersectingBody(ent.Owner, (int) CollisionGroup.Impassable).Count > 0)
         {
-            _popup.PopupPredicted(Loc.GetString("wraith-portal-blocked"), ent.Owner, ent.Owner, PopupType.MediumCaution);
+            _popup.PopupPredicted(Loc.GetString("wraith-portal-blocked"),
+                ent.Owner,
+                ent.Owner,
+                PopupType.MediumCaution);
             return;
         }
 
@@ -59,7 +63,7 @@ public sealed partial class SummonPortalSystem : EntitySystem
         ent.Comp.CurrentActivePortals = 1;
         Dirty(ent);
 
-        _popup.PopupEntity(Loc.GetString("wraith-portal-gathering"), ent.Owner, ent.Owner, PopupType.Small);
+        _popup.PopupEntity(Loc.GetString("wraith-portal-gathering"), ent.Owner, ent.Owner);
 
         args.Handled = true;
     }

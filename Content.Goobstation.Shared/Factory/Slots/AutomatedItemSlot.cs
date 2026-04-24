@@ -9,26 +9,26 @@ using Content.Shared.Containers.ItemSlots;
 namespace Content.Goobstation.Shared.Factory.Slots;
 
 /// <summary>
-/// Abstraction over an <see cref="ItemSlot"/> on the machine.
+/// Abstraction over an <see cref="ItemSlot" /> on the machine.
 /// </summary>
 public sealed partial class AutomatedItemSlot : AutomationSlot
 {
+    private ItemSlot? _slot;
+
+    private ItemSlotsSystem _slots;
+
     /// <summary>
     /// The name of the slot to automate.
     /// </summary>
     [DataField(required: true)]
     public string SlotId = string.Empty;
 
-    private ItemSlotsSystem _slots;
-
-    private ItemSlot? _slot;
-
     [ViewVariables]
     public ItemSlot Slot
     {
         get
         {
-            if (_slot is {} slot)
+            if (_slot is { } slot)
                 return slot;
 
             if (_slots.TryGetSlot(Owner, SlotId, out _slot))
@@ -45,21 +45,17 @@ public sealed partial class AutomatedItemSlot : AutomationSlot
         _slots = EntMan.System<ItemSlotsSystem>();
     }
 
-    public override bool Insert(EntityUid item)
-    {
-        return base.Insert(item) &&
-            _slots.TryInsert(Owner, Slot, item, user: null);
-    }
+    public override bool Insert(EntityUid item) =>
+        base.Insert(item) &&
+        _slots.TryInsert(Owner, Slot, item, null);
 
-    public override bool CanInsert(EntityUid item)
-    {
-        return base.CanInsert(item) &&
-            _slots.CanInsert(Owner, usedUid: item, user: null, Slot);
-    }
+    public override bool CanInsert(EntityUid item) =>
+        base.CanInsert(item) &&
+        _slots.CanInsert(Owner, item, null, Slot);
 
     public override EntityUid? GetItem(EntityUid? filter)
     {
-        if (Slot.Item is not {} item || _filter.IsBlocked(filter, item))
+        if (Slot.Item is not { } item || _filter.IsBlocked(filter, item))
             return null;
 
         return item;

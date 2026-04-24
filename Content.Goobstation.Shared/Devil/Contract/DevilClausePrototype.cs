@@ -12,21 +12,11 @@ namespace Content.Goobstation.Shared.Devil.Contract;
 [Prototype("clause")]
 public sealed class DevilClausePrototype : IPrototype
 {
-    [IdDataField]
-    public string ID { get; private init; } = default!;
-
-    [DataField(required: true)]
-    public int ClauseWeight;
-
-    // CorvaxGoob Devil fix; Without localized name clauses don't work
-    [DataField(required: true)]
-    public string? Name;
-
     [DataField]
     public ComponentRegistry? AddedComponents;
 
-    [DataField]
-    public ComponentRegistry? RemovedComponents;
+    [DataField(required: true)]
+    public int ClauseWeight;
 
     [DataField]
     public string? DamageModifierSet;
@@ -37,12 +27,21 @@ public sealed class DevilClausePrototype : IPrototype
     [DataField]
     public List<EntProtoId>? Implants;
 
-    [DataField]
-    public List<EntProtoId>? SpawnedItems;
+    // CorvaxGoob Devil fix; Without localized name clauses don't work
+    [DataField(required: true)]
+    public string? Name;
 
     [DataField]
     public ProtoId<PolymorphPrototype>? Polymorph;
 
+    [DataField]
+    public ComponentRegistry? RemovedComponents;
+
+    [DataField]
+    public List<EntProtoId>? SpawnedItems;
+
+    [IdDataField]
+    public string ID { get; } = default!;
 }
 
 public enum SpecialCase : byte

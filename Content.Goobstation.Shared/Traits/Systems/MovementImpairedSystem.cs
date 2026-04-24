@@ -5,9 +5,9 @@
 // SPDX-License-Identifier: AGPL-3.0-or-later
 
 using System.Linq;
+using Content.Goobstation.Maths.FixedPoint;
 using Content.Goobstation.Shared.Traits.Components;
 using Content.Shared.Examine;
-using Content.Goobstation.Maths.FixedPoint;
 using Content.Shared.Hands;
 using Content.Shared.IdentityManagement;
 using Content.Shared.Movement.Systems;
@@ -15,10 +15,11 @@ using Robust.Shared.Network;
 
 namespace Content.Goobstation.Shared.Traits.Systems;
 
-public sealed partial class MovementImpairedSystem : EntitySystem
+public sealed class MovementImpairedSystem : EntitySystem
 {
     [Dependency] private readonly MovementSpeedModifierSystem _movementSpeedModifier = default!;
     [Dependency] private readonly INetManager _net = default!;
+
     public override void Initialize()
     {
         base.Initialize();
@@ -29,15 +30,14 @@ public sealed partial class MovementImpairedSystem : EntitySystem
         SubscribeLocalEvent<MovementImpairedComponent, ExaminedEvent>(OnExamined);
     }
 
-    private void OnMapInit(EntityUid uid, MovementImpairedComponent comp, MapInitEvent args)
-    {
+    private void OnMapInit(EntityUid uid, MovementImpairedComponent comp, MapInitEvent args) =>
         _movementSpeedModifier.RefreshMovementSpeedModifiers(uid);
-    }
 
     private void OnExamined(Entity<MovementImpairedComponent> comp, ref ExaminedEvent args)
     {
         if (args.IsInDetailsRange && !_net.IsClient)
-            args.PushMarkup(Loc.GetString("movement-impaired-trait-examined", ("target", Identity.Entity(comp, EntityManager))));
+            args.PushMarkup(Loc.GetString("movement-impaired-trait-examined",
+                ("target", Identity.Entity(comp, EntityManager))));
     }
 
     private void OnItemEquip(EntityUid uid, MovementImpairedComponent comp, DidEquipHandEvent args)
@@ -60,7 +60,7 @@ public sealed partial class MovementImpairedSystem : EntitySystem
             if (baseMultiplier > 1)
                 comp.SpeedCorrectionOverflow[args.Equipped] = baseMultiplier - 1;
 
-            var totalOverflow = comp.SpeedCorrectionOverflow.Values.Aggregate((FixedPoint2)0, (a,b) => a + b);
+            var totalOverflow = comp.SpeedCorrectionOverflow.Values.Aggregate((FixedPoint2) 0, (a, b) => a + b);
             comp.ImpairedSpeedMultiplier = Math.Clamp((baseMultiplier + totalOverflow).Float(), 0, 1);
         }
 
@@ -96,7 +96,9 @@ public sealed partial class MovementImpairedSystem : EntitySystem
         _movementSpeedModifier.RefreshMovementSpeedModifiers(uid);
     }
 
-    private void OnModifierRefresh(EntityUid uid, MovementImpairedComponent comp, RefreshMovementSpeedModifiersEvent args)
+    private void OnModifierRefresh(EntityUid uid,
+        MovementImpairedComponent comp,
+        RefreshMovementSpeedModifiersEvent args)
     {
         args.ModifySpeed(comp.ImpairedSpeedMultiplier.Float());
         Dirty(uid, comp);

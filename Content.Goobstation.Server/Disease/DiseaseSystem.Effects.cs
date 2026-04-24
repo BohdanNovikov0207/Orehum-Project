@@ -1,3 +1,6 @@
+using System.Diagnostics.CodeAnalysis;
+using System.Linq.Expressions;
+using System.Numerics;
 using Content.Goobstation.Maths.FixedPoint;
 using Content.Goobstation.Shared.Disease;
 using Content.Goobstation.Shared.Disease.Components;
@@ -6,10 +9,6 @@ using Content.Shared.EntityEffects;
 using Robust.Shared.Map;
 using Robust.Shared.Prototypes;
 using Robust.Shared.Utility;
-using System.Diagnostics.CodeAnalysis;
-using System.Linq;
-using System.Linq.Expressions;
-using System.Numerics;
 
 namespace Content.Goobstation.Server.Disease;
 
@@ -25,7 +24,8 @@ public sealed partial class DiseaseSystem
     {
         base.InitializeEffects();
 
-        SubscribeLocalEvent<DiseaseReagentEffectComponent, DiseaseEffectEvent>(OnReagentEffect); // can get moved to shared after we get shared entity effects
+        SubscribeLocalEvent<DiseaseReagentEffectComponent, DiseaseEffectEvent>(
+            OnReagentEffect); // can get moved to shared after we get shared entity effects
         SubscribeLocalEvent<DiseaseEmoteEffectComponent, DiseaseEffectEvent>(OnEmoteEffect);
         SubscribeLocalEvent<DiseaseGenericEffectComponent, DiseaseEffectEvent>(OnGenericEffect);
         SubscribeLocalEvent<DiseaseGenericEffectComponent, DiseaseEffectFailedEvent>(OnGenericEffectFail);
@@ -34,14 +34,14 @@ public sealed partial class DiseaseSystem
     private void OnReagentEffect(Entity<DiseaseReagentEffectComponent> ent, ref DiseaseEffectEvent args)
     {
         var reagentArgs = new EntityEffectReagentArgs(
-            targetEntity: args.Ent,
-            entityManager: EntityManager,
-            organEntity: null,
-            source: null,
-            quantity: FixedPoint2.New(1),
-            reagent: null,
-            method: null,
-            scale: FixedPoint2.New(GetScale(args, ent.Comp))
+            args.Ent,
+            EntityManager,
+            null,
+            null,
+            FixedPoint2.New(1),
+            null,
+            null,
+            FixedPoint2.New(GetScale(args, ent.Comp))
         );
 
         foreach (var effect in ent.Comp.Effects)
@@ -60,10 +60,8 @@ public sealed partial class DiseaseSystem
             _chat.TryEmoteWithoutChat(args.Ent, emote, voluntary: false);
     }
 
-    private void OnGenericEffect(Entity<DiseaseGenericEffectComponent> ent, ref DiseaseEffectEvent args)
-    {
+    private void OnGenericEffect(Entity<DiseaseGenericEffectComponent> ent, ref DiseaseEffectEvent args) =>
         ApplyGenericEffect(ent, GetScale(args, ent.Comp));
-    }
 
     private void OnGenericEffectFail(Entity<DiseaseGenericEffectComponent> ent, ref DiseaseEffectFailedEvent args)
     {
@@ -93,7 +91,7 @@ public sealed partial class DiseaseSystem
                 _setterCache[key] = setter;
             }
 
-            setter?.Invoke((Component)comp, baseValue * mul);
+            setter?.Invoke((Component) comp, baseValue * mul);
         }
     }
 
@@ -120,7 +118,9 @@ public sealed partial class DiseaseSystem
     /// <summary>
     /// Adds an effect of given prototype to the specified disease
     /// </summary>
-    public override bool TryAddEffect(Entity<DiseaseComponent?> ent, EntProtoId effectId, [NotNullWhen(true)] out Entity<DiseaseEffectComponent>? effect)
+    public override bool TryAddEffect(Entity<DiseaseComponent?> ent,
+        EntProtoId effectId,
+        [NotNullWhen(true)] out Entity<DiseaseEffectComponent>? effect)
     {
         effect = null;
         if (!Resolve(ent, ref ent.Comp) || HasEffect(ent, effectId))

@@ -22,7 +22,7 @@ public sealed class LightDetectionDamageSystem : SharedLightDetectionDamageSyste
             return;
 
         var alert = args.SpriteViewEnt;
-        var normalized = (int)( (ent.Comp.DetectionValue / ent.Comp.DetectionValueMax) * ent.Comp.AlertMaxSeverity);
+        var normalized = (int) (ent.Comp.DetectionValue / ent.Comp.DetectionValueMax * ent.Comp.AlertMaxSeverity);
         normalized = Math.Clamp(normalized, 0, ent.Comp.AlertMaxSeverity);
 
         _sprite.LayerSetRsiState((alert.Owner, alert.Comp), AlertVisualLayers.Base, $"{normalized}");

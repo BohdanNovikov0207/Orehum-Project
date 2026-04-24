@@ -4,12 +4,12 @@ using Robust.Shared.GameStates;
 
 namespace Content.Goobstation.Shared.Wraith.Components;
 
-[RegisterComponent, NetworkedComponent]
+[RegisterComponent] [NetworkedComponent]
 public sealed partial class MakeRevenantComponent : Component
 {
     [DataField]
-    public SoundSpecifier? PossessSound = new SoundPathSpecifier("/Audio/_Goobstation/Wraith/reventer.ogg");
+    public DamageSpecifier PassiveRevenantDamage = new();
 
     [DataField]
-    public DamageSpecifier PassiveRevenantDamage = new();
+    public SoundSpecifier? PossessSound = new SoundPathSpecifier("/Audio/_Goobstation/Wraith/reventer.ogg");
 }

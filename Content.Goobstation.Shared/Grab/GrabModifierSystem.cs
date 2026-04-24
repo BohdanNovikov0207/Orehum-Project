@@ -1,8 +1,6 @@
 using Content.Goobstation.Common.Grab;
-using Content.Goobstation.Common.MartialArts;
 using Content.Shared.Hands;
 using Content.Shared.Inventory;
-using Content.Shared.Turrets;
 
 namespace Content.Goobstation.Shared.Grab;
 
@@ -28,16 +26,12 @@ public sealed class GrabModifierSystem : EntitySystem
         args.SpeedMultiplier *= ev.SpeedMultiplier;
     }
 
-    private void ModifyHeldGrab(Entity<GrabModifierComponent> ent, ref HeldRelayedEvent<GrabModifierEvent> args)
-    {
+    private void ModifyHeldGrab(Entity<GrabModifierComponent> ent, ref HeldRelayedEvent<GrabModifierEvent> args) =>
         ModifyGrab(ent, ref args.Args);
-    }
 
     private void ModifyInventoryGrab(Entity<GrabModifierComponent> ent,
-        ref InventoryRelayedEvent<GrabModifierEvent> args)
-    {
+        ref InventoryRelayedEvent<GrabModifierEvent> args) =>
         ModifyGrab(ent, ref args.Args);
-    }
 
     private void ModifyGrab(Entity<GrabModifierComponent> ent, ref GrabModifierEvent args)
     {

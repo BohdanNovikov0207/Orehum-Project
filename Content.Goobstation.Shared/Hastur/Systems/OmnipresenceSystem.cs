@@ -1,21 +1,22 @@
+using System.Numerics;
 using Content.Goobstation.Shared.Hastur.Components;
 using Content.Goobstation.Shared.Hastur.Events;
 using Content.Shared.Mobs.Components;
 using Content.Shared.Popups;
 using Content.Shared.Stunnable;
 using Robust.Shared.Network;
-using System.Numerics;
 
 namespace Content.Goobstation.Shared.Hastur.Systems;
 
 public sealed class OmnipresenceSystem : EntitySystem
 {
-    [Dependency] private readonly SharedPopupSystem _popup = default!;
     [Dependency] private readonly EntityLookupSystem _lookup = default!;
-    [Dependency] private readonly SharedStunSystem _stun = default!;
-    [Dependency] private readonly INetManager _net = default!;
 
     private readonly HashSet<Entity<MobStateComponent>> _mobCache = new();
+    [Dependency] private readonly INetManager _net = default!;
+    [Dependency] private readonly SharedPopupSystem _popup = default!;
+    [Dependency] private readonly SharedStunSystem _stun = default!;
+
     public override void Initialize()
     {
         base.Initialize();
@@ -38,7 +39,7 @@ public sealed class OmnipresenceSystem : EntitySystem
             (comp.CloneDistance, comp.CloneDistance),
             (-comp.CloneDistance, comp.CloneDistance),
             (comp.CloneDistance, -comp.CloneDistance),
-            (-comp.CloneDistance, -comp.CloneDistance)
+            (-comp.CloneDistance, -comp.CloneDistance),
         };
 
         var affectedCenters = new List<EntityUid> { uid };
@@ -75,7 +76,7 @@ public sealed class OmnipresenceSystem : EntitySystem
             if (mob.Owner == center)
                 continue;
 
-            _stun.TryKnockdown(mob.Owner, TimeSpan.FromSeconds(duration), true);
+            _stun.TryKnockdown(mob.Owner, TimeSpan.FromSeconds(duration));
         }
     }
 }

@@ -11,13 +11,13 @@ using Robust.Shared.Timing;
 
 namespace Content.Goobstation.Shared.OfficeChair;
 
-public abstract partial class SharedRocketChairSystem : EntitySystem
+public abstract class SharedRocketChairSystem : EntitySystem
 {
-    [Dependency] private readonly SharedTransformSystem _xform = default!;
+    [Dependency] private readonly SharedActionsSystem _actions = default!;
+    [Dependency] private readonly INetManager _net = default!;
     [Dependency] private readonly SharedPhysicsSystem _physics = default!;
     [Dependency] private readonly IGameTiming _timing = default!;
-    [Dependency] private readonly INetManager _net = default!;
-    [Dependency] private readonly SharedActionsSystem _actions = default!;
+    [Dependency] private readonly SharedTransformSystem _xform = default!;
 
     public override void Initialize()
     {
@@ -46,7 +46,7 @@ public abstract partial class SharedRocketChairSystem : EntitySystem
     {
         base.Update(frameTime);
 
-        var doSim = _net.IsServer || (_net.IsClient && _timing.IsFirstTimePredicted);
+        var doSim = _net.IsServer || _net.IsClient && _timing.IsFirstTimePredicted;
         if (!doSim)
             return;
 

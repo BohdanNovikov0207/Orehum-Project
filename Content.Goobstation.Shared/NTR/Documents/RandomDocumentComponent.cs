@@ -8,15 +8,14 @@
 
 using Robust.Shared.Prototypes;
 
-namespace Content.Goobstation.Shared.NTR.Documents
-{
-    [RegisterComponent]
-    public sealed partial class RandomDocumentComponent : Component
-    {
-        [DataField(required: true)]
-        public ProtoId<DocumentTypePrototype> DocumentType = default!;
+namespace Content.Goobstation.Shared.NTR.Documents;
 
-        [DataField]
-        public List<ProtoId<NtrTaskPrototype>> Tasks = new();
-    }
+[RegisterComponent]
+public sealed partial class RandomDocumentComponent : Component
+{
+    [DataField(required: true)]
+    public ProtoId<DocumentTypePrototype> DocumentType = default!;
+
+    [DataField]
+    public List<ProtoId<NtrTaskPrototype>> Tasks = new();
 }

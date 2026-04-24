@@ -9,9 +9,8 @@ namespace Content.Goobstation.Server.Chaplain;
 
 public sealed class SeeHereticFixturesSystem : EntitySystem
 {
-    [Dependency] private readonly SharedEyeSystem _eye = default!;
-
     private const int ChaplainVisFlags = (int) VisibilityFlags.EldritchInfluence;
+    [Dependency] private readonly SharedEyeSystem _eye = default!;
 
     public override void Initialize()
     {

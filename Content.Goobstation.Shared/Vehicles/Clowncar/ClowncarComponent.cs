@@ -15,7 +15,7 @@ using Robust.Shared.Prototypes;
 
 namespace Content.Goobstation.Shared.Vehicles.Clowncar;
 
-[RegisterComponent, NetworkedComponent]
+[RegisterComponent] [NetworkedComponent]
 [Access(typeof(SharedClowncarSystem))]
 public sealed partial class ClowncarComponent : Component
 {
@@ -24,28 +24,31 @@ public sealed partial class ClowncarComponent : Component
     public string Container = "clowncar_container";
 
     [DataField]
-    [ViewVariables]
-    public EntProtoId ThankRiderAction = "ActionThankDriver";
+    public EntProtoId DrunkDrivingAction = "ActionDrivingWithStyle";
 
     [DataField]
     [ViewVariables]
     public EntProtoId QuietInTheBackAction = "ActionQuietBackThere";
 
     [DataField]
-    public EntProtoId DrunkDrivingAction = "ActionDrivingWithStyle";
-
-    [DataField]
     [ViewVariables(VVAccess.ReadWrite)]
     public int ThankCounter;
 
-    #region Sound
-    [ViewVariables(VVAccess.ReadWrite)]
     [DataField]
-    public SoundSpecifier CannonActivateSound = new SoundPathSpecifier("/Audio/_Goobstation/Vehicle/Clowncar/clowncar_activate_cannon.ogg");
+    [ViewVariables]
+    public EntProtoId ThankRiderAction = "ActionThankDriver";
+
+    #region Sound
 
     [ViewVariables(VVAccess.ReadWrite)]
     [DataField]
-    public SoundSpecifier CannonDeactivateSound = new SoundPathSpecifier("/Audio/_Goobstation/Vehicle/Clowncar/clowncar_deactivate_cannon.ogg");
+    public SoundSpecifier CannonActivateSound =
+        new SoundPathSpecifier("/Audio/_Goobstation/Vehicle/Clowncar/clowncar_activate_cannon.ogg");
+
+    [ViewVariables(VVAccess.ReadWrite)]
+    [DataField]
+    public SoundSpecifier CannonDeactivateSound =
+        new SoundPathSpecifier("/Audio/_Goobstation/Vehicle/Clowncar/clowncar_deactivate_cannon.ogg");
 
     [ViewVariables(VVAccess.ReadWrite)]
     [DataField]
@@ -53,15 +56,18 @@ public sealed partial class ClowncarComponent : Component
 
     [DataField]
     public SoundSpecifier ClownMusic =
-            new SoundPathSpecifier("/Audio/_Goobstation/Music/Asgore_runs_over_dess_short.ogg")
-            {
-                Params = AudioParams.Default
-                    .WithVolume(-2f)
-                    .WithRolloffFactor(8f)
-                    .WithMaxDistance(10f)
-            };
+        new SoundPathSpecifier("/Audio/_Goobstation/Music/Asgore_runs_over_dess_short.ogg")
+        {
+            Params = AudioParams.Default
+                .WithVolume(-2f)
+                .WithRolloffFactor(8f)
+                .WithMaxDistance(10f),
+        };
+
     #endregion
 }
 
 //public sealed partial class ThankRiderAction : InstantActionEvent { }
-public sealed partial class CannonAction : InstantActionEvent { }
+public sealed partial class CannonAction : InstantActionEvent
+{
+}

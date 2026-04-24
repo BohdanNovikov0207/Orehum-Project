@@ -16,15 +16,16 @@ namespace Content.Goobstation.Server.Wraith;
 /// </summary>
 public sealed class WraithEvolveSystem : EntitySystem
 {
-    [Dependency] private readonly UserInterfaceSystem _ui = default!;
+    [Dependency] private readonly ActionsSystem _actions = default!;
+    [Dependency] private readonly ISharedAdminLogManager _admin = default!;
+    [Dependency] private readonly MetaDataSystem _meta = default!;
+    [Dependency] private readonly MindSystem _mind = default!;
+    [Dependency] private readonly SharedPopupSystem _popups = default!;
     [Dependency] private readonly IPrototypeManager _proto = default!;
     [Dependency] private readonly TransformSystem _transformSystem = default!;
-    [Dependency] private readonly MindSystem _mind = default!;
-    [Dependency] private readonly ActionsSystem _actions = default!;
-    [Dependency] private readonly MetaDataSystem _meta = default!;
-    [Dependency] private readonly SharedPopupSystem _popups = default!;
-    [Dependency] private readonly ISharedAdminLogManager _admin = default!;
-    /// <inheritdoc/>
+    [Dependency] private readonly UserInterfaceSystem _ui = default!;
+
+    /// <inheritdoc />
     public override void Initialize()
     {
         base.Initialize();
@@ -53,7 +54,9 @@ public sealed class WraithEvolveSystem : EntitySystem
             return;
 
         _ui.TryToggleUi(ent.Owner, RadialSelectorUiKey.Key, ent.Owner);
-        _ui.SetUiState(ent.Owner, RadialSelectorUiKey.Key, new TrackedRadialSelectorState(ent.Comp.AvailableEvolutions));
+        _ui.SetUiState(ent.Owner,
+            RadialSelectorUiKey.Key,
+            new TrackedRadialSelectorState(ent.Comp.AvailableEvolutions));
 
         args.Handled = true;
     }
@@ -84,7 +87,9 @@ public sealed class WraithEvolveSystem : EntitySystem
 
         EntityManager.CopyComponents(uid, newForm);
 
-        _admin.Add(LogType.Action, LogImpact.High, $"{ToPrettyString(ent.Owner)} evolved to {ToPrettyString(newForm)} as a Wraith");
+        _admin.Add(LogType.Action,
+            LogImpact.High,
+            $"{ToPrettyString(ent.Owner)} evolved to {ToPrettyString(newForm)} as a Wraith");
 
         RemComp<EvolveComponent>(newForm);
         Del(uid);
@@ -94,7 +99,9 @@ public sealed class WraithEvolveSystem : EntitySystem
     {
         if (ent.Comp.CorpsesAbsorbed < args.CorpsesRequired)
         {
-            _popups.PopupEntity(Loc.GetString("wraith-evolve-not-enough", ("corpseCount", args.CorpsesRequired)), ent.Owner, ent.Owner);
+            _popups.PopupEntity(Loc.GetString("wraith-evolve-not-enough", ("corpseCount", args.CorpsesRequired)),
+                ent.Owner,
+                ent.Owner);
             args.Cancelled = true;
         }
     }

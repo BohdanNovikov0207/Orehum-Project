@@ -10,15 +10,9 @@ public sealed class PollUIController : UIController, IOnStateExited<GameplayStat
     private PollVotingWindow? _window;
 
 
-    public void OnStateExited(GameplayState state)
-    {
-        CloseWindow();
-    }
+    public void OnStateExited(GameplayState state) => CloseWindow();
 
-    public void OnStateExited(LobbyState state)
-    {
-        CloseWindow();
-    }
+    public void OnStateExited(LobbyState state) => CloseWindow();
 
     public void TogglePollWindow()
     {
@@ -41,9 +35,7 @@ public sealed class PollUIController : UIController, IOnStateExited<GameplayStat
     public void CloseWindow()
     {
         if (_window?.Disposed == false)
-        {
             _window.Close();
-        }
         _window = null;
     }
 }

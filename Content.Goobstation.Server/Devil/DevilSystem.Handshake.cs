@@ -10,7 +10,6 @@ using Content.Goobstation.Shared.Devil;
 using Content.Goobstation.Shared.Devil.Condemned;
 using Content.Shared.Body.Part;
 using Content.Shared.Mobs.Components;
-using Content.Shared.Popups;
 using Content.Shared.Verbs;
 using Robust.Shared.Utility;
 
@@ -23,26 +22,27 @@ public sealed partial class DevilSystem
         SubscribeLocalEvent<DevilComponent, GetVerbsEvent<InnateVerb>>(OnGetVerbs);
         SubscribeLocalEvent<PendingHandshakeComponent, GetVerbsEvent<InnateVerb>>(OnGetVerbsPending);
     }
+
     private void OnGetVerbs(EntityUid uid, DevilComponent comp, GetVerbsEvent<InnateVerb> args)
     {
         // Can't shake your own hand, and you can't shake from a distance
         if (!args.CanAccess
-        || !args.CanInteract
-        || _state.IsIncapacitated(args.Target)
-        || !HasComp<MobStateComponent>(args.Target)
-        || HasComp<CondemnedComponent>(args.Target)
-        || args.Target == args.User
-        || !_body.BodyHasPartType(uid, BodyPartType.Hand) // cant shake if you have no hands
-        || !_body.BodyHasPartType(args.Target, BodyPartType.Hand) // or if they have none
-        || !_contract.IsUserValid(args.Target, out _))
+            || !args.CanInteract
+            || _state.IsIncapacitated(args.Target)
+            || !HasComp<MobStateComponent>(args.Target)
+            || HasComp<CondemnedComponent>(args.Target)
+            || args.Target == args.User
+            || !_body.BodyHasPartType(uid, BodyPartType.Hand) // cant shake if you have no hands
+            || !_body.BodyHasPartType(args.Target, BodyPartType.Hand) // or if they have none
+            || !_contract.IsUserValid(args.Target, out _))
             return;
 
         InnateVerb handshakeVerb = new()
         {
             Act = () => OfferHandshake(args.User, args.Target),
             Text = Loc.GetString("hand-shake-prompt-verb", ("target", args.Target)),
-            Icon = new SpriteSpecifier.Rsi(new("_Goobstation/Actions/devil.rsi"), "summon-contract"),
-            Priority = 1 // Higher priority than default verbs
+            Icon = new SpriteSpecifier.Rsi(new ResPath("_Goobstation/Actions/devil.rsi"), "summon-contract"),
+            Priority = 1, // Higher priority than default verbs
         };
         args.Verbs.Add(handshakeVerb);
     }
@@ -60,8 +60,8 @@ public sealed partial class DevilSystem
         {
             Act = () => HandleHandshake(args.Target, args.User),
             Text = Loc.GetString("hand-shake-accept-verb", ("target", args.Target)),
-            Icon = new SpriteSpecifier.Rsi(new("_Goobstation/Actions/devil.rsi"), "summon-contract"),
-            Priority = 1 // Higher priority than default verbs
+            Icon = new SpriteSpecifier.Rsi(new ResPath("_Goobstation/Actions/devil.rsi"), "summon-contract"),
+            Priority = 1, // Higher priority than default verbs
         };
         args.Verbs.Add(handshakeVerb);
     }
@@ -85,6 +85,7 @@ public sealed partial class DevilSystem
         var selfPopup = Loc.GetString("handshake-offer-popup-self", ("target", target));
         _popup.PopupEntity(selfPopup, user, user);
     }
+
     private void HandleHandshake(EntityUid user, EntityUid target)
     {
         if (!_contract.TryTransferSouls(user, target, 1))

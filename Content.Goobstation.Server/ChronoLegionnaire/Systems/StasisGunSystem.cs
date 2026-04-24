@@ -7,15 +7,17 @@
 // SPDX-License-Identifier: AGPL-3.0-or-later
 
 using Content.Goobstation.Server.ChronoLegionnaire.Components;
+using Content.Goobstation.Shared.ChronoLegionnaire.Components;
 using Content.Shared.Interaction.Events;
 using Content.Shared.Inventory;
 using Content.Shared.Throwing;
 
 namespace Content.Goobstation.Server.ChronoLegionnaire.Systems;
 
-public sealed partial class StasisGunSystem : EntitySystem
+public sealed class StasisGunSystem : EntitySystem
 {
     [Dependency] private readonly InventorySystem _inventory = default!;
+
     public override void Initialize()
     {
         base.Initialize();
@@ -32,7 +34,7 @@ public sealed partial class StasisGunSystem : EntitySystem
         if (args.Handled)
             return;
 
-        if (!HasComp<Shared.ChronoLegionnaire.Components.StasisImmunityComponent>(args.User))
+        if (!HasComp<StasisImmunityComponent>(args.User))
             return;
 
         args.Handled = _inventory.TryEquip(args.User, gun, gun.Comp.ReturningSlot, predicted: true, force: true);
@@ -43,11 +45,9 @@ public sealed partial class StasisGunSystem : EntitySystem
     /// </summary>
     private void OnWeaponThrown(Entity<StasisGunComponent> gun, ref ThrownEvent args)
     {
-        if (!HasComp<Shared.ChronoLegionnaire.Components.StasisImmunityComponent>(args.User))
+        if (!HasComp<StasisImmunityComponent>(args.User))
             return;
 
         _inventory.TryEquip(args.User.Value, gun, gun.Comp.ReturningSlot, predicted: true, force: true);
     }
-
-
 }

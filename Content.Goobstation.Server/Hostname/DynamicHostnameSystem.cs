@@ -6,14 +6,14 @@
 //
 // SPDX-License-Identifier: AGPL-3.0-or-later
 
+using Content.Goobstation.Common.CCVar;
+using Content.Goobstation.Common.JoinQueue;
+using Content.Shared.Dataset;
+using Content.Shared.Random.Helpers;
 using Robust.Shared;
 using Robust.Shared.Configuration;
-using Content.Goobstation.Common.CCVar;
 using Robust.Shared.Prototypes;
-using Content.Shared.Dataset;
 using Robust.Shared.Random;
-using Content.Shared.Random.Helpers;
-using Content.Goobstation.Common.JoinQueue;
 using Robust.Shared.Timing;
 
 namespace Content.Goobstation.Server.Hostname;
@@ -23,18 +23,17 @@ namespace Content.Goobstation.Server.Hostname;
 /// </summary>
 public sealed class DynamicHostnameSystem : EntitySystem
 {
-    [Dependency] private readonly IConfigurationManager _configuration = default!;
-    [Dependency] private readonly IPrototypeManager _proto = default!;
-    [Dependency] private readonly IRobustRandom _random = default!;
-    [Dependency] private readonly IJoinQueueManager _queue = default!;
-    [Dependency] private readonly IGameTiming _gameTiming = default!;
-
     private static readonly ProtoId<LocalizedDatasetPrototype> _messagesProto = "MessageOfTheDay";
-    private LocalizedDatasetPrototype? _messages;
-    private string _originalHostname = string.Empty;
-    private TimeSpan _nextUpdateTime;
-    private TimeSpan _updateInterval = TimeSpan.FromSeconds(10);
+    [Dependency] private readonly IConfigurationManager _configuration = default!;
+    [Dependency] private readonly IGameTiming _gameTiming = default!;
+    [Dependency] private readonly IPrototypeManager _proto = default!;
+    [Dependency] private readonly IJoinQueueManager _queue = default!;
+    [Dependency] private readonly IRobustRandom _random = default!;
     private bool _dynHostEnabled;
+    private LocalizedDatasetPrototype? _messages;
+    private TimeSpan _nextUpdateTime;
+    private string _originalHostname = string.Empty;
+    private TimeSpan _updateInterval = TimeSpan.FromSeconds(10);
 
     public override void Initialize()
     {

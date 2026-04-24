@@ -7,15 +7,13 @@ namespace Content.Goobstation.Shared.CustomLawboard;
 [NetSerializable]
 public enum CustomLawboardUiKey : byte
 {
-    Key
+    Key,
 }
-
 
 [Serializable]
 [NetSerializable]
 public sealed class CustomLawboardChangeLawsMessage : BoundUserInterfaceMessage
 {
-    public List<SiliconLaw> Laws { get; }
     public bool Popup;
 
     public CustomLawboardChangeLawsMessage(List<SiliconLaw> laws, bool popup)
@@ -23,4 +21,6 @@ public sealed class CustomLawboardChangeLawsMessage : BoundUserInterfaceMessage
         Laws = laws;
         Popup = popup;
     }
+
+    public List<SiliconLaw> Laws { get; }
 }

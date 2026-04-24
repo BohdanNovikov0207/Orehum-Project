@@ -13,6 +13,7 @@ using Content.Shared.Teleportation.Components;
 using Content.Shared.Teleportation.Systems;
 using Content.Shared.Verbs;
 using Robust.Shared.Audio.Systems;
+using Robust.Shared.EntitySerialization;
 using Robust.Shared.EntitySerialization.Systems;
 using Robust.Shared.Map;
 using Robust.Shared.Map.Components;
@@ -32,7 +33,7 @@ public sealed class PocketDimensionSystem : EntitySystem
 
     private ISawmill _sawmill = default!;
 
-    /// <inheritdoc/>
+    /// <inheritdoc />
     public override void Initialize()
     {
         base.Initialize();
@@ -56,7 +57,7 @@ public sealed class PocketDimensionSystem : EntitySystem
         AlternativeVerb verb = new()
         {
             Text = Loc.GetString("pocket-dimension-verb-text"),
-            Act = () => HandleActivation(uid, comp, args.User)
+            Act = () => HandleActivation(uid, comp, args.User),
         };
         args.Verbs.Add(verb);
     }
@@ -68,8 +69,10 @@ public sealed class PocketDimensionSystem : EntitySystem
     {
         if (Deleted(comp.PocketDimensionMap))
         {
-            if (!_mapLoader.TryLoadMap(comp.PocketDimensionPath, out var map, out var roots,
-                options: new Robust.Shared.EntitySerialization.DeserializationOptions { InitializeMaps = true }))
+            if (!_mapLoader.TryLoadMap(comp.PocketDimensionPath,
+                    out var map,
+                    out var roots,
+                    new DeserializationOptions { InitializeMaps = true }))
             {
                 _sawmill.Error($"Failed to load pocket dimension map {comp.PocketDimensionPath}");
                 QueueDel(map);
@@ -79,7 +82,7 @@ public sealed class PocketDimensionSystem : EntitySystem
             comp.PocketDimensionMap = map;
 
             // find the pocket dimension's first grid and put the portal there
-            bool foundGrid = false;
+            var foundGrid = false;
             foreach (var root in roots)
             {
                 if (!HasComp<MapGridComponent>(root))
@@ -100,6 +103,7 @@ public sealed class PocketDimensionSystem : EntitySystem
                 foundGrid = true;
                 break;
             }
+
             if (!foundGrid)
             {
                 _sawmill.Error($"Pocket dimension {comp.PocketDimensionPath} had no grids!");

@@ -13,7 +13,7 @@ namespace Content.Goobstation.Shared.Enchanting.Components;
 /// <summary>
 /// Linearly adds bonus damage to melee attacks with <c>damage * level</c>.
 /// </summary>
-[RegisterComponent, NetworkedComponent, Access(typeof(BonusDamageEnchantSystem))]
+[RegisterComponent] [NetworkedComponent] [Access(typeof(BonusDamageEnchantSystem))]
 [AutoGenerateComponentState]
 [EntityCategory("Enchants")]
 public sealed partial class BonusDamageEnchantComponent : Component
@@ -22,6 +22,6 @@ public sealed partial class BonusDamageEnchantComponent : Component
     /// Bonus damage to apply to melee attacks.
     /// Gets multiplied by level.
     /// </summary>
-    [DataField(required: true), AutoNetworkedField]
+    [DataField(required: true)] [AutoNetworkedField]
     public DamageSpecifier Damage = new();
 }

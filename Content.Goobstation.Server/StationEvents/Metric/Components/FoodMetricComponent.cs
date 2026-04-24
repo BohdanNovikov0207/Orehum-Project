@@ -11,15 +11,16 @@ using Robust.Shared.Serialization.TypeSerializers.Implementations.Generic;
 
 namespace Content.Goobstation.Server.StationEvents.Metric.Components;
 
-[RegisterComponent, Access(typeof(FoodMetricSystem))]
+[RegisterComponent] [Access(typeof(FoodMetricSystem))]
 public sealed partial class FoodMetricComponent : Component
 {
-    [DataField(customTypeSerializer: typeof(DictionarySerializer<ThirstThreshold, FixedPoint2>))]
-    public Dictionary<ThirstThreshold, FixedPoint2> ThirstScores =
+    [DataField(customTypeSerializer: typeof(DictionarySerializer<float, FixedPoint2>))]
+    public Dictionary<float, FixedPoint2> ChargeScores =
         new()
         {
-            { ThirstThreshold.Thirsty, 2.0f },
-            { ThirstThreshold.Parched, 5.0f },
+            { 0.80f, 1.0f },
+            { 0.35f, 2.0f },
+            { 0.10f, 5.0f },
         };
 
     [DataField(customTypeSerializer: typeof(DictionarySerializer<HungerThreshold, FixedPoint2>))]
@@ -30,13 +31,11 @@ public sealed partial class FoodMetricComponent : Component
             { HungerThreshold.Starving, 5.0f },
         };
 
-    [DataField(customTypeSerializer: typeof(DictionarySerializer<float, FixedPoint2>))]
-    public Dictionary<float, FixedPoint2> ChargeScores =
+    [DataField(customTypeSerializer: typeof(DictionarySerializer<ThirstThreshold, FixedPoint2>))]
+    public Dictionary<ThirstThreshold, FixedPoint2> ThirstScores =
         new()
         {
-            { 0.80f, 1.0f },
-            { 0.35f, 2.0f },
-            { 0.10f, 5.0f },
+            { ThirstThreshold.Thirsty, 2.0f },
+            { ThirstThreshold.Parched, 5.0f },
         };
-
 }

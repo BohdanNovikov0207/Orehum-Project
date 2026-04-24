@@ -7,13 +7,13 @@ namespace Content.Goobstation.Shared.Chemistry.InjectOnMobState;
 public sealed partial class InjectOnMobStateComponent : Component
 {
     [DataField]
-    public MobState State = MobState.Critical;
+    public float Cooldown = 180;
+
+    public TimeSpan NextUse = TimeSpan.Zero;
 
     [DataField]
     public Dictionary<string, FixedPoint2> Reagents = new();
 
     [DataField]
-    public float Cooldown = 180;
-
-    public TimeSpan NextUse = TimeSpan.Zero;
+    public MobState State = MobState.Critical;
 }

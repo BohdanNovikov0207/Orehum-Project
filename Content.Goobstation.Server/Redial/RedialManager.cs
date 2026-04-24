@@ -10,17 +10,13 @@ using Content.Server.Administration;
 using Content.Shared.Administration;
 using Robust.Server.Player;
 using Robust.Shared.Console;
-using Robust.Shared.IoC;
 using Robust.Shared.Network;
 
 namespace Content.Goobstation.Server.Redial;
 
 public sealed class RedialManager : SharedRedialManager
 {
-    public override void Initialize()
-    {
-        _netManager.RegisterNetMessage<MsgRedial>();
-    }
+    public override void Initialize() => _netManager.RegisterNetMessage<MsgRedial>();
 
     public void Redial(INetChannel channel, string address)
     {
@@ -65,12 +61,10 @@ public sealed class RedialCommand : IConsoleCommand
         redialMan.Redial(player.Channel, reason);
     }
 
-    public CompletionResult GetCompletion(IConsoleShell shell, string[] args)
-    {
-        return args.Length switch
+    public CompletionResult GetCompletion(IConsoleShell shell, string[] args) =>
+        args.Length switch
         {
             1 => CompletionResult.FromHintOptions(CompletionHelper.SessionNames(), "Username"),
-            _ => CompletionResult.Empty
+            _ => CompletionResult.Empty,
         };
-    }
 }

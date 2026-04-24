@@ -29,10 +29,8 @@ public sealed class SharedAltClothingLayerSystem : EntitySystem
             after: new[] { typeof(ClothingSystem) });
     }
 
-    private void OnAfterAutoHandleState(Entity<AltClothingLayerComponent> ent, ref AfterAutoHandleStateEvent args)
-    {
+    private void OnAfterAutoHandleState(Entity<AltClothingLayerComponent> ent, ref AfterAutoHandleStateEvent args) =>
         _item.VisualsChanged(ent);
-    }
 
     private void OnGetActualMapLayer(Entity<AltClothingLayerComponent> ent, ref GetActualMapLayerEvent args)
     {
@@ -65,8 +63,10 @@ public sealed class SharedAltClothingLayerSystem : EntitySystem
                 Dirty(ent);
                 _item.VisualsChanged(ent);
             },
-            Text = ent.Comp.AltStyle ? Loc.GetString(ent.Comp.ChangeToDefaultMessage) : Loc.GetString(ent.Comp.ChangeToAltMessage),
-            Icon = new SpriteSpecifier.Texture(new ("/Textures/Interface/VerbIcons/flip.svg.192dpi.png")),
+            Text = ent.Comp.AltStyle
+                ? Loc.GetString(ent.Comp.ChangeToDefaultMessage)
+                : Loc.GetString(ent.Comp.ChangeToAltMessage),
+            Icon = new SpriteSpecifier.Texture(new ResPath("/Textures/Interface/VerbIcons/flip.svg.192dpi.png")),
             Priority = 1,
         };
 

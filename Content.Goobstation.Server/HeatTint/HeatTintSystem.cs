@@ -24,13 +24,9 @@ public sealed class HeatTintSystem : SharedHeatTintSystem
             _appearance.SetData(ent, HeatTintVisuals.Temperature, temp.CurrentTemperature);
     }
 
-    private void OnTemperatureChange(Entity<HeatTintComponent> ent, ref OnTemperatureChangeEvent args)
-    {
+    private void OnTemperatureChange(Entity<HeatTintComponent> ent, ref OnTemperatureChangeEvent args) =>
         _appearance.SetData(ent, HeatTintVisuals.Temperature, args.CurrentTemperature);
-    }
 
-    private void OnSolutionChanged(Entity<HeatTintComponent> ent, ref SolutionContainerChangedEvent args)
-    {
+    private void OnSolutionChanged(Entity<HeatTintComponent> ent, ref SolutionContainerChangedEvent args) =>
         _appearance.SetData(ent, HeatTintVisuals.Temperature, args.Solution.Temperature);
-    }
 }

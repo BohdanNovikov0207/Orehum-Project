@@ -11,13 +11,9 @@ public sealed class RandomHumanoidSkinColorSystem : EntitySystem
     [Dependency] private readonly IPrototypeManager _prototype = default!;
     [Dependency] private readonly IRobustRandom _random = default!;
 
-    public override void Initialize()
-    {
-        SubscribeLocalEvent<RandomHumanoidSkinColorComponent, MapInitEvent>(OnMapInit);
-    }
+    public override void Initialize() => SubscribeLocalEvent<RandomHumanoidSkinColorComponent, MapInitEvent>(OnMapInit);
 
-    private void OnMapInit(Entity<RandomHumanoidSkinColorComponent> ent, ref MapInitEvent args)
-    {
-        _appearance.SetSkinColor(ent, _random.Pick(_prototype.Index<ColorPalettePrototype>(ent.Comp.Palette).Colors.Values));
-    }
+    private void OnMapInit(Entity<RandomHumanoidSkinColorComponent> ent, ref MapInitEvent args) =>
+        _appearance.SetSkinColor(ent,
+            _random.Pick(_prototype.Index<ColorPalettePrototype>(ent.Comp.Palette).Colors.Values));
 }

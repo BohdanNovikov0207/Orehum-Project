@@ -13,7 +13,7 @@ public sealed partial class SlaughterSpreadBloodObjectiveComponent : Component
     {
         "Brig",
         "Chapel",
-        "Bridge"
+        "Bridge",
     };
 
     [DataField]

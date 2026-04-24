@@ -6,6 +6,7 @@
 //
 // SPDX-License-Identifier: AGPL-3.0-or-later
 
+using Content.Goobstation.Common.Speech;
 using Content.Server.Speech.EntitySystems;
 using Content.Shared.Speech;
 using Robust.Shared.Random;
@@ -20,10 +21,10 @@ public sealed class OhioAccentSystem : EntitySystem
     public override void Initialize()
     {
         base.Initialize();
-        SubscribeLocalEvent<Common.Speech.OhioAccentComponent, AccentGetEvent>(OnAccent);
+        SubscribeLocalEvent<OhioAccentComponent, AccentGetEvent>(OnAccent);
     }
 
-    private void OnAccent(EntityUid uid, Common.Speech.OhioAccentComponent component, AccentGetEvent args)
+    private void OnAccent(EntityUid uid, OhioAccentComponent component, AccentGetEvent args)
     {
         var message = args.Message;
 
@@ -51,4 +52,4 @@ public sealed class OhioAccentSystem : EntitySystem
 
         args.Message = message;
     }
-};
+}

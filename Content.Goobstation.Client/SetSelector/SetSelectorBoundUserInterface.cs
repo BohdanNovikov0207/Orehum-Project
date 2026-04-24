@@ -31,13 +31,7 @@ public sealed class SetSelectorBoundUserInterface(EntityUid owner, Enum uiKey) :
         _window?.UpdateState(current);
     }
 
-    private void SendChangeSelected(int setNumber)
-    {
-        SendMessage(new SetSelectorChangeSetMessage(setNumber));
-    }
+    private void SendChangeSelected(int setNumber) => SendMessage(new SetSelectorChangeSetMessage(setNumber));
 
-    private void SendApprove()
-    {
-        SendMessage(new SetSelectorApproveMessage());
-    }
+    private void SendApprove() => SendMessage(new SetSelectorApproveMessage());
 }

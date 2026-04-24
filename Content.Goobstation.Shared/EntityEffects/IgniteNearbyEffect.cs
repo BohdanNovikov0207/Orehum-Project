@@ -7,20 +7,18 @@
 
 using Content.Shared.Database;
 using Content.Shared.EntityEffects;
-using Content.Shared.EntityEffects.Effects;
 using Robust.Shared.Prototypes;
 
 namespace Content.Goobstation.Shared.EntityEffects;
 
 /// <summary>
-///     Ignites mobs nearby.
+/// Ignites mobs nearby.
 /// </summary>
 public sealed partial class IgniteNearbyEffect : EventEntityEffect<IgniteNearbyEffect>
 {
+    [DataField] public float FireStacks = 2;
 
     [DataField] public float Radius = 7;
-
-    [DataField] public float FireStacks = 2;
 
     public IgniteNearbyEffect(float radius, float fireStacks)
     {
@@ -30,10 +28,10 @@ public sealed partial class IgniteNearbyEffect : EventEntityEffect<IgniteNearbyE
 
     public override bool ShouldLog => true;
 
+    public override LogImpact LogImpact => LogImpact.Medium;
+
     protected override string? ReagentEffectGuidebookText(IPrototypeManager prototype, IEntitySystemManager entSys)
         => Loc.GetString("reagent-effect-guidebook-ignite", ("chance", Probability));
-
-    public override LogImpact LogImpact => LogImpact.Medium;
 
     public override void Effect(EntityEffectBaseArgs args)
     {

@@ -11,7 +11,7 @@ using Content.Server.Station.Systems;
 
 namespace Content.Goobstation.Server.Spawn.Systems;
 
-public sealed partial class UniqueEntitySystem : EntitySystem
+public sealed class UniqueEntitySystem : EntitySystem
 {
     [Dependency] private readonly StationSystem _station = default!;
 

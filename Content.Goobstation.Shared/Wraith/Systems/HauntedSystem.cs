@@ -4,9 +4,10 @@ using Robust.Shared.Timing;
 
 namespace Content.Goobstation.Shared.Wraith.Systems;
 
-public sealed partial class HauntedSystem : EntitySystem
+public sealed class HauntedSystem : EntitySystem
 {
     [Dependency] private readonly IGameTiming _timing = default!;
+
     public override void Initialize()
     {
         base.Initialize();
@@ -28,15 +29,20 @@ public sealed partial class HauntedSystem : EntitySystem
             RemCompDeferred<HauntedComponent>(uid);
         }
     }
+
     private void OnExamined(Entity<HauntedComponent> ent, ref ExaminedEvent args)
     {
         if (HasComp<WraithComponent>(args.Examiner))
         {
             var remaining = ent.Comp.DeletionTime - _timing.CurTime;
-            args.PushMarkup($"[color=mediumpurple]{Loc.GetString("wraith-already-haunted", ("target", ent.Owner))}[/color]");
-            args.PushMarkup(Loc.GetString("wraith-haunted-expiration",("minutes", remaining.Minutes),("seconds", remaining.Seconds)));
+            args.PushMarkup(
+                $"[color=mediumpurple]{Loc.GetString("wraith-already-haunted", ("target", ent.Owner))}[/color]");
+            args.PushMarkup(Loc.GetString("wraith-haunted-expiration",
+                ("minutes", remaining.Minutes),
+                ("seconds", remaining.Seconds)));
         }
     }
+
     private void OnMapInit(Entity<HauntedComponent> ent, ref MapInitEvent args)
     {
         ent.Comp.DeletionTime = _timing.CurTime + ent.Comp.Lifetime;

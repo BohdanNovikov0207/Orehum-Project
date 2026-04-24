@@ -12,7 +12,7 @@ namespace Content.Goobstation.Shared.Enchanting.Components;
 /// <summary>
 /// Gives a chance to double your mined ores, increases linearly with level.
 /// </summary>
-[RegisterComponent, NetworkedComponent, Access(typeof(FortuneEnchantSystem))]
+[RegisterComponent] [NetworkedComponent] [Access(typeof(FortuneEnchantSystem))]
 [EntityCategory("Enchants")]
 public sealed partial class FortuneEnchantComponent : Component
 {

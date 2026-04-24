@@ -17,12 +17,12 @@ namespace Content.Goobstation.Server.Wraith.Curses;
 /// </summary>
 public sealed class CurseDeathSystem : EntitySystem
 {
+    [Dependency] private readonly SharedAudioSystem _audio = default!;
+    [Dependency] private readonly BodySystem _bodySystem = default!;
     [Dependency] private readonly DamageableSystem _damageableSystem = default!;
     [Dependency] private readonly SmokeSystem _smokeSystem = default!;
     [Dependency] private readonly TransformSystem _transformSystem = default!;
     [Dependency] private readonly WraithPointsSystem _wraithPoints = default!;
-    [Dependency] private readonly BodySystem _bodySystem = default!;
-    [Dependency] private readonly SharedAudioSystem _audio = default!;
 
     public override void Initialize()
     {
@@ -54,7 +54,8 @@ public sealed class CurseDeathSystem : EntitySystem
             return;
 
         if (curseHolder.Curser != null)
-            _wraithPoints.AdjustWpGenerationRate(ent.Comp.WpGeneration, curseHolder.Curser.Value); // wraith gets extra regen rate
+            _wraithPoints.AdjustWpGenerationRate(ent.Comp.WpGeneration,
+                curseHolder.Curser.Value); // wraith gets extra regen rate
 
         _bodySystem.GibBody(ent.Owner);
         RemCompDeferred<CurseHolderComponent>(ent.Owner);

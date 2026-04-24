@@ -14,10 +14,10 @@ namespace Content.Goobstation.Client.Shadowling;
 
 public sealed class EnthrallSystem : SharedEnthrallSystem
 {
-    private EnthrallOverlay _overlay = default!;
+    [Dependency] private readonly IOverlayManager _overlayManager = default!;
 
     [Dependency] private readonly IPlayerManager _playerManager = default!;
-    [Dependency] private readonly IOverlayManager _overlayManager = default!;
+    private EnthrallOverlay _overlay = default!;
 
     public override void Initialize()
     {
@@ -28,18 +28,14 @@ public sealed class EnthrallSystem : SharedEnthrallSystem
         SubscribeLocalEvent<ThrallComponent, LocalPlayerAttachedEvent>(OnPlayerAttached);
         SubscribeLocalEvent<ThrallComponent, LocalPlayerDetachedEvent>(OnPlayerDetached);
 
-        _overlay = new();
+        _overlay = new EnthrallOverlay();
     }
 
-    private void OnPlayerAttached(EntityUid uid, ThrallComponent component, LocalPlayerAttachedEvent args)
-    {
+    private void OnPlayerAttached(EntityUid uid, ThrallComponent component, LocalPlayerAttachedEvent args) =>
         _overlayManager.AddOverlay(_overlay);
-    }
 
-    private void OnPlayerDetached(EntityUid uid, ThrallComponent component, LocalPlayerDetachedEvent args)
-    {
+    private void OnPlayerDetached(EntityUid uid, ThrallComponent component, LocalPlayerDetachedEvent args) =>
         _overlayManager.RemoveOverlay(_overlay);
-    }
 
     private void OnInit(EntityUid uid, ThrallComponent component, ComponentInit init)
     {

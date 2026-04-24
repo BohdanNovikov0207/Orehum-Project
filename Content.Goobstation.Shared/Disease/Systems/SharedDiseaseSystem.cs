@@ -2,7 +2,6 @@ using System.Diagnostics.CodeAnalysis;
 using System.Numerics;
 using Content.Goobstation.Shared.Disease.Components;
 using Content.Shared.Mobs.Systems;
-using JetBrains.Annotations;
 using Robust.Shared.Containers;
 using Robust.Shared.Map;
 using Robust.Shared.Network;
@@ -15,22 +14,24 @@ namespace Content.Goobstation.Shared.Disease.Systems;
 public abstract partial class SharedDiseaseSystem : EntitySystem
 {
     [Dependency] private readonly IComponentFactory _factory = default!;
-    [Dependency] private readonly IGameTiming _timing = default!;
+    [Dependency] private readonly MobStateSystem _mobState = default!;
     [Dependency] private readonly INetManager _net = default!;
     [Dependency] private readonly IPrototypeManager _proto = default!;
     [Dependency] private readonly IRobustRandom _random = default!;
-    [Dependency] private readonly MobStateSystem _mobState = default!;
+    [Dependency] private readonly IGameTiming _timing = default!;
     [Dependency] private readonly SharedTransformSystem _transform = default!;
+
+    /// <summary>
+    /// The interval between updates of disease and disease effect entities
+    /// </summary>
+    private readonly TimeSpan
+        _updateInterval = TimeSpan.FromSeconds(0.5f); // update every half-second to not lag the game
+
     [Dependency] protected readonly SharedContainerSystem ContainerSystem = default!;
 
     private TimeSpan _lastUpdated = TimeSpan.FromSeconds(0);
 
     protected EntProtoId BaseDisease = "DiseaseBase";
-
-    /// <summary>
-    /// The interval between updates of disease and disease effect entities
-    /// </summary>
-    private readonly TimeSpan _updateInterval = TimeSpan.FromSeconds(0.5f); // update every half-second to not lag the game
 
     protected EntityQuery<DiseaseEffectComponent> EffectQuery;
 
@@ -70,9 +71,14 @@ public abstract partial class SharedDiseaseSystem : EntitySystem
         // so that we can EnsureComp disease carriers while we're looping over them without erroring
         List<Entity<DiseaseCarrierComponent>> carriers = [];
         while (diseaseCarriers.MoveNext(out var uid, out var diseaseCarrier))
+        {
             carriers.Add((uid, diseaseCarrier));
+        }
+
         foreach (var carrier in carriers)
+        {
             UpdateDiseases(carrier);
+        }
     }
 
     private void UpdateDiseases(Entity<DiseaseCarrierComponent> ent)
@@ -85,16 +91,16 @@ public abstract partial class SharedDiseaseSystem : EntitySystem
         }
     }
 
-    private void OnDiseaseCarrierStartup(Entity<DiseaseCarrierComponent> ent, ref ComponentStartup args)
-    {
-        ent.Comp.Diseases = ContainerSystem.EnsureContainer<Container>(ent.Owner, DiseaseCarrierComponent.DiseaseContainerId);
-    }
+    private void OnDiseaseCarrierStartup(Entity<DiseaseCarrierComponent> ent, ref ComponentStartup args) =>
+        ent.Comp.Diseases =
+            ContainerSystem.EnsureContainer<Container>(ent.Owner, DiseaseCarrierComponent.DiseaseContainerId);
 
     private void OnDiseaseCarrierInit(Entity<DiseaseCarrierComponent> ent, ref MapInitEvent args)
     {
-
         foreach (var diseaseId in ent.Comp.StartingDiseases)
+        {
             TryInfect((ent, ent.Comp), diseaseId, out _);
+        }
     }
 
     private void OnDiseaseInit(Entity<DiseaseComponent> ent, ref MapInitEvent args)
@@ -109,25 +115,22 @@ public abstract partial class SharedDiseaseSystem : EntitySystem
             if (TryAdjustEffect((ent, ent.Comp), effectSpecifier.Key, out var effect, effectSpecifier.Value))
                 complexity += effect.Value.Comp.GetComplexity();
         }
+
         // disease is a preset so set the complexity
         ent.Comp.Complexity = complexity;
 
         Dirty(ent);
     }
 
-    private void OnDiseaseCompInit(Entity<DiseaseComponent> ent, ref ComponentInit args)
-    {
-        ent.Comp.Effects = ContainerSystem.EnsureContainer<Container>(ent.Owner, DiseaseComponent.EffectContainerId);
-    }
+    private void OnDiseaseCompInit(Entity<DiseaseComponent> ent, ref ComponentInit args) => ent.Comp.Effects =
+        ContainerSystem.EnsureContainer<Container>(ent.Owner, DiseaseComponent.EffectContainerId);
 
-    private void OnDiseaseCured(Entity<DiseaseCarrierComponent> ent, ref DiseaseCuredEvent args)
-    {
+    private void OnDiseaseCured(Entity<DiseaseCarrierComponent> ent, ref DiseaseCuredEvent args) =>
         TryCure((ent, ent.Comp), args.Disease);
-    }
 
     private void OnUpdateDisease(Entity<DiseaseComponent> ent, ref DiseaseUpdateEvent args)
     {
-        var timeDelta = (float)_updateInterval.TotalSeconds;
+        var timeDelta = (float) _updateInterval.TotalSeconds;
         var alive = !_mobState.IsDead(args.Ent.Owner) || ent.Comp.AffectsDead;
 
         if (!args.Ent.Comp.EffectImmune)
@@ -223,7 +226,9 @@ public abstract partial class SharedDiseaseSystem : EntitySystem
     /// <summary>
     /// Finds a disease of specified genotype, if any
     /// </summary>
-    private bool FindDisease(Entity<DiseaseCarrierComponent?> ent, int genotype, [NotNullWhen(true)] out EntityUid? disease)
+    private bool FindDisease(Entity<DiseaseCarrierComponent?> ent,
+        int genotype,
+        [NotNullWhen(true)] out EntityUid? disease)
     {
         disease = null;
         if (!Resolve(ent, ref ent.Comp, false))
@@ -239,50 +244,45 @@ public abstract partial class SharedDiseaseSystem : EntitySystem
             disease = diseaseUid;
             return true;
         }
+
         return false;
     }
 
     /// <summary>
     /// Checks if the entity has a disease of specified genotype
     /// </summary>
-    private bool HasDisease(Entity<DiseaseCarrierComponent?> ent, int genotype)
-    {
-        return FindDisease(ent, genotype, out _);
-    }
+    private bool HasDisease(Entity<DiseaseCarrierComponent?> ent, int genotype) => FindDisease(ent, genotype, out _);
 
     /// <summary>
     /// Tries to cure the entity of the given disease entity
     /// </summary>
-    public virtual bool TryCure(Entity<DiseaseCarrierComponent?> ent, EntityUid disease)
-    {
+    public virtual bool TryCure(Entity<DiseaseCarrierComponent?> ent, EntityUid disease) =>
         // does nothing on client
-        return false;
-    }
+        false;
 
     /// <summary>
     /// Tries to cure the entity of all diseases
     /// </summary>
-    public virtual bool TryCureAll(Entity<DiseaseCarrierComponent?> ent)
-    {
+    public virtual bool TryCureAll(Entity<DiseaseCarrierComponent?> ent) =>
         // does nothing on client
-        return false;
-    }
+        false;
 
     /// <summary>
     /// Tries to infect the entity with the given disease entity
-    /// Does not clone the provided disease entity, use <see cref="TryClone"/> for that
+    /// Does not clone the provided disease entity, use <see cref="TryClone" /> for that
     /// </summary>
     public bool TryInfect(Entity<DiseaseCarrierComponent?> ent, EntityUid disease, bool force = false)
     {
         if (force)
-            EnsureComp<DiseaseCarrierComponent>(ent, out ent.Comp);
+            EnsureComp(ent, out ent.Comp);
 
         if (!Resolve(ent, ref ent.Comp, false))
             return false;
 
         if (!TryComp<DiseaseComponent>(disease, out var diseaseComp))
         {
-            Log.Error($"Attempted to infect {ToPrettyString(ent)} with disease ToPrettyString{disease}, but it had no DiseaseComponent");
+            Log.Error(
+                $"Attempted to infect {ToPrettyString(ent)} with disease ToPrettyString{disease}, but it had no DiseaseComponent");
             return false;
         }
 
@@ -303,7 +303,10 @@ public abstract partial class SharedDiseaseSystem : EntitySystem
     /// <summary>
     /// Tries to infect the entity with a given disease prototype
     /// </summary>
-    public virtual bool TryInfect(Entity<DiseaseCarrierComponent?> ent, EntProtoId diseaseId, [NotNullWhen(true)] out EntityUid? disease, bool force = false)
+    public virtual bool TryInfect(Entity<DiseaseCarrierComponent?> ent,
+        EntProtoId diseaseId,
+        [NotNullWhen(true)] out EntityUid? disease,
+        bool force = false)
     {
         // does nothing on client
         disease = null;

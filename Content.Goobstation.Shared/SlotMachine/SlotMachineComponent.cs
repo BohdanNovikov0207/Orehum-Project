@@ -1,17 +1,24 @@
+using Robust.Shared.Audio;
 using Robust.Shared.GameStates;
 using Robust.Shared.Prototypes;
 using Robust.Shared.Serialization;
-using Robust.Shared.Audio;
 
 namespace Content.Goobstation.Shared.SlotMachine;
 
-[RegisterComponent, NetworkedComponent, AutoGenerateComponentState]
+[RegisterComponent] [NetworkedComponent] [AutoGenerateComponentState]
 public sealed partial class SlotMachineComponent : Component
 {
+    [DataField] [AutoNetworkedField]
+    public bool Emagged;
+
+    [DataField] [AutoNetworkedField]
+    public EntProtoId GodPotPrize = "WeaponShotgunHeavy";
+
     #region Sounds
 
     [DataField]
-    public SoundSpecifier SpinSound = new SoundPathSpecifier("/Audio/_Goobstation/Machines/SlotMachine/slotmachine_spin.ogg");
+    public SoundSpecifier SpinSound =
+        new SoundPathSpecifier("/Audio/_Goobstation/Machines/SlotMachine/slotmachine_spin.ogg");
 
     [DataField]
     public SoundSpecifier LoseSound = new SoundPathSpecifier("/Audio/Machines/buzz-two.ogg");
@@ -23,73 +30,70 @@ public sealed partial class SlotMachineComponent : Component
     public SoundSpecifier MediumWinSound = new SoundPathSpecifier("/Audio/Effects/Arcade/win.ogg");
 
     [DataField]
-    public SoundSpecifier BigWinSound = new SoundPathSpecifier("/Audio/_Goobstation/Machines/SlotMachine/slotmachine_bigwin.ogg");
+    public SoundSpecifier BigWinSound =
+        new SoundPathSpecifier("/Audio/_Goobstation/Machines/SlotMachine/slotmachine_bigwin.ogg");
 
     [DataField]
-    public SoundSpecifier JackPotWinSound = new SoundPathSpecifier("/Audio/_Goobstation/Machines/SlotMachine/slotmachine_jackpotwin.ogg");
+    public SoundSpecifier JackPotWinSound =
+        new SoundPathSpecifier("/Audio/_Goobstation/Machines/SlotMachine/slotmachine_jackpotwin.ogg");
 
     [DataField]
-    public SoundSpecifier GodPotWinSound = new SoundPathSpecifier("/Audio/_Goobstation/Machines/SlotMachine/slotmachine_godpot.ogg");
+    public SoundSpecifier GodPotWinSound =
+        new SoundPathSpecifier("/Audio/_Goobstation/Machines/SlotMachine/slotmachine_godpot.ogg");
 
     #endregion
 
     #region Chances
 
-    [DataField, AutoNetworkedField]
+    [DataField] [AutoNetworkedField]
     public float SmallWinChance = .20f;
 
-    [DataField, AutoNetworkedField]
+    [DataField] [AutoNetworkedField]
     public float MediumWinChance = .10f;
 
-    [DataField, AutoNetworkedField]
+    [DataField] [AutoNetworkedField]
     public float BigWinChance = .05f;
 
-    [DataField, AutoNetworkedField]
+    [DataField] [AutoNetworkedField]
     public float JackPotWinChance = .01f;
 
-    [DataField, AutoNetworkedField]
+    [DataField] [AutoNetworkedField]
     public float GodPotWinChance = .0001f;
 
     #endregion
 
-    [DataField, AutoNetworkedField]
-    public EntProtoId GodPotPrize = "WeaponShotgunHeavy";
-
-    [DataField, AutoNetworkedField]
-    public bool Emagged;
-
     #region Prize Amounts
 
-    [DataField, AutoNetworkedField]
+    [DataField] [AutoNetworkedField]
     public int SpinCost = 250;
 
-    [DataField, AutoNetworkedField]
+    [DataField] [AutoNetworkedField]
     public int SmallPrizeAmount = 250;
 
-    [DataField, AutoNetworkedField]
+    [DataField] [AutoNetworkedField]
     public int MediumPrizeAmount = 500;
 
-    [DataField, AutoNetworkedField]
+    [DataField] [AutoNetworkedField]
     public int BigPrizeAmount = 5000;
 
-    [DataField, AutoNetworkedField]
+    [DataField] [AutoNetworkedField]
     public int JackPotPrizeAmount = 20000;
 
     #endregion
 
     #region DoAfter
 
-    [DataField, AutoNetworkedField]
+    [DataField] [AutoNetworkedField]
     public float DoAfterTime = 3.8f;
 
-    [DataField, AutoNetworkedField]
+    [DataField] [AutoNetworkedField]
     public bool IsSpinning;
 
     #endregion
 }
 
-[Serializable, NetSerializable]
+[Serializable] [NetSerializable]
 public enum SlotMachineVisuals : byte
 {
-    Spinning
+    Spinning,
 }

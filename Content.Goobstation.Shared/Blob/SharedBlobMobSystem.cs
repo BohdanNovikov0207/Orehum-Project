@@ -25,10 +25,13 @@ namespace Content.Goobstation.Shared.Blob;
 
 public abstract class SharedBlobMobSystem : EntitySystem
 {
-    [Dependency] private readonly SharedPopupSystem _popupSystem = default!;
+    [ValidatePrototypeId<EntityPrototype>]
+    private const string HealEffect = "EffectHealPlusTripleYellow";
+
     [Dependency] private readonly SharedAudioSystem _audioSystem = default!;
-    private EntityQuery<BlobTileComponent> _tileQuery;
+    [Dependency] private readonly SharedPopupSystem _popupSystem = default!;
     private EntityQuery<BlobMobComponent> _mobQuery;
+    private EntityQuery<BlobTileComponent> _tileQuery;
 
     public override void Initialize()
     {
@@ -46,9 +49,6 @@ public abstract class SharedBlobMobSystem : EntitySystem
     {
         //args.Channel = ent.Comp.Channel;
     }
-
-    [ValidatePrototypeId<EntityPrototype>]
-    private const string HealEffect = "EffectHealPlusTripleYellow";
 
     private void OnPulse(BlobMobGetPulseEvent ev)
     {

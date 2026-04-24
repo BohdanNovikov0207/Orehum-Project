@@ -7,25 +7,25 @@ namespace Content.Goobstation.Shared.Factory.Filters;
 /// <summary>
 /// Filters entities that have MobStateComponent and a state that matches a configured list.
 /// </summary>
-[RegisterComponent, NetworkedComponent, Access(typeof(AutomationFilterSystem))]
+[RegisterComponent] [NetworkedComponent] [Access(typeof(AutomationFilterSystem))]
 [AutoGenerateComponentState]
 public sealed partial class MobFilterComponent : Component
 {
     /// <summary>
     /// Mob states allowed by the filter.
     /// </summary>
-    [DataField, AutoNetworkedField]
+    [DataField] [AutoNetworkedField]
     public HashSet<MobState> States = new();
 }
 
-[Serializable, NetSerializable]
+[Serializable] [NetSerializable]
 public enum MobFilterUiKey : byte
 {
-    Key
+    Key,
 }
 
-[Serializable, NetSerializable]
-public sealed partial class MobFilterToggleMessage(MobState state) : BoundUserInterfaceMessage
+[Serializable] [NetSerializable]
+public sealed class MobFilterToggleMessage(MobState state) : BoundUserInterfaceMessage
 {
     public readonly MobState State = state;
 }

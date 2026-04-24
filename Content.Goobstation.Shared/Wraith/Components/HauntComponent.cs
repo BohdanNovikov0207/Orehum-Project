@@ -5,48 +5,21 @@ using Robust.Shared.Prototypes;
 
 namespace Content.Goobstation.Shared.Wraith.Components;
 
-[RegisterComponent, NetworkedComponent]
+[RegisterComponent] [NetworkedComponent]
 [AutoGenerateComponentState]
 public sealed partial class HauntComponent : Component
 {
     [DataField]
-    public EntProtoId ActionId = "ActionHaunt";
-
-    [DataField]
     public EntityUid? ActionEnt;
 
-    /// <summary>
-    /// How much the Wp regeneration gets boosted per witness.
-    /// </summary>
     [DataField]
-    public FixedPoint2 HauntWpRegenPerWitness = 0.5;
+    public EntProtoId ActionId = "ActionHaunt";
 
     /// <summary>
-    /// How long the Wp regen boost lasts.
+    /// Is the action active?
     /// </summary>
-    [DataField]
-    public TimeSpan HauntWpRegenDuration = TimeSpan.FromSeconds(30);
-
-    [DataField, AutoNetworkedField]
-    public TimeSpan NextHauntWpRegenUpdate = TimeSpan.Zero;
-
-    /// <summary>
-    /// How much the Wp regeneration gets boosted per witness.
-    /// </summary>
-    [DataField]
-    public TimeSpan HauntCorporealDuration = TimeSpan.FromSeconds(30);
-
-    /// <summary>
-    /// How long the flash effect lasts when someone gets haunted.
-    /// </summary>
-    [DataField]
-    public TimeSpan HauntFlashDuration = TimeSpan.FromSeconds(2);
-
-    /// <summary>
-    /// The status effect to flash anyone who gets haunted.
-    /// </summary>
-    [DataField]
-    public ProtoId<StatusEffectPrototype> FlashedId = "Flashed";
+    [ViewVariables] [AutoNetworkedField]
+    public bool Active;
 
     /// <summary>
     /// The status effect to make the Wraith corporeal upon using haunt.
@@ -55,16 +28,16 @@ public sealed partial class HauntComponent : Component
     public ProtoId<StatusEffectPrototype> CorporealEffect = "Corporeal";
 
     /// <summary>
-    /// Is the action active?
+    /// The status effect to flash anyone who gets haunted.
     /// </summary>
-    [ViewVariables, AutoNetworkedField]
-    public bool Active;
+    [DataField]
+    public ProtoId<StatusEffectPrototype> FlashedId = "Flashed";
 
     /// <summary>
-    /// Is the wp boost active?
+    /// How much the Wp regeneration gets boosted per witness.
     /// </summary>
-    [ViewVariables, AutoNetworkedField]
-    public bool WpBoostActive;
+    [DataField]
+    public TimeSpan HauntCorporealDuration = TimeSpan.FromSeconds(30);
 
     /// <summary>
     /// How long the haunt lasts
@@ -72,15 +45,42 @@ public sealed partial class HauntComponent : Component
     [DataField]
     public TimeSpan HauntDuration = TimeSpan.FromSeconds(30);
 
-    [ViewVariables, AutoNetworkedField]
+    /// <summary>
+    /// How long the flash effect lasts when someone gets haunted.
+    /// </summary>
+    [DataField]
+    public TimeSpan HauntFlashDuration = TimeSpan.FromSeconds(2);
+
+    /// <summary>
+    /// How long the Wp regen boost lasts.
+    /// </summary>
+    [DataField]
+    public TimeSpan HauntWpRegenDuration = TimeSpan.FromSeconds(30);
+
+    /// <summary>
+    /// How much the Wp regeneration gets boosted per witness.
+    /// </summary>
+    [DataField]
+    public FixedPoint2 HauntWpRegenPerWitness = 0.5;
+
+    [ViewVariables] [AutoNetworkedField]
     public TimeSpan NextHauntUpdate;
+
+    [DataField] [AutoNetworkedField]
+    public TimeSpan NextHauntWpRegenUpdate = TimeSpan.Zero;
+
+    [ViewVariables]
+    public FixedPoint2 OriginalWpRegen;
+
+    [ViewVariables] [AutoNetworkedField]
+    public TimeSpan WitnessNextUpdate;
 
     [DataField]
     public TimeSpan WitnessUpdate = TimeSpan.FromSeconds(0.75f);
 
-    [ViewVariables, AutoNetworkedField]
-    public TimeSpan WitnessNextUpdate;
-
-    [ViewVariables]
-    public FixedPoint2 OriginalWpRegen;
+    /// <summary>
+    /// Is the wp boost active?
+    /// </summary>
+    [ViewVariables] [AutoNetworkedField]
+    public bool WpBoostActive;
 }

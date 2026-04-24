@@ -9,11 +9,9 @@ namespace Content.Goobstation.Client.JoinQueue;
 
 public sealed class QueueState : State
 {
-    [Dependency] private readonly IUserInterfaceManager _userInterface = default!;
-    [Dependency] private readonly IClientConsoleHost _console = default!;
-
-
     private const string JoinSoundPath = "/Audio/Effects/newplayerping.ogg";
+    [Dependency] private readonly IClientConsoleHost _console = default!;
+    [Dependency] private readonly IUserInterfaceManager _userInterface = default!;
 
     private QueueGui? _gui;
 
@@ -35,15 +33,9 @@ public sealed class QueueState : State
     }
 
 
-    public void OnQueueUpdate(QueueUpdateMessage msg)
-    {
-        _gui?.UpdateInfo(msg);
-    }
+    public void OnQueueUpdate(QueueUpdateMessage msg) => _gui?.UpdateInfo(msg);
 
-    private void OnQuitPressed()
-    {
-        _console.ExecuteCommand("disconnect");
-    }
+    private void OnQuitPressed() => _console.ExecuteCommand("disconnect");
 
 
     private void Ding()

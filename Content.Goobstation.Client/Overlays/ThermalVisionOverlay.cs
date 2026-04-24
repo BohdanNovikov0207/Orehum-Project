@@ -23,27 +23,24 @@ namespace Content.Goobstation.Client.Overlays;
 
 public sealed class ThermalVisionOverlay : Overlay
 {
-    [Dependency] private readonly IPrototypeManager _protoMan = default!;
-    [Dependency] private readonly IEntityManager _entity = default!;
-    [Dependency] private readonly IPlayerManager _player = default!;
-    [Dependency] private readonly IGameTiming _timing = default!;
-    [Dependency] private readonly IEyeManager _eyeManager = default!;
-
-    private readonly TransformSystem _transform;
-    private readonly SpriteSystem _sprite;
     private readonly ContainerSystem _container;
-    private readonly SharedPointLightSystem _light;
-
-    public override bool RequestScreenTexture => true;
-    public override OverlaySpace Space => OverlaySpace.WorldSpace;
+    [Dependency] private readonly IEntityManager _entity = default!;
 
     private readonly List<ThermalVisionRenderEntry> _entries = [];
+    [Dependency] private readonly IEyeManager _eyeManager = default!;
+    private readonly SharedPointLightSystem _light;
+    [Dependency] private readonly IPlayerManager _player = default!;
+    [Dependency] private readonly IPrototypeManager _protoMan = default!;
+    private readonly SpriteSystem _sprite;
+    [Dependency] private readonly IGameTiming _timing = default!;
+
+    private readonly TransformSystem _transform;
 
     private EntityUid? _lightEntity;
 
-    public float LightRadius;
-
     public ThermalVisionComponent? Comp;
+
+    public float LightRadius;
 
     public ThermalVisionOverlay()
     {
@@ -57,10 +54,10 @@ public sealed class ThermalVisionOverlay : Overlay
         ZIndex = -1;
     }
 
-    protected override bool BeforeDraw(in OverlayDrawArgs args)
-    {
-        return args.Viewport.Eye == _eyeManager.CurrentEye;
-    }
+    public override bool RequestScreenTexture => true;
+    public override OverlaySpace Space => OverlaySpace.WorldSpace;
+
+    protected override bool BeforeDraw(in OverlayDrawArgs args) => args.Viewport.Eye == _eyeManager.CurrentEye;
 
     protected override void Draw(in OverlayDrawArgs args)
     {
@@ -172,6 +169,7 @@ public sealed class ThermalVisionOverlay : Overlay
         }
         else
             _sprite.SetColor((uid, sprite), color.WithAlpha(alpha));
+
         _sprite.RenderSprite((uid, sprite), handle, eyeRot, rotation, position);
         _sprite.SetColor((uid, sprite), originalColor);
         handle.UseShader(null);
@@ -183,11 +181,9 @@ public sealed class ThermalVisionOverlay : Overlay
         }
     }
 
-    private bool CanSee(EntityUid uid, SpriteComponent sprite)
-    {
-        return sprite.Visible && (!_entity.TryGetComponent(uid, out StealthComponent? stealth) ||
-                                  !stealth.ThermalsImmune); // Goobstation - thermals ability to see invisible entities
-    }
+    private bool CanSee(EntityUid uid, SpriteComponent sprite) =>
+        sprite.Visible && (!_entity.TryGetComponent(uid, out StealthComponent? stealth) ||
+                           !stealth.ThermalsImmune); // Goobstation - thermals ability to see invisible entities
 
     public void ResetLight(bool checkFirstTimePredicted = true)
     {

@@ -8,8 +8,8 @@ namespace Content.Goobstation.Server.Wraith.Systems.Minions;
 
 public sealed class DiseasedRatSystem : SharedDiseasedRatSystem
 {
-    [Dependency] private readonly IPrototypeManager _proto = default!;
     [Dependency] private readonly PolymorphSystem _polymorph = default!;
+    [Dependency] private readonly IPrototypeManager _proto = default!;
 
     protected override void Evolve(EntityUid uid, ProtoId<DiseasedRatFormUnlockPrototype> newProto)
     {

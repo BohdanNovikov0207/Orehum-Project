@@ -14,16 +14,16 @@ namespace Content.Goobstation.Shared.Enchanting.Components;
 /// Provides immunity to step triggers of a certain type, lava by default.
 /// Does nothing to other step triggers.
 /// </summary>
-[RegisterComponent, NetworkedComponent, Access(typeof(LavaImmunityEnchantSystem))]
+[RegisterComponent] [NetworkedComponent] [Access(typeof(LavaImmunityEnchantSystem))]
 [EntityCategory("Enchants")]
 public sealed partial class LavaImmunityEnchantComponent : Component
 {
     [DataField]
     public StepTriggerGroup Group = new()
     {
-        Types = new List<ProtoId<StepTriggerTypePrototype>>()
+        Types = new List<ProtoId<StepTriggerTypePrototype>>
         {
-            "Lava"
-        }
+            "Lava",
+        },
     };
 }

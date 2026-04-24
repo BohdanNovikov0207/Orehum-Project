@@ -7,26 +7,32 @@
 //
 // SPDX-License-Identifier: AGPL-3.0-or-later
 
-using Content.Shared.Damage;
 using Content.Goobstation.Maths.FixedPoint;
+using Content.Shared.Damage;
 using Robust.Shared.GameStates;
 
 namespace Content.Goobstation.Shared.Blob.Components;
 
-[RegisterComponent, NetworkedComponent, AutoGenerateComponentState(true), Serializable]
+[RegisterComponent] [NetworkedComponent] [AutoGenerateComponentState(true)] [Serializable]
 public sealed partial class BlobTileComponent : Component
 {
-    [DataField, AutoNetworkedField]
+    [DataField(required: true)]
+    public BlobTileType BlobTileType = BlobTileType.Invalid;
+
+    [DataField] [AutoNetworkedField]
     public Color Color = Color.White;
 
     [ViewVariables]
     public Entity<BlobCoreComponent>? Core;
 
     [DataField]
-    public bool ReturnCost = true;
-
-    [DataField(required: true)]
-    public BlobTileType BlobTileType = BlobTileType.Invalid;
+    public DamageSpecifier FlashDamage = new()
+    {
+        DamageDict = new Dictionary<string, FixedPoint2>
+        {
+            { "Heat", 24 },
+        },
+    };
 
     [DataField]
     public DamageSpecifier HealthOfPulse = new()
@@ -39,17 +45,11 @@ public sealed partial class BlobTileComponent : Component
             { "Heat", -4 },
             { "Cold", -4 },
             { "Shock", -4 },
-        }
+        },
     };
 
     [DataField]
-    public DamageSpecifier FlashDamage = new()
-    {
-        DamageDict = new Dictionary<string, FixedPoint2>
-        {
-            { "Heat", 24 },
-        }
-    };
+    public bool ReturnCost = true;
 }
 
 [Serializable]
@@ -60,6 +60,7 @@ public enum BlobTileType : byte
     Strong,
     Reflective,
     Resource,
+
     /*
     Storage,
     Turret,

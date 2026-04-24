@@ -18,7 +18,7 @@ public sealed class ShadowlingPlaneShiftSystem : EntitySystem
 {
     [Dependency] private readonly SharedActionsSystem _actions = default!;
 
-    /// <inheritdoc/>
+    /// <inheritdoc />
     public override void Initialize()
     {
         base.Initialize();
@@ -41,9 +41,7 @@ public sealed class ShadowlingPlaneShiftSystem : EntitySystem
 
         comp.IsActive = !comp.IsActive;
         if (comp.IsActive)
-        {
             TryDoShift(uid);
-        }
         else
         {
             if (!HasComp<PhaseShiftedComponent>(uid))

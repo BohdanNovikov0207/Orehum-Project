@@ -15,10 +15,10 @@ using Robust.Shared.Utility;
 
 namespace Content.Goobstation.Shared.Religion.AlternatePrayable;
 
-public sealed partial class AlternatePrayableSystem : EntitySystem
+public sealed class AlternatePrayableSystem : EntitySystem
 {
-    [Dependency] private readonly SharedPopupSystem _popupSystem = default!;
     [Dependency] private readonly SharedDoAfterSystem _doAfterSystem = default!;
+    [Dependency] private readonly SharedPopupSystem _popupSystem = default!;
     [Dependency] private readonly IGameTiming _timing = default!;
 
     public override void Initialize()
@@ -28,6 +28,7 @@ public sealed partial class AlternatePrayableSystem : EntitySystem
         SubscribeLocalEvent<AlternatePrayableComponent, GetVerbsEvent<InteractionVerb>>(OnGetVerbs);
         SubscribeLocalEvent<AlternatePrayableComponent, AlternatePrayDoAfterEvent>(OnPrayDoAfter);
     }
+
     private void OnGetVerbs(Entity<AlternatePrayableComponent> ent, ref GetVerbsEvent<InteractionVerb> args)
     {
         if (!args.CanAccess
@@ -47,7 +48,7 @@ public sealed partial class AlternatePrayableSystem : EntitySystem
             {
                 StartPrayDoAfter(user, ent, ent.Comp);
             },
-            Text = Loc.GetString("alternate-pray-prompt", ("item",item)),
+            Text = Loc.GetString("alternate-pray-prompt", ("item", item)),
             Icon = new SpriteSpecifier.Rsi(new ResPath("Objects/Specific/Chapel/bible.rsi"), "icon"),
             Priority = 30,
         };
@@ -56,6 +57,7 @@ public sealed partial class AlternatePrayableSystem : EntitySystem
     }
 
     #region Doafter
+
     private void StartPrayDoAfter(EntityUid user, EntityUid nullRod, AlternatePrayableComponent comp)
     {
         if (_timing.CurTime > comp.NextPopup)
@@ -97,5 +99,4 @@ public sealed partial class AlternatePrayableSystem : EntitySystem
     }
 
     #endregion
-
 }

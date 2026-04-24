@@ -34,16 +34,13 @@ public sealed class VehicleSystem : SharedVehicleSystem
 
         SpritePos(ent);
 
-        if(!_sprite.TryGetLayer((ent,spriteComp),0,out var layer, false))
+        if (!_sprite.TryGetLayer((ent, spriteComp), 0, out var layer, false))
             return;
 
         _sprite.LayerSetAutoAnimated(layer, animated);
     }
 
-    private void OnMove(Entity<VehicleComponent> ent, ref MoveEvent args)
-    {
-        SpritePos(ent);
-    }
+    private void OnMove(Entity<VehicleComponent> ent, ref MoveEvent args) => SpritePos(ent);
 
     private void SpritePos(Entity<VehicleComponent> ent)
     {
@@ -51,7 +48,7 @@ public sealed class VehicleSystem : SharedVehicleSystem
             || !_appearance.TryGetData(ent, VehicleState.DrawOver, out _))
             return;
 
-        _sprite.SetDrawDepth((ent, spriteComp), (int)Content.Shared.DrawDepth.DrawDepth.Objects);
+        _sprite.SetDrawDepth((ent, spriteComp), (int) Content.Shared.DrawDepth.DrawDepth.Objects);
 
         if (ent.Comp.RenderOver == VehicleRenderOver.None)
             return;

@@ -6,7 +6,6 @@
 
 using Content.Goobstation.Shared.Silicon.AiCameraWarping;
 using Robust.Client.UserInterface;
-using Serilog;
 
 namespace Content.Goobstation.Client.Silicon.AiCameraWarping.Ui;
 
@@ -33,13 +32,7 @@ public sealed class AiCameraWarpBoundUserInterface(EntityUid owner, Enum uiKey) 
         _menu?.Update(msg);
     }
 
-    public void SendAction(CameraWarpActionEvent action)
-    {
-        SendMessage(new CameraWarpActionMessage(action));
-    }
+    public void SendAction(CameraWarpActionEvent action) => SendMessage(new CameraWarpActionMessage(action));
 
-    public void SendRefresh()
-    {
-        SendMessage(new CameraWarpRefreshActionMessage());
-    }
+    public void SendRefresh() => SendMessage(new CameraWarpRefreshActionMessage());
 }

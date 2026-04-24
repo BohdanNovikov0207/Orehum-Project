@@ -8,30 +8,15 @@ using Robust.Shared.Prototypes;
 
 namespace Content.Goobstation.Shared.Wraith.Components;
 
-[RegisterComponent, NetworkedComponent]
+[RegisterComponent] [NetworkedComponent]
 [AutoGenerateComponentState]
 public sealed partial class AbsorbCorpseComponent : Component
 {
     /// <summary>
-    /// The amount of corpses that have already been absorbed
-    /// </summary>
-    [DataField, AutoNetworkedField]
-    public int CorpsesAbsorbed;
-
-    [DataField]
-    public EntProtoId SmokeProto = "AdminInstantEffectSmoke3";
-
-    /// <summary>
-    /// How much to add to the generation rate of WP of the entity
+    /// Sounds to be played when wraith absorbs someone.
     /// </summary>
     [DataField]
-    public FixedPoint2 WpPassiveAdd = 0.4;
-
-    /// <summary>
-    /// If the target has this much of X chem in their body, it hurts the wraith.
-    /// </summary>
-    [DataField]
-    public FixedPoint2 FormaldehydeThreshhold = 25;
+    public SoundSpecifier? AbsorbSound = new SoundCollectionSpecifier("Wraith_SoulSucc");
 
     /// <summary>
     /// Removes all the formaldehyde from their system.
@@ -40,22 +25,37 @@ public sealed partial class AbsorbCorpseComponent : Component
     public FixedPoint2 ChemToRemove = 999;
 
     /// <summary>
-    ///  Damage to deal to the wraith.
+    /// The amount of corpses that have already been absorbed
+    /// </summary>
+    [DataField] [AutoNetworkedField]
+    public int CorpsesAbsorbed;
+
+    /// <summary>
+    /// Damage to deal to the wraith.
     /// </summary>
     [DataField]
     public DamageSpecifier Damage = new();
 
+    /// <summary>
+    /// If the target has this much of X chem in their body, it hurts the wraith.
+    /// </summary>
+    [DataField]
+    public FixedPoint2 FormaldehydeThreshhold = 25;
+
     [DataField]
     public ProtoId<ReagentPrototype> Reagent = "Formaldehyde";
 
-    /// <summary>
-    /// Sounds to be played when wraith absorbs someone.
-    /// </summary>
     [DataField]
-    public SoundSpecifier? AbsorbSound = new SoundCollectionSpecifier("Wraith_SoulSucc");
+    public EntProtoId SmokeProto = "AdminInstantEffectSmoke3";
 
     [ViewVariables]
     public ProtoId<TagPrototype> Tag = "VimPilot";
+
+    /// <summary>
+    /// How much to add to the generation rate of WP of the entity
+    /// </summary>
+    [DataField]
+    public FixedPoint2 WpPassiveAdd = 0.4;
 }
 
 /// <summary>

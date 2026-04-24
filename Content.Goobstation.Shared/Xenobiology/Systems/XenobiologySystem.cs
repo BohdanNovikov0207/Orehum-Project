@@ -22,24 +22,24 @@ using Robust.Shared.Timing;
 namespace Content.Goobstation.Shared.Xenobiology.Systems;
 
 /// <summary>
-///     This handles the server-side of Xenobiology.
-///     Why is it in shared again if it handles the server-side part?
+/// This handles the server-side of Xenobiology.
+/// Why is it in shared again if it handles the server-side part?
 /// </summary>
 public sealed partial class XenobiologySystem : EntitySystem
 {
+    [Dependency] private readonly SharedAppearanceSystem _appearance = default!;
+    [Dependency] private readonly SharedAudioSystem _audio = default!;
+    [Dependency] private readonly IConfigurationManager _configuration = default!;
+    [Dependency] private readonly SharedContainerSystem _containerSystem = default!;
     [Dependency] private readonly IGameTiming _gameTiming = default!;
     [Dependency] private readonly HungerSystem _hunger = default!;
-    [Dependency] private readonly SharedAppearanceSystem _appearance = default!;
-    [Dependency] private readonly MobStateSystem _mobState = default!;
-    [Dependency] private readonly IRobustRandom _random = default!;
-    [Dependency] private readonly IPrototypeManager _prototypeManager = default!;
-    [Dependency] private readonly MetaDataSystem _metaData = default!;
-    [Dependency] private readonly SharedContainerSystem _containerSystem = default!;
-    [Dependency] private readonly SharedPopupSystem _popup = default!;
-    [Dependency] private readonly SharedAudioSystem _audio = default!;
     [Dependency] private readonly SharedJitteringSystem _jitter = default!;
+    [Dependency] private readonly MetaDataSystem _metaData = default!;
+    [Dependency] private readonly MobStateSystem _mobState = default!;
     [Dependency] private readonly INetManager _net = default!;
-    [Dependency] private readonly IConfigurationManager _configuration = default!;
+    [Dependency] private readonly SharedPopupSystem _popup = default!;
+    [Dependency] private readonly IPrototypeManager _prototypeManager = default!;
+    [Dependency] private readonly IRobustRandom _random = default!;
 
     public override void Initialize()
     {
@@ -74,10 +74,8 @@ public sealed partial class XenobiologySystem : EntitySystem
     /// </summary>
     /// <param name="slime">The slime entity.</param>
     /// <returns>Grey if no breed can be found.</returns>
-    public EntProtoId GetProducedExtract(Entity<SlimeComponent> slime)
-    {
-        return _prototypeManager.TryIndex(slime.Comp.Breed, out var breedPrototype)
+    public EntProtoId GetProducedExtract(Entity<SlimeComponent> slime) =>
+        _prototypeManager.TryIndex(slime.Comp.Breed, out var breedPrototype)
             ? breedPrototype.ProducedExtract
             : slime.Comp.DefaultExtract;
-    }
 }

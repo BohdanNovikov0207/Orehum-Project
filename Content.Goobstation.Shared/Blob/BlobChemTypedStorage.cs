@@ -16,19 +16,24 @@ using Robust.Shared.Serialization;
 namespace Content.Goobstation.Shared.Blob;
 
 #region BlobChemTypedStorage
-[DataDefinition, Serializable, NetSerializable]
+
+[DataDefinition] [Serializable] [NetSerializable]
 public abstract partial class BlobChemTypedStorage<T> : IEnumerable
 {
     [DataField]
     public virtual T BlazingOil { get; set; } = default!;
+
     [DataField]
-    public virtual T ReactiveSpines { get; set; }= default!;
+    public virtual T ReactiveSpines { get; set; } = default!;
+
     [DataField]
-    public virtual T RegenerativeMateria { get; set; }= default!;
+    public virtual T RegenerativeMateria { get; set; } = default!;
+
     [DataField]
-    public virtual T ExplosiveLattice { get; set; }= default!;
+    public virtual T ExplosiveLattice { get; set; } = default!;
+
     [DataField]
-    public virtual T ElectromagneticWeb { get; set; }= default!;
+    public virtual T ElectromagneticWeb { get; set; } = default!;
 
     // Indexer to access fields via BlobChemType enumeration
     [Pure]
@@ -41,7 +46,7 @@ public abstract partial class BlobChemTypedStorage<T> : IEnumerable
             BlobChemType.RegenerativeMateria => RegenerativeMateria,
             BlobChemType.ExplosiveLattice => ExplosiveLattice,
             BlobChemType.ElectromagneticWeb => ElectromagneticWeb,
-            _ => throw new ArgumentOutOfRangeException(nameof(type), $"Unknown chemical type: {type}")
+            _ => throw new ArgumentOutOfRangeException(nameof(type), $"Unknown chemical type: {type}"),
         };
         set
         {
@@ -68,11 +73,10 @@ public abstract partial class BlobChemTypedStorage<T> : IEnumerable
         }
     }
 
+    IEnumerator IEnumerable.GetEnumerator() => GetEnumerator();
+
     // Method for adding a value
-    public void Add(BlobChemType key, T value)
-    {
-        this[key] = value;
-    }
+    public void Add(BlobChemType key, T value) => this[key] = value;
 
     // Realization IEnumerable
     public IEnumerator<KeyValuePair<BlobChemType, T>> GetEnumerator()
@@ -83,19 +87,16 @@ public abstract partial class BlobChemTypedStorage<T> : IEnumerable
         yield return new KeyValuePair<BlobChemType, T>(BlobChemType.ExplosiveLattice, ExplosiveLattice);
         yield return new KeyValuePair<BlobChemType, T>(BlobChemType.ElectromagneticWeb, ElectromagneticWeb);
     }
-
-    IEnumerator IEnumerable.GetEnumerator() => GetEnumerator();
 }
+
 #endregion
 
-[DataDefinition, Serializable, NetSerializable]
+[DataDefinition] [Serializable] [NetSerializable]
 public sealed partial class BlobChemColors : BlobChemTypedStorage<Color>
 {
-
 }
 
-[DataDefinition, Serializable, NetSerializable]
+[DataDefinition] [Serializable] [NetSerializable]
 public sealed partial class BlobChemDamage : BlobChemTypedStorage<DamageSpecifier>
 {
-
 }

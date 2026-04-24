@@ -31,22 +31,22 @@ namespace Content.Goobstation.Server.Shadowling.Systems;
 /// </summary>
 public sealed class ShadowlingAscensionEggSystem : EntitySystem
 {
-    [Dependency] private readonly EntityStorageSystem _entityStorage = default!;
-    [Dependency] private readonly IGameTiming _timing = default!;
-    [Dependency] private readonly IPrototypeManager _protoMan = default!;
-    [Dependency] private readonly SharedPopupSystem _popup = default!;
     [Dependency] private readonly SharedActionsSystem _actions = default!;
-    [Dependency] private readonly PolymorphSystem _polymorph = default!;
-    [Dependency] private readonly ShadowlingSystem _shadowling = default!;
-    [Dependency] private readonly SharedTransformSystem _transform = default!;
-    [Dependency] private readonly PoweredLightSystem _poweredLight = default!;
-    [Dependency] private readonly NavMapSystem _navMap = default!;
-    [Dependency] private readonly SharedAudioSystem _audio = default!;
-    [Dependency] private readonly StationSystem _station = default!;
     [Dependency] private readonly AlertLevelSystem _alertLevel = default!;
+    [Dependency] private readonly SharedAudioSystem _audio = default!;
     [Dependency] private readonly ChatSystem _chatSystem = default!;
     [Dependency] private readonly DamageableSystem _damageable = default!;
+    [Dependency] private readonly EntityStorageSystem _entityStorage = default!;
     [Dependency] private readonly ServerGlobalSoundSystem _globalSound = default!;
+    [Dependency] private readonly NavMapSystem _navMap = default!;
+    [Dependency] private readonly PolymorphSystem _polymorph = default!;
+    [Dependency] private readonly SharedPopupSystem _popup = default!;
+    [Dependency] private readonly PoweredLightSystem _poweredLight = default!;
+    [Dependency] private readonly IPrototypeManager _protoMan = default!;
+    [Dependency] private readonly ShadowlingSystem _shadowling = default!;
+    [Dependency] private readonly StationSystem _station = default!;
+    [Dependency] private readonly IGameTiming _timing = default!;
+    [Dependency] private readonly SharedTransformSystem _transform = default!;
 
     public override void Initialize()
     {
@@ -92,7 +92,9 @@ public sealed class ShadowlingAscensionEggSystem : EntitySystem
             {
                 Act = () => TryAscend(args.User, args.Target, component),
                 Text = Loc.GetString(component.VerbName),
-                Icon = new SpriteSpecifier.Texture(new ResPath("/Textures/Interface/VerbIcons/settings.svg.192dpi.png")) //todo: custom icon
+                Icon =
+                    new SpriteSpecifier.Texture(
+                        new ResPath("/Textures/Interface/VerbIcons/settings.svg.192dpi.png")), //todo: custom icon
             });
     }
 
@@ -141,13 +143,16 @@ public sealed class ShadowlingAscensionEggSystem : EntitySystem
         {
             if (sling.CurrentPhase == ShadowlingPhases.Ascension)
             {
-                _popup.PopupEntity(Loc.GetString("shadowling-ascension-already-ascended"), uid, uid, PopupType.MediumCaution);
+                _popup.PopupEntity(Loc.GetString("shadowling-ascension-already-ascended"),
+                    uid,
+                    uid,
+                    PopupType.MediumCaution);
                 return;
             }
 
             if (sling.IsAscending)
             {
-                _popup.PopupEntity(Loc.GetString("shadowling-ascension-ascending"), uid,uid, PopupType.MediumCaution);
+                _popup.PopupEntity(Loc.GetString("shadowling-ascension-ascending"), uid, uid, PopupType.MediumCaution);
                 return;
             }
         }
@@ -263,6 +268,9 @@ public sealed class ShadowlingAscensionEggSystem : EntitySystem
             Color.Red);
 
         // Begin Global Sound
-        _globalSound.DispatchStationEventMusic(uid, component.AscensionTheme, StationEventMusicType.ShadowLing, AudioParams.Default.WithLoop(true));
+        _globalSound.DispatchStationEventMusic(uid,
+            component.AscensionTheme,
+            StationEventMusicType.ShadowLing,
+            AudioParams.Default.WithLoop(true));
     }
 }

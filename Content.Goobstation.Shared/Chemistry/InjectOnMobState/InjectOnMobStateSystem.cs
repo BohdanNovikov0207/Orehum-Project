@@ -32,9 +32,9 @@ public sealed class InjectOnMobStateSystem : EntitySystem
         if (!_solutionContainers.TryGetInjectableSolution(ent.Owner, out var targetSoln, out var targetSolution))
             return;
 
-        var solution = new Solution()
+        var solution = new Solution
         {
-            MaxVolume = targetSolution.AvailableVolume
+            MaxVolume = targetSolution.AvailableVolume,
         };
 
         foreach (var item in ent.Comp.Reagents)

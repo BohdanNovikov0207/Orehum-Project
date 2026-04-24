@@ -1,3 +1,5 @@
+using System.Diagnostics.CodeAnalysis;
+using System.Linq;
 using Content.Goobstation.Shared.Alert.Events;
 using Content.Goobstation.Shared.InternalResources.Components;
 using Content.Goobstation.Shared.InternalResources.Data;
@@ -5,35 +7,32 @@ using Content.Goobstation.Shared.InternalResources.Events;
 using Content.Shared.Alert;
 using Robust.Shared.Prototypes;
 using Robust.Shared.Timing;
-using System.Diagnostics.CodeAnalysis;
-using System.Linq;
 
 namespace Content.Goobstation.Shared.InternalResources.EntitySystems;
+
 public abstract class SharedInternalResourcesSystem : EntitySystem
 {
+    [Dependency] private readonly AlertsSystem _alertsSystem = default!;
     [Dependency] private readonly IGameTiming _gameTiming = default!;
     [Dependency] private readonly IPrototypeManager _protoMan = default!;
-    [Dependency] private readonly AlertsSystem _alertsSystem = default!;
 
     private readonly TimeSpan _systemUpdateRate = TimeSpan.FromSeconds(1);
     private TimeSpan _systemNextUpdate = TimeSpan.Zero;
 
     public override void Initialize()
     {
-        SubscribeLocalEvent<InternalResourcesComponent, InternalResourcesAmountChangedEvent>(OnInternalResourcesAmountChanged);
-        SubscribeLocalEvent<InternalResourcesComponent, InternalResourcesCapacityChangedEvent>(OnInternalResourcesCapacityChanged);
+        SubscribeLocalEvent<InternalResourcesComponent, InternalResourcesAmountChangedEvent>(
+            OnInternalResourcesAmountChanged);
+        SubscribeLocalEvent<InternalResourcesComponent, InternalResourcesCapacityChangedEvent>(
+            OnInternalResourcesCapacityChanged);
         SubscribeLocalEvent<InternalResourcesComponent, GetValueRelatedAlertValuesEvent>(OnAlertGetValues);
     }
 
-    private void OnInternalResourcesAmountChanged(Entity<InternalResourcesComponent> entity, ref InternalResourcesAmountChangedEvent args)
-    {
-        UpdateAppearance(entity, args.Data.InternalResourcesType);
-    }
+    private void OnInternalResourcesAmountChanged(Entity<InternalResourcesComponent> entity,
+        ref InternalResourcesAmountChangedEvent args) => UpdateAppearance(entity, args.Data.InternalResourcesType);
 
-    private void OnInternalResourcesCapacityChanged(Entity<InternalResourcesComponent> entity, ref InternalResourcesCapacityChangedEvent args)
-    {
-        UpdateAppearance(entity, args.Data.InternalResourcesType);
-    }
+    private void OnInternalResourcesCapacityChanged(Entity<InternalResourcesComponent> entity,
+        ref InternalResourcesCapacityChangedEvent args) => UpdateAppearance(entity, args.Data.InternalResourcesType);
 
     private void OnAlertGetValues(Entity<InternalResourcesComponent> entity, ref GetValueRelatedAlertValuesEvent args)
     {
@@ -52,7 +51,8 @@ public abstract class SharedInternalResourcesSystem : EntitySystem
     /// <summary>
     /// Updates internal resources alert
     /// </summary>
-    private void UpdateAppearance(Entity<InternalResourcesComponent> entity, ProtoId<InternalResourcesPrototype> protoId)
+    private void UpdateAppearance(Entity<InternalResourcesComponent> entity,
+        ProtoId<InternalResourcesPrototype> protoId)
     {
         if (!_protoMan.TryIndex(protoId, out var proto))
             return;
@@ -68,7 +68,10 @@ public abstract class SharedInternalResourcesSystem : EntitySystem
     /// <summary>
     /// Updates amount of given resources by float amount with given protoId
     /// </summary>
-    public bool TryUpdateResourcesAmount(EntityUid uid, string protoId, float amount, InternalResourcesComponent? component = null)
+    public bool TryUpdateResourcesAmount(EntityUid uid,
+        string protoId,
+        float amount,
+        InternalResourcesComponent? component = null)
     {
         if (!Resolve(uid, ref component) || amount == 0)
             return false;
@@ -82,7 +85,10 @@ public abstract class SharedInternalResourcesSystem : EntitySystem
     /// <summary>
     /// Updates amount of given resources by float amount with given internal resources data
     /// </summary>
-    public bool TryUpdateResourcesAmount(EntityUid uid, InternalResourcesData data, float amount, InternalResourcesComponent? component = null)
+    public bool TryUpdateResourcesAmount(EntityUid uid,
+        InternalResourcesData data,
+        float amount,
+        InternalResourcesComponent? component = null)
     {
         if (!Resolve(uid, ref component) || amount == 0)
             return false;
@@ -113,7 +119,10 @@ public abstract class SharedInternalResourcesSystem : EntitySystem
     /// Updates the capacity of a resource by a float amount with a given protoId
     /// Does not SET the capacity - just adds the given value.
     /// </summary>
-    public bool TryUpdateResourcesCapacity(EntityUid uid, string protoId, float amount, InternalResourcesComponent? component = null)
+    public bool TryUpdateResourcesCapacity(EntityUid uid,
+        string protoId,
+        float amount,
+        InternalResourcesComponent? component = null)
     {
         if (!Resolve(uid, ref component)
             || !component.HasResourceData(protoId, out var data))
@@ -126,7 +135,10 @@ public abstract class SharedInternalResourcesSystem : EntitySystem
     /// Updates the capacity of a resource by a float amount with a given internal resources data.
     /// Does not SET the capacity - just adds the given value.
     /// </summary>
-    public bool TryUpdateResourcesCapacity(EntityUid uid, InternalResourcesData data, float amount, InternalResourcesComponent? component = null)
+    public bool TryUpdateResourcesCapacity(EntityUid uid,
+        InternalResourcesData data,
+        float amount,
+        InternalResourcesComponent? component = null)
     {
         if (!Resolve(uid, ref component)
             || !component.CurrentInternalResources.Contains(data))
@@ -148,7 +160,10 @@ public abstract class SharedInternalResourcesSystem : EntitySystem
     /// <summary>
     /// Sets the capacity of a resource using a float amount with a given protoId
     /// </summary>
-    public bool TrySetResourcesCapacity(EntityUid uid, string protoId, float capacity, InternalResourcesComponent? component = null)
+    public bool TrySetResourcesCapacity(EntityUid uid,
+        string protoId,
+        float capacity,
+        InternalResourcesComponent? component = null)
     {
         if (!Resolve(uid, ref component)
             || !component.HasResourceData(protoId, out var data))
@@ -160,7 +175,10 @@ public abstract class SharedInternalResourcesSystem : EntitySystem
     /// <summary>
     /// Sets the capacity of a resource using a float amount with a given internal resources data.
     /// </summary>
-    public bool TrySetResourcesCapacity(EntityUid uid, InternalResourcesData data, float capacity, InternalResourcesComponent? component = null)
+    public bool TrySetResourcesCapacity(EntityUid uid,
+        InternalResourcesData data,
+        float capacity,
+        InternalResourcesComponent? component = null)
     {
         if (!Resolve(uid, ref component)
             || !component.CurrentInternalResources.Contains(data))
@@ -182,13 +200,16 @@ public abstract class SharedInternalResourcesSystem : EntitySystem
     /// <summary>
     /// Tries to add internal resources type to entity by protoId.
     /// </summary>
-    public bool TryAddInternalResources(EntityUid uid, string protoId, [NotNullWhen(true)] out InternalResourcesData? data)
+    public bool TryAddInternalResources(EntityUid uid,
+        string protoId,
+        [NotNullWhen(true)] out InternalResourcesData? data)
     {
         data = null;
 
         if (!_protoMan.TryIndex<InternalResourcesPrototype>(protoId, out var proto))
         {
-            Log.Debug($"Failed to add {protoId} internal resource type to entity {ToPrettyString(uid):uid}. Internal resource prototype does not exist.");
+            Log.Debug(
+                $"Failed to add {protoId} internal resource type to entity {ToPrettyString(uid):uid}. Internal resource prototype does not exist.");
             return false;
         }
 
@@ -207,7 +228,8 @@ public abstract class SharedInternalResourcesSystem : EntitySystem
 
         if (!_protoMan.TryIndex<InternalResourcesPrototype>(protoId, out var proto))
         {
-            Log.Debug($"Failed to remove {protoId} internal resource type from entity {ToPrettyString(uid):uid}. Internal resource prototype does not exist.");
+            Log.Debug(
+                $"Failed to remove {protoId} internal resource type from entity {ToPrettyString(uid):uid}. Internal resource prototype does not exist.");
             return;
         }
 
@@ -218,7 +240,9 @@ public abstract class SharedInternalResourcesSystem : EntitySystem
     /// Ensures that entity have InternalResourcesComponent and adds internal resources type to it.
     /// Returns true if entity already had this internal resource type.
     /// </summary>
-    public bool EnsureInternalResources(EntityUid uid, InternalResourcesPrototype proto, out InternalResourcesData? data)
+    public bool EnsureInternalResources(EntityUid uid,
+        InternalResourcesPrototype proto,
+        out InternalResourcesData? data)
     {
         data = null;
 
@@ -266,7 +290,10 @@ public abstract class SharedInternalResourcesSystem : EntitySystem
     /// <summary>
     /// Check if user has internal resources type
     /// </summary>
-    public bool TryGetResourceType(EntityUid uid, ProtoId<InternalResourcesPrototype> type, [NotNullWhen(true)] out InternalResourcesData? data, InternalResourcesComponent? component = null)
+    public bool TryGetResourceType(EntityUid uid,
+        ProtoId<InternalResourcesPrototype> type,
+        [NotNullWhen(true)] out InternalResourcesData? data,
+        InternalResourcesComponent? component = null)
     {
         data = null;
 

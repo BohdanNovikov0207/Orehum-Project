@@ -23,22 +23,21 @@ using Robust.Shared.Audio;
 using Robust.Shared.Audio.Systems;
 using Robust.Shared.Prototypes;
 
-namespace Content.Goobstation.Shared.EntityEffects
+namespace Content.Goobstation.Shared.EntityEffects;
+
+public sealed partial class PlaySoundEffect : EntityEffect
 {
-    public sealed partial class PlaySoundEffect : EntityEffect
+    [DataField(required: true)]
+    public SoundSpecifier Sound;
+
+    protected override string? ReagentEffectGuidebookText(IPrototypeManager prototype, IEntitySystemManager entSys)
+        => null;
+
+    public override void Effect(EntityEffectBaseArgs args)
     {
-        [DataField(required: true)]
-        public SoundSpecifier Sound;
+        var transform = args.EntityManager.GetComponent<TransformComponent>(args.TargetEntity);
+        var audioSys = args.EntityManager.EntitySysManager.GetEntitySystem<SharedAudioSystem>();
 
-        protected override string? ReagentEffectGuidebookText(IPrototypeManager prototype, IEntitySystemManager entSys)
-            => null;
-
-        public override void Effect(EntityEffectBaseArgs args)
-        {
-            var transform = args.EntityManager.GetComponent<TransformComponent>(args.TargetEntity);
-            var audioSys = args.EntityManager.EntitySysManager.GetEntitySystem<SharedAudioSystem>();
-
-            audioSys.PlayPredicted(Sound, transform.Coordinates, args.TargetEntity);
-        }
+        audioSys.PlayPredicted(Sound, transform.Coordinates, args.TargetEntity);
     }
 }

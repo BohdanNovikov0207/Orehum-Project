@@ -3,11 +3,8 @@
 //
 // SPDX-License-Identifier: AGPL-3.0-or-later
 
-using System;
-using System.Diagnostics.Contracts;
 using System.Text;
 using Robust.Client.Graphics;
-using Robust.Shared.Log;
 using Robust.Shared.Utility;
 
 namespace Content.Goobstation.UIKit.UserInterface.Controls;
@@ -20,16 +17,23 @@ internal struct CustomWordWrap
     private readonly float _maxSizeX;
 
     public float MaxUsedWidth;
+
     // Index we put into the LineBreaks list when a line break should occur.
     public int BreakIndexCounter;
+
     public int NextBreakIndexCounter;
+
     // If the CURRENT processing word ends up too long, this is the index to put a line break.
     public (int index, float lineSize)? WordStartBreakIndex;
+
     // Word size in pixels.
     public int WordSizePixels;
+
     // The horizontal position of the text cursor.
     public int PosX;
+
     public Rune LastRune;
+
     // If a word is larger than maxSizeX, we split it.
     // We need to keep track of some data to split it into two words.
     public (int breakIndex, int wordSizePixels)? ForceSplitData = null;
@@ -105,9 +109,7 @@ internal struct CustomWordWrap
             return;
 
         if (!ForceSplitData.HasValue)
-        {
             ForceSplitData = (BreakIndexCounter, oldWordSizePixels);
-        }
 
         // Oh hey we get to break a word that doesn't fit on a single line.
         if (WordSizePixels > _maxSizeX)
@@ -168,12 +170,9 @@ internal struct CustomWordWrap
             MaxUsedWidth = Math.Max(MaxUsedWidth, PosX);
         }
 
-        return (int)MaxUsedWidth;
+        return (int) MaxUsedWidth;
     }
 
-    private static bool IsWordBoundary(Rune a, Rune b)
-    {
-        return a == new Rune(' ') || b == new Rune(' ') || a == new Rune('-') || b == new Rune('-');
-    }
-
+    private static bool IsWordBoundary(Rune a, Rune b) =>
+        a == new Rune(' ') || b == new Rune(' ') || a == new Rune('-') || b == new Rune('-');
 }

@@ -33,4 +33,4 @@ public sealed class CheeseAccentSystem : EntitySystem
 
         args.Message = message;
     }
-};
+}

@@ -6,14 +6,20 @@ namespace Content.Goobstation.Shared.Shadowling.Components.Abilities.PreAscensio
 /// <summary>
 /// This is used for the Glare Ability
 /// </summary>
-[RegisterComponent, NetworkedComponent]
+[RegisterComponent] [NetworkedComponent]
 public sealed partial class ShadowlingGlareComponent : Component
 {
+    [DataField]
+    public EntityUid? ActionEnt;
+
     [DataField]
     public EntProtoId ActionId = "ActionGlare";
 
     [DataField]
-    public EntityUid? ActionEnt;
+    public bool ActivateGlareTimer;
+
+    [DataField]
+    public EntProtoId EffectGlare = "ShadowlingGlareEffect";
 
     // <summary>
     // Variable stun time. On distance 1 or lower, it is maximized to 4 seconds of stun (enough to Enthrall),
@@ -21,6 +27,9 @@ public sealed partial class ShadowlingGlareComponent : Component
     // </summary>
     [DataField]
     public float GlareStunTime;
+
+    [DataField]
+    public EntityUid GlareTarget;
 
     // <summary>
     // Variable activation time. On distance 1 or lower, it is immediate,
@@ -31,26 +40,17 @@ public sealed partial class ShadowlingGlareComponent : Component
     [DataField]
     public float GlareTimeBeforeEffect;
 
-    [DataField]
-    public float MaxGlareDistance = 10f;
-
-    [DataField]
-    public float MinGlareDistance = 1f;
-
-    [DataField]
-    public float MaxGlareStunTime = 6f;
-
-    [DataField]
-    public float SlowTime = 7f;
-
-    [DataField]
-    public float MuteTime = 6f;
-
     // <summary>
     // Regarding time delay before activation
     // </summary>
     [DataField]
     public float MaxGlareDelay = 2f;
+
+    [DataField]
+    public float MaxGlareDistance = 10f;
+
+    [DataField]
+    public float MaxGlareStunTime = 6f;
 
     // <summary>
     // Regarding time delay before activation
@@ -59,11 +59,11 @@ public sealed partial class ShadowlingGlareComponent : Component
     public float MinGlareDelay = 0.1f;
 
     [DataField]
-    public EntityUid GlareTarget;
+    public float MinGlareDistance = 1f;
 
     [DataField]
-    public bool ActivateGlareTimer;
+    public float MuteTime = 6f;
 
     [DataField]
-    public EntProtoId EffectGlare = "ShadowlingGlareEffect";
+    public float SlowTime = 7f;
 }

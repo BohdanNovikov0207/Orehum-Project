@@ -5,12 +5,12 @@ namespace Content.Goobstation.Shared.Alert.Components;
 /// <summary>
 /// Generic component for alerts that have needs to update when some value in some component changes.
 /// </summary>
-[RegisterComponent, NetworkedComponent]
+[RegisterComponent] [NetworkedComponent]
 public sealed partial class ValueRelatedAlertComponent : Component
 {
     [DataField]
-    public short MaxSeverity = 0;
+    public string IconPrefix = "";
 
     [DataField]
-    public string IconPrefix = "";
+    public short MaxSeverity = 0;
 }

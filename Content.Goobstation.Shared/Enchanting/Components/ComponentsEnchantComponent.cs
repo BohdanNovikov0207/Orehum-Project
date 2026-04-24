@@ -3,14 +3,13 @@
 //
 // SPDX-License-Identifier: AGPL-3.0-or-later
 
-using Content.Goobstation.Shared.Enchanting.Systems;
 using Robust.Shared.GameStates;
 using Robust.Shared.Prototypes;
 
 namespace Content.Goobstation.Shared.Enchanting.Components;
 
 /// <summary>
-[RegisterComponent, NetworkedComponent, Access(typeof(ComponentsEnchantComponent))]
+[RegisterComponent] [NetworkedComponent] [Access(typeof(ComponentsEnchantComponent))]
 [EntityCategory("Enchants")]
 public sealed partial class ComponentsEnchantComponent : Component
 {

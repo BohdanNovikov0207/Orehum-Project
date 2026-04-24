@@ -14,7 +14,7 @@ using Robust.Shared.Prototypes;
 
 namespace Content.Goobstation.Server.Emoting;
 
-public sealed partial class AnimatedEmotesSystem : SharedAnimatedEmotesSystem
+public sealed class AnimatedEmotesSystem : SharedAnimatedEmotesSystem
 {
     public override void Initialize()
     {
@@ -23,10 +23,8 @@ public sealed partial class AnimatedEmotesSystem : SharedAnimatedEmotesSystem
         SubscribeLocalEvent<AnimatedEmotesComponent, EmoteEvent>(OnEmote);
     }
 
-    private void OnEmote(Entity<AnimatedEmotesComponent> ent, ref EmoteEvent args)
-    {
+    private void OnEmote(Entity<AnimatedEmotesComponent> ent, ref EmoteEvent args) =>
         PlayEmoteAnimation(ent, args.Emote.ID);
-    }
 
     public void PlayEmoteAnimation(Entity<AnimatedEmotesComponent> ent, ProtoId<EmotePrototype> prot)
     {

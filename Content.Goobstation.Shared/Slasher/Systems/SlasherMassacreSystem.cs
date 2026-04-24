@@ -1,30 +1,30 @@
+using System.Diagnostics.CodeAnalysis;
+using Content.Goobstation.Maths.FixedPoint;
 using Content.Goobstation.Shared.Slasher.Components;
 using Content.Goobstation.Shared.Slasher.Events;
 using Content.Shared._Shitmed.Medical.Surgery.Wounds.Components;
 using Content.Shared._Shitmed.Medical.Surgery.Wounds.Systems;
 using Content.Shared.Actions;
+using Content.Shared.Body.Components;
 using Content.Shared.Body.Part;
 using Content.Shared.Body.Systems;
-using Content.Shared.Body.Components;
+using Content.Shared.Chemistry.Components;
 using Content.Shared.Chemistry.EntitySystems;
 using Content.Shared.Chemistry.Reagent;
-using Content.Shared.Chemistry.Components;
 using Content.Shared.Damage;
-using Content.Shared.Mobs.Systems;
-using Content.Shared.Mobs;
-using Content.Shared.Movement.Systems;
-using Content.Shared.Popups;
-using Content.Shared.Weapons.Melee.Events;
-using Content.Shared.Weapons.Melee;
 using Content.Shared.Hands.Components;
 using Content.Shared.Hands.EntitySystems;
+using Content.Shared.Humanoid;
+using Content.Shared.Mobs;
+using Content.Shared.Mobs.Systems;
+using Content.Shared.Movement.Systems;
+using Content.Shared.Popups;
+using Content.Shared.Weapons.Melee;
+using Content.Shared.Weapons.Melee.Events;
 using Robust.Shared.Audio.Systems;
 using Robust.Shared.Network;
 using Robust.Shared.Random;
 using Robust.Shared.Timing;
-using Content.Shared.Humanoid;
-using Content.Goobstation.Maths.FixedPoint;
-using System.Diagnostics.CodeAnalysis;
 
 namespace Content.Goobstation.Shared.Slasher.Systems;
 
@@ -33,18 +33,18 @@ namespace Content.Goobstation.Shared.Slasher.Systems;
 /// </summary>
 public sealed class SlasherMassacreSystem : EntitySystem
 {
-    [Dependency] private readonly SharedPopupSystem _popup = default!;
-    [Dependency] private readonly SharedBodySystem _body = default!;
-    [Dependency] private readonly WoundSystem _wounds = default!;
-    [Dependency] private readonly IRobustRandom _random = default!;
-    [Dependency] private readonly MobStateSystem _mobState = default!;
-    [Dependency] private readonly INetManager _net = default!;
-    [Dependency] private readonly SharedAudioSystem _audio = default!;
     [Dependency] private readonly SharedActionsSystem _actions = default!;
+    [Dependency] private readonly SharedAudioSystem _audio = default!;
+    [Dependency] private readonly SharedBodySystem _body = default!;
+    [Dependency] private readonly SharedHandsSystem _hands = default!;
+    [Dependency] private readonly MobStateSystem _mobState = default!;
     [Dependency] private readonly MovementSpeedModifierSystem _movementSpeed = default!;
+    [Dependency] private readonly INetManager _net = default!;
+    [Dependency] private readonly SharedPopupSystem _popup = default!;
+    [Dependency] private readonly IRobustRandom _random = default!;
     [Dependency] private readonly SharedSolutionContainerSystem _solutions = default!;
     [Dependency] private readonly IGameTiming _timing = default!;
-    [Dependency] private readonly SharedHandsSystem _hands = default!;
+    [Dependency] private readonly WoundSystem _wounds = default!;
 
     public override void Initialize()
     {
@@ -90,7 +90,10 @@ public sealed class SlasherMassacreSystem : EntitySystem
             ent.Comp.CurrentVictim = null;
             ent.Comp.LastAttackTime = _timing.CurTime;
 
-            _popup.PopupPredicted(Loc.GetString("slasher-massacre-start"), ent.Owner, ent.Owner, PopupType.MediumCaution);
+            _popup.PopupPredicted(Loc.GetString("slasher-massacre-start"),
+                ent.Owner,
+                ent.Owner,
+                PopupType.MediumCaution);
             _audio.PlayPredicted(ent.Comp.MassacreIntro, ent.Owner, ent.Owner);
 
             _actions.StartUseDelay((EntityUid?) args.Action);
@@ -102,7 +105,11 @@ public sealed class SlasherMassacreSystem : EntitySystem
             }
         }
         else
-            _popup.PopupEntity(Loc.GetString("slasher-massacre-already-activated"), ent.Owner, ent.Owner, PopupType.Medium);
+            _popup.PopupEntity(Loc.GetString("slasher-massacre-already-activated"),
+                ent.Owner,
+                ent.Owner,
+                PopupType.Medium);
+
         Dirty(ent);
     }
 
@@ -141,7 +148,10 @@ public sealed class SlasherMassacreSystem : EntitySystem
             && userComp.HitCount >= 1)
         {
             _audio.PlayPredicted(comp.MassacreFinale, comp.Attacker.Value, comp.Attacker.Value);
-            _popup.PopupPredicted(Loc.GetString("slasher-massacre-decap"), comp.Attacker.Value, comp.Attacker.Value, PopupType.MediumCaution);
+            _popup.PopupPredicted(Loc.GetString("slasher-massacre-decap"),
+                comp.Attacker.Value,
+                comp.Attacker.Value,
+                PopupType.MediumCaution);
 
             ApplyKillBonuses(comp.Attacker.Value, userComp.HitCount, comp.WeaponComp);
 
@@ -195,7 +205,10 @@ public sealed class SlasherMassacreSystem : EntitySystem
         if (userComp.CurrentVictim != null
             && userComp.CurrentVictim != victim.Value)
         {
-            _popup.PopupPredicted(Loc.GetString("slasher-massacre-target-change"), args.User, args.User, PopupType.MediumCaution);
+            _popup.PopupPredicted(Loc.GetString("slasher-massacre-target-change"),
+                args.User,
+                args.User,
+                PopupType.MediumCaution);
 
             // Remove victim component from old target
             if (TryComp<SlasherMassacreVictimComponent>(userComp.CurrentVictim.Value, out _))
@@ -228,13 +241,17 @@ public sealed class SlasherMassacreSystem : EntitySystem
         // Limb severing phase. sever every 4 hits.
         if (userComp.HitCount >= weaponEnt.Comp.LimbSeverHits
             && userComp.HitCount % weaponEnt.Comp.LimbSeverHits == 0)
+        {
             if (TrySeverRandomLimb(victim.Value))
                 playedDelimb = true;
+        }
 
         // Decapitation.
         if (userComp.HitCount == weaponEnt.Comp.DecapitateHit)
+        {
             if (Decapitate(victim.Value))
                 playedDelimb = true;
+        }
 
         // Audio handling
         if (_net.IsServer)
@@ -281,11 +298,15 @@ public sealed class SlasherMassacreSystem : EntitySystem
 
         // Apply healing via slasherium
         if (healAmount > 0 && TryComp<BloodstreamComponent>(user, out var bloodstream))
+        {
             if (_solutions.ResolveSolution(user, bloodstream.ChemicalSolutionName, ref bloodstream.ChemicalSolution))
+            {
                 _solutions.TryAddReagent(bloodstream.ChemicalSolution.Value,
                     new ReagentId(comp.HealReagent, null),
                     FixedPoint2.New(healAmount),
                     out _);
+            }
+        }
     }
 
     // Handles severing a random limb.
@@ -295,8 +316,10 @@ public sealed class SlasherMassacreSystem : EntitySystem
         var severable = new List<EntityUid>();
 
         foreach (var part in parts)
+        {
             if (part.Component.PartType is BodyPartType.Arm or BodyPartType.Leg)
                 severable.Add(part.Id);
+        }
 
         if (severable.Count == 0)
             return false;
@@ -332,6 +355,7 @@ public sealed class SlasherMassacreSystem : EntitySystem
                     break;
             }
         }
+
         if (head == null || chest == null)
             return false;
         _wounds.AmputateWoundable(chest.Value, head.Value);
@@ -341,7 +365,9 @@ public sealed class SlasherMassacreSystem : EntitySystem
     /// <summary>
     /// Tries to get the machete held by the user.
     /// </summary>
-    private bool TryGetMachete(EntityUid user, out EntityUid weaponUid, [NotNullWhen(true)] out MeleeWeaponComponent? melee)
+    private bool TryGetMachete(EntityUid user,
+        out EntityUid weaponUid,
+        [NotNullWhen(true)] out MeleeWeaponComponent? melee)
     {
         weaponUid = default;
         melee = null;
@@ -350,12 +376,14 @@ public sealed class SlasherMassacreSystem : EntitySystem
             return false;
 
         foreach (var held in _hands.EnumerateHeld((user, hands)))
+        {
             if (HasComp<SlasherMassacreMacheteComponent>(held) && TryComp<MeleeWeaponComponent>(held, out var weapon))
             {
                 weaponUid = held;
                 melee = weapon;
                 return true;
             }
+        }
 
         return false;
     }

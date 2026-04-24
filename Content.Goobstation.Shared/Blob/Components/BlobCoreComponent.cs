@@ -10,9 +10,9 @@
 //
 // SPDX-License-Identifier: AGPL-3.0-or-later
 
+using Content.Goobstation.Maths.FixedPoint;
 using Content.Shared.Damage;
 using Content.Shared.Explosion;
-using Content.Goobstation.Maths.FixedPoint;
 using Robust.Shared.Audio;
 using Robust.Shared.GameStates;
 using Robust.Shared.Prototypes;
@@ -20,9 +20,70 @@ using Robust.Shared.Serialization;
 
 namespace Content.Goobstation.Shared.Blob.Components;
 
-[RegisterComponent, NetworkedComponent, AutoGenerateComponentState]
+[RegisterComponent] [NetworkedComponent] [AutoGenerateComponentState]
 public sealed partial class BlobCoreComponent : Component
 {
+    #region Damage Specifiers
+
+    [ViewVariables(VVAccess.ReadWrite)] [AutoNetworkedField]
+    public BlobChemDamage ChemDamageDict { get; set; } = new()
+    {
+        {
+            BlobChemType.BlazingOil, new DamageSpecifier
+            {
+                DamageDict = new Dictionary<string, FixedPoint2>
+                {
+                    { "Heat", 15 },
+                    { "Structural", 150 },
+                },
+            }
+        },
+        {
+            BlobChemType.ReactiveSpines, new DamageSpecifier
+            {
+                DamageDict = new Dictionary<string, FixedPoint2>
+                {
+                    { "Blunt", 8 },
+                    { "Slash", 8 },
+                    { "Piercing", 8 },
+                    { "Structural", 150 },
+                },
+            }
+        },
+        {
+            BlobChemType.ExplosiveLattice, new DamageSpecifier
+            {
+                DamageDict = new Dictionary<string, FixedPoint2>
+                {
+                    { "Heat", 5 },
+                    { "Structural", 150 },
+                },
+            }
+        },
+        {
+            BlobChemType.ElectromagneticWeb, new DamageSpecifier
+            {
+                DamageDict = new Dictionary<string, FixedPoint2>
+                {
+                    { "Structural", 150 },
+                    { "Heat", 20 },
+                },
+            }
+        },
+        {
+            BlobChemType.RegenerativeMateria, new DamageSpecifier
+            {
+                DamageDict = new Dictionary<string, FixedPoint2>
+                {
+                    { "Structural", 150 },
+                    { "Poison", 15 },
+                },
+            }
+        },
+    };
+
+    #endregion
+
     #region Live Data
 
     [ViewVariables]
@@ -61,77 +122,16 @@ public sealed partial class BlobCoreComponent : Component
 
     #endregion
 
-    #region Damage Specifiers
-
-    [ViewVariables(VVAccess.ReadWrite), AutoNetworkedField]
-    public BlobChemDamage ChemDamageDict { get; set; } = new()
-    {
-        {
-            BlobChemType.BlazingOil, new DamageSpecifier()
-            {
-                DamageDict = new Dictionary<string, FixedPoint2>
-                {
-                    { "Heat", 15 },
-                    { "Structural", 150 },
-                }
-            }
-        },
-        {
-            BlobChemType.ReactiveSpines, new DamageSpecifier()
-            {
-                DamageDict = new Dictionary<string, FixedPoint2>
-                {
-                    { "Blunt", 8 },
-                    { "Slash", 8 },
-                    { "Piercing", 8 },
-                    { "Structural", 150 },
-                }
-            }
-        },
-        {
-            BlobChemType.ExplosiveLattice, new DamageSpecifier()
-            {
-                DamageDict = new Dictionary<string, FixedPoint2>
-                {
-                    { "Heat", 5 },
-                    { "Structural", 150 },
-                }
-            }
-        },
-        {
-            BlobChemType.ElectromagneticWeb, new DamageSpecifier()
-            {
-                DamageDict = new Dictionary<string, FixedPoint2>
-                {
-                    { "Structural", 150 },
-                    { "Heat", 20 },
-                },
-            }
-        },
-        {
-            BlobChemType.RegenerativeMateria, new DamageSpecifier()
-            {
-                DamageDict = new Dictionary<string, FixedPoint2>
-                {
-                    { "Structural", 150 },
-                    { "Poison", 15 },
-                }
-            }
-        },
-    };
-
-    #endregion
-
     #region Blob Chems
 
     [ViewVariables]
     public readonly BlobChemColors ChemСolors = new()
     {
-        {BlobChemType.ReactiveSpines, Color.FromHex("#637b19")},
-        {BlobChemType.BlazingOil, Color.FromHex("#937000")},
-        {BlobChemType.RegenerativeMateria, Color.FromHex("#441e59")},
-        {BlobChemType.ExplosiveLattice, Color.FromHex("#6e1900")},
-        {BlobChemType.ElectromagneticWeb, Color.FromHex("#0d7777")},
+        { BlobChemType.ReactiveSpines, Color.FromHex("#637b19") },
+        { BlobChemType.BlazingOil, Color.FromHex("#937000") },
+        { BlobChemType.RegenerativeMateria, Color.FromHex("#441e59") },
+        { BlobChemType.ExplosiveLattice, Color.FromHex("#6e1900") },
+        { BlobChemType.ElectromagneticWeb, Color.FromHex("#0d7777") },
     };
 
     [DataField]
@@ -150,14 +150,14 @@ public sealed partial class BlobCoreComponent : Component
     [DataField]
     public BlobTileCosts BlobTileCosts = new()
     {
-        {BlobTileType.Core, 0},
-        {BlobTileType.Invalid, 0},
-        {BlobTileType.Resource, 60},
-        {BlobTileType.Factory, 80},
-        {BlobTileType.Node, 50},
-        {BlobTileType.Reflective, 15},
-        {BlobTileType.Strong, 15},
-        {BlobTileType.Normal, 6},
+        { BlobTileType.Core, 0 },
+        { BlobTileType.Invalid, 0 },
+        { BlobTileType.Resource, 60 },
+        { BlobTileType.Factory, 80 },
+        { BlobTileType.Node, 50 },
+        { BlobTileType.Reflective, 15 },
+        { BlobTileType.Strong, 15 },
+        { BlobTileType.Normal, 6 },
         /*
         {BlobTileType.Storage, 50},
         {BlobTileType.Turret, 75},*/
@@ -192,16 +192,16 @@ public sealed partial class BlobCoreComponent : Component
     [DataField]
     public BlobTileProto TilePrototypes = new()
     {
-        {BlobTileType.Resource, "ResourceBlobTile"},
-        {BlobTileType.Factory, "FactoryBlobTile"},
-        {BlobTileType.Node, "NodeBlobTile"},
-        {BlobTileType.Reflective, "ReflectiveBlobTile"},
-        {BlobTileType.Strong, "StrongBlobTile"},
-        {BlobTileType.Normal, "NormalBlobTile"},
-        {BlobTileType.Invalid, "NormalBlobTile"}, // wtf
+        { BlobTileType.Resource, "ResourceBlobTile" },
+        { BlobTileType.Factory, "FactoryBlobTile" },
+        { BlobTileType.Node, "NodeBlobTile" },
+        { BlobTileType.Reflective, "ReflectiveBlobTile" },
+        { BlobTileType.Strong, "StrongBlobTile" },
+        { BlobTileType.Normal, "NormalBlobTile" },
+        { BlobTileType.Invalid, "NormalBlobTile" }, // wtf
         //{BlobTileType.Storage, "StorageBlobTile"},
         //{BlobTileType.Turret, "TurretBlobTile"},
-        {BlobTileType.Core, "CoreBlobTile"},
+        { BlobTileType.Core, "CoreBlobTile" },
     };
 
     [DataField(required: true)]
@@ -229,12 +229,12 @@ public sealed partial class BlobCoreComponent : Component
     #endregion
 }
 
-[Serializable, NetSerializable]
+[Serializable] [NetSerializable]
 public enum BlobChemType : byte
 {
     BlazingOil,
     ReactiveSpines,
     RegenerativeMateria,
     ExplosiveLattice,
-    ElectromagneticWeb
+    ElectromagneticWeb,
 }

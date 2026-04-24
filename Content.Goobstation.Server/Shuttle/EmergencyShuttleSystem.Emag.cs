@@ -20,11 +20,11 @@ namespace Content.Goobstation.Server.Shuttle;
 
 public sealed class GoobEmergencyShuttleSystem : EntitySystem
 {
-    [Dependency] private readonly IAdminLogManager _logger = default!;
-    [Dependency] private readonly SharedDoAfterSystem _doAfter = default!;
     [Dependency] private readonly SharedChargesSystem _charge = default!;
+    [Dependency] private readonly SharedDoAfterSystem _doAfter = default!;
     [Dependency] private readonly EmagSystem _emag = default!;
     [Dependency] private readonly EmergencyShuttleSystem _emerg = default!;
+    [Dependency] private readonly IAdminLogManager _logger = default!;
 
     public override void Initialize()
     {
@@ -55,7 +55,8 @@ public sealed class GoobEmergencyShuttleSystem : EntitySystem
 
     private void OnEmagged(EntityUid uid, EmergencyShuttleConsoleComponent component, ref GotEmaggedEvent args)
     {
-        if (_emerg.EarlyLaunchAuthorized || !_emerg.EmergencyShuttleArrived || _emerg.ConsoleAccumulator <= _emerg.AuthorizeTime)
+        if (_emerg.EarlyLaunchAuthorized || !_emerg.EmergencyShuttleArrived ||
+            _emerg.ConsoleAccumulator <= _emerg.AuthorizeTime)
             return;
 
         if (!_emag.CompareFlag(args.Type, EmagType.Interaction))

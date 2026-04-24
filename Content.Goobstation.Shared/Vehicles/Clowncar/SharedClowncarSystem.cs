@@ -12,10 +12,9 @@ using Content.Shared.CombatMode;
 using Content.Shared.DoAfter;
 using Content.Shared.Hands.EntitySystems;
 using Content.Shared.Stunnable;
+using Robust.Shared.Audio.Systems;
 using Robust.Shared.Containers;
 using Robust.Shared.Serialization;
-using Robust.Shared.Audio.Systems;
-
 
 namespace Content.Goobstation.Shared.Vehicles.Clowncar;
 
@@ -48,18 +47,18 @@ namespace Content.Goobstation.Shared.Vehicles.Clowncar;
  */
 public abstract partial class SharedClowncarSystem : EntitySystem
 {
-    [Dependency] private readonly IComponentFactory _factory = default!;
-
-    [Dependency] protected readonly SharedAppearanceSystem AppearanceSystem = default!;
-    [Dependency] private readonly SharedTransformSystem _transformSystem = default!;
     [Dependency] private readonly SharedActionsSystem _actionsSystem = default!;
-    [Dependency] private readonly SharedDoAfterSystem _doAfterSystem = default!;
-    [Dependency] private readonly SharedHandsSystem _handsSystem = default!;
-    [Dependency] private readonly SharedStunSystem _stunSystem = default!;
     [Dependency] private readonly SharedAudioSystem _audioSystem = default!;
     [Dependency] private readonly SharedCombatModeSystem _combatSystem = default!;
+    [Dependency] private readonly SharedDoAfterSystem _doAfterSystem = default!;
+    [Dependency] private readonly IComponentFactory _factory = default!;
+    [Dependency] private readonly SharedHandsSystem _handsSystem = default!;
+    [Dependency] private readonly SharedStunSystem _stunSystem = default!;
+    [Dependency] private readonly SharedTransformSystem _transformSystem = default!;
 
-    /// <inheritdoc/>
+    [Dependency] protected readonly SharedAppearanceSystem AppearanceSystem = default!;
+
+    /// <inheritdoc />
     public override void Initialize()
     {
         base.Initialize();
@@ -79,7 +78,7 @@ public abstract partial class SharedClowncarSystem : EntitySystem
         if (args.Container.ID != component.Container)
             return;
 
-        if (!TryComp<VehicleComponent>(uid, out var _))
+        if (!TryComp<VehicleComponent>(uid, out _))
             return;
         EnsureComp<StunnedComponent>(args.Entity);
         _actionsSystem.AddAction(args.Entity, component.ThankRiderAction, uid);
@@ -105,17 +104,14 @@ public abstract partial class SharedClowncarSystem : EntitySystem
             if (!TryComp(actionId, out MetaDataComponent? metaData))
                 continue;
             if (metaData.EntityPrototype != null
-            && (metaData.EntityPrototype == component.QuietInTheBackAction
-            || metaData.EntityPrototype == component.DrunkDrivingAction))
-            {
+                && (metaData.EntityPrototype == component.QuietInTheBackAction
+                    || metaData.EntityPrototype == component.DrunkDrivingAction))
                 _actionsSystem.RemoveAction(actionId);
-            }
         }
     }
 
     private void ToggleCannon(EntityUid uid, ClowncarComponent component, EntityUid user, bool activated)
     {
-
     }
 
     /// <summary>
@@ -123,7 +119,6 @@ public abstract partial class SharedClowncarSystem : EntitySystem
     /// </summary>
     private void OnEntRemoved(EntityUid uid, ClowncarComponent component, EntRemovedFromContainerMessage args)
     {
-
         if (args.Container.ID != component.Container)
             return;
 
@@ -134,23 +129,44 @@ public abstract partial class SharedClowncarSystem : EntitySystem
             if (metaData.EntityPrototype != null && metaData.EntityPrototype == component.ThankRiderAction)
                 _actionsSystem.RemoveAction(actionId);
         }
+
         RemComp<StunnedComponent>(args.Entity);
     }
 }
 
-[Serializable, NetSerializable]
-public sealed partial class ClownCarDoAfterEvent : SimpleDoAfterEvent { }
-[Serializable, NetSerializable]
-public sealed partial class ClownCarEnterDriverSeatDoAfterEvent : SimpleDoAfterEvent { }
-[Serializable, NetSerializable]
-public sealed partial class ClownCarOpenTrunkDoAfterEvent : SimpleDoAfterEvent { }
-public sealed partial class ThankRiderActionEvent : InstantActionEvent { }
-public sealed partial class ClowncarFireModeActionEvent : InstantActionEvent { }
-public sealed partial class QuietBackThereActionEvent : InstantActionEvent { }
-public sealed partial class DrivingWithStyleActionEvent : InstantActionEvent { }
+[Serializable] [NetSerializable]
+public sealed partial class ClownCarDoAfterEvent : SimpleDoAfterEvent
+{
+}
 
-[Serializable, NetSerializable]
+[Serializable] [NetSerializable]
+public sealed partial class ClownCarEnterDriverSeatDoAfterEvent : SimpleDoAfterEvent
+{
+}
+
+[Serializable] [NetSerializable]
+public sealed partial class ClownCarOpenTrunkDoAfterEvent : SimpleDoAfterEvent
+{
+}
+
+public sealed partial class ThankRiderActionEvent : InstantActionEvent
+{
+}
+
+public sealed partial class ClowncarFireModeActionEvent : InstantActionEvent
+{
+}
+
+public sealed partial class QuietBackThereActionEvent : InstantActionEvent
+{
+}
+
+public sealed partial class DrivingWithStyleActionEvent : InstantActionEvent
+{
+}
+
+[Serializable] [NetSerializable]
 public enum ClowncarVisuals : byte
 {
-    FireModeEnabled
+    FireModeEnabled,
 }

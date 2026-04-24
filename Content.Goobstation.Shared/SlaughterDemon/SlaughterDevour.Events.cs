@@ -1,5 +1,4 @@
 using Content.Shared.DoAfter;
-using Robust.Shared.Map;
 using Robust.Shared.Serialization;
 
 namespace Content.Goobstation.Shared.SlaughterDemon;
@@ -13,7 +12,7 @@ public record struct SlaughterDevourEvent(
     EntityUid pullerEnt);
 
 /// <summary>
-///  Raised on the entity that gets devoured
+/// Raised on the entity that gets devoured
 /// </summary>
 /// <param name="Devoured"></param>
 /// <param name="Devourer"></param>
@@ -27,5 +26,5 @@ public record struct SlaughterDevourAttemptEvent(
 /// <summary>
 /// Doafter for when an entity attempts to devour an entity
 /// </summary>
-[Serializable, NetSerializable]
+[Serializable] [NetSerializable]
 public sealed partial class SlaughterDevourDoAfter : SimpleDoAfterEvent;

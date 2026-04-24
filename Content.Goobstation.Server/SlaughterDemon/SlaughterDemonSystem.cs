@@ -7,7 +7,6 @@ using Content.Goobstation.Common.Devour;
 using Content.Goobstation.Shared.SlaughterDemon;
 using Content.Goobstation.Shared.SlaughterDemon.Systems;
 using Content.Server.Administration.Systems;
-using Content.Server.Body.Components;
 using Content.Server.Body.Systems;
 using Content.Shared.Body.Components;
 using Content.Shared.Body.Events;
@@ -17,13 +16,13 @@ namespace Content.Goobstation.Server.SlaughterDemon;
 
 public sealed class SlaughterDemonSystem : SharedSlaughterDemonSystem
 {
-    [Dependency] private readonly RejuvenateSystem _rejuvenate = default!;
-    [Dependency] private readonly SharedContainerSystem _container = default!;
     [Dependency] private readonly BloodstreamSystem _bloodstream = default!;
+    [Dependency] private readonly SharedContainerSystem _container = default!;
+    [Dependency] private readonly RejuvenateSystem _rejuvenate = default!;
 
     private EntityQuery<BloodstreamComponent> _bloodstreamQuery;
 
-    /// <inheritdoc/>
+    /// <inheritdoc />
     public override void Initialize()
     {
         base.Initialize();
@@ -43,14 +42,18 @@ public sealed class SlaughterDemonSystem : SharedSlaughterDemonSystem
 
         // Allow everyone to self revive again (if they have the ability to)
         foreach (var entity in ent.Comp.ConsumedMobs)
+        {
             RemComp<PreventSelfRevivalComponent>(entity);
+        }
 
         // heal them if they were in the laughter demon
         if (!ent.Comp.IsLaughter)
             return;
 
         foreach (var entity in ent.Comp.ConsumedMobs)
+        {
             _rejuvenate.PerformRejuvenate(entity);
+        }
     }
 
     protected override void RemoveBlood(EntityUid uid)

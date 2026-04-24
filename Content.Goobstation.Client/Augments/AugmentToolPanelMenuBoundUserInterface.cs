@@ -2,15 +2,14 @@ using Content.Goobstation.Shared.Augments;
 using Robust.Client.Graphics;
 using Robust.Client.Input;
 using Robust.Client.UserInterface;
-using Robust.Shared.Prototypes;
 
 namespace Content.Goobstation.Client.Augments;
 
 public sealed class AugmentToolPanelMenuBoundUserInterface : BoundUserInterface
 {
     [Dependency] private readonly IClyde _clyde = default!;
-    [Dependency] private readonly IInputManager _input = default!;
     [Dependency] private readonly IEntityManager _ent = default!;
+    [Dependency] private readonly IInputManager _input = default!;
 
     private AugmentToolPanelMenu? _menu;
 
@@ -32,8 +31,6 @@ public sealed class AugmentToolPanelMenuBoundUserInterface : BoundUserInterface
         _menu.OpenCenteredAt(_input.MouseScreenPosition.Position / vpSize);
     }
 
-    public void SendSwitchMessage(EntityUid? desiredTool)
-    {
+    public void SendSwitchMessage(EntityUid? desiredTool) =>
         SendMessage(new AugmentToolPanelSwitchMessage(_ent.GetNetEntity(desiredTool)));
-    }
 }

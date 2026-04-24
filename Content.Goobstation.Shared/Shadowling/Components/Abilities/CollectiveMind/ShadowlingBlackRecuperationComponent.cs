@@ -9,41 +9,14 @@ namespace Content.Goobstation.Shared.Shadowling.Components.Abilities.CollectiveM
 /// <summary>
 /// This is used for the Black Recuperation ability.
 /// </summary>
-[RegisterComponent, NetworkedComponent]
+[RegisterComponent] [NetworkedComponent]
 public sealed partial class ShadowlingBlackRecuperationComponent : Component
 {
     [DataField]
-    public TimeSpan Duration = TimeSpan.FromSeconds(5);
+    public EntityUid? ActionEnt;
 
-    /// <summary>
-    /// The effect that is used once the ability activates.
-    /// </summary>
     [DataField]
-    public EntProtoId BlackRecuperationEffect = "ShadowlingBlackRecuperationEffect";
-
-    /// <summary>
-    /// The max limit of Lesser Shadowlings that a Shadowling can have.
-    /// </summary>
-    [DataField]
-    public int LesserShadowlingMaxLimit = 5;
-
-    /// <summary>
-    /// The current amount of Lesser Shadowlings that the Shadowling has.
-    /// </summary>
-    [DataField]
-    public int LesserShadowlingAmount;
-
-    /// <summary>
-    /// The polymorph species of the Lesser Shadowlings
-    /// </summary>
-    [DataField]
-    public ProtoId<PolymorphPrototype> LesserShadowlingSpeciesProto = "ShadowPolymorph";
-
-    /// <summary>
-    /// The marking of the eyes of a Lesser Shadowling.
-    /// </summary>
-    [DataField]
-    public ProtoId<MarkingPrototype> MarkingId = "LesserShadowlingEyes";
+    public EntProtoId ActionId = "ActionBlackRecuperation";
 
     /// <summary>
     /// The sound that is used once the ability activates.
@@ -52,10 +25,40 @@ public sealed partial class ShadowlingBlackRecuperationComponent : Component
     public SoundSpecifier? BlackRecSound = new SoundPathSpecifier("/Audio/Items/Defib/defib_zap.ogg");
 
     /// <summary>
-    /// How much light resistance the ability removes from the Shadowling, if used on a dead Thrall
+    /// The effect that is used once the ability activates.
     /// </summary>
     [DataField]
-    public float ResistanceRemoveFromThralls = 0.5f;
+    public EntProtoId BlackRecuperationEffect = "ShadowlingBlackRecuperationEffect";
+
+    [DataField]
+    public TimeSpan Duration = TimeSpan.FromSeconds(5);
+
+    /// <summary>
+    /// The current amount of Lesser Shadowlings that the Shadowling has.
+    /// </summary>
+    [DataField]
+    public int LesserShadowlingAmount;
+
+    /// <summary>
+    /// The max limit of Lesser Shadowlings that a Shadowling can have.
+    /// </summary>
+    [DataField]
+    public int LesserShadowlingMaxLimit = 5;
+
+    /// <summary>
+    /// The polymorph species of the Lesser Shadowlings
+    /// </summary>
+    [DataField]
+    public ProtoId<PolymorphPrototype> LesserShadowlingSpeciesProto = "ShadowPolymorph";
+
+    [DataField]
+    public EntProtoId LesserSlingComponents = "LesserShadowlingAbilities";
+
+    /// <summary>
+    /// The marking of the eyes of a Lesser Shadowling.
+    /// </summary>
+    [DataField]
+    public ProtoId<MarkingPrototype> MarkingId = "LesserShadowlingEyes";
 
     /// <summary>
     /// How much light resistance the ability removes from the Shadowling, if used to convert a Thrall to a Lesser Shadowling
@@ -63,12 +66,9 @@ public sealed partial class ShadowlingBlackRecuperationComponent : Component
     [DataField]
     public float ResistanceRemoveFromLesser = 0.12f;
 
+    /// <summary>
+    /// How much light resistance the ability removes from the Shadowling, if used on a dead Thrall
+    /// </summary>
     [DataField]
-    public EntProtoId LesserSlingComponents = "LesserShadowlingAbilities";
-
-    [DataField]
-    public EntProtoId ActionId = "ActionBlackRecuperation";
-
-    [DataField]
-    public EntityUid? ActionEnt;
+    public float ResistanceRemoveFromThralls = 0.5f;
 }

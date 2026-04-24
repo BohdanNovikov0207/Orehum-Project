@@ -11,6 +11,8 @@ namespace Content.Goobstation.Client.SpecialPassives.Fleshmend;
 
 public sealed class FleshmendEffectSystem : EntitySystem
 {
+    // todo goobstation nuke all lingcode and unhardcode ts
+    private static readonly ResPath ResPath = new("_Goobstation/SpecialPassives/fleshmend_visuals.rsi");
     [Dependency] private readonly SpriteSystem _sprite = default!;
 
     public override void Initialize()
@@ -20,12 +22,11 @@ public sealed class FleshmendEffectSystem : EntitySystem
         SubscribeLocalEvent<FleshmendEffectComponent, ComponentStartup>(OnStartup);
         SubscribeLocalEvent<FleshmendEffectComponent, ComponentShutdown>(OnShutdown);
     }
-    // todo goobstation nuke all lingcode and unhardcode ts
-    private static readonly ResPath ResPath = new("_Goobstation/SpecialPassives/fleshmend_visuals.rsi");
 
     private void OnStartup(Entity<FleshmendEffectComponent> ent, ref ComponentStartup args)
     {
-        if (TryComp<FleshmendComponent>(ent, out var fleshmend) // only done if new effects were yaml'd in (or just applied to the comp)
+        if (TryComp<FleshmendComponent>(ent,
+                out var fleshmend) // only done if new effects were yaml'd in (or just applied to the comp)
             && fleshmend.EffectState != null
             && fleshmend.ResPath != ResPath.Empty)
         {

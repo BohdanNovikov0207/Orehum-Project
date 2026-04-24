@@ -7,18 +7,18 @@ using Robust.Shared.GameStates;
 
 namespace Content.Goobstation.Shared.Medical.Components;
 
-[RegisterComponent, NetworkedComponent, AutoGenerateComponentState]
+[RegisterComponent] [NetworkedComponent] [AutoGenerateComponentState]
 public sealed partial class MediGunHealedComponent : Component
 {
     /// <summary>
-    /// Source of the healing that it receives.
-    /// </summary>
-    [DataField, AutoNetworkedField]
-    public EntityUid Source;
-
-    /// <summary>
     /// Color that will be used on target entity when healing is active.
     /// </summary>
-    [DataField, AutoNetworkedField]
+    [DataField] [AutoNetworkedField]
     public Color LineColor;
+
+    /// <summary>
+    /// Source of the healing that it receives.
+    /// </summary>
+    [DataField] [AutoNetworkedField]
+    public EntityUid Source;
 }

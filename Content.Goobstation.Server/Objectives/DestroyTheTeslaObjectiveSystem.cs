@@ -8,14 +8,17 @@ namespace Content.Goobstation.Server.Objectives;
 /// </summary>
 public sealed class DestroyTheTeslaObjectiveSystem : EntitySystem
 {
-    /// <inheritdoc/>
+    /// <inheritdoc />
     public override void Initialize()
     {
         base.Initialize();
 
         SubscribeLocalEvent<DestroyTheTeslaObjectiveComponent, ObjectiveGetProgressEvent>(OnGetProgress);
     }
-    private void OnGetProgress(EntityUid uid, DestroyTheTeslaObjectiveComponent component, ref ObjectiveGetProgressEvent args)
+
+    private void OnGetProgress(EntityUid uid,
+        DestroyTheTeslaObjectiveComponent component,
+        ref ObjectiveGetProgressEvent args)
     {
         args.Progress = 0f;
         var query = EntityQueryEnumerator<TeslaEnergyBallComponent>();

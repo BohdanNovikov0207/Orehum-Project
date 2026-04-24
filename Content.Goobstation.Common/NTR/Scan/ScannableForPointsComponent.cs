@@ -3,15 +3,14 @@
 //
 // SPDX-License-Identifier: AGPL-3.0-or-later
 
-namespace Content.Goobstation.Common.NTR.Scan
-{
-    [RegisterComponent]
-    public sealed partial class ScannableForPointsComponent : Component
-    {
-        [DataField("points")]
-        public int Points = 5;
+namespace Content.Goobstation.Common.NTR.Scan;
 
-        [ViewVariables(VVAccess.ReadWrite)]
-        public bool AlreadyScanned = false;
-    }
+[RegisterComponent]
+public sealed partial class ScannableForPointsComponent : Component
+{
+    [ViewVariables(VVAccess.ReadWrite)]
+    public bool AlreadyScanned = false;
+
+    [DataField("points")]
+    public int Points = 5;
 }

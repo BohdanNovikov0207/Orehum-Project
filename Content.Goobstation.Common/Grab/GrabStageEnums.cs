@@ -9,9 +9,9 @@
 
 using Robust.Shared.Serialization;
 
-namespace  Content.Goobstation.Common.Grab;
+namespace Content.Goobstation.Common.Grab;
 
-[Serializable, NetSerializable]
+[Serializable] [NetSerializable]
 public enum GrabStage
 {
     No = 0,

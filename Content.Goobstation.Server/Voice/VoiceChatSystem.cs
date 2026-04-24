@@ -31,7 +31,8 @@ public sealed class VoiceChatSystem : EntitySystem
                 if (clientData.PlayerEntity == ev.Entity)
                     return;
 
-                Logger.Debug($"Player {ev.Player.Name} attached to new entity {ev.Entity}. Updating voice client data.");
+                Logger.Debug(
+                    $"Player {ev.Player.Name} attached to new entity {ev.Entity}. Updating voice client data.");
                 clientData.PlayerEntity = ev.Entity;
                 break;
             }

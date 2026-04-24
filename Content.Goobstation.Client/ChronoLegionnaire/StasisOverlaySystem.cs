@@ -16,8 +16,8 @@ namespace Content.Goobstation.Client.ChronoLegionnaire;
 
 public sealed class StasisOverlaySystem : EntitySystem
 {
-    [Dependency] private readonly IPlayerManager _player = default!;
     [Dependency] private readonly IOverlayManager _overlayManager = default!;
+    [Dependency] private readonly IPlayerManager _player = default!;
 
     private StasisOverlay _overlay = default!;
 
@@ -31,18 +31,14 @@ public sealed class StasisOverlaySystem : EntitySystem
         SubscribeLocalEvent<InsideStasisComponent, LocalPlayerAttachedEvent>(OnPlayerAttached);
         SubscribeLocalEvent<InsideStasisComponent, LocalPlayerDetachedEvent>(OnPlayerDetached);
 
-        _overlay = new();
+        _overlay = new StasisOverlay();
     }
 
-    private void OnPlayerAttached(Entity<InsideStasisComponent> stasised, ref LocalPlayerAttachedEvent args)
-    {
+    private void OnPlayerAttached(Entity<InsideStasisComponent> stasised, ref LocalPlayerAttachedEvent args) =>
         _overlayManager.AddOverlay(_overlay);
-    }
 
-    private void OnPlayerDetached(Entity<InsideStasisComponent> stasised, ref LocalPlayerDetachedEvent args)
-    {
+    private void OnPlayerDetached(Entity<InsideStasisComponent> stasised, ref LocalPlayerDetachedEvent args) =>
         _overlayManager.RemoveOverlay(_overlay);
-    }
 
     private void OnStasisInit(Entity<InsideStasisComponent> stasised, ref ComponentInit args)
     {
@@ -53,8 +49,6 @@ public sealed class StasisOverlaySystem : EntitySystem
     private void OnStasisShutdown(Entity<InsideStasisComponent> stasised, ref ComponentShutdown args)
     {
         if (_player.LocalEntity == stasised)
-        {
             _overlayManager.RemoveOverlay(_overlay);
-        }
     }
 }

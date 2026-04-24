@@ -15,14 +15,11 @@ namespace Content.Goobstation.Shared.Stun;
 public sealed class SharedGoobStunSystem : EntitySystem
 {
     [Dependency] private readonly ClothingModifyStunTimeSystem _modifySystem = default!;
-    /// <inheritdoc/>
-    public override void Initialize()
-    {
-        SubscribeLocalEvent<GetClothingStunModifierEvent>(HandleGetClothingStunModifier);
-    }
 
-    private void HandleGetClothingStunModifier(GetClothingStunModifierEvent ev)
-    {
+    /// <inheritdoc />
+    public override void Initialize() =>
+        SubscribeLocalEvent<GetClothingStunModifierEvent>(HandleGetClothingStunModifier);
+
+    private void HandleGetClothingStunModifier(GetClothingStunModifierEvent ev) =>
         ev.Modifier *= _modifySystem.GetModifier(ev.Target);
-    }
 }

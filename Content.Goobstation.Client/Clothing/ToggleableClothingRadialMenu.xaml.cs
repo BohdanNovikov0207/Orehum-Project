@@ -18,19 +18,19 @@ using Robust.Client.UserInterface.XAML;
 
 namespace Content.Goobstation.Client.Clothing;
 
-public sealed partial class ToggleableClothingRadialMenu : RadialMenu
+public sealed class ToggleableClothingRadialMenu : RadialMenu
 {
     [Dependency] private readonly EntityManager _entityManager = default!;
-
-    public event Action<EntityUid>? SendToggleClothingMessageAction;
-
-    public EntityUid Entity { get; set; }
 
     public ToggleableClothingRadialMenu()
     {
         IoCManager.InjectDependencies(this);
         RobustXamlLoader.Load(this);
     }
+
+    public EntityUid Entity { get; set; }
+
+    public event Action<EntityUid>? SendToggleClothingMessageAction;
 
     public void SetEntity(EntityUid uid)
     {
@@ -58,19 +58,19 @@ public sealed partial class ToggleableClothingRadialMenu : RadialMenu
             if (clothingContainer.Contains(attached.Key))
                 tooltipText = Loc.GetString("toggleable-clothing-attach-tooltip");
 
-            var button = new ToggleableClothingRadialMenuButton()
+            var button = new ToggleableClothingRadialMenuButton
             {
                 SetSize = new Vector2(64, 64),
                 ToolTip = tooltipText,
-                AttachedClothingId = attached.Key
+                AttachedClothingId = attached.Key,
             };
 
-            var spriteView = new SpriteView()
+            var spriteView = new SpriteView
             {
                 SetSize = new Vector2(48, 48),
                 VerticalAlignment = VAlignment.Center,
                 HorizontalAlignment = HAlignment.Center,
-                Stretch = SpriteView.StretchMode.Fill
+                Stretch = SpriteView.StretchMode.Fill,
             };
 
             spriteView.SetEntity(attached.Key);

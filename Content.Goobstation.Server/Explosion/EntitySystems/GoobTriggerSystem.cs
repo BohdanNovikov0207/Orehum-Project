@@ -15,7 +15,6 @@
 using Content.Goobstation.Server.Explosion.Components;
 using Content.Goobstation.Server.Explosion.Components.OnTrigger;
 using Content.Server.Explosion.Components;
-using Content.Server.Explosion.EntitySystems;
 using Content.Shared.Hands.Components;
 using Content.Shared.Hands.EntitySystems;
 using Content.Shared.Inventory;
@@ -28,8 +27,9 @@ namespace Content.Goobstation.Server.Explosion.EntitySystems;
 public sealed class GoobTriggerSystem : EntitySystem
 {
     [Dependency] private readonly SharedHandsSystem _hands = default!;
-    [Dependency] private readonly TriggerSystem _trigger = default!;
     [Dependency] private readonly InventorySystem _inventory = default!;
+    [Dependency] private readonly TriggerSystem _trigger = default!;
+
     public override void Initialize()
     {
         base.Initialize();
@@ -46,7 +46,8 @@ public sealed class GoobTriggerSystem : EntitySystem
 
     private void HandleDropOnTrigger(Entity<DropOnTriggerComponent> entity, ref TriggerEvent args)
     {
-        if (!TryComp(entity, out HandsComponent? hands) || !_inventory.TryGetContainingEntity(entity.Owner, out var containingEntity))
+        if (!TryComp(entity, out HandsComponent? hands) ||
+            !_inventory.TryGetContainingEntity(entity.Owner, out var containingEntity))
             return;
 
 
@@ -57,6 +58,7 @@ public sealed class GoobTriggerSystem : EntitySystem
 
             _hands.TryDrop((containingEntity.Value, hands), hand);
         }
+
         args.Handled = true;
     }
 

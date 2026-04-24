@@ -2,6 +2,7 @@
 // SPDX-FileCopyrightText: 2025 RichardBlonski <48651647+RichardBlonski@users.noreply.github.com>
 // SPDX-License-Identifier: AGPL-3.0-or-later
 
+using System.Numerics;
 using Content.Shared._Starlight.VentCrawling;
 using Content.Shared.Actions;
 using Content.Shared.Body.Systems;
@@ -14,37 +15,34 @@ using Content.Shared.Mobs;
 using Content.Shared.Mobs.Components;
 using Content.Shared.Mobs.Systems;
 using Content.Shared.Popups;
-using Content.Shared.VentCrawler.Tube.Components;
 using Robust.Shared.Audio.Systems;
 using Robust.Shared.Containers;
-using Robust.Shared.Map;
 using Robust.Shared.Network;
 using Robust.Shared.Physics.Components;
 using Robust.Shared.Physics.Systems;
 using Robust.Shared.Random;
-using System.Numerics;
 
 // This system allows floor goblins to steal shoes from other entities.
 // It handles the entire process from checking valid targets to transferring the shoes to the goblin's inventory.
 
 namespace Content.Goobstation.Shared.FloorGoblin;
 
-public sealed partial class StealShoesSystem : EntitySystem
+public sealed class StealShoesSystem : EntitySystem
 {
     [Dependency] private readonly SharedActionsSystem _actions = default!;
-    [Dependency] private readonly InventorySystem _inventory = default!;
-    [Dependency] private readonly SharedInteractionSystem _interaction = default!;
-    [Dependency] private readonly SharedPopupSystem _popup = default!;
-    [Dependency] private readonly SharedTransformSystem _transform = default!;
     [Dependency] private readonly SharedAudioSystem _audio = default!;
-    [Dependency] private readonly SharedContainerSystem _containers = default!;
-    [Dependency] private readonly SharedDoAfterSystem _doAfter = default!;
-    [Dependency] private readonly IRobustRandom _random = default!;
-    [Dependency] private readonly SharedPhysicsSystem _physics = default!;
-    [Dependency] private readonly INetManager _net = default!;
     [Dependency] private readonly SharedBodySystem _body = default!;
+    [Dependency] private readonly SharedContainerSystem _containers = default!;
     [Dependency] private readonly SharedCrawlUnderFloorSystem _crawlUnderFloorSystem = default!;
+    [Dependency] private readonly SharedDoAfterSystem _doAfter = default!;
+    [Dependency] private readonly SharedInteractionSystem _interaction = default!;
+    [Dependency] private readonly InventorySystem _inventory = default!;
     [Dependency] private readonly MobStateSystem _mobstate = default!;
+    [Dependency] private readonly INetManager _net = default!;
+    [Dependency] private readonly SharedPhysicsSystem _physics = default!;
+    [Dependency] private readonly SharedPopupSystem _popup = default!;
+    [Dependency] private readonly IRobustRandom _random = default!;
+    [Dependency] private readonly SharedTransformSystem _transform = default!;
 
     public override void Initialize()
     {
@@ -100,7 +98,12 @@ public sealed partial class StealShoesSystem : EntitySystem
             return;
         }
 
-        var dargs = new DoAfterArgs(EntityManager, uid, TimeSpan.FromSeconds(2), new StealShoesDoAfterEvent(), uid, target)
+        var dargs = new DoAfterArgs(EntityManager,
+            uid,
+            TimeSpan.FromSeconds(2),
+            new StealShoesDoAfterEvent(),
+            uid,
+            target)
         {
             DistanceThreshold = 1.5f,
             BreakOnMove = true,
@@ -108,7 +111,7 @@ public sealed partial class StealShoesSystem : EntitySystem
             BreakOnWeightlessMove = true,
             NeedHand = false,
             AttemptFrequency = AttemptFrequency.EveryTick,
-            DuplicateCondition = DuplicateConditions.SameEvent
+            DuplicateCondition = DuplicateConditions.SameEvent,
         };
 
         if (_doAfter.TryStartDoAfter(dargs))
@@ -134,7 +137,11 @@ public sealed partial class StealShoesSystem : EntitySystem
         if (component.ChompSound is { } chomp)
             _audio.PlayPredicted(chomp, uid, uid);
 
-        _popup.PopupClient(Loc.GetString("steal-shoes-event", ("target", Identity.Name(target, EntityManager)), ("shoes", Name(shoes))), uid, uid);
+        _popup.PopupClient(Loc.GetString("steal-shoes-event",
+                ("target", Identity.Name(target, EntityManager)),
+                ("shoes", Name(shoes))),
+            uid,
+            uid);
         _popup.PopupEntity(Loc.GetString("shoes-stolen-target-event"), target, target);
 
         ev.Handled = true;
@@ -144,7 +151,9 @@ public sealed partial class StealShoesSystem : EntitySystem
     /// Attempts to remove shoes from the target's equipment or containers.
     /// Returns true if successful, false otherwise.
     /// </summary>
-    private void OnStealShoesAttempt(EntityUid uid, StealShoesComponent component, ref DoAfterAttemptEvent<StealShoesDoAfterEvent> ev)
+    private void OnStealShoesAttempt(EntityUid uid,
+        StealShoesComponent component,
+        ref DoAfterAttemptEvent<StealShoesDoAfterEvent> ev)
     {
         if (ev.Cancelled)
             return;
@@ -157,13 +166,11 @@ public sealed partial class StealShoesSystem : EntitySystem
     {
         // For dead or critical targets, we need to remove the item directly
         if (_mobstate.IsDead(target) ||
-            (TryComp<MobStateComponent>(target, out var mobState) && mobState.CurrentState == MobState.Critical))
+            TryComp<MobStateComponent>(target, out var mobState) && mobState.CurrentState == MobState.Critical)
         {
             if (!_inventory.TryGetContainingSlot((shoes, null, null), out var slot) ||
                 !_inventory.TryGetSlotContainer(target, slot.Name, out var container, out _))
-            {
                 return false;
-            }
 
             return _containers.Remove(shoes, container, force: true, reparent: false);
         }
@@ -172,7 +179,7 @@ public sealed partial class StealShoesSystem : EntitySystem
         if (!_inventory.TryGetContainingSlot((shoes, null, null), out var slotDef))
             return false;
 
-        return _inventory.TryUnequip(target, slotDef.Name, silent: true, predicted: true, reparent: false);
+        return _inventory.TryUnequip(target, slotDef.Name, true, predicted: true, reparent: false);
     }
 
 
@@ -213,6 +220,4 @@ public sealed partial class StealShoesSystem : EntitySystem
 
         return _crawlUnderFloorSystem.IsOnSubfloor(uid);
     }
-
-
 }

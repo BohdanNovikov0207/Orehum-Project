@@ -6,8 +6,6 @@ namespace Content.Goobstation.Client.MisandryBox.Thunderdome;
 
 public sealed class ThunderdomeRevivalWindow : ThunderdomeWindow
 {
-    public event Action? OnAccepted;
-
     public ThunderdomeRevivalWindow()
     {
         WindowTitle = Loc.GetString("thunderdome-revival-title");
@@ -51,4 +49,6 @@ public sealed class ThunderdomeRevivalWindow : ThunderdomeWindow
 
         Contents.AddChild(buttons);
     }
+
+    public event Action? OnAccepted;
 }

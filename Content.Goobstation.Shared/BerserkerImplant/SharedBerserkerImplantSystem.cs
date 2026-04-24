@@ -14,12 +14,12 @@ namespace Content.Goobstation.Shared.BerserkerImplant;
 
 public abstract class SharedBerserkerImplantSystem : EntitySystem
 {
-    [Dependency] protected readonly IGameTiming Timing = default!;
-    [Dependency] protected readonly SharedPopupSystem Popup = default!;
-    [Dependency] private readonly MobThresholdSystem _mobThreshold = default!;
-    [Dependency] private readonly MobStateSystem _mobState = default!;
     [Dependency] private readonly SharedAudioSystem _audio = default!;
     [Dependency] private readonly SharedJitteringSystem _jitter = default!;
+    [Dependency] private readonly MobStateSystem _mobState = default!;
+    [Dependency] private readonly MobThresholdSystem _mobThreshold = default!;
+    [Dependency] protected readonly SharedPopupSystem Popup = default!;
+    [Dependency] protected readonly IGameTiming Timing = default!;
 
     public override void Initialize()
     {
@@ -57,7 +57,7 @@ public abstract class SharedBerserkerImplantSystem : EntitySystem
             trail.Frequency = 0.07f;
             trail.AlphaLerpAmount = 0.2f;
             trail.MaxParticleAmount = 25;
-            trail.Color = new(255, 47, 0, 180);
+            trail.Color = new Color(255, 47, 0, 180);
         }
 
         _jitter.DoJitter(uid, TimeSpan.FromSeconds(3), true);
@@ -90,22 +90,17 @@ public abstract class SharedBerserkerImplantSystem : EntitySystem
 
         args.Cancelled = true;
 
-        if (ent.Comp.DelayedDamage.GetTotal() < 150)    // Prevent insta gib after berserker ends
+        if (ent.Comp.DelayedDamage.GetTotal() < 150) // Prevent insta gib after berserker ends
             ent.Comp.DelayedDamage += args.Damage;
     }
 
-    private void OnStaminaDamageModify(Entity<BerserkerImplantActiveComponent> ent, ref BeforeStaminaDamageEvent args)
-    {
+    private void
+        OnStaminaDamageModify(Entity<BerserkerImplantActiveComponent> ent, ref BeforeStaminaDamageEvent args) =>
         args.Value *= ent.Comp.StunModifier;
-    }
 
-    private void OnGetMeleeDamage(Entity<BerserkerImplantActiveComponent> ent, ref GetUserMeleeDamageEvent args)
-    {
+    private void OnGetMeleeDamage(Entity<BerserkerImplantActiveComponent> ent, ref GetUserMeleeDamageEvent args) =>
         args.Damage *= ent.Comp.SelfDamageModifier;
-    }
 
-    private void OnShotAttempted(Entity<BerserkerImplantActiveComponent> ent, ref ShotAttemptedEvent args)
-    {
+    private void OnShotAttempted(Entity<BerserkerImplantActiveComponent> ent, ref ShotAttemptedEvent args) =>
         args.Cancel();
-    }
 }

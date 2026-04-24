@@ -13,10 +13,9 @@ namespace Content.Goobstation.Shared.Mimery;
 
 public abstract class SharedAdvancedMimerySystem : EntitySystem
 {
-    [Dependency] private readonly IMapManager _mapMan = default!;
-
     [Dependency] private readonly SharedHandsSystem _hands = default!;
     [Dependency] private readonly SharedMagicSystem _magic = default!;
+    [Dependency] private readonly IMapManager _mapMan = default!;
     [Dependency] private readonly SharedPopupSystem _popupSystem = default!;
 
     public override void Initialize()
@@ -41,10 +40,8 @@ public abstract class SharedAdvancedMimerySystem : EntitySystem
         EnsureComp<MimePowersComponent>(user.Value);
     }
 
-    private void OnFingerGuns(Entity<MimePowersComponent> ent, ref FingerGunsActionEvent args)
-    {
+    private void OnFingerGuns(Entity<MimePowersComponent> ent, ref FingerGunsActionEvent args) =>
         ShootFingerGuns(ent, ref args);
-    }
 
     protected virtual bool ShootFingerGuns(Entity<MimePowersComponent> ent, ref FingerGunsActionEvent args)
     {

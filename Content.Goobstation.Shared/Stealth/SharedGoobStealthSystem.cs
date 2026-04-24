@@ -6,15 +6,17 @@
 //
 // SPDX-License-Identifier: AGPL-3.0-or-later
 
-using Content.Shared.Stealth.Components;
-using Content.Shared.Stealth;
+using Content.Goobstation.Shared.Slasher.Components;
 using Content.Shared.Damage;
 using Content.Shared.Ninja.Components;
 using Content.Shared.Ninja.Systems;
+using Content.Shared.Stealth;
+using Content.Shared.Stealth.Components;
+using Content.Shared.Throwing;
 using Content.Shared.Weapons.Melee.Events;
 using Content.Shared.Weapons.Ranged.Events;
-using Content.Shared.Throwing;
-using Content.Goobstation.Shared.Slasher.Components; // For SlasherIncorporealComponent
+
+// For SlasherIncorporealComponent
 
 namespace Content.Goobstation.Shared.Stealth;
 
@@ -28,8 +30,8 @@ public sealed class SharedGoobStealthSystem : EntitySystem
 
     public override void Initialize()
     {
-        SubscribeLocalEvent<StealthComponent, MeleeAttackEvent> (OnMeleeAttack);
-        SubscribeLocalEvent<StealthComponent, SelfBeforeGunShotEvent> (OnGunShootAttack);
+        SubscribeLocalEvent<StealthComponent, MeleeAttackEvent>(OnMeleeAttack);
+        SubscribeLocalEvent<StealthComponent, SelfBeforeGunShotEvent>(OnGunShootAttack);
         SubscribeLocalEvent<StealthComponent, BeforeDamageChangedEvent>(OnTakeDamage);
         SubscribeLocalEvent<StealthComponent, BeforeThrowEvent>(OnThrow);
         SubscribeLocalEvent<SlasherIncorporealComponent, MoveEvent>(OnSlasherMove);
@@ -107,6 +109,6 @@ public sealed class SharedGoobStealthSystem : EntitySystem
 
         if (ninja.Suit is { } suit
             && TryComp<NinjaSuitComponent>(suit, out var suitComp))
-            _suit.RevealNinja((suit, suitComp), uid, true);
+            _suit.RevealNinja((suit, suitComp), uid);
     }
 }

@@ -30,7 +30,7 @@ public abstract class SharedBlobObserverSystem : EntitySystem
 
     private void OnGetUsedEntityEvent(Entity<BlobObserverComponent> ent, ref GetUsedEntityEvent args)
     {
-        if(ent.Comp.VirtualItem.Valid)
+        if (ent.Comp.VirtualItem.Valid)
             args.Used = ent.Comp.VirtualItem;
     }
 
@@ -42,7 +42,8 @@ public abstract class SharedBlobObserverSystem : EntitySystem
         args.Cancel();
     }*/
 
-    public (EntityUid? nearestEntityUid, float nearestDistance) CalculateNearestBlobTileDistance(MapCoordinates position)
+    public (EntityUid? nearestEntityUid, float nearestDistance) CalculateNearestBlobTileDistance(
+        MapCoordinates position)
     {
         var nearestDistance = float.MaxValue;
         EntityUid? nearestEntityUid = null;

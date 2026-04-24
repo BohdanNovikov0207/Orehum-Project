@@ -5,19 +5,35 @@
 // SPDX-License-Identifier: AGPL-3.0-or-later
 
 using Content.Goobstation.Maths.FixedPoint;
-using Content.Shared.Damage;
 using Content.Shared.Chemistry.Reagent;
+using Content.Shared.Damage;
 using Robust.Shared.GameStates;
 using Robust.Shared.Prototypes;
 
 namespace Content.Goobstation.Shared.Xenobiology.Components;
 
 /// <summary>
-/// This is used for slime latching damage, this can be expanded in the future to allow for special breed dependent effects.
+/// This is used for slime latching damage, this can be expanded in the future to allow for special breed dependent
+/// effects.
 /// </summary>
-[RegisterComponent, NetworkedComponent]
+[RegisterComponent] [NetworkedComponent]
 public sealed partial class SlimeDamageOvertimeComponent : Component
 {
+    [DataField]
+    public DamageSpecifier Damage = new()
+    {
+        DamageDict = new Dictionary<string, FixedPoint2>
+        {
+            { "Caustic", 2.5 },
+        },
+    };
+
+    [DataField]
+    public TimeSpan Interval = TimeSpan.FromSeconds(1);
+
+    [ViewVariables(VVAccess.ReadOnly)]
+    public TimeSpan NextTickTime = TimeSpan.Zero;
+
     [ViewVariables(VVAccess.ReadOnly)]
     public EntityUid? SourceEntityUid;
 
@@ -38,19 +54,4 @@ public sealed partial class SlimeDamageOvertimeComponent : Component
     /// </summary>
     [DataField]
     public FixedPoint2 ToxinUnits = 0.15;
-
-    [DataField]
-    public TimeSpan Interval = TimeSpan.FromSeconds(1);
-
-    [ViewVariables(VVAccess.ReadOnly)]
-    public TimeSpan NextTickTime = TimeSpan.Zero;
-
-    [DataField]
-    public DamageSpecifier Damage = new()
-    {
-        DamageDict = new Dictionary<string, FixedPoint2>
-        {
-            { "Caustic", 2.5 },
-        },
-    };
 }

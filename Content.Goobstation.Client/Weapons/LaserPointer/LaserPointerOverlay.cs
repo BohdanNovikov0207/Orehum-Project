@@ -17,7 +17,6 @@ namespace Content.Goobstation.Client.Weapons.LaserPointer;
 
 public sealed class LaserPointerOverlay : Overlay
 {
-    public override OverlaySpace Space => OverlaySpace.WorldSpaceEntities;
     private readonly IEntityManager _entManager;
 
     private readonly TransformSystem _transform;
@@ -34,6 +33,8 @@ public sealed class LaserPointerOverlay : Overlay
 
         _unshadedShader = prototype.Index<ShaderPrototype>("unshaded").Instance();
     }
+
+    public override OverlaySpace Space => OverlaySpace.WorldSpaceEntities;
 
     protected override void Draw(in OverlayDrawArgs args)
     {
@@ -71,8 +72,5 @@ public sealed class LaserPointerOverlay : Overlay
         handle.UseShader(null);
     }
 
-    private static (float min, float max) MinMax(float a, float b)
-    {
-        return a >= b ? (b, a) : (a, b);
-    }
+    private static (float min, float max) MinMax(float a, float b) => a >= b ? (b, a) : (a, b);
 }

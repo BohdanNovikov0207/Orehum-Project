@@ -33,7 +33,7 @@ public sealed partial class NtrTaskHistoryEntry : BoxContainer
             return;
         }
 
-        if (!_prototype.TryIndex(task.Task, out NtrTaskPrototype? taskPrototype))
+        if (!_prototype.TryIndex(task.Task, out var taskPrototype))
         {
             Visible = false;
             return;
@@ -41,8 +41,9 @@ public sealed partial class NtrTaskHistoryEntry : BoxContainer
 
         var items = new List<string>();
         var prototypeManager = IoCManager.Resolve<IPrototypeManager>();
-        if (!prototypeManager.TryIndex(task.Task, out NtrTaskPrototype? proto))
-        {//to not crash the game if something goes wrong
+        if (!prototypeManager.TryIndex(task.Task, out var proto))
+        {
+            //to not crash the game if something goes wrong
             Visible = false;
             return;
         }
@@ -63,7 +64,9 @@ public sealed partial class NtrTaskHistoryEntry : BoxContainer
         if (task.Result == NtrTaskHistoryData.TaskResult.Completed)
             NoticeLabel.SetMarkup(Loc.GetString("bounty-console-history-notice-completed-label"));
         else
+        {
             NoticeLabel.SetMarkup(Loc.GetString("bounty-console-history-notice-skipped-label",
                 ("id", task.ActorName ?? "")));
+        }
     }
 }

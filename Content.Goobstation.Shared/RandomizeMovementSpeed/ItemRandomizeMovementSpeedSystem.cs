@@ -8,36 +8,35 @@
 using Content.Shared.Hands;
 using Content.Shared.Hands.EntitySystems;
 using Content.Shared.Movement.Systems;
+using Content.Shared.Whitelist;
 using Robust.Shared.Random;
 using Robust.Shared.Timing;
-using Content.Shared.Whitelist;
 
 namespace Content.Goobstation.Shared.RandomizeMovementSpeed;
 
 public sealed class ItemRandomizeMovementSpeedSystem : EntitySystem
 {
+    [Dependency] private readonly SharedHandsSystem _hands = default!;
     [Dependency] private readonly MovementSpeedModifierSystem _movementSpeedModifier = default!;
     [Dependency] private readonly IRobustRandom _random = default!;
     [Dependency] private readonly IGameTiming _timing = default!;
     [Dependency] private readonly EntityWhitelistSystem _whitelist = default!;
-    [Dependency] private readonly SharedHandsSystem _hands = default!;
 
     public override void Initialize()
     {
         base.Initialize();
         SubscribeLocalEvent<ItemRandomizeMovementspeedComponent, GotEquippedHandEvent>(OnGotEquippedHand);
-        SubscribeLocalEvent<ItemRandomizeMovementspeedComponent, HeldRelayedEvent<RefreshMovementSpeedModifiersEvent>>(OnRefreshMovementSpeedModifiers);
+        SubscribeLocalEvent<ItemRandomizeMovementspeedComponent, HeldRelayedEvent<RefreshMovementSpeedModifiersEvent>>(
+            OnRefreshMovementSpeedModifiers);
     }
 
-    private void OnGotEquippedHand(EntityUid uid, ItemRandomizeMovementspeedComponent comp, GotEquippedHandEvent args)
-    {
+    private void
+        OnGotEquippedHand(EntityUid uid, ItemRandomizeMovementspeedComponent comp, GotEquippedHandEvent args) =>
         comp.User = args.User;
-    }
 
-    private void OnRefreshMovementSpeedModifiers(EntityUid uid, ItemRandomizeMovementspeedComponent comp, ref HeldRelayedEvent<RefreshMovementSpeedModifiersEvent> args)
-    {
-        args.Args.ModifySpeed(comp.CurrentModifier);
-    }
+    private void OnRefreshMovementSpeedModifiers(EntityUid uid,
+        ItemRandomizeMovementspeedComponent comp,
+        ref HeldRelayedEvent<RefreshMovementSpeedModifiersEvent> args) => args.Args.ModifySpeed(comp.CurrentModifier);
 
     public override void Update(float frameTime)
     {
@@ -46,7 +45,8 @@ public sealed class ItemRandomizeMovementSpeedSystem : EntitySystem
         var query = EntityQueryEnumerator<ItemRandomizeMovementspeedComponent>();
         while (query.MoveNext(out var uid, out var comp))
         {
-            comp.CurrentModifier = MathHelper.Lerp(comp.CurrentModifier, comp.TargetModifier, frameTime / comp.SmoothingTime);
+            comp.CurrentModifier =
+                MathHelper.Lerp(comp.CurrentModifier, comp.TargetModifier, frameTime / comp.SmoothingTime);
 
             if (comp.Whitelist is not { } whitelist
                 || comp.User is not { } user
@@ -66,6 +66,5 @@ public sealed class ItemRandomizeMovementSpeedSystem : EntitySystem
             Dirty(uid, comp);
             comp.NextExecutionTime = _timing.CurTime + comp.ExecutionInterval;
         }
-
     }
 }

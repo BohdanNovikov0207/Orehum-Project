@@ -6,7 +6,6 @@
 // SPDX-License-Identifier: AGPL-3.0-or-later
 
 using Content.Server.DeviceLinking.Systems;
-using Content.Server.Explosion.EntitySystems;
 using Content.Shared.Trigger;
 using Robust.Shared.Timing;
 
@@ -24,6 +23,7 @@ public sealed class MiscSignallerSystem : EntitySystem
         SubscribeLocalEvent<MiscSignallerComponent, ComponentInit>(OnInit);
         SubscribeLocalEvent<MiscSignallerComponent, TriggerEvent>(OnTrigger);
     }
+
     private void OnInit(EntityUid uid, MiscSignallerComponent component, ComponentInit args)
         => _link.EnsureSourcePorts(uid, component.Port);
 
@@ -34,6 +34,7 @@ public sealed class MiscSignallerSystem : EntitySystem
             args.Handled = true;
             return;
         }
+
         _link.InvokePort(uid, component.Port);
         args.Handled = true;
         component.NextActivationWindow = _timing.CurTime + component.ActivationInterval;

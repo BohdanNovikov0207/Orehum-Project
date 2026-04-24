@@ -50,10 +50,7 @@ public sealed partial class NoEorgPopup : FancyWindow
         _cfg.SaveToFile();
     }
 
-    private void OnClosePressed(BaseButton.ButtonEventArgs args)
-    {
-        Close();
-    }
+    private void OnClosePressed(BaseButton.ButtonEventArgs args) => Close();
 
     private void UpdateCloseButtonText()
     {

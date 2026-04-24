@@ -14,11 +14,8 @@ namespace Content.Goobstation.Client.SetSelector;
 [GenerateTypedNameReferences]
 public sealed partial class SetSelectorMenu : FancyWindow
 {
-    [Dependency] private readonly IEntitySystemManager _sysMan = default!;
     private readonly SpriteSystem _spriteSystem;
-
-    public event Action? OnApprove;
-    public event Action<int>? OnSetChange;
+    [Dependency] private readonly IEntitySystemManager _sysMan = default!;
 
     public SetSelectorMenu()
     {
@@ -32,6 +29,9 @@ public sealed partial class SetSelectorMenu : FancyWindow
         };
     }
 
+    public event Action? OnApprove;
+    public event Action<int>? OnSetChange;
+
     public void UpdateState(SetSelectorBoundUserInterfaceState state)
     {
         SetsGrid.DisposeAllChildren();
@@ -40,7 +40,7 @@ public sealed partial class SetSelectorMenu : FancyWindow
         {
             var child = new SelectableSet(info, _spriteSystem);
 
-            child.SetButton.OnButtonDown += (_) =>
+            child.SetButton.OnButtonDown += _ =>
             {
                 OnSetChange?.Invoke(set);
             };
@@ -52,7 +52,9 @@ public sealed partial class SetSelectorMenu : FancyWindow
         }
 
         Description.Text = Loc.GetString("set-selector-window-description", ("maxCount", state.MaxSelectedSets));
-        SelectedSets.Text = Loc.GetString("set-selector-window-selected", ("selectedCount", selectedNumber), ("maxCount", state.MaxSelectedSets));
+        SelectedSets.Text = Loc.GetString("set-selector-window-selected",
+            ("selectedCount", selectedNumber),
+            ("maxCount", state.MaxSelectedSets));
         ApproveButton.Disabled = selectedNumber != state.MaxSelectedSets;
     }
 }

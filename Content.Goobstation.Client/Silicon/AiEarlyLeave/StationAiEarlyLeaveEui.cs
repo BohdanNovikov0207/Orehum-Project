@@ -1,8 +1,7 @@
 using Content.Client.Eui;
+using Content.Goobstation.Shared.Silicons;
 using JetBrains.Annotations;
 using Robust.Client.Graphics;
-
-using Content.Goobstation.Shared.Silicons;
 
 namespace Content.Goobstation.Client.Silicon;
 
@@ -41,5 +40,4 @@ public sealed class StationAiEarlyLeaveEui : BaseEui
         SendMessage(new StationAiEarlyLeaveMessage(false));
         _menu.Close();
     }
-
 }

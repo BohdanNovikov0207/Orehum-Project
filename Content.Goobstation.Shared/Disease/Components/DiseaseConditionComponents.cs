@@ -15,14 +15,12 @@ public sealed partial class DiseaseChanceConditionComponent : ScalingDiseaseEffe
 /// <summary>
 /// Causes this effect to only trigger ocassionally
 /// </summary>
-[RegisterComponent, NetworkedComponent, AutoGenerateComponentState]
+[RegisterComponent] [NetworkedComponent] [AutoGenerateComponentState]
 public sealed partial class DiseasePeriodicConditionComponent : ScalingDiseaseEffect
 {
-    /// <summary>
-    /// Minimum delay between passes, increases inversely proportional to severity
-    /// </summary>
-    [DataField]
-    public TimeSpan DelayMin = TimeSpan.FromSeconds(10);
+    // state: delay until next pass
+    [AutoNetworkedField]
+    public TimeSpan? CurrentDelay;
 
     /// <summary>
     /// Maximum delay between passes, increases inversely proportional to severity
@@ -30,13 +28,15 @@ public sealed partial class DiseasePeriodicConditionComponent : ScalingDiseaseEf
     [DataField]
     public TimeSpan DelayMax = TimeSpan.FromSeconds(30);
 
+    /// <summary>
+    /// Minimum delay between passes, increases inversely proportional to severity
+    /// </summary>
+    [DataField]
+    public TimeSpan DelayMin = TimeSpan.FromSeconds(10);
+
     // state: time since last passed
     [AutoNetworkedField]
     public TimeSpan TimeSinceLast = TimeSpan.FromSeconds(0);
-
-    // state: delay until next pass
-    [AutoNetworkedField]
-    public TimeSpan? CurrentDelay;
 }
 
 /// <summary>
@@ -46,14 +46,14 @@ public sealed partial class DiseasePeriodicConditionComponent : ScalingDiseaseEf
 public sealed partial class DiseaseProgressConditionComponent : Component
 {
     /// <summary>
-    /// Minimum disease progress for this effect to be active, doesn't apply if null
-    /// </summary>
-    [DataField]
-    public float? MinProgress;
-
-    /// <summary>
     /// Maximum disease progress for this effect to be active, doesn't apply if null
     /// </summary>
     [DataField]
     public float? MaxProgress;
+
+    /// <summary>
+    /// Minimum disease progress for this effect to be active, doesn't apply if null
+    /// </summary>
+    [DataField]
+    public float? MinProgress;
 }

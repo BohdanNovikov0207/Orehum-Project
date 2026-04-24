@@ -9,6 +9,7 @@
 // SPDX-License-Identifier: AGPL-3.0-or-later
 
 //using Content.Server.SpecForces;
+
 namespace Content.Goobstation.Server.Blob.Components;
 
 [RegisterComponent]

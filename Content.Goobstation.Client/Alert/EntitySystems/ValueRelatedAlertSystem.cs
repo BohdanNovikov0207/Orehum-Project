@@ -5,14 +5,13 @@ using Content.Goobstation.Shared.Alert.Events;
 using Robust.Client.GameObjects;
 
 namespace Content.Goobstation.Client.Alert.EntitySystems;
+
 public sealed class ValueRelatedAlertSystem : EntitySystem
 {
     [Dependency] private readonly SpriteSystem _spriteSystem = default!;
 
-    public override void Initialize()
-    {
+    public override void Initialize() =>
         SubscribeLocalEvent<ValueRelatedAlertComponent, UpdateAlertSpriteEvent>(OnAlertSpriteUpdate);
-    }
 
     private void OnAlertSpriteUpdate(Entity<ValueRelatedAlertComponent> alert, ref UpdateAlertSpriteEvent args)
     {
@@ -27,7 +26,8 @@ public sealed class ValueRelatedAlertSystem : EntitySystem
         var normalized = (int) (ev.CurrentValue / ev.MaxValue * alert.Comp.MaxSeverity);
         normalized = Math.Clamp(normalized, (int) ev.MinValue, alert.Comp.MaxSeverity);
 
-        var rsiString = (string.IsNullOrEmpty(alert.Comp.IconPrefix) ? "" : $"{alert.Comp.IconPrefix}_") + $"{normalized}";
+        var rsiString = (string.IsNullOrEmpty(alert.Comp.IconPrefix) ? "" : $"{alert.Comp.IconPrefix}_") +
+                        $"{normalized}";
 
         _spriteSystem.LayerSetRsiState(sprite.Owner, AlertVisualLayers.Base, rsiString);
     }

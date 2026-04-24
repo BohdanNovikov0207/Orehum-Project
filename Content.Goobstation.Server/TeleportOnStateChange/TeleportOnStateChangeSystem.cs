@@ -5,13 +5,13 @@
 // SPDX-License-Identifier: AGPL-3.0-or-later
 
 using Content.Shared.Mobs;
-using Robust.Shared.Map;
 
 namespace Content.Goobstation.Server.TeleportOnStateChange;
 
-public sealed partial class TeleportOnStateChangeSystem : EntitySystem
+public sealed class TeleportOnStateChangeSystem : EntitySystem
 {
     [Dependency] private readonly SharedTransformSystem _transformSystem = default!;
+
     public override void Initialize()
     {
         base.Initialize();

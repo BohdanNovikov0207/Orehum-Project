@@ -6,11 +6,12 @@ using Content.Shared.Humanoid;
 using Content.Shared.Popups;
 
 namespace Content.Goobstation.Shared.Wraith.Systems;
-public sealed partial class DecaySystem : EntitySystem
+
+public sealed class DecaySystem : EntitySystem
 {
+    [Dependency] private readonly EmagSystem _emag = default!;
     [Dependency] private readonly SharedPopupSystem _popup = default!;
     [Dependency] private readonly SharedStaminaSystem _stamina = default!;
-    [Dependency] private readonly EmagSystem _emag = default!;
 
     public override void Initialize()
     {

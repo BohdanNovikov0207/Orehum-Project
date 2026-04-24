@@ -16,7 +16,6 @@
 
 using System.Linq;
 using Content.Goobstation.Shared.Teleportation.Systems;
-using Content.Shared.Body.Components;
 using Content.Shared.Destructible.Thresholds;
 using Content.Shared.EntityEffects;
 using Content.Shared.Examine;
@@ -28,18 +27,17 @@ namespace Content.Goobstation.Shared.EntityEffects;
 
 public sealed partial class RandomTeleportNearby : EntityEffect
 {
+    /// <summary>
+    /// Up to how far to teleport the user in tiles.
+    /// </summary>
+    [DataField]
+    public MinMax Radius = new(5, 20);
 
     [DataField]
     public float Range = 7;
 
     /// <summary>
-    ///     Up to how far to teleport the user in tiles.
-    /// </summary>
-    [DataField]
-    public MinMax Radius = new MinMax(5, 20);
-
-    /// <summary>
-    ///     How many times to try to pick the destination. Larger number means the teleport is more likely to be safe.
+    /// How many times to try to pick the destination. Larger number means the teleport is more likely to be safe.
     /// </summary>
     [DataField]
     public int TeleportAttempts = 10;
@@ -81,6 +79,8 @@ public sealed partial class RandomTeleportNearby : EntityEffect
             return;
 
         foreach (var entity in canTarget)
+        {
             teleportSystem.RandomTeleport(entity, Radius, TeleportAttempts);
+        }
     }
 }

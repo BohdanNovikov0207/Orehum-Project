@@ -5,12 +5,12 @@ namespace Content.Goobstation.Shared.Examine;
 /// <summary>
 /// Gives an <c>ItemToggleComponent</c> an examine message depending on it being enabled or disabled.
 /// </summary>
-[RegisterComponent, NetworkedComponent, Access(typeof(ToggleExamineSystem))]
+[RegisterComponent] [NetworkedComponent] [Access(typeof(ToggleExamineSystem))]
 public sealed partial class ToggleExamineComponent : Component
 {
     [DataField(required: true)]
-    public LocId Enabled;
+    public LocId Disabled;
 
     [DataField(required: true)]
-    public LocId Disabled;
+    public LocId Enabled;
 }

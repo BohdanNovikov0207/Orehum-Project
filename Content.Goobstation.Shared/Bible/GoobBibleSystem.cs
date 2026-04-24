@@ -22,25 +22,29 @@ using Robust.Shared.Timing;
 
 namespace Content.Goobstation.Shared.Bible;
 
-public sealed partial class GoobBibleSystem : EntitySystem
+public sealed class GoobBibleSystem : EntitySystem
 {
-    [Dependency] private readonly DamageableSystem _damageableSystem = default!;
-    [Dependency] private readonly MobStateSystem _mobStateSystem = default!;
-    [Dependency] private readonly SharedPopupSystem _popupSystem = default!;
     [Dependency] private readonly SharedAudioSystem _audio = default!;
+    [Dependency] private readonly DamageableSystem _damageableSystem = default!;
     [Dependency] private readonly UseDelaySystem _delay = default!;
-    [Dependency] private readonly SharedStunSystem _stun = default!;
     [Dependency] private readonly SharedDoAfterSystem _doAfter = default!;
-    [Dependency] private readonly IGameTiming _timing = default!;
+    [Dependency] private readonly MobStateSystem _mobStateSystem = default!;
     [Dependency] private readonly INetManager _netManager = default!;
+    [Dependency] private readonly SharedPopupSystem _popupSystem = default!;
+    [Dependency] private readonly SharedStunSystem _stun = default!;
+    [Dependency] private readonly IGameTiming _timing = default!;
 
-    public bool TryDoSmite(EntityUid bible, EntityUid performer, EntityUid target, UseDelayComponent? useDelay = null, BibleComponent? bibleComp = null)
+    public bool TryDoSmite(EntityUid bible,
+        EntityUid performer,
+        EntityUid target,
+        UseDelayComponent? useDelay = null,
+        BibleComponent? bibleComp = null)
     {
         if (!Resolve(bible, ref useDelay, ref bibleComp))
             return false;
 
         if (!TryComp<WeakToHolyComponent>(target, out var weakToHoly)
-            || weakToHoly is {AlwaysTakeHoly: false}
+            || weakToHoly is { AlwaysTakeHoly: false }
             || !HasComp<BibleUserComponent>(performer)
             || !_timing.IsFirstTimePredicted
             || _delay.IsDelayed(bible)
@@ -61,7 +65,12 @@ public sealed partial class GoobBibleSystem : EntitySystem
             var popup = Loc.GetString("weaktoholy-component-bible-sizzle", ("target", target), ("item", bible));
             _popupSystem.PopupPredicted(popup, target, performer, PopupType.LargeCaution);
             _audio.PlayPvs(bibleComp.SizzleSoundPath, target);
-            _damageableSystem.TryChangeDamage(target, bibleComp.SmiteDamage * multiplier, true, origin: bible, targetPart: TargetBodyPart.All, ignoreBlockers: true);
+            _damageableSystem.TryChangeDamage(target,
+                bibleComp.SmiteDamage * multiplier,
+                true,
+                origin: bible,
+                targetPart: TargetBodyPart.All,
+                ignoreBlockers: true);
             _stun.TryUpdateParalyzeDuration(target, bibleComp.SmiteStunDuration * multiplier);
             _delay.TryResetDelay((bible, useDelay));
         }
@@ -72,8 +81,8 @@ public sealed partial class GoobBibleSystem : EntitySystem
                 performer,
                 10f,
                 new ExorcismDoAfterEvent(),
-                eventTarget: target,
-                target: target)
+                target,
+                target)
             {
                 BreakOnMove = true,
                 NeedHand = true,

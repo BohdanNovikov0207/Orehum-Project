@@ -5,13 +5,13 @@
 // SPDX-License-Identifier: AGPL-3.0-or-later
 
 using System.Text.RegularExpressions;
+using Content.Goobstation.Common.CrematorImmune;
 using Content.Goobstation.Common.Religion;
 using Content.Goobstation.Server.Devil.Condemned;
 using Content.Goobstation.Server.Devil.Contract;
 using Content.Goobstation.Server.Devil.Objectives.Components;
 using Content.Goobstation.Server.Possession;
 using Content.Goobstation.Shared.CheatDeath;
-using Content.Goobstation.Common.CrematorImmune;
 using Content.Goobstation.Shared.Devil;
 using Content.Goobstation.Shared.Devil.Condemned;
 using Content.Goobstation.Shared.Exorcism;
@@ -28,8 +28,6 @@ using Content.Server.Jittering;
 using Content.Server.Mind;
 using Content.Server.Polymorph.Systems;
 using Content.Server.Popups;
-using Content.Server.Speech;
-using Content.Server.Speech.Components;
 using Content.Server.Stunnable;
 using Content.Server.Temperature.Components;
 using Content.Server.Zombies;
@@ -62,27 +60,26 @@ namespace Content.Goobstation.Server.Devil;
 
 public sealed partial class DevilSystem : EntitySystem
 {
-    [Dependency] private readonly HandsSystem _hands = default!;
+    private static readonly Regex WhitespaceAndNonWordRegex = new(@"[\s\W]+", RegexOptions.Compiled);
     [Dependency] private readonly ActionsSystem _actions = default!;
+    [Dependency] private readonly SharedAudioSystem _audio = default!;
+    [Dependency] private readonly BodySystem _body = default!;
+    [Dependency] private readonly CondemnedSystem _condemned = default!;
+    [Dependency] private readonly ContainerSystem _container = default!;
+    [Dependency] private readonly DevilContractSystem _contract = default!;
+    [Dependency] private readonly DamageableSystem _damageable = default!;
+    [Dependency] private readonly HandsSystem _hands = default!;
+    [Dependency] private readonly JitteringSystem _jittering = default!;
+    [Dependency] private readonly MindSystem _mind = default!;
     [Dependency] private readonly PolymorphSystem _poly = default!;
+    [Dependency] private readonly PopupSystem _popup = default!;
+    [Dependency] private readonly PossessionSystem _possession = default!;
     [Dependency] private readonly IPrototypeManager _prototype = default!;
     [Dependency] private readonly IRobustRandom _random = default!;
-    [Dependency] private readonly StunSystem _stun = default!;
-    [Dependency] private readonly PopupSystem _popup = default!;
-    [Dependency] private readonly MindSystem _mind = default!;
-    [Dependency] private readonly SharedAudioSystem _audio = default!;
-    [Dependency] private readonly DamageableSystem _damageable = default!;
     [Dependency] private readonly RejuvenateSystem _rejuvenate = default!;
-    [Dependency] private readonly DevilContractSystem _contract = default!;
-    [Dependency] private readonly IGameTiming _timing = default!;
-    [Dependency] private readonly PossessionSystem _possession = default!;
-    [Dependency] private readonly CondemnedSystem _condemned = default!;
     [Dependency] private readonly MobStateSystem _state = default!;
-    [Dependency] private readonly JitteringSystem _jittering = default!;
-    [Dependency] private readonly BodySystem _body = default!;
-    [Dependency] private readonly ContainerSystem _container = default!;
-
-    private static readonly Regex WhitespaceAndNonWordRegex = new(@"[\s\W]+", RegexOptions.Compiled);
+    [Dependency] private readonly StunSystem _stun = default!;
+    [Dependency] private readonly IGameTiming _timing = default!;
 
     public override void Initialize()
     {
@@ -94,7 +91,8 @@ public sealed partial class DevilSystem : EntitySystem
         SubscribeLocalEvent<DevilComponent, PowerLevelChangedEvent>(OnPowerLevelChanged);
         SubscribeLocalEvent<DevilComponent, ExorcismDoAfterEvent>(OnExorcismDoAfter);
 
-        SubscribeLocalEvent<IdentityBlockerComponent, InventoryRelayedEvent<IsEyesCoveredCheckEvent>>(OnEyesCoveredCheckEvent);
+        SubscribeLocalEvent<IdentityBlockerComponent, InventoryRelayedEvent<IsEyesCoveredCheckEvent>>(
+            OnEyesCoveredCheckEvent);
 
         InitializeHandshakeSystem();
         SubscribeAbilities();
@@ -132,7 +130,7 @@ public sealed partial class DevilSystem : EntitySystem
 
         // Change damage modifier
         if (TryComp<DamageableComponent>(devil, out var damageableComp))
-           _damageable.SetDamageModifierSetId(devil, devil.Comp.DevilDamageModifierSet, damageableComp);
+            _damageable.SetDamageModifierSetId(devil, devil.Comp.DevilDamageModifierSet, damageableComp);
 
         // No decapitating the devil
         foreach (var part in _body.GetBodyChildren(devil))
@@ -146,7 +144,9 @@ public sealed partial class DevilSystem : EntitySystem
 
         // Add base actions
         foreach (var actionId in devil.Comp.BaseDevilActions)
+        {
             _actions.AddAction(devil, actionId);
+        }
 
         // Self Explanatory
         GenerateTrueName(devil);
@@ -166,7 +166,7 @@ public sealed partial class DevilSystem : EntitySystem
 
         if (devil.Comp.Souls is > 1 and < 7 && devil.Comp.Souls % 2 == 0)
         {
-            devil.Comp.PowerLevel = (DevilPowerLevel)(devil.Comp.Souls / 2); // malicious casting to enum
+            devil.Comp.PowerLevel = (DevilPowerLevel) (devil.Comp.Souls / 2); // malicious casting to enum
 
             // Raise event
             var ev = new PowerLevelChangedEvent(args.User, devil.Comp.PowerLevel);
@@ -191,7 +191,9 @@ public sealed partial class DevilSystem : EntitySystem
                 continue;
 
             foreach (var actionId in ability.Value)
+            {
                 _actions.AddAction(devil, actionId);
+            }
         }
     }
 
@@ -209,18 +211,20 @@ public sealed partial class DevilSystem : EntitySystem
         args.PushMarkup(Loc.GetString("devil-component-examined", ("target", Identity.Entity(ent, EntityManager))));
     }
 
-    private void OnEyesCoveredCheckEvent(Entity<IdentityBlockerComponent> ent, ref InventoryRelayedEvent<IsEyesCoveredCheckEvent> args)
+    private void OnEyesCoveredCheckEvent(Entity<IdentityBlockerComponent> ent,
+        ref InventoryRelayedEvent<IsEyesCoveredCheckEvent> args)
     {
         if (ent.Comp.Enabled)
             args.Args.IsEyesProtected = true;
     }
+
     private void OnListen(Entity<DevilComponent> devil, ref ListenEvent args)
     {
         // Other Devils and entities without souls have no authority over you.
         if (HasComp<DevilComponent>(args.Source)
-        || HasComp<CondemnedComponent>(args.Source)
-        || HasComp<SiliconComponent>(args.Source)
-        || args.Source == devil.Owner)
+            || HasComp<CondemnedComponent>(args.Source)
+            || HasComp<SiliconComponent>(args.Source)
+            || args.Source == devil.Owner)
             return;
 
         var message = WhitespaceAndNonWordRegex.Replace(args.Message.ToLowerInvariant(), "");
@@ -239,8 +243,11 @@ public sealed partial class DevilSystem : EntitySystem
 
         if (HasComp<BibleUserComponent>(args.Source))
         {
-            _damageable.TryChangeDamage(devil, devil.Comp.DamageOnTrueName * devil.Comp.BibleUserDamageMultiplier, true);
-            _stun.TryUpdateParalyzeDuration(devil, devil.Comp.ParalyzeDurationOnTrueName * devil.Comp.BibleUserDamageMultiplier);
+            _damageable.TryChangeDamage(devil,
+                devil.Comp.DamageOnTrueName * devil.Comp.BibleUserDamageMultiplier,
+                true);
+            _stun.TryUpdateParalyzeDuration(devil,
+                devil.Comp.ParalyzeDurationOnTrueName * devil.Comp.BibleUserDamageMultiplier);
 
             var popup = Loc.GetString("devil-true-name-heard-chaplain", ("speaker", args.Source), ("target", devil));
             _popup.PopupEntity(popup, devil, PopupType.LargeCaution);
@@ -264,7 +271,6 @@ public sealed partial class DevilSystem : EntitySystem
 
         _popup.PopupEntity(Loc.GetString("devil-exorcised", ("target", Name(devil))), devil, PopupType.LargeCaution);
         _condemned.StartCondemnation(target, behavior: CondemnedBehavior.Banish, doFlavor: false);
-
     }
 
     #endregion
@@ -279,12 +285,15 @@ public sealed partial class DevilSystem : EntitySystem
         action.Handled = true;
         return true;
     }
+
     private void PlayFwooshSound(EntityUid uid, DevilComponent? comp = null)
     {
         if (!Resolve(uid, ref comp))
             return;
 
-        _audio.PlayPvs(comp.FwooshPath, uid, new AudioParams(-2f, 1f, SharedAudioSystem.DefaultSoundRange, 1f, false, 0f));
+        _audio.PlayPvs(comp.FwooshPath,
+            uid,
+            new AudioParams(-2f, 1f, SharedAudioSystem.DefaultSoundRange, 1f, false, 0f));
     }
 
     private void DoContractFlavor(EntityUid devil, string name)
@@ -292,6 +301,7 @@ public sealed partial class DevilSystem : EntitySystem
         var flavor = Loc.GetString("contract-summon-flavor", ("name", name));
         _popup.PopupEntity(flavor, devil, PopupType.Medium);
     }
+
     private void GenerateTrueName(DevilComponent comp)
     {
         // Generate true name.
@@ -302,5 +312,4 @@ public sealed partial class DevilSystem : EntitySystem
     }
 
     #endregion
-
 }

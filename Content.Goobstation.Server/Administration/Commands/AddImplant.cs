@@ -37,7 +37,7 @@ public sealed class AddImplant : LocalizedCommands
             return;
         }
 
-        var target  = targetEntity.Value;
+        var target = targetEntity.Value;
         var implant = implantSystem.AddImplant(target, args[1]);
 
         if (implant != null)
@@ -70,4 +70,3 @@ public sealed class AddImplant : LocalizedCommands
         return CompletionResult.FromHintOptions(options, Loc.GetString("cmd-addimplant-hint"));
     }
 }
-

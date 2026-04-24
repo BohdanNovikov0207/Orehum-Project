@@ -1,5 +1,4 @@
 using Content.Goobstation.Shared.DarkLord;
-using Content.Server.Objectives.Components;
 using Content.Server.Objectives.Systems;
 using Content.Shared.Mind;
 using Content.Shared.Objectives.Components;
@@ -13,11 +12,13 @@ public sealed class KillTheDarkLordObjectiveSystem : EntitySystem
 {
     [Dependency] private readonly SharedMindSystem _mind = default!;
     [Dependency] private readonly TargetObjectiveSystem _target = default!;
-    public override void Initialize()
-    {
+
+    public override void Initialize() =>
         SubscribeLocalEvent<KillTheDarkLordObjectiveComponent, ObjectiveGetProgressEvent>(OnGetDarkLordKillProgress);
-    }
-    private void OnGetDarkLordKillProgress(EntityUid uid, KillTheDarkLordObjectiveComponent component, ref ObjectiveGetProgressEvent args)
+
+    private void OnGetDarkLordKillProgress(EntityUid uid,
+        KillTheDarkLordObjectiveComponent component,
+        ref ObjectiveGetProgressEvent args)
     {
         args.Progress = 0f;
         var query = EntityQueryEnumerator<DarkLordMarkerComponent>();

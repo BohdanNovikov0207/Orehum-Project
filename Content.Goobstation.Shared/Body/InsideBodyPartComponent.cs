@@ -12,16 +12,15 @@ namespace Content.Goobstation.Shared.Body;
 /// Component added to items inserted to someone's chest cavity via surgery.
 /// Mobs will be able to burst out with an action.
 /// </summary>
-[RegisterComponent, NetworkedComponent, Access(typeof(InsideBodyPartSystem))]
+[RegisterComponent] [NetworkedComponent] [Access(typeof(InsideBodyPartSystem))]
 [AutoGenerateComponentState]
 public sealed partial class InsideBodyPartComponent : Component
 {
-    /// <summary>
-    /// The part this entity is inside of.
-    /// Should always be valid.
-    /// </summary>
-    [DataField, AutoNetworkedField]
-    public EntityUid Part;
+    [DataField] [AutoNetworkedField]
+    public EntityUid? ActionEntity;
+
+    [DataField]
+    public TimeSpan AliveDelay = TimeSpan.FromSeconds(10); // more drama when alive
 
     /// <summary>
     /// Action to grant for mobs (BodyComponent) inside of body parts.
@@ -31,23 +30,24 @@ public sealed partial class InsideBodyPartComponent : Component
     [DataField]
     public EntProtoId<InstantActionComponent> BurstAction = "ActionBodyPartBurst";
 
-    [DataField, AutoNetworkedField]
-    public EntityUid? ActionEntity;
-
-    [DataField]
-    public TimeSpan Delay = TimeSpan.FromSeconds(4);
-
-    [DataField]
-    public TimeSpan AliveDelay = TimeSpan.FromSeconds(10); // more drama when alive
-
     [DataField]
     public DamageSpecifier BurstDamage = new()
     {
         DamageDict =
         {
-            { "Blunt", 70 }
-        }
+            { "Blunt", 70 },
+        },
     };
+
+    [DataField]
+    public TimeSpan Delay = TimeSpan.FromSeconds(4);
+
+    /// <summary>
+    /// The part this entity is inside of.
+    /// Should always be valid.
+    /// </summary>
+    [DataField] [AutoNetworkedField]
+    public EntityUid Part;
 
     /// <summary>
     /// How long to stun the victim for when bursting.
@@ -61,5 +61,5 @@ public sealed partial class InsideBodyPartComponent : Component
 /// </summary>
 public sealed partial class BodyPartBurstEvent : InstantActionEvent;
 
-[Serializable, NetSerializable]
+[Serializable] [NetSerializable]
 public sealed partial class BurstDoAfterEvent : SimpleDoAfterEvent;

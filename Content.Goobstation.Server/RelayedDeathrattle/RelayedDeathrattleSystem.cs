@@ -16,7 +16,6 @@
 // SPDX-License-Identifier: AGPL-3.0-or-later
 
 using Content.Server.Chat.Systems;
-using Content.Server.Medical.CrewMonitoring;
 using Content.Server.Pinpointer;
 using Content.Shared.Chat;
 using Content.Shared.Mobs;
@@ -26,8 +25,9 @@ namespace Content.Goobstation.Server.RelayedDeathrattle;
 
 public sealed class RelayedDeathrattleSystem : EntitySystem
 {
-    [Dependency] private readonly NavMapSystem _navMap = default!;
     [Dependency] private readonly ChatSystem _chat = default!;
+    [Dependency] private readonly NavMapSystem _navMap = default!;
+
     public override void Initialize()
     {
         base.Initialize();
@@ -49,6 +49,9 @@ public sealed class RelayedDeathrattleSystem : EntitySystem
         else
             return;
 
-        _chat.TrySendInGameICMessage(comp.Target.Value, Loc.GetString(dead ? comp.DeathMessage : comp.CritMessage, ("user", uid), ("position", posText)), InGameICChatType.Speak, hideChat: false);
+        _chat.TrySendInGameICMessage(comp.Target.Value,
+            Loc.GetString(dead ? comp.DeathMessage : comp.CritMessage, ("user", uid), ("position", posText)),
+            InGameICChatType.Speak,
+            false);
     }
 }

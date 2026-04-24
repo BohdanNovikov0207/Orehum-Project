@@ -8,11 +8,11 @@ using Robust.Shared.Network;
 
 namespace Content.Goobstation.Shared.Changeling.Systems;
 
-public abstract partial class SharedAugmentedEyesightSystem : EntitySystem
+public abstract class SharedAugmentedEyesightSystem : EntitySystem
 {
-    [Dependency] private readonly INetManager _net = default!;
     [Dependency] private readonly SharedActionsSystem _actions = default!;
     [Dependency] private readonly SharedEyeSystem _eye = default!;
+    [Dependency] private readonly INetManager _net = default!;
 
     public override void Initialize()
     {
@@ -43,6 +43,15 @@ public abstract partial class SharedAugmentedEyesightSystem : EntitySystem
         SetVision(ent, true);
     }
 
+    #region Helper Methods
+
+    protected virtual void SetVision(Entity<AugmentedEyesightComponent> ent, bool? state = null)
+    {
+        // go to AugmentedEyesightSystem for the logic
+    }
+
+    #endregion
+
     #region Event Handlers
 
     private void OnToggleVision(Entity<AugmentedEyesightComponent> ent, ref ActionAugmentedEyesightEvent args)
@@ -55,15 +64,11 @@ public abstract partial class SharedAugmentedEyesightSystem : EntitySystem
         args.Handled = true;
     }
 
-    private void OnFlashVulnerableCheck(Entity<AugmentedEyesightComponent> ent, ref CheckFlashVulnerable args)
-    {
+    private void OnFlashVulnerableCheck(Entity<AugmentedEyesightComponent> ent, ref CheckFlashVulnerable args) =>
         args.Vulnerable = !ent.Comp.Enabled;
-    }
 
-    private void OnFlashAttempt(Entity<AugmentedEyesightComponent> ent, ref FlashAttemptEvent args)
-    {
+    private void OnFlashAttempt(Entity<AugmentedEyesightComponent> ent, ref FlashAttemptEvent args) =>
         args.Cancelled = ent.Comp.Enabled;
-    }
 
     private void OnGetFlashMultiplier(Entity<AugmentedEyesightComponent> ent, ref FlashDurationMultiplierEvent args)
     {
@@ -77,13 +82,5 @@ public abstract partial class SharedAugmentedEyesightSystem : EntitySystem
             args.Protection += ent.Comp.EyeProtectionTime;
     }
 
-    #endregion
-
-    #region Helper Methods
-
-    protected virtual void SetVision(Entity<AugmentedEyesightComponent> ent, bool? state = null)
-    {
-        // go to AugmentedEyesightSystem for the logic
-    }
     #endregion
 }

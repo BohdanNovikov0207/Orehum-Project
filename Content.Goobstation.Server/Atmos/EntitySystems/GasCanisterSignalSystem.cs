@@ -3,10 +3,8 @@
 //
 // SPDX-License-Identifier: AGPL-3.0-or-later
 
-using Content.Server.Atmos.Piping.Unary.Components;
 using Content.Shared.Atmos.Piping.Binary.Components;
 using Content.Shared.Atmos.Piping.Unary.Components;
-using Content.Shared.DeviceLinking;
 using Content.Shared.DeviceLinking.Events;
 
 namespace Content.Goobstation.Server.Atmos.EntitySystems;
@@ -30,7 +28,7 @@ public sealed class GasCanisterSignalSystem : EntitySystem
             "Open" => true,
             "Close" => false,
             "Toggle" => !ent.Comp.ReleaseValve,
-            _ => false // fuck you c# cant just return
+            _ => false, // fuck you c# cant just return
         };
 
         if (ent.Comp.ReleaseValve == valve)
@@ -38,7 +36,7 @@ public sealed class GasCanisterSignalSystem : EntitySystem
 
         var ev = new GasCanisterChangeReleaseValveMessage(valve);
         ev.UiKey = GasCanisterUiKey.Key;
-        if (args.Trigger is {} actor)
+        if (args.Trigger is { } actor)
             ev.Actor = actor;
         RaiseLocalEvent(ent, ev);
     }

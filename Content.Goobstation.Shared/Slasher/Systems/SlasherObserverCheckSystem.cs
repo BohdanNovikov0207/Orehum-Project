@@ -16,10 +16,10 @@ namespace Content.Goobstation.Shared.Slasher.Systems;
 public sealed class SlasherObserverCheckSystem : EntitySystem
 {
     [Dependency] private readonly AlertsSystem _alerts = default!;
-    [Dependency] private readonly INetManager _net = default!;
+    [Dependency] private readonly SharedInteractionSystem _interaction = default!;
     [Dependency] private readonly EntityLookupSystem _lookup = default!;
     [Dependency] private readonly MobStateSystem _mobState = default!;
-    [Dependency] private readonly SharedInteractionSystem _interaction = default!;
+    [Dependency] private readonly INetManager _net = default!;
 
     public override void Initialize()
     {
@@ -29,15 +29,11 @@ public sealed class SlasherObserverCheckSystem : EntitySystem
         SubscribeLocalEvent<SlasherObserverCheckComponent, ComponentShutdown>(OnShutdown);
     }
 
-    private void OnStartup(Entity<SlasherObserverCheckComponent> ent, ref ComponentStartup args)
-    {
+    private void OnStartup(Entity<SlasherObserverCheckComponent> ent, ref ComponentStartup args) =>
         UpdateAlert(ent, false);
-    }
 
-    private void OnShutdown(Entity<SlasherObserverCheckComponent> ent, ref ComponentShutdown args)
-    {
+    private void OnShutdown(Entity<SlasherObserverCheckComponent> ent, ref ComponentShutdown args) =>
         _alerts.ClearAlert(ent, ent.Comp.Alert);
-    }
 
     public override void Update(float frameTime)
     {
@@ -54,10 +50,8 @@ public sealed class SlasherObserverCheckSystem : EntitySystem
         }
     }
 
-    private void UpdateAlert(Entity<SlasherObserverCheckComponent> ent, bool isObserved)
-    {
+    private void UpdateAlert(Entity<SlasherObserverCheckComponent> ent, bool isObserved) =>
         _alerts.ShowAlert(ent, ent.Comp.Alert, (short) (isObserved ? 1 : 0));
-    }
 
     /// <summary>
     /// Checks if the slasher is being observed by any valid players.

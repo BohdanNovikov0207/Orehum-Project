@@ -1,10 +1,9 @@
 <controls:FancyWindow xmlns="https://spacestation14.io"
-               xmlns:ui="clr-namespace:Content.Client.Pinpointer.UI"
-               xmlns:controls="using:Content.Client.UserInterface.Controls"
-               Title="{Loc 'supermatter-console-window-title'}"
-               Resizable="True"
-               SetSize="700 550"
-               MinSize="700 550">
+                      xmlns:controls="using:Content.Client.UserInterface.Controls"
+                      Title="{Loc 'supermatter-console-window-title'}"
+                      Resizable="True"
+                      SetSize="700 550"
+                      MinSize="700 550">
     <BoxContainer Orientation="Vertical">
         <!-- Main display -->
         <BoxContainer Orientation="Horizontal" VerticalExpand="True" HorizontalExpand="True">
@@ -13,7 +12,8 @@
                 <!-- Supermatters (entries added by C# code) -->
                 <BoxContainer VerticalExpand="True" HorizontalExpand="True" Margin="0 10 0 0">
                     <ScrollContainer HorizontalExpand="True">
-                        <BoxContainer Name="SupermattersTable" Orientation="Vertical" VerticalExpand="True" HorizontalExpand="True" Margin="0 0 0 10" />
+                        <BoxContainer Name="SupermattersTable" Orientation="Vertical" VerticalExpand="True"
+                                      HorizontalExpand="True" Margin="0 0 0 10" />
                     </ScrollContainer>
                 </BoxContainer>
             </BoxContainer>
@@ -25,9 +25,9 @@
             <BoxContainer Orientation="Horizontal" Margin="10 2 5 0" VerticalAlignment="Bottom">
                 <Label Text="{Loc 'supermatter-console-window-flavor-left'}" StyleClasses="WindowFooterText" />
                 <Label Text="{Loc 'supermatter-console-window-flavor-right'}" StyleClasses="WindowFooterText"
-                        HorizontalAlignment="Right" HorizontalExpand="True"  Margin="0 0 5 0" />
+                       HorizontalAlignment="Right" HorizontalExpand="True" Margin="0 0 5 0" />
                 <TextureRect StyleClasses="NTLogoDark" Stretch="KeepAspectCentered"
-                        VerticalAlignment="Center" HorizontalAlignment="Right" SetSize="19 19"/>
+                             VerticalAlignment="Center" HorizontalAlignment="Right" SetSize="19 19" />
             </BoxContainer>
         </BoxContainer>
     </BoxContainer>

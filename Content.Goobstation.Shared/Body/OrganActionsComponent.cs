@@ -7,7 +7,7 @@ namespace Content.Goobstation.Shared.Body;
 /// <summary>
 /// Adds actions to an organ's body.
 /// </summary>
-[RegisterComponent, NetworkedComponent, Access(typeof(OrganActionsSystem))]
+[RegisterComponent] [NetworkedComponent] [Access(typeof(OrganActionsSystem))]
 public sealed partial class OrganActionsComponent : Component
 {
     /// <summary>

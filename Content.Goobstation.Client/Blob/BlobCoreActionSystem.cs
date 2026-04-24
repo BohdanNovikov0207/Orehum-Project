@@ -20,6 +20,9 @@ namespace Content.Goobstation.Client.Blob;
 
 public sealed class BlobCoreActionSystem : SharedBlobCoreActionSystem
 {
+    [ValidatePrototypeId<EntityPrototype>]
+    private const string Animation = "WeaponArcPunch";
+
     [Dependency] private readonly MeleeWeaponSystem _meleeWeaponSystem = default!;
 
     public override void Initialize()
@@ -29,12 +32,9 @@ public sealed class BlobCoreActionSystem : SharedBlobCoreActionSystem
         SubscribeNetworkEvent<BlobAttackEvent>(OnBlobAttack);
     }
 
-    [ValidatePrototypeId<EntityPrototype>]
-    private const string Animation = "WeaponArcPunch";
-
     private void OnBlobAttack(BlobAttackEvent ev)
     {
-        if(!TryGetEntity(ev.BlobEntity, out var user))
+        if (!TryGetEntity(ev.BlobEntity, out var user))
             return;
 
         _meleeWeaponSystem.DoLunge(user.Value, user.Value, Angle.Zero, ev.Position, Animation, Angle.Zero, false);

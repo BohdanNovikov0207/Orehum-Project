@@ -1,14 +1,13 @@
-using Content.Shared.Actions;
+using Robust.Shared.Audio;
 using Robust.Shared.GameStates;
 using Robust.Shared.Prototypes;
-using Robust.Shared.Audio;
 
 namespace Content.Goobstation.Shared.Slasher.Components;
 
 /// <summary>
 /// Grants the Slasher the ability to instantly spawn a meat spike.
 /// </summary>
-[RegisterComponent, NetworkedComponent]
+[RegisterComponent] [NetworkedComponent]
 public sealed partial class SlasherSummonMeatSpikeComponent : Component
 {
     [ViewVariables]
@@ -31,6 +30,6 @@ public sealed partial class SlasherSummonMeatSpikeComponent : Component
         = new SoundPathSpecifier("/Audio/_Goobstation/Effects/Slasher/SlasherSummonMeatspike.ogg")
         {
             Params = AudioParams.Default
-                       .WithMaxDistance(4f)
+                .WithMaxDistance(4f),
         };
 }

@@ -4,9 +4,15 @@ using Robust.Shared.Prototypes;
 
 namespace Content.Goobstation.Shared.Wraith.Components;
 
-[RegisterComponent, NetworkedComponent]
+[RegisterComponent] [NetworkedComponent]
 public sealed partial class EvolveComponent : Component
 {
+    [ViewVariables]
+    public EntityUid? ActionEnt;
+
+    [ViewVariables]
+    public EntProtoId ActionId = "ActionEvolve";
+
     /// <summary>
     /// Used in UI. The evolutions that you can choose from.
     /// </summary>
@@ -18,12 +24,6 @@ public sealed partial class EvolveComponent : Component
     /// </summary>
     [DataField]
     public int CorpsesRequired = 3;
-
-    [ViewVariables]
-    public EntityUid? ActionEnt;
-
-    [ViewVariables]
-    public EntProtoId ActionId = "ActionEvolve";
 }
 
 /// <summary>

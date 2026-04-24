@@ -41,7 +41,9 @@ public sealed partial class GameDirectorSystem
 
         // For each set of label values, remove that shit.
         foreach (var labelSet in labelValues)
+        {
             gauge.RemoveLabelled(labelSet);
+        }
     }
 
     /// <summary>
@@ -54,7 +56,9 @@ public sealed partial class GameDirectorSystem
         var labelValues = gauge.GetAllLabelValues();
         foreach (var labelSet in labelValues)
         foreach (var label in labelSet)
+        {
             Log.Warning($"Label: {label}");
+        }
     }
 
     /// <summary>
@@ -68,5 +72,4 @@ public sealed partial class GameDirectorSystem
         ResetGaugeLabels(StoryBeatChangesTotal);
         ResetGaugeLabels(RoundstartAntagsSelectedTotal);
     }
-
 }

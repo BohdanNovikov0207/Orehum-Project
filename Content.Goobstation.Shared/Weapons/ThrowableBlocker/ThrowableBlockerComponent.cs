@@ -14,7 +14,7 @@ namespace Content.Goobstation.Shared.Weapons.ThrowableBlocker;
 /// <summary>
 /// Added to items that are able to block thrown objects. These items must be able to reflect projectiles for it to work.
 /// </summary>
-[RegisterComponent, NetworkedComponent]
+[RegisterComponent] [NetworkedComponent]
 public sealed partial class ThrowableBlockerComponent : Component
 {
     [DataField]

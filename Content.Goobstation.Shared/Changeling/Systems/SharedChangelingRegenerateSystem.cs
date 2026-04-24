@@ -1,3 +1,4 @@
+using System.Linq;
 using Content.Goobstation.Shared.Changeling.Actions;
 using Content.Goobstation.Shared.Changeling.Components;
 using Content.Shared.Actions;
@@ -6,21 +7,20 @@ using Content.Shared.Body.Systems;
 using Content.Shared.Popups;
 using Robust.Shared.Audio.Systems;
 using Robust.Shared.Prototypes;
-using System.Linq;
 
 namespace Content.Goobstation.Shared.Changeling.Systems;
 
-public abstract partial class SharedChangelingRegenerateSystem : EntitySystem
+public abstract class SharedChangelingRegenerateSystem : EntitySystem
 {
-    [Dependency] private readonly IPrototypeManager _proto = default!;
     [Dependency] private readonly SharedActionsSystem _actions = default!;
     [Dependency] private readonly SharedAudioSystem _audio = default!;
     [Dependency] private readonly SharedBloodstreamSystem _blood = default!;
     [Dependency] private readonly SharedBodySystem _body = default!;
     [Dependency] private readonly SharedPopupSystem _popup = default!;
+    [Dependency] private readonly IPrototypeManager _proto = default!;
+    private EntityQuery<BloodstreamComponent> _bloodQuery;
 
     private EntityQuery<BodyComponent> _bodyQuery;
-    private EntityQuery<BloodstreamComponent> _bloodQuery;
 
     public override void Initialize()
     {
@@ -35,15 +35,11 @@ public abstract partial class SharedChangelingRegenerateSystem : EntitySystem
         _bodyQuery = GetEntityQuery<BodyComponent>();
     }
 
-    private void OnMapInit(Entity<ChangelingRegenerateComponent> ent, ref MapInitEvent args)
-    {
+    private void OnMapInit(Entity<ChangelingRegenerateComponent> ent, ref MapInitEvent args) =>
         ent.Comp.ActionEnt = _actions.AddAction(ent, ent.Comp.ActionId);
-    }
 
-    private void OnShutdown(Entity<ChangelingRegenerateComponent> ent, ref ComponentShutdown args)
-    {
+    private void OnShutdown(Entity<ChangelingRegenerateComponent> ent, ref ComponentShutdown args) =>
         _actions.RemoveAction(ent.Owner, ent.Comp.ActionEnt);
-    }
 
     private void OnRegenerateAction(Entity<ChangelingRegenerateComponent> ent, ref ChangelingRegenerateEvent args)
     {

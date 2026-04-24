@@ -10,7 +10,6 @@ using Robust.Shared.Prototypes;
 
 namespace Content.Goobstation.Shared.SlaughterDemon.Systems;
 
-
 /// <summary>
 /// This handles the blood crawl system.
 /// Blood Crawl allows you to jaunt, as long as you activate it in a pool of blood.
@@ -19,16 +18,16 @@ namespace Content.Goobstation.Shared.SlaughterDemon.Systems;
 public abstract class SharedBloodCrawlSystem : EntitySystem
 {
     [Dependency] private readonly SharedActionsSystem _actions = default!;
-    [Dependency] private readonly EntityLookupSystem _lookup = default!;
-    [Dependency] private readonly SharedSolutionContainerSystem _solutionContainerSystem = default!;
     [Dependency] private readonly SharedAudioSystem _audio = default!;
-    [Dependency] private readonly SharedPopupSystem _popup = default!;
+    [Dependency] private readonly EntityLookupSystem _lookup = default!;
     [Dependency] private readonly INetManager _netManager = default!;
+    [Dependency] private readonly SharedPopupSystem _popup = default!;
+    [Dependency] private readonly SharedSolutionContainerSystem _solutionContainerSystem = default!;
 
     private EntityQuery<ActionsComponent> _actionQuery;
     private EntityQuery<PuddleComponent> _puddleQuery;
 
-    /// <inheritdoc/>
+    /// <inheritdoc />
     public override void Initialize()
     {
         base.Initialize();
@@ -89,7 +88,10 @@ public abstract class SharedBloodCrawlSystem : EntitySystem
             if (!_puddleQuery.TryComp(entity, out var puddle))
                 continue;
 
-            if (!_solutionContainerSystem.ResolveSolution(entity, puddle.SolutionName, ref puddle.Solution, out var solution))
+            if (!_solutionContainerSystem.ResolveSolution(entity,
+                    puddle.SolutionName,
+                    ref puddle.Solution,
+                    out var solution))
                 continue;
 
             foreach (var reagent in solution.Contents)
@@ -99,15 +101,13 @@ public abstract class SharedBloodCrawlSystem : EntitySystem
                     return true;
             }
         }
+
         return false;
     }
 
-    protected virtual bool CheckAlreadyCrawling(Entity<BloodCrawlComponent> ent)
-    {
-        return false;
-    }
+    protected virtual bool CheckAlreadyCrawling(Entity<BloodCrawlComponent> ent) => false;
 
-    protected virtual void PolymorphDemon(EntityUid user, ProtoId<PolymorphPrototype> polymorph) {}
+    protected virtual void PolymorphDemon(EntityUid user, ProtoId<PolymorphPrototype> polymorph) { }
 
     #endregion
 }

@@ -7,28 +7,24 @@
 using Content.Goobstation.Common.DelayedDeath;
 using Content.Goobstation.Shared.CheatDeath;
 using Content.Goobstation.Shared.Devour.Events;
-using Content.Server._Shitmed.DelayedDeath;
 using Content.Server.Actions;
 using Content.Server.Administration.Systems;
 using Content.Server.Jittering;
 using Content.Shared.Damage;
 using Content.Shared.Examine;
-using Content.Shared.IdentityManagement;
-using Content.Shared.Mobs.Components;
 using Content.Shared.Mobs.Systems;
 using Content.Shared.Popups;
 using Content.Shared.Traits.Assorted;
-using Robust.Shared.Network;
 
 namespace Content.Goobstation.Server.Devil.CheatDeath;
 
-public sealed partial class CheatDeathSystem : EntitySystem
+public sealed class CheatDeathSystem : EntitySystem
 {
-    [Dependency] private readonly RejuvenateSystem _rejuvenateSystem = default!;
-    [Dependency] private readonly SharedPopupSystem _popupSystem = default!;
-    [Dependency] private readonly MobStateSystem _mobStateSystem = default!;
     [Dependency] private readonly ActionsSystem _actionsSystem = default!;
     [Dependency] private readonly JitteringSystem _jitter = default!;
+    [Dependency] private readonly MobStateSystem _mobStateSystem = default!;
+    [Dependency] private readonly SharedPopupSystem _popupSystem = default!;
+    [Dependency] private readonly RejuvenateSystem _rejuvenateSystem = default!;
     [Dependency] private readonly MobThresholdSystem _thresholdSystem = default!;
 
     public override void Initialize()
@@ -66,7 +62,6 @@ public sealed partial class CheatDeathSystem : EntitySystem
 
         var remaining = Loc.GetString("cheat-death-component-remaining-revives", ("amount", ent.Comp.ReviveAmount));
         args.PushMarkup(remaining);
-
     }
 
     private void OnDelayedDeath(Entity<CheatDeathComponent> ent, ref DelayedDeathEvent args)

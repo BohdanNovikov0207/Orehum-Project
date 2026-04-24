@@ -20,7 +20,7 @@ using Robust.Shared.Timing;
 
 namespace Content.Goobstation.Shared.Religion.Nullrod.Systems;
 
-public abstract partial class SharedNullRodSystem : EntitySystem
+public abstract class SharedNullRodSystem : EntitySystem
 {
     [Dependency] private readonly SharedAudioSystem _audio = default!;
     [Dependency] private readonly DamageableSystem _damageableSystem = default!;
@@ -35,7 +35,31 @@ public abstract partial class SharedNullRodSystem : EntitySystem
         SubscribeLocalEvent<NullrodComponent, ShotAttemptedEvent>(OnShootAttempt);
     }
 
+    #region Helper Methods
+
+    private void UntrainedDamageAndPopup(Entity<NullrodComponent> ent, EntityUid user)
+    {
+        // WHY IS EVERY ATTACK ATTEMPT EVENT SO FUCKING SCUFFED AAARGGGHHHH
+        if (_timing.CurTime < ent.Comp.NextPopupTime)
+            return;
+
+        if (_damageableSystem.TryChangeDamage(user,
+                ent.Comp.DamageOnUntrainedUse,
+                origin: ent,
+                targetPart: TargetBodyPart.All,
+                ignoreBlockers: true) is null)
+            return;
+
+        _popupSystem.PopupEntity(Loc.GetString(ent.Comp.UntrainedUseString), user, user, PopupType.MediumCaution);
+        _audio.PlayPvs(ent.Comp.UntrainedUseSound, user);
+
+        ent.Comp.NextPopupTime = _timing.CurTime + ent.Comp.PopupCooldown;
+    }
+
+    #endregion
+
     #region Attack Attempts
+
     private void OnAttackAttempt(Entity<NullrodComponent> ent, ref AttackAttemptEvent args)
     {
         if (!ent.Comp.UntrainedUseRestriction || HasComp<BibleUserComponent>(args.Uid))
@@ -53,23 +77,6 @@ public abstract partial class SharedNullRodSystem : EntitySystem
         args.Cancel();
         UntrainedDamageAndPopup(ent, args.User);
     }
+
     #endregion
-
-    #region Helper Methods
-    private void UntrainedDamageAndPopup(Entity<NullrodComponent> ent, EntityUid user)
-    {
-        // WHY IS EVERY ATTACK ATTEMPT EVENT SO FUCKING SCUFFED AAARGGGHHHH
-        if (_timing.CurTime < ent.Comp.NextPopupTime)
-            return;
-
-        if (_damageableSystem.TryChangeDamage(user, ent.Comp.DamageOnUntrainedUse, origin: ent, targetPart: TargetBodyPart.All, ignoreBlockers: true) is null)
-            return;
-
-        _popupSystem.PopupEntity(Loc.GetString(ent.Comp.UntrainedUseString), user, user, PopupType.MediumCaution);
-        _audio.PlayPvs(ent.Comp.UntrainedUseSound, user);
-
-        ent.Comp.NextPopupTime = _timing.CurTime + ent.Comp.PopupCooldown;
-    }
-    #endregion
-
 }

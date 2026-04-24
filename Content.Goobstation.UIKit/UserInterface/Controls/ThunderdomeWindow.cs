@@ -1,10 +1,7 @@
 using System.Numerics;
 using Robust.Client.Graphics;
-using Robust.Client.UserInterface;
 using Robust.Client.UserInterface.Controls;
 using Robust.Client.UserInterface.CustomControls;
-using Robust.Shared.Input;
-using Robust.Shared.Maths;
 
 namespace Content.Goobstation.UIKit.UserInterface.Controls;
 
@@ -13,21 +10,12 @@ public class ThunderdomeWindow : BaseWindow
     private const float TitleBarHeight = 36;
     private const float BorderWidth = 2;
     private const float DragMarginSize = 7;
+    private readonly PanelContainer _bodyPanel;
+    private readonly TextureButton _closeButton;
 
     private readonly PanelContainer _outerBorder;
     private readonly PanelContainer _titleBar;
     private readonly Label _titleLabel;
-    private readonly TextureButton _closeButton;
-    private readonly PanelContainer _bodyPanel;
-    private readonly BoxContainer _contentBox;
-
-    public string WindowTitle
-    {
-        get => _titleLabel.Text ?? string.Empty;
-        set => _titleLabel.Text = value;
-    }
-
-    public BoxContainer Contents => _contentBox;
 
     public ThunderdomeWindow()
     {
@@ -119,15 +107,23 @@ public class ThunderdomeWindow : BaseWindow
             HorizontalExpand = true,
         };
 
-        _contentBox = new BoxContainer
+        Contents = new BoxContainer
         {
             Orientation = BoxContainer.LayoutOrientation.Vertical,
             HorizontalExpand = true,
             VerticalExpand = true,
         };
-        _bodyPanel.AddChild(_contentBox);
+        _bodyPanel.AddChild(Contents);
         outerVBox.AddChild(_bodyPanel);
     }
+
+    public string WindowTitle
+    {
+        get => _titleLabel.Text ?? string.Empty;
+        set => _titleLabel.Text = value;
+    }
+
+    public BoxContainer Contents { get; }
 
     protected override void Resized()
     {

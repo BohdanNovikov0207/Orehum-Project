@@ -37,20 +37,13 @@ public sealed class IntrinsicVoiceModulatorBoundUserInterface(EntityUid owner, E
         _window.OnVerbChange += OnVerbChanged;
     }
 
-    private void OnNameChanged(string newName)
-    {
-        SendMessage(new IntrinsicVoiceModulatorNameChangedMessage(newName));
-    }
+    private void OnNameChanged(string newName) => SendMessage(new IntrinsicVoiceModulatorNameChangedMessage(newName));
 
-    public void OnJobIconChanged(ProtoId<JobIconPrototype> newJobIconId)
-    {
+    public void OnJobIconChanged(ProtoId<JobIconPrototype> newJobIconId) =>
         SendMessage(new IntrinsicVoiceModulatorJobIconChangedMessage(newJobIconId));
-    }
 
-    public void OnVerbChanged(ProtoId<SpeechVerbPrototype>? protoId)
-    {
+    public void OnVerbChanged(ProtoId<SpeechVerbPrototype>? protoId) =>
         SendMessage(new IntrinsicVoicemodulatorVerbChangedMessage(protoId));
-    }
 
     protected override void UpdateState(BoundUserInterfaceState state)
     {
@@ -65,4 +58,3 @@ public sealed class IntrinsicVoiceModulatorBoundUserInterface(EntityUid owner, E
         _window.SetCurrentJobIcon(cast.JobIcon);
     }
 }
-

@@ -11,6 +11,15 @@ namespace Content.Goobstation.Server.Xenobiology.SlimeGrinder;
 [RegisterComponent]
 public sealed partial class SlimeGrinderComponent : Component
 {
+    [DataField]
+    public SoundSpecifier GrindSound = new SoundPathSpecifier("/Audio/Machines/reclaimer_startup.ogg");
+
+    /// <summary>
+    /// The time it takes to process a mob, per mass.
+    /// </summary>
+    [DataField]
+    public float ProcessingTimePerUnitMass = 0.1f;
+
     /// <summary>
     /// This gets set for each mob it processes.
     /// When it hits 0, spit out extract.
@@ -23,14 +32,4 @@ public sealed partial class SlimeGrinderComponent : Component
     /// </summary>
     [ViewVariables]
     public Dictionary<EntProtoId, float> YieldQueue = new();
-
-    /// <summary>
-    /// The time it takes to process a mob, per mass.
-    /// </summary>
-    [DataField]
-    public float ProcessingTimePerUnitMass = 0.1f;
-
-    [DataField]
-    public SoundSpecifier GrindSound = new SoundPathSpecifier("/Audio/Machines/reclaimer_startup.ogg");
-
 }

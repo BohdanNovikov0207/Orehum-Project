@@ -6,7 +6,7 @@ namespace Content.Goobstation.Shared.Speech;
 /// <summary>
 /// Prevents this entity from listening to entities that match a blacklist.
 /// </summary>
-[RegisterComponent, NetworkedComponent]
+[RegisterComponent] [NetworkedComponent]
 public sealed partial class ListenBlacklistComponent : Component
 {
     /// <summary>

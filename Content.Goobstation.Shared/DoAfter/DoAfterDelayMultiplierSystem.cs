@@ -9,7 +9,6 @@
 using Content.Goobstation.Common.DoAfter;
 using Content.Shared._Shitmed.Cybernetics;
 using Content.Shared._Shitmed.DoAfter;
-using Content.Shared.Body.Part;
 using Content.Shared.Body.Systems;
 
 namespace Content.Goobstation.Shared.DoAfter;
@@ -34,8 +33,7 @@ public sealed class DoAfterDelayMultiplierSystem : EntitySystem
         args.Args.Multiplier *= ent.Comp.Multiplier;
     }
 
-    private void OnGetMultiplier(Entity<DoAfterDelayMultiplierComponent> ent, ref GetDoAfterDelayMultiplierEvent args)
-    {
+    private void
+        OnGetMultiplier(Entity<DoAfterDelayMultiplierComponent> ent, ref GetDoAfterDelayMultiplierEvent args) =>
         args.Multiplier *= ent.Comp.Multiplier;
-    }
 }

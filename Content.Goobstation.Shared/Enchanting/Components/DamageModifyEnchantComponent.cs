@@ -12,7 +12,7 @@ namespace Content.Goobstation.Shared.Enchanting.Components;
 /// <summary>
 /// Modifies all incoming damage by <c>factor^level</c>.
 /// </summary>
-[RegisterComponent, NetworkedComponent, Access(typeof(DamageModifyEnchantSystem))]
+[RegisterComponent] [NetworkedComponent] [Access(typeof(DamageModifyEnchantSystem))]
 [EntityCategory("Enchants")]
 public sealed partial class DamageModifyEnchantComponent : Component
 {

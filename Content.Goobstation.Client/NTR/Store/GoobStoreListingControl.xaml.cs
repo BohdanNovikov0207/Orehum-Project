@@ -10,9 +10,8 @@ using Robust.Shared.Timing;
 
 namespace Content.Goobstation.Client.NTR;
 
-public sealed partial class GoobStoreListingControl : Control
+public sealed class GoobStoreListingControl : Control
 {
-
     [Dependency] private readonly IPrototypeManager _prototype = default!;
     [Dependency] private readonly IGameTiming _timing = default!;
 

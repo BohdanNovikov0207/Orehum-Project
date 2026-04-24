@@ -20,13 +20,13 @@ using Content.Shared.Objectives.Components;
 namespace Content.Goobstation.Server.Changeling.Objectives.Systems;
 
 /// <summary>
-///     Handles escaping on the shuttle while being another person detection.
+/// Handles escaping on the shuttle while being another person detection.
 /// </summary>
 public sealed class ImpersonateConditionSystem : EntitySystem
 {
-    [Dependency] private readonly TargetObjectiveSystem _target = default!;
     [Dependency] private readonly EmergencyShuttleSystem _emergencyShuttle = default!;
     [Dependency] private readonly SharedMindSystem _mind = default!;
+    [Dependency] private readonly TargetObjectiveSystem _target = default!;
 
     public override void Initialize()
     {
@@ -53,7 +53,8 @@ public sealed class ImpersonateConditionSystem : EntitySystem
 
             if (metaData.EntityName == comp.Name)
                 comp.Completed = true;
-            else comp.Completed = false;
+            else
+                comp.Completed = false;
         }
     }
 
@@ -70,10 +71,8 @@ public sealed class ImpersonateConditionSystem : EntitySystem
     }
 
     // copypasta from escape shittle objective. eh.
-    private void OnGetProgress(EntityUid uid, ImpersonateConditionComponent comp, ref ObjectiveGetProgressEvent args)
-    {
+    private void OnGetProgress(EntityUid uid, ImpersonateConditionComponent comp, ref ObjectiveGetProgressEvent args) =>
         args.Progress = GetProgress(args.Mind, comp);
-    }
 
     public float GetProgress(MindComponent mind, ImpersonateConditionComponent comp)
     {

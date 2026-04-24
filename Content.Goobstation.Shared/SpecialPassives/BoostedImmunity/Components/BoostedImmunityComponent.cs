@@ -7,9 +7,9 @@ using Robust.Shared.Prototypes;
 namespace Content.Goobstation.Shared.SpecialPassives.BoostedImmunity.Components;
 
 /// <summary>
-///     Entities with this will rapidly heal non-physical damage. This component holds all the relevant data.
+/// Entities with this will rapidly heal non-physical damage. This component holds all the relevant data.
 /// </summary>
-[RegisterComponent, NetworkedComponent]
+[RegisterComponent] [NetworkedComponent]
 public sealed partial class BoostedImmunityComponent : Component
 {
     /// <summary>
@@ -18,42 +18,13 @@ public sealed partial class BoostedImmunityComponent : Component
     public ProtoId<AlertPrototype>? AlertId;
 
     /// <summary>
-    /// How long should the effect go on for?
+    /// Should the entity be sobered?
     /// </summary>
     [DataField]
-    public float? Duration;
+    public bool ApplySober = true;
 
-    public TimeSpan MaxDuration = TimeSpan.Zero;
-
-    public TimeSpan UpdateTimer = default!;
-
-    /// <summary>
-    /// Delay between healing ticks.
-    /// </summary>
-    public TimeSpan UpdateDelay = TimeSpan.FromSeconds(1);
-
-    /// <summary>
-    /// Current mobstate of the entity.
-    /// </summary>
-    public MobState Mobstate;
-
-    /// <summary>
-    /// Should the ability continue while on fire?
-    /// </summary>
     [DataField]
-    public bool IgnoreFire = false;
-
-    /// <summary>
-    /// Should the ability continue while dead?
-    /// </summary>
-    [DataField]
-    public bool WorkWhileDead = false;
-
-    /// <summary>
-    /// Should the entity be rid of all disabilities?
-    /// </summary>
-    [DataField]
-    public bool RemoveDisabilities = true;
+    public float CellularHeal = -10f;
 
     /// <summary>
     /// Should chemicals be cleansed from the bloodstream?
@@ -65,22 +36,26 @@ public sealed partial class BoostedImmunityComponent : Component
     public FixedPoint2 CleanseChemicalsAmount = 25;
 
     /// <summary>
-    /// Should the entity be sobered?
+    /// How long should the effect go on for?
     /// </summary>
     [DataField]
-    public bool ApplySober = true;
+    public float? Duration;
+
+    [DataField]
+    public int EyeDamageHeal = 1;
 
     /// <summary>
-    /// Should the entity resist vomiting?
+    /// Should the ability continue while on fire?
     /// </summary>
     [DataField]
-    public bool ResistNausea = true;
+    public bool IgnoreFire = false;
+
+    public TimeSpan MaxDuration = TimeSpan.Zero;
 
     /// <summary>
-    /// Should the entity be cleared of pacifism?
+    /// Current mobstate of the entity.
     /// </summary>
-    [DataField]
-    public bool RemovePacifism = true;
+    public MobState Mobstate;
 
     /// <summary>
     /// Should the entity have any present alien embryos removed and destroyed?
@@ -89,19 +64,44 @@ public sealed partial class BoostedImmunityComponent : Component
     public bool RemoveAlienEmbryo = true;
 
     /// <summary>
+    /// Should the entity be rid of all disabilities?
+    /// </summary>
+    [DataField]
+    public bool RemoveDisabilities = true;
+
+    /// <summary>
     /// Should the entity be cured of all diseases?
     /// </summary>
     [DataField]
     public bool RemoveDiseases = true;
 
+    /// <summary>
+    /// Should the entity be cleared of pacifism?
+    /// </summary>
+    [DataField]
+    public bool RemovePacifism = true;
+
+    /// <summary>
+    /// Should the entity resist vomiting?
+    /// </summary>
+    [DataField]
+    public bool ResistNausea = true;
+
     [DataField]
     public float ToxinHeal = -10f;
 
-    [DataField]
-    public float CellularHeal = -10f;
+    /// <summary>
+    /// Delay between healing ticks.
+    /// </summary>
+    public TimeSpan UpdateDelay = TimeSpan.FromSeconds(1);
 
+    public TimeSpan UpdateTimer = default!;
+
+    /// <summary>
+    /// Should the ability continue while dead?
+    /// </summary>
     [DataField]
-    public int EyeDamageHeal = 1;
+    public bool WorkWhileDead = false;
 
     // add bools later for curing diseases and mutations (when they exist)
 }

@@ -22,5 +22,4 @@ public sealed class ToggleExamineSystem : EntitySystem
         var enabled = _toggle.IsActivated(ent.Owner);
         args.PushMarkup(Loc.GetString(enabled ? ent.Comp.Enabled : ent.Comp.Disabled));
     }
-
 }

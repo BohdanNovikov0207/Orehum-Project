@@ -19,9 +19,9 @@ namespace Content.Goobstation.Server.Shadowling.Systems.Abilities.Ascension;
 /// </summary>
 public sealed class ShadowlingAscendantBroadcastSystem : EntitySystem
 {
+    [Dependency] private readonly SharedActionsSystem _actions = default!;
     [Dependency] private readonly QuickDialogSystem _dialogSystem = default!;
     [Dependency] private readonly SharedPopupSystem _popupSystem = default!;
-    [Dependency] private readonly SharedActionsSystem _actions = default!;
 
     public override void Initialize()
     {
@@ -38,7 +38,9 @@ public sealed class ShadowlingAscendantBroadcastSystem : EntitySystem
     private void OnShutdown(Entity<ShadowlingAscendantBroadcastComponent> ent, ref ComponentShutdown args)
         => _actions.RemoveAction(ent.Owner, ent.Comp.ActionEnt);
 
-    private void OnBroadcast(EntityUid uid, ShadowlingAscendantBroadcastComponent component, AscendantBroadcastEvent args)
+    private void OnBroadcast(EntityUid uid,
+        ShadowlingAscendantBroadcastComponent component,
+        AscendantBroadcastEvent args)
     {
         if (args.Handled
             || !TryComp<ActorComponent>(args.Performer, out var actor))
@@ -48,19 +50,23 @@ public sealed class ShadowlingAscendantBroadcastSystem : EntitySystem
             Loc.GetString("asc-broadcast-title"),
             Loc.GetString("asc-broadcast-prompt"),
             (string message) =>
-        {
-            if (actor.PlayerSession.AttachedEntity == null)
-                return;
-
-            var query = EntityQueryEnumerator<ActorComponent>();
-            while (query.MoveNext(out var ent, out _))
             {
-                if (ent == uid)
-                    continue;
-                _popupSystem.PopupEntity(message, ent, ent, PopupType.LargeCaution);
-            }
-            _popupSystem.PopupEntity(Loc.GetString("shadowling-ascendant-broadcast-dialog"), uid, uid, PopupType.Medium);
-        });
+                if (actor.PlayerSession.AttachedEntity == null)
+                    return;
+
+                var query = EntityQueryEnumerator<ActorComponent>();
+                while (query.MoveNext(out var ent, out _))
+                {
+                    if (ent == uid)
+                        continue;
+                    _popupSystem.PopupEntity(message, ent, ent, PopupType.LargeCaution);
+                }
+
+                _popupSystem.PopupEntity(Loc.GetString("shadowling-ascendant-broadcast-dialog"),
+                    uid,
+                    uid,
+                    PopupType.Medium);
+            });
 
         args.Handled = true;
     }

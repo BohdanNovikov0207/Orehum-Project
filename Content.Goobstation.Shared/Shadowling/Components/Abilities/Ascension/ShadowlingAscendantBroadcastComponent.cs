@@ -6,12 +6,12 @@ namespace Content.Goobstation.Shared.Shadowling.Components.Abilities.Ascension;
 /// <summary>
 /// This is used for Ascendant Broadcast ability.
 /// </summary>
-[RegisterComponent, NetworkedComponent]
+[RegisterComponent] [NetworkedComponent]
 public sealed partial class ShadowlingAscendantBroadcastComponent : Component
 {
     [DataField]
-    public EntProtoId ActionId = "ActionAscendantBroadcast";
+    public EntityUid? ActionEnt;
 
     [DataField]
-    public EntityUid? ActionEnt;
+    public EntProtoId ActionId = "ActionAscendantBroadcast";
 }

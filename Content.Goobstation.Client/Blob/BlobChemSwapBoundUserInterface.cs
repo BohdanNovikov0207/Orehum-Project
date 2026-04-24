@@ -42,10 +42,8 @@ public sealed class BlobChemSwapBoundUserInterface : BoundUserInterface
         _menu?.UpdateState(st.ChemList, st.SelectedChem);
     }
 
-    private void OnIdSelected(BlobChemType selectedId)
-    {
+    private void OnIdSelected(BlobChemType selectedId) =>
         SendMessage(new BlobChemSwapPrototypeSelectedMessage(selectedId));
-    }
 
     protected override void Dispose(bool disposing)
     {

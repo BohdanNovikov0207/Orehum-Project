@@ -48,10 +48,8 @@ public sealed class ShowDiseaseIconsSystem : EquipmentHudSystem<ShowDiseaseIcons
         HighThreshold = null;
     }
 
-    private void OnHandleState(Entity<ShowDiseaseIconsComponent> ent, ref AfterAutoHandleStateEvent args)
-    {
+    private void OnHandleState(Entity<ShowDiseaseIconsComponent> ent, ref AfterAutoHandleStateEvent args) =>
         RefreshOverlay();
-    }
 
     private void OnGetStatusIconsEvent(Entity<DiseaseCarrierComponent> entity, ref GetStatusIconsEvent args)
     {
@@ -75,11 +73,12 @@ public sealed class ShowDiseaseIconsSystem : EquipmentHudSystem<ShowDiseaseIcons
 
             total += comp.InfectionProgress * comp.Complexity;
         }
+
         if (total > (HighThreshold ?? int.MaxValue) && _proto.TryIndex(carrier.HighIcon, out var highIcon))
             return highIcon;
-        else if (total > (MediumThreshold ?? int.MaxValue) && _proto.TryIndex(carrier.MediumIcon, out var medIcon))
+        if (total > (MediumThreshold ?? int.MaxValue) && _proto.TryIndex(carrier.MediumIcon, out var medIcon))
             return medIcon;
-        else if (total > (LowThreshold ?? int.MaxValue) && _proto.TryIndex(carrier.LowIcon, out var lowIcon))
+        if (total > (LowThreshold ?? int.MaxValue) && _proto.TryIndex(carrier.LowIcon, out var lowIcon))
             return lowIcon;
 
         return null;

@@ -19,7 +19,7 @@ public sealed class SurgeryDamageUserSystem : EntitySystem
     private void OnSurgeryStep(Entity<SurgeryDamageUserComponent> ent, ref SurgeryStepEvent args)
     {
         _damage.TryChangeDamage(args.User, ent.Comp.Damage);
-        if (ent.Comp.Popup is {} popup)
+        if (ent.Comp.Popup is { } popup)
         {
             var msg = Loc.GetString(popup, ("target", args.Body), ("part", args.Part));
             _popup.PopupPredicted(msg, args.Body, args.User, PopupType.SmallCaution);

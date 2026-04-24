@@ -7,10 +7,11 @@ namespace Content.Goobstation.Shared.Wraith.Other;
 
 public sealed class DamageOnCollideSystem : EntitySystem
 {
-    [Dependency] private readonly DamageableSystem _damageable  = default!;
-    [Dependency] private readonly EntityWhitelistSystem _whitelist = default!;
+    [Dependency] private readonly DamageableSystem _damageable = default!;
     [Dependency] private readonly TagSystem _tag = default!;
-    /// <inheritdoc/>
+    [Dependency] private readonly EntityWhitelistSystem _whitelist = default!;
+
+    /// <inheritdoc />
     public override void Initialize()
     {
         base.Initialize();

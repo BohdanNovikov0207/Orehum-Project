@@ -21,63 +21,63 @@ using Robust.Shared.Prototypes;
 namespace Content.Goobstation.Shared.Clothing.Components;
 
 /// <summary>
-///     Component used to designate contol of sealable clothing. It'll contain action to seal clothing.
+/// Component used to designate contol of sealable clothing. It'll contain action to seal clothing.
 /// </summary>
 [RegisterComponent]
-[NetworkedComponent, AutoGenerateComponentState]
+[NetworkedComponent] [AutoGenerateComponentState]
 [Access(typeof(SharedSealableClothingSystem))]
 public sealed partial class SealableClothingControlComponent : Component
 {
     /// <summary>
-    ///     Action that used to start sealing
+    /// True if clothing is currently sealed and need to start unsealing process. False if opposite.
     /// </summary>
-    [DataField, AutoNetworkedField]
-    public EntProtoId SealAction = "ActionClothingSeal";
-
-    [DataField, AutoNetworkedField]
-    public EntityUid? SealActionEntity;
-
-    /// <summary>
-    ///     Slot required for control to show action
-    /// </summary>
-    [DataField("requiredSlot"), AutoNetworkedField]
-    public SlotFlags RequiredControlSlot = SlotFlags.BACK;
-
-    /// <summary>
-    ///     True if clothing in sealing/unsealing process, false if not
-    /// </summary>
-    [DataField, AutoNetworkedField]
-    public bool IsInProcess = false;
-
-    /// <summary>
-    ///     True if clothing is currently sealed and need to start unsealing process. False if opposite.
-    /// </summary>
-    [DataField, AutoNetworkedField]
+    [DataField] [AutoNetworkedField]
     public bool IsCurrentlySealed = false;
 
     /// <summary>
-    ///     Queue of attached parts that should be sealed/unsealed
+    /// True if clothing in sealing/unsealing process, false if not
     /// </summary>
-    [DataField, AutoNetworkedField]
-    public Queue<NetEntity> ProcessQueue = new();
+    [DataField] [AutoNetworkedField]
+    public bool IsInProcess = false;
 
     /// <summary>
-    ///     Uid of entity that currently wear seal control
+    /// Doafter time for other players to start sealing via stripping menu
     /// </summary>
-    [DataField, AutoNetworkedField]
-    public EntityUid? WearerEntity;
-
-    /// <summary>
-    ///     Doafter time for other players to start sealing via stripping menu
-    /// </summary>
-    [DataField, AutoNetworkedField]
+    [DataField] [AutoNetworkedField]
     public TimeSpan NonWearerSealingTime = TimeSpan.FromSeconds(2);
 
     /// <summary>
-    ///     if true; after ClothingControlSealCompleteEvent it will unToggle the control
+    /// Queue of attached parts that should be sealed/unsealed
     /// </summary>
-    [DataField, AutoNetworkedField]
+    [DataField] [AutoNetworkedField]
+    public Queue<NetEntity> ProcessQueue = new();
+
+    /// <summary>
+    /// Slot required for control to show action
+    /// </summary>
+    [DataField("requiredSlot")] [AutoNetworkedField]
+    public SlotFlags RequiredControlSlot = SlotFlags.BACK;
+
+    /// <summary>
+    /// Action that used to start sealing
+    /// </summary>
+    [DataField] [AutoNetworkedField]
+    public EntProtoId SealAction = "ActionClothingSeal";
+
+    [DataField] [AutoNetworkedField]
+    public EntityUid? SealActionEntity;
+
+    /// <summary>
+    /// if true; after ClothingControlSealCompleteEvent it will unToggle the control
+    /// </summary>
+    [DataField] [AutoNetworkedField]
     public bool UnequipAfterUnseal = false;
+
+    /// <summary>
+    /// Uid of entity that currently wear seal control
+    /// </summary>
+    [DataField] [AutoNetworkedField]
+    public EntityUid? WearerEntity;
 
     #region Popups & Sounds
 
@@ -112,6 +112,8 @@ public sealed partial class SealableClothingControlComponent : Component
     public SoundSpecifier UnsealCompleteSound = new SoundPathSpecifier("/Audio/_Goobstation/Machines/computer_end.ogg");
 
     [DataField]
-    public SoundSpecifier GenericSuitWarning = new SoundPathSpecifier("/Audio/_Goobstation/Machines/MaxTempAlertCut.wav");
+    public SoundSpecifier GenericSuitWarning =
+        new SoundPathSpecifier("/Audio/_Goobstation/Machines/MaxTempAlertCut.wav");
+
     #endregion
 }

@@ -9,7 +9,7 @@ using Robust.Shared.Network;
 namespace Content.Goobstation.Server.PlayerListener;
 
 /// <summary>
-///     Stores data about players, listens even.
+/// Stores data about players, listens even.
 /// </summary>
 [RegisterComponent]
 public sealed partial class PlayerListenerComponent : Component

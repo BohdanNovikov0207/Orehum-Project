@@ -8,7 +8,6 @@
 
 using Content.Shared._Goobstation.Heretic.Components;
 using Content.Shared._Goobstation.Wizard.Mutate;
-using Content.Shared._White.Standing;
 using Content.Shared.Projectiles;
 using Content.Shared.Stunnable;
 using Content.Shared.Throwing;
@@ -29,21 +28,17 @@ public sealed class KnockdownOnCollideSystem : EntitySystem
         SubscribeLocalEvent<KnockdownOnCollideComponent, ThrowDoHitEvent>(OnEntityHit);
     }
 
-    private void OnEntityHit(Entity<KnockdownOnCollideComponent> ent, ref ThrowDoHitEvent args)
-    {
+    private void OnEntityHit(Entity<KnockdownOnCollideComponent> ent, ref ThrowDoHitEvent args) =>
         ApplyEffects(args.Target, ent.Comp);
-    }
 
-    private void OnProjectileHit(Entity<KnockdownOnCollideComponent> ent, ref ProjectileHitEvent args)
-    {
+    private void OnProjectileHit(Entity<KnockdownOnCollideComponent> ent, ref ProjectileHitEvent args) =>
         ApplyEffects(args.Target, ent.Comp);
-    }
 
     private void ApplyEffects(EntityUid target, KnockdownOnCollideComponent component)
     {
         if (TryComp(target, out HulkComponent? hulk))
         {
-            _hulk.Roar((target, hulk), 1f);
+            _hulk.Roar((target, hulk));
             return;
         }
 

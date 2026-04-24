@@ -11,5 +11,4 @@ namespace Content.Goobstation.Server.Singularity.ContainmentField;
 [RegisterComponent]
 public sealed partial class ContainmentFieldIgnoreComponent : Component
 {
-
 }

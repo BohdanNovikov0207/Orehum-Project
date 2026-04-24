@@ -21,29 +21,29 @@ public sealed partial class BlobObserverControllerComponent : Component
     public Entity<BlobObserverComponent> Blob;
 }
 
-[RegisterComponent, NetworkedComponent, AutoGenerateComponentState(false)]
+[RegisterComponent] [NetworkedComponent] [AutoGenerateComponentState()]
 public sealed partial class BlobObserverComponent : Component
 {
-    [ViewVariables]
-    public bool IsProcessingMoveEvent;
-
     //[AutoNetworkedField]
     [ViewVariables]
     public Entity<BlobCoreComponent>? Core = default!;
 
+    [ViewVariables]
+    public bool IsProcessingMoveEvent;
+
     /*[ViewVariables]
     public bool CanMove = true;*/
 
-    [ViewVariables, AutoNetworkedField]
+    [ViewVariables] [AutoNetworkedField]
     public BlobChemType SelectedChemId = BlobChemType.ReactiveSpines;
 
-    public override bool SendOnlyToOwner => true;
-
-    [ViewVariables, AutoNetworkedField]
+    [ViewVariables] [AutoNetworkedField]
     public EntityUid VirtualItem = EntityUid.Invalid;
+
+    public override bool SendOnlyToOwner => true;
 }
 
-[Serializable, NetSerializable]
+[Serializable] [NetSerializable]
 public sealed class BlobChemSwapBoundUserInterfaceState(
     BlobChemColors chemList,
     BlobChemType selectedId)
@@ -53,26 +53,25 @@ public sealed class BlobChemSwapBoundUserInterfaceState(
     public readonly BlobChemType SelectedChem = selectedId;
 }
 
-[Serializable, NetSerializable]
+[Serializable] [NetSerializable]
 public sealed class BlobChemSwapPrototypeSelectedMessage(BlobChemType selectedId) : BoundUserInterfaceMessage
 {
     public readonly BlobChemType SelectedId = selectedId;
 }
 
-[Serializable, NetSerializable]
+[Serializable] [NetSerializable]
 public enum BlobChemSwapUiKey : byte
 {
-    Key
+    Key,
 }
 
 public sealed partial class BlobTransformTileActionEvent : WorldTargetActionEvent
 {
     /// <summary>
-    /// Type of tile that can be transformed.
-    /// Will be ignored if equals to Invalid.
+    /// Does this tile requires node nearby.
     /// </summary>
     [DataField]
-    public BlobTileType TransformFrom = BlobTileType.Normal;
+    public bool RequireNode = true;
 
     /// <summary>
     /// Type of the resulting tile.
@@ -81,12 +80,17 @@ public sealed partial class BlobTransformTileActionEvent : WorldTargetActionEven
     public BlobTileType TileType = BlobTileType.Invalid;
 
     /// <summary>
-    /// Does this tile requires node nearby.
+    /// Type of tile that can be transformed.
+    /// Will be ignored if equals to Invalid.
     /// </summary>
     [DataField]
-    public bool RequireNode = true;
+    public BlobTileType TransformFrom = BlobTileType.Normal;
 
-    public BlobTransformTileActionEvent(EntityUid performer, EntityCoordinates target, BlobTileType transformFrom, BlobTileType tileType, bool requireNode) : this()
+    public BlobTransformTileActionEvent(EntityUid performer,
+        EntityCoordinates target,
+        BlobTileType transformFrom,
+        BlobTileType tileType,
+        bool requireNode) : this()
     {
         Performer = performer;
         Target = target;
@@ -98,25 +102,20 @@ public sealed partial class BlobTransformTileActionEvent : WorldTargetActionEven
 
 public sealed partial class BlobCreateBlobbernautActionEvent : WorldTargetActionEvent
 {
-
 }
 
 public sealed partial class BlobSplitCoreActionEvent : WorldTargetActionEvent
 {
-
 }
 
 public sealed partial class BlobSwapCoreActionEvent : WorldTargetActionEvent
 {
-
 }
 
 public sealed partial class BlobToCoreActionEvent : InstantActionEvent
 {
-
 }
 
 public sealed partial class BlobSwapChemActionEvent : InstantActionEvent
 {
-
 }

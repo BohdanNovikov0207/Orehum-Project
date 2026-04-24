@@ -10,58 +10,47 @@
 //
 // SPDX-License-Identifier: AGPL-3.0-or-later
 
-using Content.Shared.ActionBlocker;
+using System.Linq;
+using System.Numerics;
+using Content.Shared.Camera;
 using Content.Shared.Chat;
 using Content.Shared.CombatMode;
+using Content.Shared.CombatMode.Pacification;
 using Content.Shared.Damage;
 using Content.Shared.Database;
 using Content.Shared.DoAfter;
-using Content.Shared.IdentityManagement;
-using Content.Shared.Mobs.Components;
-using Content.Shared.Mobs.Systems;
-using Content.Shared.Popups;
-using Content.Shared.Verbs;
-using Content.Shared.Entry;
-using Content.Shared.Interaction.Events;
-using Content.Shared.Weapons.Ranged.Components;
-using Content.Shared.Weapons.Ranged.Systems;
-using Content.Shared.Weapons.Ranged.Events;
-using Content.Shared.Weapons.Ranged;
-using Content.Shared.CombatMode.Pacification;
-using Content.Shared.Projectiles;
 using Content.Shared.Execution;
-using Content.Shared.Camera;
-using Robust.Shared.Player;
+using Content.Shared.Projectiles;
+using Content.Shared.Verbs;
+using Content.Shared.Weapons.Ranged;
+using Content.Shared.Weapons.Ranged.Components;
+using Content.Shared.Weapons.Ranged.Events;
+using Content.Shared.Weapons.Ranged.Systems;
 using Robust.Shared.Audio.Systems;
 using Robust.Shared.Network;
 using Robust.Shared.Prototypes;
 using Robust.Shared.Timing;
-using System.Diagnostics;
-using System.Linq;
-using System.Net.Http.Headers;
-using System.Numerics;
 
 namespace Content.Goobstation.Shared.Execution;
 
 /// <summary>
-///     verb for executing with guns
+/// verb for executing with guns
 /// </summary>
 public sealed class SharedGunExecutionSystem : EntitySystem
 {
+    private const float GunExecutionTime = 4.0f;
+    [Dependency] private readonly SharedAppearanceSystem _appearanceSystem = default!;
     [Dependency] private readonly SharedAudioSystem _audio = default!;
-    [Dependency] private readonly SharedDoAfterSystem _doAfter = default!;
-    [Dependency] private readonly SharedSuicideSystem _suicide = default!;
     [Dependency] private readonly SharedCombatModeSystem _combat = default!;
+    [Dependency] private readonly IComponentFactory _componentFactory = default!;
+    [Dependency] private readonly SharedDoAfterSystem _doAfter = default!;
     [Dependency] private readonly SharedExecutionSystem _execution = default!;
     [Dependency] private readonly SharedGunSystem _gunSystem = default!;
-    [Dependency] private readonly IComponentFactory _componentFactory = default!;
-    [Dependency] private readonly IPrototypeManager _prototypeManager = default!;
-    [Dependency] private readonly SharedAppearanceSystem _appearanceSystem = default!;
-    [Dependency] private readonly IGameTiming _timing = default!;
-    [Dependency] private readonly SharedCameraRecoilSystem _recoil = default!;
     [Dependency] private readonly INetManager _net = default!;
-
-    private const float GunExecutionTime = 4.0f;
+    [Dependency] private readonly IPrototypeManager _prototypeManager = default!;
+    [Dependency] private readonly SharedCameraRecoilSystem _recoil = default!;
+    [Dependency] private readonly SharedSuicideSystem _suicide = default!;
+    [Dependency] private readonly IGameTiming _timing = default!;
 
     public override void Initialize()
     {
@@ -69,7 +58,6 @@ public sealed class SharedGunExecutionSystem : EntitySystem
 
         SubscribeLocalEvent<GunComponent, GetVerbsEvent<UtilityVerb>>(OnGetInteractionVerbsGun);
         SubscribeLocalEvent<GunComponent, ExecutionDoAfterEvent>(OnDoafterGun);
-
     }
 
     private void OnGetInteractionVerbsGun(EntityUid uid, GunComponent component, GetVerbsEvent<UtilityVerb> args)
@@ -108,7 +96,10 @@ public sealed class SharedGunExecutionSystem : EntitySystem
         return true;
     }
 
-    private void TryStartGunExecutionDoafter(EntityUid weapon, EntityUid victim, EntityUid attacker, float gunexecutiontime)
+    private void TryStartGunExecutionDoafter(EntityUid weapon,
+        EntityUid victim,
+        EntityUid attacker,
+        float gunexecutiontime)
     {
         if (!CanExecuteWithGun(weapon, victim, attacker))
             return;
@@ -125,7 +116,13 @@ public sealed class SharedGunExecutionSystem : EntitySystem
         }
 
         var doAfter =
-            new DoAfterArgs(EntityManager, attacker, gunexecutiontime, new ExecutionDoAfterEvent(), weapon, target: victim, used: weapon)
+            new DoAfterArgs(EntityManager,
+                attacker,
+                gunexecutiontime,
+                new ExecutionDoAfterEvent(),
+                weapon,
+                victim,
+                weapon)
             {
                 BreakOnMove = true,
                 BreakOnDamage = true,
@@ -148,9 +145,7 @@ public sealed class SharedGunExecutionSystem : EntitySystem
             .Where(kv => !string.Equals(kv.Key, "Structural", StringComparison.OrdinalIgnoreCase));
 
         if (filtered.Any())
-        {
             mainDamageType = filtered.Aggregate((a, b) => a.Value > b.Value ? a : b).Key;
-        }
 
         return mainDamageType ?? "Blunt";
     }
@@ -170,7 +165,7 @@ public sealed class SharedGunExecutionSystem : EntitySystem
         var weapon = args.Used.Value;
 
         // Get the direction for the recoil
-        Vector2 direction = Vector2.Zero;
+        var direction = Vector2.Zero;
         var attackerXform = Transform(attacker);
         var victimXform = Transform(victim);
         var diff = victimXform.WorldPosition - attackerXform.WorldPosition;
@@ -196,7 +191,7 @@ public sealed class SharedGunExecutionSystem : EntitySystem
             return;
         }
 
-        DamageSpecifier damage = new DamageSpecifier();
+        var damage = new DamageSpecifier();
         string? mainDamageType = null;
         // Get some information from IShootable
         var ammoUid = ev.Ammo[0].Entity;
@@ -204,31 +199,32 @@ public sealed class SharedGunExecutionSystem : EntitySystem
         switch (ev.Ammo[0].Shootable)
         {
             case CartridgeAmmoComponent cartridge:
+            {
+                if (cartridge.Spent) // cant use a spent cartridge
                 {
-                    if (cartridge.Spent) // cant use a spent cartridge
-                    {
-                        _audio.PlayPredicted(component.SoundEmpty, uid, attacker);
-                        _execution.ShowExecutionInternalPopup("execution-popup-gun-empty", attacker, victim, weapon);
-                        _execution.ShowExecutionExternalPopup("execution-popup-gun-empty", attacker, victim, weapon);
-                        return;
-                    }
-
-                    var prototype = _prototypeManager.Index<EntityPrototype>(cartridge.Prototype);
-
-                    prototype.TryGetComponent<ProjectileComponent>(out var projectileA, _componentFactory); // sloth forgive me
-
-                    if (projectileA != null)
-                    {
-                        damage = projectileA.Damage;
-                        mainDamageType = GetDamage(damage, mainDamageType);
-                    }
-
-                    cartridge.Spent = true; // Expend the cartridge
-                    _appearanceSystem.SetData(ammoUid!.Value, AmmoVisuals.Spent, true);
-                    Dirty(ammoUid.Value, cartridge);
-
-                    break;
+                    _audio.PlayPredicted(component.SoundEmpty, uid, attacker);
+                    _execution.ShowExecutionInternalPopup("execution-popup-gun-empty", attacker, victim, weapon);
+                    _execution.ShowExecutionExternalPopup("execution-popup-gun-empty", attacker, victim, weapon);
+                    return;
                 }
+
+                var prototype = _prototypeManager.Index<EntityPrototype>(cartridge.Prototype);
+
+                prototype.TryGetComponent<ProjectileComponent>(out var projectileA,
+                    _componentFactory); // sloth forgive me
+
+                if (projectileA != null)
+                {
+                    damage = projectileA.Damage;
+                    mainDamageType = GetDamage(damage, mainDamageType);
+                }
+
+                cartridge.Spent = true; // Expend the cartridge
+                _appearanceSystem.SetData(ammoUid!.Value, AmmoVisuals.Spent, true);
+                Dirty(ammoUid.Value, cartridge);
+
+                break;
+            }
             case AmmoComponent newAmmo: // This stops revolvers from hitting the user while executing someone, somehow
                 TryComp<ProjectileComponent>(ammoUid, out var projectileB);
 
@@ -243,7 +239,8 @@ public sealed class SharedGunExecutionSystem : EntitySystem
                 break;
         }
 
-        if (HasComp<HitscanBatteryAmmoProviderComponent>(weapon)) // Almost all hitscans are heat so this should work fine 
+        if (HasComp<HitscanBatteryAmmoProviderComponent>(
+                weapon)) // Almost all hitscans are heat so this should work fine 
             mainDamageType = "Heat";
 
         var prev = _combat.IsInCombatMode(attacker);
@@ -258,7 +255,8 @@ public sealed class SharedGunExecutionSystem : EntitySystem
         }
         else
         {
-            if (_net.IsClient && direction != Vector2.Zero && _timing.IsFirstTimePredicted) // Just apply recoil for the client
+            if (_net.IsClient && direction != Vector2.Zero &&
+                _timing.IsFirstTimePredicted) // Just apply recoil for the client
                 _recoil.KickCamera(attacker, direction);
             _execution.ShowExecutionInternalPopup("execution-popup-gun-complete-internal", attacker, victim, weapon);
             _execution.ShowExecutionExternalPopup("execution-popup-gun-complete-external", attacker, victim, weapon);

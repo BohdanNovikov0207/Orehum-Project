@@ -23,14 +23,19 @@ public sealed partial class DiseaseProgressChange : EventEntityEffect<DiseasePro
     public float ProgressModifier = -0.02f;
 
     [DataField]
-    public bool Scaled = true;
+    public float Quantity = 1f;
 
     [DataField]
     public float Scale = 1f;
-    [DataField]
-    public float Quantity = 1f;
 
-    public DiseaseProgressChange(ProtoId<DiseaseTypePrototype> affectedType, float progressModifier, bool scaled, float scale, float quantity)
+    [DataField]
+    public bool Scaled = true;
+
+    public DiseaseProgressChange(ProtoId<DiseaseTypePrototype> affectedType,
+        float progressModifier,
+        bool scaled,
+        float scale,
+        float quantity)
     {
         AffectedType = affectedType;
         ProgressModifier = progressModifier;
@@ -39,13 +44,11 @@ public sealed partial class DiseaseProgressChange : EventEntityEffect<DiseasePro
         Quantity = quantity;
     }
 
-    protected override string? ReagentEffectGuidebookText(IPrototypeManager prototype, IEntitySystemManager entSys)
-    {
-        return Loc.GetString("reagent-effect-guidebook-disease-progress-change",
+    protected override string? ReagentEffectGuidebookText(IPrototypeManager prototype, IEntitySystemManager entSys) =>
+        Loc.GetString("reagent-effect-guidebook-disease-progress-change",
             ("chance", Probability),
             ("type", prototype.Index<DiseaseTypePrototype>(AffectedType).LocalizedName),
             ("amount", ProgressModifier));
-    }
 
     public override void Effect(EntityEffectBaseArgs args)
     {

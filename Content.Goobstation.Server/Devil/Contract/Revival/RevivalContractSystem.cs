@@ -17,14 +17,15 @@ using Robust.Server.GameObjects;
 using Robust.Server.Player;
 
 namespace Content.Goobstation.Server.Devil.Contract.Revival;
-public sealed partial class PendingRevivalContractSystem : EntitySystem
+
+public sealed class PendingRevivalContractSystem : EntitySystem
 {
-    [Dependency] private readonly SharedPopupSystem _popupSystem = default!;
-    [Dependency] private readonly UserInterfaceSystem _userInterface = default!;
-    [Dependency] private readonly RejuvenateSystem _rejuvenate = default!;
     [Dependency] private readonly DevilContractSystem _contract = default!;
     [Dependency] private readonly MindSystem _mind = default!;
     [Dependency] private readonly IPlayerManager _player = default!;
+    [Dependency] private readonly SharedPopupSystem _popupSystem = default!;
+    [Dependency] private readonly RejuvenateSystem _rejuvenate = default!;
+    [Dependency] private readonly UserInterfaceSystem _userInterface = default!;
 
     public override void Initialize()
     {
@@ -109,7 +110,8 @@ public sealed partial class PendingRevivalContractSystem : EntitySystem
         if (TerminatingOrDeleted(target))
             return false;
 
-        if (TryComp<RevivalContractComponent>(pending.Contract, out var contract) && contract is { ContractOwner: { Valid: true } contractOwner, Signer: { } signer })
+        if (TryComp<RevivalContractComponent>(pending.Contract, out var contract) && contract is
+                { ContractOwner: { Valid: true } contractOwner, Signer: { } signer })
         {
             _rejuvenate.PerformRejuvenate(target);
             _popupSystem.PopupEntity(Loc.GetString("revival-contract-accepted"), target, target);
@@ -119,5 +121,4 @@ public sealed partial class PendingRevivalContractSystem : EntitySystem
         RemComp(target, pending);
         return true;
     }
-
 }

@@ -9,12 +9,10 @@ using Content.Goobstation.Shared.Devil.Condemned;
 using Content.Shared.Mobs;
 
 namespace Content.Goobstation.Server.Devil.Condemned;
+
 public sealed partial class CondemnedSystem
 {
-    public void InitializeOnDeath()
-    {
-        SubscribeLocalEvent<CondemnedComponent, MobStateChangedEvent>(OnMobStateChanged);
-    }
+    public void InitializeOnDeath() => SubscribeLocalEvent<CondemnedComponent, MobStateChangedEvent>(OnMobStateChanged);
 
     private void OnMobStateChanged(EntityUid uid, CondemnedComponent comp, MobStateChangedEvent args)
     {

@@ -14,12 +14,13 @@ using Robust.Shared.Physics.Components;
 namespace Content.Goobstation.Shared.Weapons.Ranged.ProjectileThrowOnHit;
 
 /// <summary>
-/// This handles <see cref="ProjectileThrowOnHitComponent"/>
+/// This handles <see cref="ProjectileThrowOnHitComponent" />
 /// </summary>
 public sealed class ProjectileThrowOnHitSystem : EntitySystem
 {
     [Dependency] private readonly SharedStunSystem _stun = default!;
     [Dependency] private readonly ThrowingSystem _throwing = default!;
+
     public override void Initialize()
     {
         SubscribeLocalEvent<ProjectileThrowOnHitComponent, ProjectileHitEvent>(OnProjectileHit);
@@ -42,7 +43,10 @@ public sealed class ProjectileThrowOnHitSystem : EntitySystem
         ThrowOnHitHelper(projectile, args.Component.Thrower, args.Target, weaponPhysics.LinearVelocity);
     }
 
-    private void ThrowOnHitHelper(Entity<ProjectileThrowOnHitComponent> ent, EntityUid? user, EntityUid target, Vector2 direction)
+    private void ThrowOnHitHelper(Entity<ProjectileThrowOnHitComponent> ent,
+        EntityUid? user,
+        EntityUid target,
+        Vector2 direction)
     {
         var attemptEvent = new AttemptProjectileThrowOnHitEvent(target, user);
         RaiseLocalEvent(ent.Owner, ref attemptEvent);
@@ -59,6 +63,10 @@ public sealed class ProjectileThrowOnHitSystem : EntitySystem
         if (direction == Vector2.Zero)
             return;
 
-        _throwing.TryThrow(target, direction.Normalized() * ent.Comp.Distance, ent.Comp.Speed, user, unanchor: ent.Comp.UnanchorOnHit);
+        _throwing.TryThrow(target,
+            direction.Normalized() * ent.Comp.Distance,
+            ent.Comp.Speed,
+            user,
+            unanchor: ent.Comp.UnanchorOnHit);
     }
 }

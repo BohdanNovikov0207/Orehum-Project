@@ -6,15 +6,15 @@
 
 using Robust.Shared.Containers;
 
-namespace Content.Goobstation.Server.NTR
-{
-    [RegisterComponent]
-    public sealed partial class CorporateOverrideComponent : Component
-    {
-        [DataField]
-        public string UnlockedCategory = "NTREvil";
+namespace Content.Goobstation.Server.NTR;
 
-        public ContainerSlot OverrideSlot = default!;
-        public const string ContainerId = "CorporateOverrideSlot";
-}
+[RegisterComponent]
+public sealed partial class CorporateOverrideComponent : Component
+{
+    public const string ContainerId = "CorporateOverrideSlot";
+
+    public ContainerSlot OverrideSlot = default!;
+
+    [DataField]
+    public string UnlockedCategory = "NTREvil";
 }

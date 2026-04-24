@@ -3,11 +3,11 @@ using Robust.Shared.Serialization;
 
 namespace Content.Goobstation.Shared.Virology;
 
-[Serializable, NetSerializable]
+[Serializable] [NetSerializable]
 public enum DiseasePenVisuals : byte
 {
     Used,
 }
 
-[Serializable, NetSerializable]
+[Serializable] [NetSerializable]
 public sealed partial class DiseasePenInjectEvent : SimpleDoAfterEvent;
