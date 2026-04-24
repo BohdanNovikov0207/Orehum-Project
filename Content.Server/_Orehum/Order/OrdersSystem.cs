@@ -3,6 +3,9 @@ using Content.Server.Chat.Systems;
 using Content.Shared._Orehum.Orders;
 using Content.Shared.Chat;
 using Robust.Shared.Random;
+using Robust.Shared.Audio;
+using Robust.Shared.Audio.Components;
+using Robust.Shared.Audio.Systems;
 
 namespace Content.Server._Orehum.Orders;
 
@@ -11,6 +14,7 @@ public sealed class OrdersSystem : SharedOrdersSystem
     [Dependency] private readonly ActionsSystem _actions = default!;
     [Dependency] private readonly ChatSystem _chat = default!;
     [Dependency] private readonly IRobustRandom _random = default!;
+    [Dependency] private readonly SharedAudioSystem _audio = default!;
 
     public override void Initialize()
     {
@@ -45,6 +49,7 @@ public sealed class OrdersSystem : SharedOrdersSystem
         if (!ev.Handled)
             return;
         OnAction(uid, comp.MoveCallouts);
+        _audio.PlayPvs(comp.MoveSound, uid);
     }
 
     protected override void OnAction(EntityUid uid, OrdersComponent comp, HoldActionEvent ev)
@@ -53,6 +58,7 @@ public sealed class OrdersSystem : SharedOrdersSystem
         if (!ev.Handled)
             return;
         OnAction(uid, comp.HoldCallouts);
+        _audio.PlayPvs(comp.HoldSound, uid);
     }
 
     protected override void OnAction(EntityUid uid, OrdersComponent comp, FocusActionEvent ev)
@@ -61,6 +67,7 @@ public sealed class OrdersSystem : SharedOrdersSystem
         if (!ev.Handled)
             return;
         OnAction(uid, comp.FocusCallouts);
+        _audio.PlayPvs(comp.FocusSound, uid);
     }
 
     private void OnAction(EntityUid uid, List<string> callouts)
