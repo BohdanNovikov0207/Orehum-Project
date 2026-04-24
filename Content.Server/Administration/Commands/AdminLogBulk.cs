@@ -7,6 +7,9 @@
 //
 // SPDX-License-Identifier: MIT
 
+using Content.Shared.Administration;
+using Robust.Shared.Console;
+
 namespace Content.Server.Administration.Commands;
 
 #if DEBUG
