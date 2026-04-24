@@ -17,9 +17,9 @@ using Content.Server.Ghost.Roles.Components;
 using Content.Shared.Ghost;
 using Content.Shared.Mind;
 using Content.Shared.Players;
+using Robust.Server.Player;
 using Robust.Shared.Console;
 using Robust.Shared.GameObjects;
-using Robust.Shared.Prototypes;
 
 namespace Content.IntegrationTests.Tests.Minds;
 
@@ -59,7 +59,7 @@ public sealed class GhostRoleTests
         {
             Dirty = true,
             DummyTicker = false,
-            Connected = true
+            Connected = true,
         });
         var server = pair.Server;
         var client = pair.Client;
@@ -67,7 +67,7 @@ public sealed class GhostRoleTests
         var mapData = await pair.CreateTestMap();
 
         var entMan = server.ResolveDependency<IEntityManager>();
-        var sPlayerMan = server.ResolveDependency<Robust.Server.Player.IPlayerManager>();
+        var sPlayerMan = server.ResolveDependency<IPlayerManager>();
         var conHost = client.ResolveDependency<IConsoleHost>();
         var mindSystem = entMan.System<SharedMindSystem>();
         var session = sPlayerMan.Sessions.Single();
@@ -194,7 +194,7 @@ public sealed class GhostRoleTests
             Assert.That(ghostTwo, Is.Not.EqualTo(ghostRole));
             Assert.That(session.ContentData()?.Mind, Is.EqualTo(ghostRoleMindId));
 
-            if(adminGhost)
+            if (adminGhost)
             {
                 // aghost case, the ghost role mind should be owned by the ghost role entity,
                 // the ghost role mind is visiting the new ghost

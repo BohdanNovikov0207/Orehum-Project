@@ -22,6 +22,7 @@
 // SPDX-License-Identifier: AGPL-3.0-or-later
 
 using System.Linq;
+using Content.Server._Lavaland.Procedural.Components;
 using Content.Server.GameTicking;
 using Content.Server.Shuttles.Components;
 using Content.Server.Shuttles.Systems;
@@ -73,7 +74,9 @@ public sealed class EvacShuttleTest
         var data = entMan.GetComponent<StationDataComponent>(station);
         var shuttleData = entMan.GetComponent<StationEmergencyShuttleComponent>(station);
 
-        var saltern = data.Grids.First(x => !entMan.HasComponent<Content.Server._Lavaland.Procedural.Components.LavalandStationComponent>(x)); // Lavaland change - ignore lavaland outpost
+        var saltern =
+            data.Grids.First(x =>
+                !entMan.HasComponent<LavalandStationComponent>(x)); // Lavaland change - ignore lavaland outpost
         Assert.That(entMan.HasComponent<MapGridComponent>(saltern));
 
         var shuttle = shuttleData.EmergencyShuttle!.Value;
@@ -102,7 +105,11 @@ public sealed class EvacShuttleTest
         Assert.That(mapSys.IsPaused(centcommMap), Is.False);
         Assert.That(mapSys.IsPaused(salternXform.MapUid!.Value), Is.False);
 
-        EntityLifeStage LifeStage(EntityUid uid) => entMan.GetComponent<MetaDataComponent>(uid).EntityLifeStage;
+        EntityLifeStage LifeStage(EntityUid uid)
+        {
+            return entMan.GetComponent<MetaDataComponent>(uid).EntityLifeStage;
+        }
+
         Assert.That(LifeStage(saltern), Is.EqualTo(EntityLifeStage.MapInitialized));
         Assert.That(LifeStage(shuttle), Is.EqualTo(EntityLifeStage.MapInitialized));
         Assert.That(LifeStage(centcomm), Is.EqualTo(EntityLifeStage.MapInitialized));
@@ -112,7 +119,8 @@ public sealed class EvacShuttleTest
         // Set up shuttle timing
         var shuttleSys = server.System<ShuttleSystem>();
         var evacSys = server.System<EmergencyShuttleSystem>();
-        evacSys.TransitTime = shuttleSys.DefaultTravelTime; // Absolute minimum transit time, so the test has to run for at least this long
+        evacSys.TransitTime =
+            shuttleSys.DefaultTravelTime; // Absolute minimum transit time, so the test has to run for at least this long
         // TODO SHUTTLE fix spaghetti
 
         var dockTime = server.CfgMan.GetCVar(CCVars.EmergencyShuttleDockTime);

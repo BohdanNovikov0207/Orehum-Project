@@ -32,7 +32,7 @@ public sealed class MachineBoardTest
         "MachineParticleAcceleratorEmitterStarboardCircuitboard",
         "MachineParticleAcceleratorEmitterForeCircuitboard",
         "MachineParticleAcceleratorEmitterPortCircuitboard",
-        "ParticleAcceleratorComputerCircuitboard"
+        "ParticleAcceleratorComputerCircuitboard",
     };
 
     /// <summary>
@@ -65,7 +65,8 @@ public sealed class MachineBoardTest
                         $"Machine board {p.ID}'s corresponding machine has an invalid prototype.");
                     Assert.That(mProto.TryGetComponent<MachineComponent>(out var mComp, compFact),
                         $"Machine board {p.ID}'s corresponding machine {mId} does not have MachineComponent");
-                    Assert.That(mComp.Board, Is.EqualTo(p.ID),
+                    Assert.That(mComp.Board,
+                        Is.EqualTo(p.ID),
                         $"Machine {mId}'s BoardPrototype is not equal to it's corresponding machine board, {p.ID}");
                 });
             }
@@ -105,7 +106,8 @@ public sealed class MachineBoardTest
                         $"Computer board \"{p.ID}\"'s corresponding computer has an invalid prototype.");
                     Assert.That(cProto.TryGetComponent<ComputerComponent>(out var cComp, compFact),
                         $"Computer board {p.ID}'s corresponding computer \"{cId}\" does not have ComputerComponent");
-                    Assert.That(cComp.BoardPrototype, Is.EqualTo(p.ID),
+                    Assert.That(cComp.BoardPrototype,
+                        Is.EqualTo(p.ID),
                         $"Computer \"{cId}\"'s BoardPrototype is not equal to it's corresponding computer board, \"{p.ID}\"");
                 });
             }
@@ -141,7 +143,8 @@ public sealed class MachineBoardTest
                 {
                     foreach (var component in board.ComponentRequirements.Keys)
                     {
-                        Assert.That(entMan.ComponentFactory.TryGetRegistration(component, out _), $"Invalid component requirement {component} specified on machine board entity {p}");
+                        Assert.That(entMan.ComponentFactory.TryGetRegistration(component, out _),
+                            $"Invalid component requirement {component} specified on machine board entity {p}");
                     }
                 });
             }

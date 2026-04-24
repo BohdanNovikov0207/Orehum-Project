@@ -6,15 +6,15 @@
 //
 // SPDX-License-Identifier: MIT
 
+using System.Collections.Generic;
+using System.Linq;
+using Content.Goobstation.Maths.FixedPoint;
 using Content.Server.Fluids.EntitySystems;
 using Content.Shared.Chemistry.Components;
 using Content.Shared.Chemistry.EntitySystems;
-using Content.Goobstation.Maths.FixedPoint;
 using Content.Shared.Fluids;
 using Robust.Shared.GameObjects;
 using Robust.Shared.Prototypes;
-using System.Collections.Generic;
-using System.Linq;
 
 namespace Content.IntegrationTests.Tests.Fluids;
 
@@ -68,6 +68,7 @@ public sealed class AbsorbentTest
   - type: RefillableSolution
     solution: refillable
 ";
+
     public sealed record TestSolutionReagents(FixedPoint2 VolumeOfEvaporable, FixedPoint2 VolumeOfNonEvaporable);
 
     public record TestSolutionCase(
@@ -102,32 +103,47 @@ public sealed class AbsorbentTest
             refillable = entityManager.SpawnEntity(RefillableDummyId, coordinates);
 
             entityManager.TryGetComponent(absorbent, out component);
-            solutionContainerSystem.TryGetSolution(absorbent, component.SolutionName, out var absorbentSoln, out var absorbentSolution);
-            solutionContainerSystem.TryGetRefillableSolution(refillable, out var refillableSoln, out var refillableSolution);
+            solutionContainerSystem.TryGetSolution(absorbent,
+                component.SolutionName,
+                out var absorbentSoln,
+                out var absorbentSolution);
+            solutionContainerSystem.TryGetRefillableSolution(refillable,
+                out var refillableSoln,
+                out var refillableSolution);
 
             // Arrange
             if (testCase.InitialAbsorbentSolution.VolumeOfEvaporable > FixedPoint2.Zero)
-                solutionContainerSystem.AddSolution(absorbentSoln.Value, new Solution(EvaporablePrototypeId, testCase.InitialAbsorbentSolution.VolumeOfEvaporable));
+                solutionContainerSystem.AddSolution(absorbentSoln.Value,
+                    new Solution(EvaporablePrototypeId, testCase.InitialAbsorbentSolution.VolumeOfEvaporable));
             if (testCase.InitialAbsorbentSolution.VolumeOfNonEvaporable > FixedPoint2.Zero)
-                solutionContainerSystem.AddSolution(absorbentSoln.Value, new Solution(NonEvaporablePrototypeId, testCase.InitialAbsorbentSolution.VolumeOfNonEvaporable));
+                solutionContainerSystem.AddSolution(absorbentSoln.Value,
+                    new Solution(NonEvaporablePrototypeId, testCase.InitialAbsorbentSolution.VolumeOfNonEvaporable));
 
             if (testCase.InitialRefillableSolution.VolumeOfEvaporable > FixedPoint2.Zero)
-                solutionContainerSystem.AddSolution(refillableSoln.Value, new Solution(EvaporablePrototypeId, testCase.InitialRefillableSolution.VolumeOfEvaporable));
+                solutionContainerSystem.AddSolution(refillableSoln.Value,
+                    new Solution(EvaporablePrototypeId, testCase.InitialRefillableSolution.VolumeOfEvaporable));
             if (testCase.InitialRefillableSolution.VolumeOfNonEvaporable > FixedPoint2.Zero)
-                solutionContainerSystem.AddSolution(refillableSoln.Value, new Solution(NonEvaporablePrototypeId, testCase.InitialRefillableSolution.VolumeOfNonEvaporable));
+                solutionContainerSystem.AddSolution(refillableSoln.Value,
+                    new Solution(NonEvaporablePrototypeId, testCase.InitialRefillableSolution.VolumeOfNonEvaporable));
 
             // Act
             absorbentSystem.Mop((absorbent, component), user, refillable);
 
             // Assert
-            var absorbentComposition = absorbentSolution.GetReagentPrototypes(prototypeManager).ToDictionary(r => r.Key.ID, r => r.Value);
-            var refillableComposition = refillableSolution.GetReagentPrototypes(prototypeManager).ToDictionary(r => r.Key.ID, r => r.Value);
+            var absorbentComposition = absorbentSolution.GetReagentPrototypes(prototypeManager)
+                .ToDictionary(r => r.Key.ID, r => r.Value);
+            var refillableComposition = refillableSolution.GetReagentPrototypes(prototypeManager)
+                .ToDictionary(r => r.Key.ID, r => r.Value);
             Assert.Multiple(() =>
             {
-                Assert.That(VolumeOfPrototypeInComposition(absorbentComposition, EvaporablePrototypeId), Is.EqualTo(testCase.ExpectedAbsorbentSolution.VolumeOfEvaporable));
-                Assert.That(VolumeOfPrototypeInComposition(absorbentComposition, NonEvaporablePrototypeId), Is.EqualTo(testCase.ExpectedAbsorbentSolution.VolumeOfNonEvaporable));
-                Assert.That(VolumeOfPrototypeInComposition(refillableComposition, EvaporablePrototypeId), Is.EqualTo(testCase.ExpectedRefillableSolution.VolumeOfEvaporable));
-                Assert.That(VolumeOfPrototypeInComposition(refillableComposition, NonEvaporablePrototypeId), Is.EqualTo(testCase.ExpectedRefillableSolution.VolumeOfNonEvaporable));
+                Assert.That(VolumeOfPrototypeInComposition(absorbentComposition, EvaporablePrototypeId),
+                    Is.EqualTo(testCase.ExpectedAbsorbentSolution.VolumeOfEvaporable));
+                Assert.That(VolumeOfPrototypeInComposition(absorbentComposition, NonEvaporablePrototypeId),
+                    Is.EqualTo(testCase.ExpectedAbsorbentSolution.VolumeOfNonEvaporable));
+                Assert.That(VolumeOfPrototypeInComposition(refillableComposition, EvaporablePrototypeId),
+                    Is.EqualTo(testCase.ExpectedRefillableSolution.VolumeOfEvaporable));
+                Assert.That(VolumeOfPrototypeInComposition(refillableComposition, NonEvaporablePrototypeId),
+                    Is.EqualTo(testCase.ExpectedRefillableSolution.VolumeOfNonEvaporable));
             });
         });
         await pair.RunTicksSync(5);
@@ -160,31 +176,46 @@ public sealed class AbsorbentTest
             refillable = entityManager.SpawnEntity(SmallRefillableDummyId, coordinates);
 
             entityManager.TryGetComponent(absorbent, out component);
-            solutionContainerSystem.TryGetSolution(absorbent, component.SolutionName, out var absorbentSoln, out var absorbentSolution);
-            solutionContainerSystem.TryGetRefillableSolution(refillable, out var refillableSoln, out var refillableSolution);
+            solutionContainerSystem.TryGetSolution(absorbent,
+                component.SolutionName,
+                out var absorbentSoln,
+                out var absorbentSolution);
+            solutionContainerSystem.TryGetRefillableSolution(refillable,
+                out var refillableSoln,
+                out var refillableSolution);
 
             // Arrange
-            solutionContainerSystem.AddSolution(absorbentSoln.Value, new Solution(EvaporablePrototypeId, testCase.InitialAbsorbentSolution.VolumeOfEvaporable));
+            solutionContainerSystem.AddSolution(absorbentSoln.Value,
+                new Solution(EvaporablePrototypeId, testCase.InitialAbsorbentSolution.VolumeOfEvaporable));
             if (testCase.InitialAbsorbentSolution.VolumeOfNonEvaporable > FixedPoint2.Zero)
-                solutionContainerSystem.AddSolution(absorbentSoln.Value, new Solution(NonEvaporablePrototypeId, testCase.InitialAbsorbentSolution.VolumeOfNonEvaporable));
+                solutionContainerSystem.AddSolution(absorbentSoln.Value,
+                    new Solution(NonEvaporablePrototypeId, testCase.InitialAbsorbentSolution.VolumeOfNonEvaporable));
 
             if (testCase.InitialRefillableSolution.VolumeOfEvaporable > FixedPoint2.Zero)
-                solutionContainerSystem.AddSolution(refillableSoln.Value, new Solution(EvaporablePrototypeId, testCase.InitialRefillableSolution.VolumeOfEvaporable));
+                solutionContainerSystem.AddSolution(refillableSoln.Value,
+                    new Solution(EvaporablePrototypeId, testCase.InitialRefillableSolution.VolumeOfEvaporable));
             if (testCase.InitialRefillableSolution.VolumeOfNonEvaporable > FixedPoint2.Zero)
-                solutionContainerSystem.AddSolution(refillableSoln.Value, new Solution(NonEvaporablePrototypeId, testCase.InitialRefillableSolution.VolumeOfNonEvaporable));
+                solutionContainerSystem.AddSolution(refillableSoln.Value,
+                    new Solution(NonEvaporablePrototypeId, testCase.InitialRefillableSolution.VolumeOfNonEvaporable));
 
             // Act
             absorbentSystem.Mop((absorbent, component), user, refillable);
 
             // Assert
-            var absorbentComposition = absorbentSolution.GetReagentPrototypes(prototypeManager).ToDictionary(r => r.Key.ID, r => r.Value);
-            var refillableComposition = refillableSolution.GetReagentPrototypes(prototypeManager).ToDictionary(r => r.Key.ID, r => r.Value);
+            var absorbentComposition = absorbentSolution.GetReagentPrototypes(prototypeManager)
+                .ToDictionary(r => r.Key.ID, r => r.Value);
+            var refillableComposition = refillableSolution.GetReagentPrototypes(prototypeManager)
+                .ToDictionary(r => r.Key.ID, r => r.Value);
             Assert.Multiple(() =>
             {
-                Assert.That(VolumeOfPrototypeInComposition(absorbentComposition, EvaporablePrototypeId), Is.EqualTo(testCase.ExpectedAbsorbentSolution.VolumeOfEvaporable));
-                Assert.That(VolumeOfPrototypeInComposition(absorbentComposition, NonEvaporablePrototypeId), Is.EqualTo(testCase.ExpectedAbsorbentSolution.VolumeOfNonEvaporable));
-                Assert.That(VolumeOfPrototypeInComposition(refillableComposition, EvaporablePrototypeId), Is.EqualTo(testCase.ExpectedRefillableSolution.VolumeOfEvaporable));
-                Assert.That(VolumeOfPrototypeInComposition(refillableComposition, NonEvaporablePrototypeId), Is.EqualTo(testCase.ExpectedRefillableSolution.VolumeOfNonEvaporable));
+                Assert.That(VolumeOfPrototypeInComposition(absorbentComposition, EvaporablePrototypeId),
+                    Is.EqualTo(testCase.ExpectedAbsorbentSolution.VolumeOfEvaporable));
+                Assert.That(VolumeOfPrototypeInComposition(absorbentComposition, NonEvaporablePrototypeId),
+                    Is.EqualTo(testCase.ExpectedAbsorbentSolution.VolumeOfNonEvaporable));
+                Assert.That(VolumeOfPrototypeInComposition(refillableComposition, EvaporablePrototypeId),
+                    Is.EqualTo(testCase.ExpectedRefillableSolution.VolumeOfEvaporable));
+                Assert.That(VolumeOfPrototypeInComposition(refillableComposition, NonEvaporablePrototypeId),
+                    Is.EqualTo(testCase.ExpectedRefillableSolution.VolumeOfNonEvaporable));
             });
         });
         await pair.RunTicksSync(5);
@@ -192,10 +223,8 @@ public sealed class AbsorbentTest
         await pair.CleanReturnAsync();
     }
 
-    private static FixedPoint2 VolumeOfPrototypeInComposition(Dictionary<string, FixedPoint2> composition, string prototypeId)
-    {
-        return composition.TryGetValue(prototypeId, out var value) ? value : FixedPoint2.Zero;
-    }
+    private static FixedPoint2 VolumeOfPrototypeInComposition(Dictionary<string, FixedPoint2> composition,
+        string prototypeId) => composition.TryGetValue(prototypeId, out var value) ? value : FixedPoint2.Zero;
 
     public static readonly TestSolutionCase[] TestCasesToRun = new TestSolutionCase[]
     {
@@ -321,7 +350,7 @@ public sealed class AbsorbentTest
             new TestSolutionReagents(FixedPoint2.New(200), FixedPoint2.Zero),
             new TestSolutionReagents(FixedPoint2.New(100), FixedPoint2.Zero),
             new TestSolutionReagents(FixedPoint2.New(100), FixedPoint2.New(100))
-        )
+        ),
     };
 
     public static readonly TestSolutionCase[] TestCasesToRunOnSmallRefillable = new TestSolutionCase[]
@@ -347,6 +376,6 @@ public sealed class AbsorbentTest
             new TestSolutionReagents(FixedPoint2.New(10), FixedPoint2.New(5)),
             new TestSolutionReagents(FixedPoint2.New(30), FixedPoint2.New(10)),
             new TestSolutionReagents(FixedPoint2.Zero, FixedPoint2.New(20))
-        )
+        ),
     };
 }

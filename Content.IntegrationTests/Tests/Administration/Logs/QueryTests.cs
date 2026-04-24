@@ -56,18 +56,19 @@ public sealed class QueryTests
             Search = guid.ToString(),
             Types = new HashSet<LogType> { LogType.Unknown },
             After = date,
-            AnyPlayers = new[] { player.UserId.UserId }
+            AnyPlayers = new[] { player.UserId.UserId },
         };
 
-        await PoolManager.WaitUntil(server, async () =>
-        {
-            foreach (var _ in await sAdminLogSystem.All(filter))
+        await PoolManager.WaitUntil(server,
+            async () =>
             {
-                return true;
-            }
+                foreach (var _ in await sAdminLogSystem.All(filter))
+                {
+                    return true;
+                }
 
-            return false;
-        });
+                return false;
+            });
 
         await pair.CleanReturnAsync();
     }

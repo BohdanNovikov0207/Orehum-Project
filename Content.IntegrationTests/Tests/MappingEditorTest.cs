@@ -87,7 +87,7 @@ public sealed class MappingEditorTest
     {
         await using var pair = await PoolManager.GetServerClient(new PoolSettings
         {
-            Connected = true
+            Connected = true,
         });
         var client = pair.Client;
         var state = client.ResolveDependency<IStateManager>();

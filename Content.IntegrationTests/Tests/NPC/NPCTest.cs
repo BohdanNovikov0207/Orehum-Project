@@ -44,7 +44,10 @@ public sealed class NPCTest
         await pool.CleanReturnAsync();
     }
 
-    private static void Count(HTNCompoundPrototype compound, Dictionary<string, int> counts, HTNSystem htnSystem, IPrototypeManager protoManager)
+    private static void Count(HTNCompoundPrototype compound,
+        Dictionary<string, int> counts,
+        HTNSystem htnSystem,
+        IPrototypeManager protoManager)
     {
         foreach (var branch in compound.Branches)
         {

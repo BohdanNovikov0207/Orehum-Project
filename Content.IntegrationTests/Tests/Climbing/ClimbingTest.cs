@@ -34,7 +34,6 @@
 // SPDX-License-Identifier: AGPL-3.0-or-later
 
 #nullable enable
-using Content.IntegrationTests.Tests.Interaction;
 using Content.IntegrationTests.Tests.Movement;
 using Robust.Shared.Maths;
 using ClimbingComponent = Content.Shared.Climbing.Components.ClimbingComponent;
@@ -65,7 +64,10 @@ public sealed class ClimbingTest : MovementTest
 
         // Try to start climbing
         var sys = SEntMan.System<ClimbSystem>();
-        await Server.WaitPost(() => sys.TryClimb(SEntMan.GetEntity(Player), SEntMan.GetEntity(Player), SEntMan.GetEntity(Target.Value), out _));
+        await Server.WaitPost(() => sys.TryClimb(SEntMan.GetEntity(Player),
+            SEntMan.GetEntity(Player),
+            SEntMan.GetEntity(Target.Value),
+            out _));
         await AwaitDoAfters();
 
         // Player should now be climbing
@@ -92,7 +94,10 @@ public sealed class ClimbingTest : MovementTest
         Assert.That(Delta(), Is.LessThan(0));
 
         // Start climbing
-        await Server.WaitPost(() => sys.TryClimb(SEntMan.GetEntity(Player), SEntMan.GetEntity(Player), SEntMan.GetEntity(Target.Value), out _));
+        await Server.WaitPost(() => sys.TryClimb(SEntMan.GetEntity(Player),
+            SEntMan.GetEntity(Player),
+            SEntMan.GetEntity(Target.Value),
+            out _));
         await AwaitDoAfters();
 
         Assert.Multiple(() =>

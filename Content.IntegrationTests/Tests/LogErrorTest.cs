@@ -15,7 +15,7 @@ namespace Content.IntegrationTests.Tests;
 public sealed class LogErrorTest
 {
     /// <summary>
-    ///     This test ensures that error logs cause tests to fail.
+    /// This test ensures that error logs cause tests to fail.
     /// </summary>
     [Test]
     public async Task TestLogErrorCausesTestFailure()

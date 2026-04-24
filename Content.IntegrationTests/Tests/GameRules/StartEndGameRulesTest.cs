@@ -22,7 +22,7 @@ namespace Content.IntegrationTests.Tests.GameRules;
 public sealed class StartEndGameRulesTest
 {
     /// <summary>
-    ///     Tests that all game rules can be added/started/ended at the same time without exceptions.
+    /// Tests that all game rules can be added/started/ended at the same time without exceptions.
     /// </summary>
     [Test]
     public async Task TestAllConcurrent()
@@ -30,7 +30,7 @@ public sealed class StartEndGameRulesTest
         await using var pair = await PoolManager.GetServerClient(new PoolSettings
         {
             Dirty = true,
-            DummyTicker = false
+            DummyTicker = false,
         });
         var server = pair.Server;
         await server.WaitIdleAsync();

@@ -13,8 +13,8 @@
 // SPDX-License-Identifier: AGPL-3.0-or-later
 
 #nullable enable
+using System.Linq;
 using Content.Goobstation.Maths.FixedPoint;
-using Content.Server.Database;
 using Content.Server.Ghost.Roles;
 using Content.Server.Ghost.Roles.Components;
 using Content.Server.Mind;
@@ -36,7 +36,6 @@ using Robust.Server.Player;
 using Robust.Shared.GameObjects;
 using Robust.Shared.Map;
 using Robust.Shared.Prototypes;
-using System.Linq;
 
 namespace Content.IntegrationTests.Tests.Minds;
 
@@ -167,9 +166,7 @@ public sealed partial class MindTests
         {
             var damageable = entMan.GetComponent<DamageableComponent>(entity);
             if (!protoMan.TryIndex(BluntDamageType, out var prototype))
-            {
                 return;
-            }
 
             if (entMan.TryGetComponent(entity, out BodyComponent? body) &&
                 body.BodyType == BodyType.Complex &&
@@ -179,13 +176,12 @@ public sealed partial class MindTests
                 {
                     if (!entMan.TryGetComponent(woundable, out DamageableComponent? wdc) ||
                         !entMan.TryGetComponent(woundable, out BodyPartComponent? bpc))
-                    {
                         continue;
-                    }
 
                     damageableSystem.SetDamage(woundable, wdc, new DamageSpecifier(prototype, FixedPoint2.New(100)));
                 }
             }
+
             damageableSystem.SetDamage(entity, damageable, new DamageSpecifier(prototype, FixedPoint2.New(401)));
             Assert.That(mindSystem.GetMind(entity, mindContainerComp), Is.EqualTo(mindId));
         });
@@ -241,7 +237,7 @@ public sealed partial class MindTests
         await using var pair = await PoolManager.GetServerClient(new PoolSettings
         {
             Connected = true,
-            DummyTicker = false
+            DummyTicker = false,
         });
         var server = pair.Server;
 
@@ -336,7 +332,7 @@ public sealed partial class MindTests
 
             var jobRole = "";
 
-            roleSystem.MindAddJobRole(mindId, jobPrototype:jobRole);
+            roleSystem.MindAddJobRole(mindId, jobPrototype: jobRole);
 
             Assert.Multiple(() =>
             {
@@ -368,7 +364,8 @@ public sealed partial class MindTests
     public async Task TestPlayerCanGhost()
     {
         // Client is needed to spawn session
-        await using var pair = await PoolManager.GetServerClient(new PoolSettings { Connected = true, DummyTicker = false });
+        await using var pair =
+            await PoolManager.GetServerClient(new PoolSettings { Connected = true, DummyTicker = false });
         var server = pair.Server;
 
         var entMan = server.ResolveDependency<IServerEntityManager>();
@@ -447,7 +444,7 @@ public sealed partial class MindTests
         {
             DummyTicker = false,
             Connected = true,
-            Dirty = true
+            Dirty = true,
         });
         var server = pair.Server;
 

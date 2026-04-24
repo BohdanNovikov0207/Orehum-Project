@@ -64,10 +64,10 @@
 // SPDX-License-Identifier: AGPL-3.0-or-later
 
 using System.Linq;
+using Content.Goobstation.Maths.FixedPoint;
 using Content.Shared.Damage;
 using Content.Shared.Damage.Prototypes;
 using Content.Shared.Execution;
-using Content.Goobstation.Maths.FixedPoint;
 using Content.Shared.Ghost;
 using Content.Shared.Hands.Components;
 using Content.Shared.Hands.EntitySystems;
@@ -80,14 +80,14 @@ using Robust.Server.Player;
 using Robust.Shared.Console;
 using Robust.Shared.GameObjects;
 using Robust.Shared.Prototypes;
-using Content.Shared._Shitmed.Medical.Surgery.Consciousness.Components; // Shitmed Change
+
+// Shitmed Change
 
 namespace Content.IntegrationTests.Tests.Commands;
 
 [TestFixture]
 public sealed class SuicideCommandTests
 {
-
     [TestPrototypes]
     private const string Prototypes = @"
 - type: entity
@@ -118,6 +118,7 @@ public sealed class SuicideCommandTests
   name: test version of the material reclaimer
   components:
   - type: MaterialReclaimer";
+
     private static readonly ProtoId<TagPrototype> CannotSuicideTag = "CannotSuicide";
     private static readonly ProtoId<DamageTypePrototype> DamageType = "Slash";
 
@@ -132,7 +133,7 @@ public sealed class SuicideCommandTests
         {
             Connected = true,
             Dirty = true,
-            DummyTicker = false
+            DummyTicker = false,
         });
         var server = pair.Server;
         var consoleHost = server.ResolveDependency<IConsoleHost>();
@@ -165,9 +166,11 @@ public sealed class SuicideCommandTests
             consoleHost.GetSessionShell(playerMan.Sessions.First()).ExecuteCommand("suicide");
             Assert.Multiple(() =>
             {
-                Assert.That(mobStateSystem.IsDead(player, mobStateComp), $"Player is alive when they should be dead: {entManager.ToPrettyString(player)}, {player.Id}, {mobStateComp.CurrentState}, {damageableComp.Damage.GetTotal()}");
-                Assert.That(entManager.TryGetComponent<GhostComponent>(mindComponent.CurrentEntity, out var ghostComp) &&
-                            !ghostComp.CanReturnToBody);
+                Assert.That(mobStateSystem.IsDead(player, mobStateComp),
+                    $"Player is alive when they should be dead: {entManager.ToPrettyString(player)}, {player.Id}, {mobStateComp.CurrentState}, {damageableComp.Damage.GetTotal()}");
+                Assert.That(
+                    entManager.TryGetComponent<GhostComponent>(mindComponent.CurrentEntity, out var ghostComp) &&
+                    !ghostComp.CanReturnToBody);
             });
         });
 
@@ -185,7 +188,7 @@ public sealed class SuicideCommandTests
         {
             Connected = true,
             Dirty = true,
-            DummyTicker = false
+            DummyTicker = false,
         });
         var server = pair.Server;
         var consoleHost = server.ResolveDependency<IConsoleHost>();
@@ -230,9 +233,11 @@ public sealed class SuicideCommandTests
             Assert.Multiple(() =>
             {
                 Assert.That(mobStateSystem.IsDead(player, mobStateComp));
-                Assert.That(entManager.TryGetComponent<GhostComponent>(mindComponent.CurrentEntity, out var ghostComp) &&
-                            !ghostComp.CanReturnToBody);
-                Assert.That(mobThresholdSystem.CheckVitalDamage(player, damageableComp), Is.EqualTo(lethalDamageThreshold)); // Goobstation
+                Assert.That(
+                    entManager.TryGetComponent<GhostComponent>(mindComponent.CurrentEntity, out var ghostComp) &&
+                    !ghostComp.CanReturnToBody);
+                Assert.That(mobThresholdSystem.CheckVitalDamage(player, damageableComp),
+                    Is.EqualTo(lethalDamageThreshold)); // Goobstation
             });
         });
 
@@ -250,7 +255,7 @@ public sealed class SuicideCommandTests
         {
             Connected = true,
             Dirty = true,
-            DummyTicker = false
+            DummyTicker = false,
         });
         var server = pair.Server;
         var consoleHost = server.ResolveDependency<IConsoleHost>();
@@ -281,9 +286,11 @@ public sealed class SuicideCommandTests
             consoleHost.GetSessionShell(playerMan.Sessions.First()).ExecuteCommand("suicide");
             Assert.Multiple(() =>
             {
-                Assert.That(mobStateSystem.IsAlive(player, mobStateComp), $"Player is alive when they should be dead: {entManager.ToPrettyString(player)}, {player.Id}");
-                Assert.That(entManager.TryGetComponent<GhostComponent>(mindComponent.CurrentEntity, out var ghostComp) &&
-                            !ghostComp.CanReturnToBody);
+                Assert.That(mobStateSystem.IsAlive(player, mobStateComp),
+                    $"Player is alive when they should be dead: {entManager.ToPrettyString(player)}, {player.Id}");
+                Assert.That(
+                    entManager.TryGetComponent<GhostComponent>(mindComponent.CurrentEntity, out var ghostComp) &&
+                    !ghostComp.CanReturnToBody);
             });
         });
 
@@ -301,7 +308,7 @@ public sealed class SuicideCommandTests
         {
             Connected = true,
             Dirty = true,
-            DummyTicker = false
+            DummyTicker = false,
         });
         var server = pair.Server;
         var consoleHost = server.ResolveDependency<IConsoleHost>();
@@ -356,8 +363,9 @@ public sealed class SuicideCommandTests
             Assert.Multiple(() =>
             {
                 Assert.That(mobStateSystem.IsDead(player, mobStateComp));
-                Assert.That(entManager.TryGetComponent<GhostComponent>(mindComponent.CurrentEntity, out var ghostComp) &&
-                            !ghostComp.CanReturnToBody);
+                Assert.That(
+                    entManager.TryGetComponent<GhostComponent>(mindComponent.CurrentEntity, out var ghostComp) &&
+                    !ghostComp.CanReturnToBody);
                 //Assert.That(damageableComp.Damage.DamageDict["Slash"], Is.EqualTo(lethalDamageThreshold)); // GoobStation
             });
         });
@@ -376,7 +384,7 @@ public sealed class SuicideCommandTests
         {
             Connected = true,
             Dirty = true,
-            DummyTicker = false
+            DummyTicker = false,
         });
         var server = pair.Server;
         var consoleHost = server.ResolveDependency<IConsoleHost>();
@@ -431,8 +439,9 @@ public sealed class SuicideCommandTests
             Assert.Multiple(() =>
             {
                 Assert.That(mobStateSystem.IsDead(player, mobStateComp));
-                Assert.That(entManager.TryGetComponent<GhostComponent>(mindComponent.CurrentEntity, out var ghostComp) &&
-                            !ghostComp.CanReturnToBody);
+                Assert.That(
+                    entManager.TryGetComponent<GhostComponent>(mindComponent.CurrentEntity, out var ghostComp) &&
+                    !ghostComp.CanReturnToBody);
                 Assert.That(damageableComp.Damage.DamageDict["Slash"], Is.EqualTo(lethalDamageThreshold / 2));
             });
         });

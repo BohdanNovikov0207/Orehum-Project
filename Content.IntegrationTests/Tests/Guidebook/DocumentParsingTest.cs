@@ -19,13 +19,12 @@ using Robust.Client.UserInterface.Controls;
 namespace Content.IntegrationTests.Tests.Guidebook;
 
 /// <summary>
-///     This test checks that an example document string properly gets parsed by the <see cref="DocumentParsingManager"/>.
+/// This test checks that an example document string properly gets parsed by the <see cref="DocumentParsingManager" />.
 /// </summary>
 [TestFixture]
 [TestOf(typeof(DocumentParsingManager))]
 public sealed class DocumentParsingTest
 {
-
     public string TestDocument = @"multiple
    lines
  separated by
@@ -138,7 +137,8 @@ whitespace before newlines are ignored.
         Assert.That(val, Is.EqualTo("value2 with spaces"));
 
         test4.Params.TryGetValue("key3", out val);
-        Assert.That(val, Is.EqualTo(@"value3 with a
+        Assert.That(val,
+            Is.EqualTo(@"value3 with a
   newline"));
 
         subTest2.Params.TryGetValue("k", out val);

@@ -25,7 +25,7 @@ public sealed class SpeciesBUiTest
 
     private Dictionary<Enum, InterfaceData> GetInterfaces(UserInterfaceComponent comp) =>
         (Dictionary<Enum, InterfaceData>)
-            typeof(UserInterfaceComponent).GetField("Interfaces", BindingFlags.NonPublic | BindingFlags.Instance)!
+        typeof(UserInterfaceComponent).GetField("Interfaces", BindingFlags.NonPublic | BindingFlags.Instance)!
             .GetValue(comp);
 
     [Test]
@@ -34,7 +34,7 @@ public sealed class SpeciesBUiTest
         await using var pair = await PoolManager.GetServerClient(new PoolSettings
         {
             Dirty = true,
-            Connected = false
+            Connected = false,
         });
 
         var server = pair.Server;
@@ -59,7 +59,9 @@ public sealed class SpeciesBUiTest
                 var states = GetInterfaces(bUiBase);
                 foreach (var key in baseKeys)
                 {
-                    Assert.That(states.ContainsKey(key), Is.True, $"Species {species.ID} has not UserInterface of type enum.{key.GetType().Name}");
+                    Assert.That(states.ContainsKey(key),
+                        Is.True,
+                        $"Species {species.ID} has not UserInterface of type enum.{key.GetType().Name}");
                 }
             }
         });

@@ -26,33 +26,11 @@ namespace Content.IntegrationTests.Tests.Toolshed;
 [FixtureLifeCycle(LifeCycle.InstancePerTestCase)]
 public abstract class ToolshedTest : IInvocationContext
 {
-    protected TestPair Pair = default!;
-
-    protected virtual bool Connected => false;
-    protected virtual bool AssertOnUnexpectedError => true;
-
-    protected RobustIntegrationTest.ServerIntegrationInstance Server = default!;
-    protected RobustIntegrationTest.ClientIntegrationInstance? Client = null;
-    public ToolshedManager Toolshed { get; private set; } = default!;
-    public ToolshedEnvironment Environment => Toolshed.DefaultEnvironment;
-
-    protected IAdminManager AdminManager = default!;
-
-    protected IInvocationContext? InvocationContext = null;
-
     [TearDown]
     public async Task TearDownInternal()
     {
         await Pair.CleanReturnAsync();
         await TearDown();
-    }
-
-    protected virtual Task TearDown()
-    {
-        Assert.That(_expectedErrors, Is.Empty);
-        ClearErrors();
-
-        return Task.CompletedTask;
     }
 
     [SetUp]
@@ -73,10 +51,30 @@ public abstract class ToolshedTest : IInvocationContext
         AdminManager = Server.ResolveDependency<IAdminManager>();
     }
 
-    protected bool InvokeCommand(string command, out object? result, ICommonSession? session = null)
+    protected TestPair Pair = default!;
+
+    protected virtual bool Connected => false;
+    protected virtual bool AssertOnUnexpectedError => true;
+
+    protected RobustIntegrationTest.ServerIntegrationInstance Server = default!;
+    protected RobustIntegrationTest.ClientIntegrationInstance? Client;
+    public ToolshedManager Toolshed { get; private set; } = default!;
+    public ToolshedEnvironment Environment => Toolshed.DefaultEnvironment;
+
+    protected IAdminManager AdminManager = default!;
+
+    protected IInvocationContext? InvocationContext = null;
+
+    protected virtual Task TearDown()
     {
-        return Toolshed.InvokeCommand(this, command, null, out result);
+        Assert.That(_expectedErrors, Is.Empty);
+        ClearErrors();
+
+        return Task.CompletedTask;
     }
+
+    protected bool InvokeCommand(string command, out object? result, ICommonSession? session = null) =>
+        Toolshed.InvokeCommand(this, command, null, out result);
 
     protected T InvokeCommand<T>(string command)
     {
@@ -100,9 +98,7 @@ public abstract class ToolshedTest : IInvocationContext
     public bool CheckInvokable(CommandSpec command, out IConError? error)
     {
         if (InvocationContext is not null)
-        {
             return InvocationContext.CheckInvokable(command, out error);
-        }
 
         error = null;
         return true;
@@ -116,9 +112,7 @@ public abstract class ToolshedTest : IInvocationContext
         get
         {
             if (InvocationContext is not null)
-            {
                 return InvocationContext.Session;
-            }
 
             return InvocationSession;
         }
@@ -126,21 +120,18 @@ public abstract class ToolshedTest : IInvocationContext
 
     public void WriteLine(string line)
     {
-        return;
     }
 
-    private Queue<Type> _expectedErrors = new();
+    private readonly Queue<Type> _expectedErrors = new();
 
-    private List<IConError> _errors = new();
+    private readonly List<IConError> _errors = new();
 
     public void ReportError(IConError err)
     {
         if (_expectedErrors.Count == 0)
         {
             if (AssertOnUnexpectedError)
-            {
                 Assert.Fail($"Got an error, {err.GetType()}, when none was expected.\n{err.Describe()}");
-            }
 
             goto done;
         }
@@ -150,51 +141,30 @@ public abstract class ToolshedTest : IInvocationContext
         if (AssertOnUnexpectedError)
         {
             Assert.That(
-                    err.GetType().IsAssignableTo(ty),
-                    $"The error {err.GetType()} wasn't assignable to the expected type {ty}.\n{err.Describe()}"
-                );
+                err.GetType().IsAssignableTo(ty),
+                $"The error {err.GetType()} wasn't assignable to the expected type {ty}.\n{err.Describe()}"
+            );
         }
 
-    done:
+        done:
         _errors.Add(err);
     }
 
-    public IEnumerable<IConError> GetErrors()
-    {
-        return _errors;
-    }
+    public IEnumerable<IConError> GetErrors() => _errors;
 
     public bool HasErrors => _errors.Count > 0;
 
-    public void ClearErrors()
-    {
-        _errors.Clear();
-    }
+    public void ClearErrors() => _errors.Clear();
 
-    public object? ReadVar(string name)
-    {
-        return Variables.GetValueOrDefault(name);
-    }
+    public object? ReadVar(string name) => Variables.GetValueOrDefault(name);
 
-    public void WriteVar(string name, object? value)
-    {
-        Variables[name] = value;
-    }
+    public void WriteVar(string name, object? value) => Variables[name] = value;
 
-    public IEnumerable<string> GetVars()
-    {
-        return Variables.Keys;
-    }
+    public IEnumerable<string> GetVars() => Variables.Keys;
 
     public Dictionary<string, object?> Variables { get; } = new();
 
-    protected void ExpectError(Type err)
-    {
-        _expectedErrors.Enqueue(err);
-    }
+    protected void ExpectError(Type err) => _expectedErrors.Enqueue(err);
 
-    protected void ExpectError<T>()
-    {
-        _expectedErrors.Enqueue(typeof(T));
-    }
+    protected void ExpectError<T>() => _expectedErrors.Enqueue(typeof(T));
 }

@@ -43,7 +43,8 @@ public sealed class PrototypeTests
         await pair.CleanReturnAsync();
     }
 
-    public async Task SaveThenValidatePrototype(RobustIntegrationTest.IntegrationInstance instance, string instanceId,
+    public async Task SaveThenValidatePrototype(RobustIntegrationTest.IntegrationInstance instance,
+        string instanceId,
         PrototypeSaveTest.TestEntityUidContext ctx)
     {
         var protoMan = instance.ResolveDependency<IPrototypeManager>();
@@ -64,6 +65,7 @@ public sealed class PrototypeTests
                     {
                         msg += $" - {errorNode.ErrorReason}\n";
                     }
+
                     Assert.Fail(msg);
                 }
             }
@@ -138,7 +140,7 @@ public sealed class PrototypeTests
 
         try
         {
-            first = seriMan.WriteValue(kind, proto, alwaysWrite: true, context:ctx);
+            first = seriMan.WriteValue(kind, proto, true, ctx);
         }
         catch (Exception e)
         {
@@ -150,7 +152,7 @@ public sealed class PrototypeTests
         object? obj;
         try
         {
-            obj = seriMan.Read(kind, first, context:ctx);
+            obj = seriMan.Read(kind, first, ctx);
         }
         catch (Exception e)
         {
@@ -167,7 +169,7 @@ public sealed class PrototypeTests
 
         try
         {
-            second = seriMan.WriteValue(kind, deserialized, alwaysWrite: true, context:ctx);
+            second = seriMan.WriteValue(kind, deserialized, true, ctx);
         }
         catch (Exception e)
         {

@@ -11,7 +11,6 @@
 // SPDX-License-Identifier: AGPL-3.0-or-later
 
 using Content.Goobstation.Shared.Changeling.Components;
-using Content.Goobstation.Shared.InternalResources.Components;
 using Content.Goobstation.Shared.InternalResources.EntitySystems;
 using Content.Server.Actions;
 using Content.Shared.Actions.Components;
@@ -86,18 +85,20 @@ public sealed class ChangelingArmorTest
             {
                 Assert.That(invSys.TryGetSlotEntity(urist, "outerClothing", out var outerClothing), Is.True);
                 Assert.That(outerClothing, Is.Not.Null);
-                Assert.That(entMan.GetComponent<MetaDataComponent>(outerClothing.Value).EntityPrototype!.ID, Is.EqualTo(outerProto));
+                Assert.That(entMan.GetComponent<MetaDataComponent>(outerClothing.Value).EntityPrototype!.ID,
+                    Is.EqualTo(outerProto));
 
                 Assert.That(invSys.TryGetSlotEntity(urist, "head", out var head));
                 Assert.That(head, Is.Not.Null);
-                Assert.That(entMan.GetComponent<MetaDataComponent>(head.Value).EntityPrototype!.ID, Is.EqualTo(helmetProto));
+                Assert.That(entMan.GetComponent<MetaDataComponent>(head.Value).EntityPrototype!.ID,
+                    Is.EqualTo(helmetProto));
             });
         });
 
         await server.WaitPost(() =>
         {
             // Armor down
-            actionSys.PerformAction(urist,  armorAction);
+            actionSys.PerformAction(urist, armorAction);
         });
 
         await server.WaitRunTicks(5);
@@ -146,7 +147,8 @@ public sealed class ChangelingArmorTest
             {
                 Assert.That(invSys.TryGetSlotEntity(urist, "head", out var head));
                 Assert.That(head, Is.Not.Null);
-                Assert.That(entMan.GetComponent<MetaDataComponent>(head.Value).EntityPrototype!.ID, Is.EqualTo(mercenaryHelmet));
+                Assert.That(entMan.GetComponent<MetaDataComponent>(head.Value).EntityPrototype!.ID,
+                    Is.EqualTo(mercenaryHelmet));
             });
         });
 

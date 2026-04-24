@@ -9,23 +9,22 @@ namespace Content.IntegrationTests.Tests.Commands;
 
 public sealed class ObjectiveCommandsTest
 {
-
     private const string ObjectiveProtoId = "MindCommandsTestObjective";
     private const string DummyUsername = "MindCommandsTestUser";
 
     [TestPrototypes]
     private const string Prototypes = $"""
-- type: entity
-  id: {ObjectiveProtoId}
-  components:
-  - type: Objective
-    difficulty: 1
-    issuer: objective-issuer-syndicate
-    icon:
-      sprite: error.rsi
-      state: error
-  - type: DieCondition
-""";
+        - type: entity
+          id: {ObjectiveProtoId}
+          components:
+          - type: Objective
+            difficulty: 1
+            issuer: objective-issuer-syndicate
+            icon:
+              sprite: error.rsi
+              state: error
+          - type: DieCondition
+        """;
 
     /// <summary>
     /// Creates a dummy session, and assigns it a mind, then

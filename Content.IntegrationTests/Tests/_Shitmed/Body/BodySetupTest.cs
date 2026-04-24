@@ -6,10 +6,10 @@
 
 using System.Collections.Generic;
 using System.Linq;
+using Content.Goobstation.Maths.FixedPoint;
 using Content.Server.Administration.Systems;
 using Content.Server.Body.Systems;
 using Content.Server.Hands.Systems;
-using Content.Server.Tools.Innate;
 using Content.Shared._Shitmed.Body;
 using Content.Shared._Shitmed.Medical.Surgery.Consciousness.Components;
 using Content.Shared._Shitmed.Medical.Surgery.Consciousness.Systems;
@@ -17,16 +17,14 @@ using Content.Shared._Shitmed.Medical.Surgery.Pain.Components;
 using Content.Shared._Shitmed.Medical.Surgery.Traumas.Components;
 using Content.Shared._Shitmed.Medical.Surgery.Wounds.Components;
 using Content.Shared._Shitmed.Medical.Surgery.Wounds.Systems;
-using Content.Shared._Shitmed.Targeting;
 using Content.Shared.Body.Components;
 using Content.Shared.Body.Organ;
 using Content.Shared.Body.Part;
 using Content.Shared.Damage;
 using Content.Shared.Damage.Prototypes;
+using Content.Shared.Humanoid.Prototypes;
 using Content.Shared.Mobs.Components;
 using Content.Shared.Mobs.Systems;
-using Content.Goobstation.Maths.FixedPoint;
-using Content.Shared.Humanoid.Prototypes;
 using Robust.Shared.GameObjects;
 using Robust.Shared.Prototypes;
 using Robust.Shared.Utility;
@@ -42,7 +40,7 @@ public sealed class BodySetupTest
     private readonly HashSet<string> _ignoredPrototypes = new()
     {
         "Skeleton",
-        "Cyborg" // Since cyborgs are now a species just for appearance comps, we have to add em here.
+        "Cyborg", // Since cyborgs are now a species just for appearance comps, we have to add em here.
     };
 
     /// <summary>
@@ -142,9 +140,10 @@ public sealed class BodySetupTest
                 var legs = bodyComp.LegEntities;
                 var legsCount = bodySys.GetBodyPartCount(dummy, BodyPartType.Leg);
                 Assert.That(legsCount, Is.EqualTo(legs.Count));
-                Assert.That(legsCount, Is.GreaterThanOrEqualTo(2), $"legs {speciesPrototype.ID}({speciesPrototype.Prototype})");
+                Assert.That(legsCount,
+                    Is.GreaterThanOrEqualTo(2),
+                    $"legs {speciesPrototype.ID}({speciesPrototype.Prototype})");
             });
-
         }
 
         await pair.CleanReturnAsync();
@@ -179,9 +178,10 @@ public sealed class BodySetupTest
             {
                 Assert.That(dummy, Is.Not.EqualTo(EntityUid.Invalid));
                 var handCount = handsSys.EnumerateHands(dummy).Count();
-                Assert.That(handCount, Is.GreaterThanOrEqualTo(2), $"hands {speciesPrototype.ID}({speciesPrototype.Prototype})");
+                Assert.That(handCount,
+                    Is.GreaterThanOrEqualTo(2),
+                    $"hands {speciesPrototype.ID}({speciesPrototype.Prototype})");
             });
-
         }
 
         await pair.CleanReturnAsync();
@@ -213,15 +213,21 @@ public sealed class BodySetupTest
 
                 Assert.Multiple(() =>
                 {
-                    Assert.That(dummy, Is.Not.EqualTo(EntityUid.Invalid), $"Failed species to pass the test: {speciesPrototype.ID}");
-                    Assert.That(entMan.TryGetComponent(dummy, out ConsciousnessComponent consciousness), $"Failed species to pass the test: {speciesPrototype.ID}");
+                    Assert.That(dummy,
+                        Is.Not.EqualTo(EntityUid.Invalid),
+                        $"Failed species to pass the test: {speciesPrototype.ID}");
+                    Assert.That(entMan.TryGetComponent(dummy, out ConsciousnessComponent consciousness),
+                        $"Failed species to pass the test: {speciesPrototype.ID}");
 
                     Assert.That(consciousnessSystem.TryGetNerveSystem(dummy, out var dummyNerveSys));
 
-                    Assert.That(entMan.HasComponent<OrganComponent>(dummyNerveSys), $"Failed species to pass the test: {speciesPrototype.ID}, organ {dummyNerveSys}");
-                    Assert.That(entMan.HasComponent<ConsciousnessRequiredComponent>(dummyNerveSys), $"Failed species to pass the test: {speciesPrototype.ID}");
+                    Assert.That(entMan.HasComponent<OrganComponent>(dummyNerveSys),
+                        $"Failed species to pass the test: {speciesPrototype.ID}, organ {dummyNerveSys}");
+                    Assert.That(entMan.HasComponent<ConsciousnessRequiredComponent>(dummyNerveSys),
+                        $"Failed species to pass the test: {speciesPrototype.ID}");
 
-                    Assert.That(consciousnessSystem.CheckConscious(dummy, consciousness), $"Failed species to pass the test: {speciesPrototype.ID}");
+                    Assert.That(consciousnessSystem.CheckConscious(dummy, consciousness),
+                        $"Failed species to pass the test: {speciesPrototype.ID}");
                 });
             }
         });
@@ -262,11 +268,14 @@ public sealed class BodySetupTest
 
                 Assert.Multiple(() =>
                 {
-                    Assert.That(bodySystem.TryGetParentBodyPart(headEntity.Id, out var parentPart, out _), $"Failed species to pass the test: {speciesPrototype.ID}");
+                    Assert.That(bodySystem.TryGetParentBodyPart(headEntity.Id, out var parentPart, out _),
+                        $"Failed species to pass the test: {speciesPrototype.ID}");
                     Assert.That(parentPart, Is.Not.Null, $"Failed species to pass the test: {speciesPrototype.ID}");
 
-                    Assert.That(entMan.TryGetComponent(headEntity.Id, out WoundableComponent woundable), $"Failed species to pass the test: {speciesPrototype.ID}");
-                    Assert.That(entMan.TryGetComponent(groinEntity.Id, out WoundableComponent groinWoundable), $"Failed species to pass the test: {speciesPrototype.ID}");
+                    Assert.That(entMan.TryGetComponent(headEntity.Id, out WoundableComponent woundable),
+                        $"Failed species to pass the test: {speciesPrototype.ID}");
+                    Assert.That(entMan.TryGetComponent(groinEntity.Id, out WoundableComponent groinWoundable),
+                        $"Failed species to pass the test: {speciesPrototype.ID}");
 
                     // Destroy the head, and damage the groin so we can check.
                     woundSystem.DestroyWoundable(parentPart.Value, headEntity.Id, woundable);
@@ -274,12 +283,19 @@ public sealed class BodySetupTest
 
                     rejuvenateSystem.PerformRejuvenate(dummy);
 
-                    Assert.That(initialBodyPartCount, Is.EqualTo(bodySystem.GetBodyPartCount(dummy, BodyPartType.Head)), $"Failed species to pass the test: {speciesPrototype.ID}");
+                    Assert.That(initialBodyPartCount,
+                        Is.EqualTo(bodySystem.GetBodyPartCount(dummy, BodyPartType.Head)),
+                        $"Failed species to pass the test: {speciesPrototype.ID}");
 
-                    Assert.That(woundSystem.GetWoundableSeverityPoint(parentPart.Value), Is.GreaterThanOrEqualTo(FixedPoint2.Zero), $"Failed species to pass the test: {speciesPrototype.ID}");
-                    Assert.That(woundSystem.GetWoundableSeverityPoint(groinEntity.Id), Is.GreaterThanOrEqualTo(FixedPoint2.Zero), $"Failed species to pass the test: {speciesPrototype.ID}");
+                    Assert.That(woundSystem.GetWoundableSeverityPoint(parentPart.Value),
+                        Is.GreaterThanOrEqualTo(FixedPoint2.Zero),
+                        $"Failed species to pass the test: {speciesPrototype.ID}");
+                    Assert.That(woundSystem.GetWoundableSeverityPoint(groinEntity.Id),
+                        Is.GreaterThanOrEqualTo(FixedPoint2.Zero),
+                        $"Failed species to pass the test: {speciesPrototype.ID}");
 
-                    Assert.That(consciousnessSystem.CheckConscious(dummy), $"Failed species to pass the test: {speciesPrototype.ID}");
+                    Assert.That(consciousnessSystem.CheckConscious(dummy),
+                        $"Failed species to pass the test: {speciesPrototype.ID}");
                 });
             }
         });
@@ -398,12 +414,13 @@ public sealed class BodySetupTest
                         continue;
                     }
 
-                    damageableSystem.TryChangeDamage(entity, damageSpecifier, true, targetPart: bodySystem.GetTargetBodyPart(rootPart.Value));
+                    damageableSystem.TryChangeDamage(entity,
+                        damageSpecifier,
+                        true,
+                        targetPart: bodySystem.GetTargetBodyPart(rootPart.Value));
                 }
                 else
-                {
                     damageableSystem.TryChangeDamage(entity, damageSpecifier, true);
-                }
 
                 Assert.That(mobStateSystem.IsDead(entity, mobState),
                     $"Entity {entityProto.ID} should be dead after taking lethal damage ({lethalDamage}), but isn't.");

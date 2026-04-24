@@ -12,7 +12,7 @@ using Robust.Shared.Maths;
 namespace Content.IntegrationTests.Tests.Construction.Interaction;
 
 /// <summary>
-///     Check that we can build grilles on top of windows, but not the other way around.
+/// Check that we can build grilles on top of windows, but not the other way around.
 /// </summary>
 public sealed class GrilleWindowConstruction : InteractionTest
 {
@@ -56,7 +56,8 @@ public sealed class GrilleWindowConstruction : InteractionTest
         await Client.WaitPost(() =>
         {
             var proto = ProtoMan.Index<ConstructionPrototype>(second);
-            Assert.That(CConSys.TrySpawnGhost(proto, CEntMan.GetCoordinates(TargetCoords), Direction.South, out _), Is.False);
+            Assert.That(CConSys.TrySpawnGhost(proto, CEntMan.GetCoordinates(TargetCoords), Direction.South, out _),
+                Is.False);
         });
     }
 }

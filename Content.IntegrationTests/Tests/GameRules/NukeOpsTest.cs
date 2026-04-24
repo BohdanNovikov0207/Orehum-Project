@@ -84,6 +84,7 @@
 #nullable enable
 using System.Collections.Generic;
 using System.Linq;
+using Content.Goobstation.Maths.FixedPoint;
 using Content.Server.Body.Components;
 using Content.Server.GameTicking;
 using Content.Server.GameTicking.Presets;
@@ -92,10 +93,9 @@ using Content.Server.Mind;
 using Content.Server.Roles;
 using Content.Server.RoundEnd;
 using Content.Server.Shuttles.Components;
-using Content.Server.Station.Components;
+using Content.Shared._EinsteinEngines.Silicon.Components;
 using Content.Shared.CCVar;
 using Content.Shared.Damage;
-using Content.Goobstation.Maths.FixedPoint;
 using Content.Shared.GameTicking;
 using Content.Shared.Hands.Components;
 using Content.Shared.Inventory;
@@ -107,8 +107,8 @@ using Content.Shared.Station.Components;
 using Robust.Server.GameObjects;
 using Robust.Shared.GameObjects;
 using Robust.Shared.Map.Components;
-using Content.Shared._EinsteinEngines.Silicon.Components; // Goobstation
 using Robust.Shared.Prototypes;
+// Goobstation
 
 namespace Content.IntegrationTests.Tests.GameRules;
 
@@ -129,7 +129,7 @@ public sealed class NukeOpsTest
             Dirty = true,
             DummyTicker = false,
             Connected = true,
-            InLobby = true
+            InLobby = true,
         });
 
         var server = pair.Server;
@@ -228,6 +228,7 @@ public sealed class NukeOpsTest
         // The other two players should have just spawned in as normal.
         CheckDummy(0);
         CheckDummy(2);
+
         void CheckDummy(int i)
         {
             var ent = dummyEnts[i];
@@ -237,7 +238,7 @@ public sealed class NukeOpsTest
             Assert.That(roleSys.MindHasRole<NukeopsRoleComponent>(mindCrew), Is.False);
             Assert.That(factionSys.IsMember(ent, SyndicateFaction), Is.False);
             Assert.That(factionSys.IsMember(ent, NanotrasenFaction), Is.True);
-            var nukeroles = new List<string>() { "Nukeops", "NukeopsMedic", "NukeopsCommander" };
+            var nukeroles = new List<string> { "Nukeops", "NukeopsMedic", "NukeopsCommander" };
             Assert.That(roleSys.MindGetAllRoleInfo(mindCrew).Any(x => nukeroles.Contains(x.Prototype)), Is.False);
         }
 
@@ -250,6 +251,7 @@ public sealed class NukeOpsTest
             Assert.That(entMan.EntityExists(grid));
             Assert.That(entMan.HasComponent<MapGridComponent>(grid));
         }
+
         Assert.That(entMan.EntityExists(ruleComp.TargetStation));
 
         Assert.That(entMan.HasComponent<StationDataComponent>(ruleComp.TargetStation));
@@ -288,7 +290,11 @@ public sealed class NukeOpsTest
         Assert.That(mapSys.IsPaused(nukieMap), Is.False);
         Assert.That(mapSys.IsPaused(targetMap), Is.False);
 
-        EntityLifeStage LifeStage(EntityUid? uid) => entMan.GetComponent<MetaDataComponent>(uid!.Value).EntityLifeStage;
+        EntityLifeStage LifeStage(EntityUid? uid)
+        {
+            return entMan.GetComponent<MetaDataComponent>(uid!.Value).EntityLifeStage;
+        }
+
         Assert.That(LifeStage(player), Is.GreaterThan(EntityLifeStage.Initialized));
         Assert.That(LifeStage(nukieMap), Is.GreaterThan(EntityLifeStage.Initialized));
         Assert.That(LifeStage(targetMap), Is.GreaterThan(EntityLifeStage.Initialized));
@@ -307,6 +313,7 @@ public sealed class NukeOpsTest
         {
             total++;
         }
+
         Assert.That(total, Is.GreaterThan(3));
 
         // Check the nukie commander passed basic training and figured out how to breathe.
@@ -322,6 +329,7 @@ public sealed class NukeOpsTest
                 var resp = entMan.GetComponent<RespiratorComponent>(player);
                 Assert.That(resp.SuffocationCycles, Is.LessThanOrEqualTo(resp.SuffocationCycleThreshold));
             }
+
             Assert.That(damage.TotalDamage, Is.EqualTo(FixedPoint2.Zero));
         }
 
@@ -336,6 +344,7 @@ public sealed class NukeOpsTest
                     Is.False,
                     $"The round ended, but {nukies.Length - i - 1} nukies are still alive!");
             }
+
             // Delete the last nukie and make sure the round ends.
             entMan.DeleteEntity(nukies[^1]);
 

@@ -26,18 +26,12 @@ public sealed partial class TestPair
     /// <summary>
     /// Convert a time interval to some number of ticks.
     /// </summary>
-    public int SecondsToTicks(float seconds)
-    {
-        return (int) Math.Ceiling(seconds / Server.Timing.TickPeriod.TotalSeconds);
-    }
+    public int SecondsToTicks(float seconds) => (int) Math.Ceiling(seconds / Server.Timing.TickPeriod.TotalSeconds);
 
     /// <summary>
     /// Run the server & client in sync for some amount of time
     /// </summary>
-    public async Task RunSeconds(float seconds)
-    {
-        await RunTicksSync(SecondsToTicks(seconds));
-    }
+    public async Task RunSeconds(float seconds) => await RunTicksSync(SecondsToTicks(seconds));
 
     /// <summary>
     /// Runs the server-client pair in sync, but also ensures they are both idle each tick.
@@ -63,8 +57,8 @@ public sealed partial class TestPair
     /// </summary>
     public async Task SyncTicks(int targetDelta = 1)
     {
-        var sTick = (int)Server.Timing.CurTick.Value;
-        var cTick = (int)Client.Timing.CurTick.Value;
+        var sTick = (int) Server.Timing.CurTick.Value;
+        var cTick = (int) Client.Timing.CurTick.Value;
         var delta = cTick - sTick;
 
         if (delta == targetDelta)
@@ -74,8 +68,8 @@ public sealed partial class TestPair
         else
             await Client.WaitRunTicks(targetDelta - delta);
 
-        sTick = (int)Server.Timing.CurTick.Value;
-        cTick = (int)Client.Timing.CurTick.Value;
+        sTick = (int) Server.Timing.CurTick.Value;
+        cTick = (int) Client.Timing.CurTick.Value;
         delta = cTick - sTick;
         Assert.That(delta, Is.EqualTo(targetDelta));
     }

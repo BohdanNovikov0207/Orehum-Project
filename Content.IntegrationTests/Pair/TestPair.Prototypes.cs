@@ -14,8 +14,8 @@ namespace Content.IntegrationTests.Pair;
 // This partial class contains helper methods to deal with yaml prototypes.
 public sealed partial class TestPair
 {
-    private Dictionary<Type, HashSet<string>> _loadedPrototypes = new();
-    private HashSet<string> _loadedEntityPrototypes = new();
+    private readonly HashSet<string> _loadedEntityPrototypes = new();
+    private readonly Dictionary<Type, HashSet<string>> _loadedPrototypes = new();
 
     public async Task LoadPrototypes(List<string> prototypes)
     {
@@ -42,28 +42,16 @@ public sealed partial class TestPair
             _loadedEntityPrototypes.UnionWith(entIds);
     }
 
-    public bool IsTestPrototype(EntityPrototype proto)
-    {
-        return _loadedEntityPrototypes.Contains(proto.ID);
-    }
+    public bool IsTestPrototype(EntityPrototype proto) => _loadedEntityPrototypes.Contains(proto.ID);
 
-    public bool IsTestEntityPrototype(string id)
-    {
-        return _loadedEntityPrototypes.Contains(id);
-    }
+    public bool IsTestEntityPrototype(string id) => _loadedEntityPrototypes.Contains(id);
 
-    public bool IsTestPrototype<TPrototype>(string id) where TPrototype : IPrototype
-    {
-        return IsTestPrototype(typeof(TPrototype), id);
-    }
+    public bool IsTestPrototype<TPrototype>(string id) where TPrototype : IPrototype =>
+        IsTestPrototype(typeof(TPrototype), id);
 
-    public bool IsTestPrototype<TPrototype>(TPrototype proto) where TPrototype : IPrototype
-    {
-        return IsTestPrototype(typeof(TPrototype), proto.ID);
-    }
+    public bool IsTestPrototype<TPrototype>(TPrototype proto) where TPrototype : IPrototype =>
+        IsTestPrototype(typeof(TPrototype), proto.ID);
 
-    public bool IsTestPrototype(Type kind, string id)
-    {
-        return _loadedPrototypes.TryGetValue(kind, out var ids) && ids.Contains(id);
-    }
+    public bool IsTestPrototype(Type kind, string id) =>
+        _loadedPrototypes.TryGetValue(kind, out var ids) && ids.Contains(id);
 }

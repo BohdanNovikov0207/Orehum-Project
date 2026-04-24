@@ -41,10 +41,10 @@ public sealed class StationPowerTests
         "Leonid",
         "Delta",
         "Chloris",
-        "Cog"
+        "Cog",
     ];
 
-    [Test, TestCaseSource(nameof(GameMaps))]
+    [Test] [TestCaseSource(nameof(GameMaps))]
     public async Task TestStationStartingPowerWindow(string mapProtoId)
     {
         await using var pair = await PoolManager.GetServerClient(new PoolSettings
@@ -71,7 +71,8 @@ public sealed class StationPowerTests
         // Find the power network with the greatest stored charge in its batteries.
         // This keeps backup SMESes out of the calculation.
         var networks = new Dictionary<PowerState.Network, float>();
-        var batteryQuery = entMan.EntityQueryEnumerator<PowerNetworkBatteryComponent, BatteryComponent, NodeContainerComponent>();
+        var batteryQuery =
+            entMan.EntityQueryEnumerator<PowerNetworkBatteryComponent, BatteryComponent, NodeContainerComponent>();
         while (batteryQuery.MoveNext(out var uid, out _, out var battery, out var nodeContainer))
         {
             if (!nodeContainer.Nodes.TryGetValue("output", out var node))
@@ -81,6 +82,7 @@ public sealed class StationPowerTests
             networks.TryGetValue(group.NetworkNode, out var charge);
             networks[group.NetworkNode] = charge + battery.CurrentCharge;
         }
+
         var totalStartingCharge = networks.MaxBy(n => n.Value).Value;
 
         // Find how much charge all the APC-connected devices would like to use per second.
@@ -95,10 +97,12 @@ public sealed class StationPowerTests
         var requiredStoredPower = totalAPCLoad * MinimumPowerDurationSeconds;
         Assert.Multiple(() =>
         {
-            Assert.That(estimatedDuration, Is.GreaterThanOrEqualTo(MinimumPowerDurationSeconds),
+            Assert.That(estimatedDuration,
+                Is.GreaterThanOrEqualTo(MinimumPowerDurationSeconds),
                 $"Initial power for {mapProtoId} does not last long enough! Needs at least {MinimumPowerDurationSeconds}s " +
                 $"but estimated to last only {estimatedDuration}s!");
-            Assert.That(totalStartingCharge, Is.GreaterThanOrEqualTo(requiredStoredPower),
+            Assert.That(totalStartingCharge,
+                Is.GreaterThanOrEqualTo(requiredStoredPower),
                 $"Needs at least {requiredStoredPower - totalStartingCharge} more stored power!");
         });
 

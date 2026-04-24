@@ -29,7 +29,8 @@ public sealed class ActionsAddedTest
     [Test]
     public async Task TestCombatActionsAdded()
     {
-        await using var pair = await PoolManager.GetServerClient(new PoolSettings { Connected = true, DummyTicker = false });
+        await using var pair =
+            await PoolManager.GetServerClient(new PoolSettings { Connected = true, DummyTicker = false });
         var server = pair.Server;
         var client = pair.Client;
         var sEntMan = server.ResolveDependency<IEntityManager>();
@@ -59,10 +60,12 @@ public sealed class ActionsAddedTest
 
         var sQuery = sEntMan.GetEntityQuery<InstantActionComponent>();
         var cQuery = cEntMan.GetEntityQuery<InstantActionComponent>();
-        var sActions = sActionSystem.GetActions(serverEnt).Where(
-            ent => sQuery.CompOrNull(ent)?.Event?.GetType() == evType).ToArray();
-        var cActions = cActionSystem.GetActions(clientEnt).Where(
-            ent => cQuery.CompOrNull(ent)?.Event?.GetType() == evType).ToArray();
+        var sActions = sActionSystem.GetActions(serverEnt)
+            .Where(ent => sQuery.CompOrNull(ent)?.Event?.GetType() == evType)
+            .ToArray();
+        var cActions = cActionSystem.GetActions(clientEnt)
+            .Where(ent => cQuery.CompOrNull(ent)?.Event?.GetType() == evType)
+            .ToArray();
 
         Assert.That(sActions.Length, Is.EqualTo(1));
         Assert.That(cActions.Length, Is.EqualTo(1));

@@ -52,7 +52,7 @@ namespace Content.IntegrationTests.Tests.UserInterface;
 public sealed class UiControlTest
 {
     // You should not be adding to this.
-    private Type[] _ignored = new Type[]
+    private readonly Type[] _ignored = new[]
     {
         typeof(LateJoinGui),
     };
@@ -63,7 +63,7 @@ public sealed class UiControlTest
     [Test]
     public async Task TestWindows()
     {
-        var pair = await PoolManager.GetServerClient(new PoolSettings()
+        var pair = await PoolManager.GetServerClient(new PoolSettings
         {
             Connected = true,
         });
@@ -88,7 +88,7 @@ public sealed class UiControlTest
                     continue;
 
                 // Don't inject because the control themselves have to do it.
-                activator.CreateInstance(type, oneOff: true, inject: false);
+                activator.CreateInstance(type, true, false);
             }
         });
 

@@ -16,10 +16,10 @@
 // SPDX-License-Identifier: AGPL-3.0-or-later
 
 #nullable enable
+using Content.Goobstation.Maths.FixedPoint;
 using Content.Server.Fluids.EntitySystems;
 using Content.Server.Spreader;
 using Content.Shared.Chemistry.Components;
-using Content.Goobstation.Maths.FixedPoint;
 using Content.Shared.Fluids.Components;
 using Robust.Shared.GameObjects;
 using Robust.Shared.Map;
@@ -33,12 +33,13 @@ namespace Content.IntegrationTests.Tests.Fluids;
 [TestOf(typeof(SpreaderSystem))]
 public sealed class FluidSpill
 {
-    private static PuddleComponent? GetPuddle(IEntityManager entityManager, Entity<MapGridComponent> mapGrid, Vector2i pos)
-    {
-        return GetPuddleEntity(entityManager, mapGrid, pos)?.Comp;
-    }
+    private static PuddleComponent? GetPuddle(IEntityManager entityManager,
+        Entity<MapGridComponent> mapGrid,
+        Vector2i pos) => GetPuddleEntity(entityManager, mapGrid, pos)?.Comp;
 
-    private static Entity<PuddleComponent>? GetPuddleEntity(IEntityManager entityManager, Entity<MapGridComponent> mapGrid, Vector2i pos)
+    private static Entity<PuddleComponent>? GetPuddleEntity(IEntityManager entityManager,
+        Entity<MapGridComponent> mapGrid,
+        Vector2i pos)
     {
         var mapSys = entityManager.System<SharedMapSystem>();
         foreach (var uid in mapSys.GetAnchoredEntities(mapGrid, mapGrid.Comp, pos))
@@ -117,9 +118,7 @@ public sealed class FluidSpill
                 for (var y = 0; y < 3; y++)
                 {
                     if (x == 0 && y == 0 || x == 0 && y == 1 || x == 1 && y == 0)
-                    {
                         continue;
-                    }
 
                     var newPos = new Vector2i(x, y);
                     var sidePuddle = GetPuddle(entityManager, (gridId, grid), newPos);

@@ -28,18 +28,18 @@ public sealed class AnchorPrototypeTest
             foreach (var ent in protoManager.EnumeratePrototypes<EntityPrototype>())
             {
                 if (!ent.Components.TryGetComponent("Transform", out var xformComp) ||
-                   !ent.Components.TryGetComponent("Physics", out var physicsComp))
-                {
+                    !ent.Components.TryGetComponent("Physics", out var physicsComp))
                     continue;
-                }
 
-                var xform = (TransformComponent)xformComp;
-                var physics = (PhysicsComponent)physicsComp;
+                var xform = (TransformComponent) xformComp;
+                var physics = (PhysicsComponent) physicsComp;
 
                 if (!xform.Anchored)
                     continue;
 
-                Assert.That(physics.BodyType, Is.EqualTo(BodyType.Static), $"Found entity prototype {ent} marked as anchored but not static for physics.");
+                Assert.That(physics.BodyType,
+                    Is.EqualTo(BodyType.Static),
+                    $"Found entity prototype {ent} marked as anchored but not static for physics.");
             }
         });
 

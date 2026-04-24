@@ -9,11 +9,14 @@ public sealed class EntityPrototypeLocalizationTest
     /// An explanation of why LocIds should not be used for entity prototype names/descriptions.
     /// Appended to the error message when the test is failed.
     /// </summary>
-    private const string NoLocIdExplanation = "Entity prototypes should not use LocIds for names/descriptions, as localization IDs are automated for entity prototypes. See https://docs.spacestation14.com/en/ss14-by-example/fluent-and-localization.html#localizing-prototypes for more information.";
+    private const string NoLocIdExplanation =
+        "Entity prototypes should not use LocIds for names/descriptions, as localization IDs are automated for entity prototypes. See https://docs.spacestation14.com/en/ss14-by-example/fluent-and-localization.html#localizing-prototypes for more information.";
 
     /// <summary>
     /// Checks that no entity prototypes have a LocId as their name or description.
-    /// See <see href="https://docs.spacestation14.com/en/ss14-by-example/fluent-and-localization.html#localizing-prototypes"/> for why this is important.
+    /// See
+    /// <see href="https://docs.spacestation14.com/en/ss14-by-example/fluent-and-localization.html#localizing-prototypes" />
+    /// for why this is important.
     /// </summary>
     [Test]
     public async Task TestNoManualEntityLocStrings()
@@ -32,14 +35,16 @@ public sealed class EntityPrototypeLocalizationTest
                 // Check name
                 if (!string.IsNullOrEmpty(proto.SetName))
                 {
-                    Assert.That(locMan.HasString(proto.SetName), Is.False,
+                    Assert.That(locMan.HasString(proto.SetName),
+                        Is.False,
                         $"Entity prototype {proto.ID} has a LocId ({proto.SetName}) as a name. {NoLocIdExplanation}");
                 }
 
                 // Check description
                 if (!string.IsNullOrEmpty(proto.SetDesc))
                 {
-                    Assert.That(locMan.HasString(proto.SetDesc), Is.False,
+                    Assert.That(locMan.HasString(proto.SetDesc),
+                        Is.False,
                         $"Entity prototype {proto.ID} has a LocId ({proto.SetDesc}) as a description. {NoLocIdExplanation}");
                 }
             }

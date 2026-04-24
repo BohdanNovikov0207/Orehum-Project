@@ -32,7 +32,8 @@ public sealed class TechnologyPrototypePositionTests
 
         if (fails.Count > 0)
         {
-            var msg = string.Join("\n", fails) + "\n" + "Found duplicate positions for following" + nameof(TechnologyPrototype);
+            var msg = string.Join("\n", fails) + "\n" + "Found duplicate positions for following" +
+                      nameof(TechnologyPrototype);
             Assert.Fail(msg);
         }
 

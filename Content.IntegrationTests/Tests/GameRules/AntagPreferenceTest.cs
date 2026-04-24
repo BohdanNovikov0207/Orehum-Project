@@ -33,7 +33,7 @@ public sealed class AntagPreferenceTest
         {
             DummyTicker = false,
             Connected = true,
-            InLobby = true
+            InLobby = true,
         });
 
         var server = pair.Server;

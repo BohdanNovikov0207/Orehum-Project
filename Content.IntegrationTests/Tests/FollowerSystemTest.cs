@@ -18,11 +18,11 @@ using Robust.Shared.Map;
 
 namespace Content.IntegrationTests.Tests;
 
-[TestFixture, TestOf(typeof(FollowerSystem))]
+[TestFixture] [TestOf(typeof(FollowerSystem))]
 public sealed class FollowerSystemTest
 {
     /// <summary>
-    ///     This test ensures that deleting a map while an entity follows another doesn't throw any exceptions.
+    /// This test ensures that deleting a map while an entity follows another doesn't throw any exceptions.
     /// </summary>
     [Test]
     public async Task FollowerMapDeleteTest()

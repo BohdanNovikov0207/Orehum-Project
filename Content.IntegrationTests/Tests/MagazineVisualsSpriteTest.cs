@@ -42,7 +42,10 @@ public sealed class MagazineVisualsSpriteTest
                     toTest.Clear();
                     if (spriteSys.LayerMapTryGet((uid, sprite), GunVisualLayers.Mag, out var magLayerId, false))
                         toTest.Add((magLayerId, ""));
-                    if (spriteSys.LayerMapTryGet((uid, sprite), GunVisualLayers.MagUnshaded, out var magUnshadedLayerId, false))
+                    if (spriteSys.LayerMapTryGet((uid, sprite),
+                            GunVisualLayers.MagUnshaded,
+                            out var magUnshadedLayerId,
+                            false))
                         toTest.Add((magUnshadedLayerId, "-unshaded"));
 
                     Assert.That(
@@ -64,7 +67,8 @@ public sealed class MagazineVisualsSpriteTest
 
                         // MagSteps includes the 0th step, so sometimes people are off by one.
                         var extraState = $"{visuals.MagState}{midfix}-{visuals.MagSteps}";
-                        Assert.That(rsi.TryGetState(extraState, out _), Is.False,
+                        Assert.That(rsi.TryGetState(extraState, out _),
+                            Is.False,
                             @$"{proto.ID} has MagazineVisualsComponent with MagSteps = {visuals.MagSteps}, but more states exist!");
 
                         client.EntMan.DeleteEntity(uid);

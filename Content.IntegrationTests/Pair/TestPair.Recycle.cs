@@ -19,7 +19,7 @@ using Content.Shared.Mind;
 using Content.Shared.Mind.Components;
 using Content.Shared.Preferences;
 using Robust.Client;
-using Robust.Server.Player;
+using Robust.Client.Player;
 using Robust.Shared.Exceptions;
 using Robust.Shared.GameObjects;
 using Robust.Shared.Network;
@@ -32,14 +32,34 @@ public sealed partial class TestPair : IAsyncDisposable
 {
     public PairState State { get; private set; } = PairState.Ready;
 
+    public async ValueTask DisposeAsync()
+    {
+        switch (State)
+        {
+            case PairState.Dead:
+            case PairState.Ready:
+                break;
+            case PairState.InUse:
+                await _testOut.WriteLineAsync($"{nameof(DisposeAsync)}: Dirty return of pair {Id} started");
+                await OnDirtyDispose();
+                PoolManager.NoCheckReturn(this);
+                ClearContext();
+                break;
+            default:
+                throw new Exception($"{nameof(DisposeAsync)}: Unexpected state. Pair: {Id}. State: {State}.");
+        }
+    }
+
     private async Task OnDirtyDispose()
     {
         var usageTime = Watch.Elapsed;
         Watch.Restart();
-        await _testOut.WriteLineAsync($"{nameof(DisposeAsync)}: Test gave back pair {Id} in {usageTime.TotalMilliseconds} ms");
+        await _testOut.WriteLineAsync(
+            $"{nameof(DisposeAsync)}: Test gave back pair {Id} in {usageTime.TotalMilliseconds} ms");
         Kill();
         var disposeTime = Watch.Elapsed;
-        await _testOut.WriteLineAsync($"{nameof(DisposeAsync)}: Disposed pair {Id} in {disposeTime.TotalMilliseconds} ms");
+        await _testOut.WriteLineAsync(
+            $"{nameof(DisposeAsync)}: Disposed pair {Id} in {disposeTime.TotalMilliseconds} ms");
         // Test pairs should only dirty dispose if they are failing. If they are not failing, this probably happened
         // because someone forgot to clean-return the pair.
         Assert.Warn("Test was dirty-disposed.");
@@ -62,27 +82,27 @@ public sealed partial class TestPair : IAsyncDisposable
 
         var usageTime = Watch.Elapsed;
         Watch.Restart();
-        await _testOut.WriteLineAsync($"{nameof(CleanReturnAsync)}: Test borrowed pair {Id} for {usageTime.TotalMilliseconds} ms");
+        await _testOut.WriteLineAsync(
+            $"{nameof(CleanReturnAsync)}: Test borrowed pair {Id} for {usageTime.TotalMilliseconds} ms");
         // Let any last minute failures the test cause happen.
         await ReallyBeIdle();
         if (!Settings.Destructive)
         {
-            if (Client.IsAlive == false)
-            {
-                throw new Exception($"{nameof(CleanReturnAsync)}: Test killed the client in pair {Id}:", Client.UnhandledException);
-            }
+            if (!Client.IsAlive)
+                throw new Exception($"{nameof(CleanReturnAsync)}: Test killed the client in pair {Id}:",
+                    Client.UnhandledException);
 
-            if (Server.IsAlive == false)
-            {
-                throw new Exception($"{nameof(CleanReturnAsync)}: Test killed the server in pair {Id}:", Server.UnhandledException);
-            }
+            if (!Server.IsAlive)
+                throw new Exception($"{nameof(CleanReturnAsync)}: Test killed the server in pair {Id}:",
+                    Server.UnhandledException);
         }
 
         if (Settings.MustNotBeReused)
         {
             Kill();
             await ReallyBeIdle();
-            await _testOut.WriteLineAsync($"{nameof(CleanReturnAsync)}: Clean disposed in {Watch.Elapsed.TotalMilliseconds} ms");
+            await _testOut.WriteLineAsync(
+                $"{nameof(CleanReturnAsync)}: Clean disposed in {Watch.Elapsed.TotalMilliseconds} ms");
             return;
         }
 
@@ -94,7 +114,8 @@ public sealed partial class TestPair : IAsyncDisposable
             throw new Exception($"{nameof(CleanReturnAsync)}: Client logged exceptions");
 
         var returnTime = Watch.Elapsed;
-        await _testOut.WriteLineAsync($"{nameof(CleanReturnAsync)}: PoolManager took {returnTime.TotalMilliseconds} ms to put pair {Id} back into the pool");
+        await _testOut.WriteLineAsync(
+            $"{nameof(CleanReturnAsync)}: PoolManager took {returnTime.TotalMilliseconds} ms to put pair {Id} back into the pool");
         State = PairState.Ready;
     }
 
@@ -105,6 +126,7 @@ public sealed partial class TestPair : IAsyncDisposable
         {
             await Server.WaitPost(() => prefMan.SetProfile(user, 0, new HumanoidCharacterProfile()).Wait());
         }
+
         _modifiedProfiles.Clear();
     }
 
@@ -121,29 +143,11 @@ public sealed partial class TestPair : IAsyncDisposable
         ClearContext();
     }
 
-    public async ValueTask DisposeAsync()
-    {
-        switch (State)
-        {
-            case PairState.Dead:
-            case PairState.Ready:
-                break;
-            case PairState.InUse:
-                await _testOut.WriteLineAsync($"{nameof(DisposeAsync)}: Dirty return of pair {Id} started");
-                await OnDirtyDispose();
-                PoolManager.NoCheckReturn(this);
-                ClearContext();
-                break;
-            default:
-                throw new Exception($"{nameof(DisposeAsync)}: Unexpected state. Pair: {Id}. State: {State}.");
-        }
-    }
-
     public async Task CleanPooledPair(PoolSettings settings, TextWriter testOut)
     {
         Settings = default!;
         Watch.Restart();
-        await testOut.WriteLineAsync($"Recycling...");
+        await testOut.WriteLineAsync("Recycling...");
 
         var gameTicker = Server.System<GameTicker>();
         var cNetMgr = Client.ResolveDependency<IClientNetManager>();
@@ -157,6 +161,7 @@ public sealed partial class TestPair : IAsyncDisposable
             await Client.WaitPost(() => cNetMgr.ClientDisconnect("Test pooling cleanup disconnect"));
             await RunTicksSync(1);
         }
+
         Assert.That(cNetMgr.IsConnected, Is.False);
 
         // Move to pre-round lobby. Required to toggle dummy ticker on and off
@@ -218,8 +223,8 @@ public sealed partial class TestPair : IAsyncDisposable
             return;
 
         Assert.That(baseClient.RunLevel, Is.EqualTo(ClientRunLevel.InGame));
-        var cPlayer = Client.ResolveDependency<Robust.Client.Player.IPlayerManager>();
-        var sPlayer = Server.ResolveDependency<IPlayerManager>();
+        var cPlayer = Client.ResolveDependency<IPlayerManager>();
+        var sPlayer = Server.ResolveDependency<Robust.Server.Player.IPlayerManager>();
         Assert.That(sPlayer.Sessions.Count(), Is.EqualTo(1));
         var session = sPlayer.Sessions.Single();
         Assert.That(cPlayer.LocalSession?.UserId, Is.EqualTo(session.UserId));

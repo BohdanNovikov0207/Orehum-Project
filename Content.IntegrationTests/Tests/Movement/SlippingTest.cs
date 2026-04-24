@@ -36,7 +36,6 @@
 
 #nullable enable
 using System.Collections.Generic;
-using Content.IntegrationTests.Tests.Interaction;
 using Content.Shared.Movement.Components;
 using Content.Shared.Slippery;
 using Content.Shared.Stunnable;
@@ -48,20 +47,6 @@ namespace Content.IntegrationTests.Tests.Movement;
 
 public sealed class SlippingTest : MovementTest
 {
-    public sealed class SlipTestSystem : EntitySystem
-    {
-        public HashSet<EntityUid> Slipped = new();
-        public override void Initialize()
-        {
-            SubscribeLocalEvent<SlipperyComponent, SlipEvent>(OnSlip);
-        }
-
-        private void OnSlip(EntityUid uid, SlipperyComponent component, ref SlipEvent args)
-        {
-            Slipped.Add(args.Slipped);
-        }
-    }
-
     [Test]
     public async Task BananaSlipTest()
     {
@@ -88,5 +73,14 @@ public sealed class SlippingTest : MovementTest
         await Move(DirectionFlag.West, 1f);
         Assert.That(sys.Slipped, Does.Contain(SEntMan.GetEntity(Player)));
         AssertComp<KnockedDownComponent>(true, Player);
+    }
+
+    public sealed class SlipTestSystem : EntitySystem
+    {
+        public HashSet<EntityUid> Slipped = new();
+        public override void Initialize() => SubscribeLocalEvent<SlipperyComponent, SlipEvent>(OnSlip);
+
+        private void OnSlip(EntityUid uid, SlipperyComponent component, ref SlipEvent args) =>
+            Slipped.Add(args.Slipped);
     }
 }

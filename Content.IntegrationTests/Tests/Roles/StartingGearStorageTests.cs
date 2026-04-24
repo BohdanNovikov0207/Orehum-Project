@@ -76,10 +76,10 @@
 // SPDX-License-Identifier: AGPL-3.0-or-later
 
 using System.Linq;
-using Content.Shared.Roles;
 using Content.Server.Storage.EntitySystems;
-using Robust.Shared.GameObjects;
+using Content.Shared.Roles;
 using Robust.Shared.Collections;
+using Robust.Shared.GameObjects;
 
 namespace Content.IntegrationTests.Tests.Roles;
 
@@ -116,7 +116,7 @@ public sealed class StartingGearPrototypeStorageTest
                 foreach (var (slot, entProtos) in gearProto.Storage)
                 {
                     ents.Clear();
-                    var storageProto = ((IEquipmentLoadout)gearProto).GetGear(slot);
+                    var storageProto = ((IEquipmentLoadout) gearProto).GetGear(slot);
                     if (storageProto == string.Empty)
                         continue;
 
@@ -132,10 +132,12 @@ public sealed class StartingGearPrototypeStorageTest
                     foreach (var ent in ents)
                     {
                         if (!storageSystem.CanInsert(bag, ent, out _))
-                            Assert.Fail($"StartingGearPrototype {gearProto.ID} could not successfully put items into storage {bag.Id}");
+                            Assert.Fail(
+                                $"StartingGearPrototype {gearProto.ID} could not successfully put items into storage {bag.Id}");
 
                         server.EntMan.DeleteEntity(ent);
                     }
+
                     server.EntMan.DeleteEntity(bag);
                 }
             }

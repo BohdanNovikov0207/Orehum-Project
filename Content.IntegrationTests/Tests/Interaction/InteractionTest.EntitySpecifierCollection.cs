@@ -19,18 +19,27 @@ namespace Content.IntegrationTests.Tests.Interaction;
 
 public abstract partial class InteractionTest
 {
+    protected EntitySpecifierCollection ToEntityCollection(IEnumerable<EntityUid> entities)
+    {
+        var collection = new EntitySpecifierCollection(entities
+            .Select(ToEntitySpecifier)
+            .OfType<EntitySpecifier>());
+        Assert.That(collection.Converted);
+        return collection;
+    }
+
     /// <summary>
-    /// Data structure for representing a collection of <see cref="EntitySpecifier"/>s.
+    /// Data structure for representing a collection of <see cref="EntitySpecifier" />s.
     /// </summary>
     protected sealed class EntitySpecifierCollection
     {
-        public Dictionary<string, int> Entities = new();
-
         /// <summary>
         /// If true, a check has been performed to see if the prototypes correspond to entity prototypes with a stack
         /// component, in which case the specifier was converted into a stack-specifier
         /// </summary>
         public bool Converted;
+
+        public Dictionary<string, int> Entities = new();
 
         public EntitySpecifierCollection()
         {
@@ -60,15 +69,10 @@ public abstract partial class InteractionTest
             return result;
         }
 
-        public void Remove(EntitySpecifier spec)
-        {
+        public void Remove(EntitySpecifier spec) =>
             Add(new EntitySpecifier(spec.Prototype, -spec.Quantity, spec.Converted));
-        }
 
-        public void Add(EntitySpecifier spec)
-        {
-            Add(spec.Prototype, spec.Quantity, spec.Converted);
-        }
+        public void Add(EntitySpecifier spec) => Add(spec.Prototype, spec.Quantity, spec.Converted);
 
         public void Add(string id, int quantity, bool converted = false)
         {
@@ -95,6 +99,7 @@ public abstract partial class InteractionTest
             {
                 Add(id, quantity);
             }
+
             Converted = converted;
         }
 
@@ -105,22 +110,23 @@ public abstract partial class InteractionTest
             {
                 Add(id, -quantity);
             }
+
             Converted = converted;
         }
 
-        public EntitySpecifierCollection Clone()
-        {
-            return new EntitySpecifierCollection()
+        public EntitySpecifierCollection Clone() =>
+            new()
             {
                 Entities = Entities.ShallowClone(),
-                Converted = Converted
+                Converted = Converted,
             };
-        }
 
         /// <summary>
         /// Convert applicable entity prototypes into stack prototypes.
         /// </summary>
-        public async Task ConvertToStacks(IPrototypeManager protoMan, IComponentFactory factory, ServerIntegrationInstance server)
+        public async Task ConvertToStacks(IPrototypeManager protoMan,
+            IComponentFactory factory,
+            ServerIntegrationInstance server)
         {
             if (Converted)
                 return;
@@ -129,7 +135,6 @@ public abstract partial class InteractionTest
             List<(string, int)> toAdd = new();
             foreach (var (id, quantity) in Entities)
             {
-
                 if (protoMan.HasIndex<StackPrototype>(id))
                     continue;
 
@@ -164,14 +169,5 @@ public abstract partial class InteractionTest
 
             Converted = true;
         }
-    }
-
-    protected EntitySpecifierCollection ToEntityCollection(IEnumerable<EntityUid> entities)
-    {
-        var collection = new EntitySpecifierCollection(entities
-            .Select(ToEntitySpecifier)
-            .OfType<EntitySpecifier>());
-        Assert.That(collection.Converted);
-        return collection;
     }
 }

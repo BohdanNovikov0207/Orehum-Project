@@ -103,7 +103,7 @@ public sealed class StrippableTest : InteractionTest
             BoundKeyState.Down,
             TargetCoords,
             Target,
-            screenCoordinates: new ScreenCoordinates(screenX, 0f, WindowId.Main));
+            new ScreenCoordinates(screenX, 0f, WindowId.Main));
 
         await RunTicks(5);
 
@@ -112,7 +112,7 @@ public sealed class StrippableTest : InteractionTest
             BoundKeyState.Up,
             PlayerCoords,
             Player,
-            screenCoordinates: new ScreenCoordinates(0f, 0f, WindowId.Main));
+            new ScreenCoordinates(0f, 0f, WindowId.Main));
 
         await RunTicks(5);
 

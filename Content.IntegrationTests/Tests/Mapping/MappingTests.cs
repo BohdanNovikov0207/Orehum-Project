@@ -19,7 +19,8 @@ public sealed class MappingTests
     [Test]
     public async Task MappingTest()
     {
-        await using var pair = await PoolManager.GetServerClient(new PoolSettings { Dirty = true, Connected = true, DummyTicker = false });
+        await using var pair = await PoolManager.GetServerClient(new PoolSettings
+            { Dirty = true, Connected = true, DummyTicker = false });
 
         var server = pair.Server;
         var entMan = server.EntMan;
@@ -27,7 +28,7 @@ public sealed class MappingTests
 
         await pair.RunTicksSync(5);
         var mapId = 1;
-        while (mapSys.MapExists(new(mapId)))
+        while (mapSys.MapExists(new MapId(mapId)))
         {
             mapId++;
         }
@@ -51,7 +52,7 @@ public sealed class MappingTests
         EntityUid ent = default;
         await server.WaitPost(() =>
         {
-            ent = entMan.Spawn(null, new MapCoordinates(default, new(mapId)));
+            ent = entMan.Spawn(null, new MapCoordinates(default, new MapId(mapId)));
         });
         await pair.RunTicksSync(5);
         Assert.That(server.MetaData(ent).EntityLifeStage, Is.EqualTo(EntityLifeStage.Initialized));
@@ -74,7 +75,7 @@ public sealed class MappingTests
 
         // Load the saved map
         mapId++;
-        while (mapSys.MapExists(new(mapId)))
+        while (mapSys.MapExists(new MapId(mapId)))
         {
             mapId++;
         }

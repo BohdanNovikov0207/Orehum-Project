@@ -3,7 +3,7 @@ using System.IO;
 namespace Content.IntegrationTests;
 
 /// <summary>
-/// Canonical implementation of <see cref="ITestContextLike"/> for usage in actual NUnit tests.
+/// Canonical implementation of <see cref="ITestContextLike" /> for usage in actual NUnit tests.
 /// </summary>
 public sealed class NUnitTestContextWrap(TestContext context, TextWriter writer) : ITestContextLike
 {

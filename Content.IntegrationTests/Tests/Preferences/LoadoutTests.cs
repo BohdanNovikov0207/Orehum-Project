@@ -125,7 +125,7 @@ public sealed class LoadoutTests
 
     private readonly Dictionary<string, EntProtoId> _expectedEquipment = new()
     {
-        ["jumpsuit"] = "ClothingUniformJumpsuitColorGrey"
+        ["jumpsuit"] = "ClothingUniformJumpsuitColorGrey",
     };
 
     /// <summary>
@@ -134,7 +134,7 @@ public sealed class LoadoutTests
     [Test]
     public async Task TestEmptyLoadout()
     {
-        var pair = await PoolManager.GetServerClient(new PoolSettings()
+        var pair = await PoolManager.GetServerClient(new PoolSettings
         {
             Dirty = true,
         });
@@ -153,21 +153,25 @@ public sealed class LoadoutTests
 
             profile.SetLoadout(new RoleLoadout("LoadoutTester"));
 
-            var tester = stationSystem.SpawnPlayerMob(testMap.GridCoords, job: "LoadoutTester", profile, station: null);
+            var tester = stationSystem.SpawnPlayerMob(testMap.GridCoords, "LoadoutTester", profile, null);
 
             var slotQuery = inventorySystem.GetSlotEnumerator(tester);
             var checkedCount = 0;
             while (slotQuery.NextItem(out var item, out var slot))
             {
                 // Make sure the slot is valid
-                Assert.That(_expectedEquipment.TryGetValue(slot.Name, out var expectedItem), $"Spawned item in unexpected slot: {slot.Name}");
+                Assert.That(_expectedEquipment.TryGetValue(slot.Name, out var expectedItem),
+                    $"Spawned item in unexpected slot: {slot.Name}");
 
                 // Make sure that the item is the right one
                 var meta = entManager.GetComponent<MetaDataComponent>(item);
-                Assert.That(meta.EntityPrototype.ID, Is.EqualTo(expectedItem.Id), $"Spawned wrong item in slot {slot.Name}!");
+                Assert.That(meta.EntityPrototype.ID,
+                    Is.EqualTo(expectedItem.Id),
+                    $"Spawned wrong item in slot {slot.Name}!");
 
                 checkedCount++;
             }
+
             // Make sure the number of items is the same
             Assert.That(checkedCount, Is.EqualTo(_expectedEquipment.Count), "Number of items does not match expected!");
 

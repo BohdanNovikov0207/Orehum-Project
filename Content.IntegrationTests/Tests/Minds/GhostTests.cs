@@ -8,10 +8,12 @@
 
 using System.Numerics;
 using Content.IntegrationTests.Pair;
+using Content.Server.Mind;
 using Content.Shared.Ghost;
 using Content.Shared.Mind;
 using Content.Shared.Players;
 using Robust.Server.GameObjects;
+using Robust.Server.Player;
 using Robust.Shared.GameObjects;
 using Robust.Shared.Map;
 using Robust.Shared.Player;
@@ -25,8 +27,8 @@ public sealed class GhostTests
     private struct GhostTestData
     {
         public IEntityManager SEntMan;
-        public Robust.Server.Player.IPlayerManager SPlayerMan;
-        public Server.Mind.MindSystem SMindSys;
+        public IPlayerManager SPlayerMan;
+        public MindSystem SMindSys;
         public SharedTransformSystem STransformSys = default!;
 
         public TestPair Pair = default!;
@@ -38,7 +40,7 @@ public sealed class GhostTests
 
         /// <summary>
         /// Initial player coordinates. Note that this does not necessarily correspond to the position of the
-        /// <see cref="Player"/> entity.
+        /// <see cref="Player" /> entity.
         /// </summary>
         public NetCoordinates PlayerCoords = default!;
 
@@ -62,19 +64,21 @@ public sealed class GhostTests
             {
                 DummyTicker = false,
                 Connected = true,
-                Dirty = true
-            })
+                Dirty = true,
+            }),
         };
 
         data.SEntMan = data.Pair.Server.ResolveDependency<IServerEntityManager>();
-        data.SPlayerMan = data.Pair.Server.ResolveDependency<Robust.Server.Player.IPlayerManager>();
-        data.SMindSys = data.SEntMan.System<Server.Mind.MindSystem>();
+        data.SPlayerMan = data.Pair.Server.ResolveDependency<IPlayerManager>();
+        data.SMindSys = data.SEntMan.System<MindSystem>();
         data.STransformSys = data.SEntMan.System<SharedTransformSystem>();
 
         // Setup map.
         await data.Pair.CreateTestMap();
         var test = data.MapData.GridCoords.Offset(new Vector2(0.5f, 0.5f));
-        data.PlayerCoords = data.SEntMan.GetNetCoordinates(data.STransformSys.WithEntityId(data.MapData.GridCoords.Offset(new Vector2(0.5f, 0.5f)), data.MapData.MapUid));
+        data.PlayerCoords = data.SEntMan.GetNetCoordinates(
+            data.STransformSys.WithEntityId(data.MapData.GridCoords.Offset(new Vector2(0.5f, 0.5f)),
+                data.MapData.MapUid));
 
         if (data.Client.Session == null)
             Assert.Fail("No player");
@@ -84,7 +88,9 @@ public sealed class GhostTests
         Entity<MindComponent> mind = default!;
         await data.Pair.Server.WaitPost(() =>
         {
-            data.Player = data.SEntMan.GetNetEntity(data.SEntMan.SpawnEntity(null, data.SEntMan.GetCoordinates(data.PlayerCoords)));
+            data.Player =
+                data.SEntMan.GetNetEntity(
+                    data.SEntMan.SpawnEntity(null, data.SEntMan.GetCoordinates(data.PlayerCoords)));
             mind = data.SMindSys.CreateMind(data.ServerSession.UserId, "DummyPlayerEntity");
             data.SPlayerEnt = data.SEntMan.GetEntity(data.Player);
             data.SMindSys.TransferTo(mind, data.SPlayerEnt, mind: mind.Comp);
@@ -97,7 +103,8 @@ public sealed class GhostTests
         {
             Assert.That(data.ServerSession.ContentData()?.Mind, Is.EqualTo(mind.Owner));
             Assert.That(data.ServerSession.AttachedEntity, Is.EqualTo(data.SPlayerEnt));
-            Assert.That(data.ServerSession.AttachedEntity, Is.EqualTo(mind.Comp.CurrentEntity),
+            Assert.That(data.ServerSession.AttachedEntity,
+                Is.EqualTo(mind.Comp.CurrentEntity),
                 "Player is not attached to the mind's current entity.");
             Assert.That(data.SEntMan.EntityExists(mind.Comp.OwnedEntity),
                 "The mind's current entity does not exist");
@@ -181,5 +188,4 @@ public sealed class GhostTests
 
         await data.Pair.CleanReturnAsync();
     }
-
 }

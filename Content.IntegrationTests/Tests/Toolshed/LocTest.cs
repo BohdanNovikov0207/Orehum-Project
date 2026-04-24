@@ -7,7 +7,6 @@
 // SPDX-License-Identifier: AGPL-3.0-or-later
 
 using System.Collections.Generic;
-using System.Globalization;
 using System.Reflection;
 using Robust.Shared.Localization;
 using Robust.Shared.Toolshed;
@@ -26,8 +25,8 @@ public sealed class LocTest : ToolshedTest
         var toolMan = Server.ResolveDependency<ToolshedManager>();
         var locStrings = new HashSet<string>();
 
-        var ignored = new HashSet<Assembly>()
-            {typeof(LocTest).Assembly, typeof(Robust.UnitTesting.Shared.Toolshed.LocTest).Assembly};
+        var ignored = new HashSet<Assembly>
+            { typeof(LocTest).Assembly, typeof(Robust.UnitTesting.Shared.Toolshed.LocTest).Assembly };
 
         await Server.WaitAssertion(() =>
         {
@@ -40,7 +39,8 @@ public sealed class LocTest : ToolshedTest
 
                     var descLoc = cmd.DescLocStr();
                     Assert.That(locStrings.Add(descLoc), $"Duplicate command description key: {descLoc}");
-                    Assert.That(locMan.TryGetString(descLoc, out _), $"Failed to get command description for command {cmd.FullName()}");
+                    Assert.That(locMan.TryGetString(descLoc, out _),
+                        $"Failed to get command description for command {cmd.FullName()}");
                 }
             });
         });

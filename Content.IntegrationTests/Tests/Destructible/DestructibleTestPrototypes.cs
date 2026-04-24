@@ -34,26 +34,26 @@
 //
 // SPDX-License-Identifier: AGPL-3.0-or-later
 
-namespace Content.IntegrationTests.Tests.Destructible
-{
-    public static class DestructibleTestPrototypes
-    {
-        public const string SpawnedEntityId = "DestructibleTestsSpawnedEntity";
-        public const string DestructibleEntityId = "DestructibleTestsDestructibleEntity";
-        public const string DestructibleDestructionEntityId = "DestructibleTestsDestructibleDestructionEntity";
-        public const string DestructibleDamageTypeEntityId = "DestructibleTestsDestructibleDamageTypeEntity";
-        public const string DestructibleDamageGroupEntityId = "DestructibleTestsDestructibleDamageGroupEntity";
-        public const string TestBruteDamageGroupId = "TestBrute";
-        public const string TestBurnDamageGroupId = "TestBurn";
-        public const string TestBluntDamageTypeId = "TestBlunt";
-        public const string TestSlashDamageTypeId = "TestSlash";
-        public const string TestPiercingDamageTypeId = "TestPiercing";
-        public const string TestHeatDamageTypeId = "TestHeat";
-        public const string TestShockDamageTypeId = "TestShock";
-        public const string TestColdDamageTypeId = "TestCold";
+namespace Content.IntegrationTests.Tests.Destructible;
 
-        [TestPrototypes]
-        public const string DamagePrototypes = $@"
+public static class DestructibleTestPrototypes
+{
+    public const string SpawnedEntityId = "DestructibleTestsSpawnedEntity";
+    public const string DestructibleEntityId = "DestructibleTestsDestructibleEntity";
+    public const string DestructibleDestructionEntityId = "DestructibleTestsDestructibleDestructionEntity";
+    public const string DestructibleDamageTypeEntityId = "DestructibleTestsDestructibleDamageTypeEntity";
+    public const string DestructibleDamageGroupEntityId = "DestructibleTestsDestructibleDamageGroupEntity";
+    public const string TestBruteDamageGroupId = "TestBrute";
+    public const string TestBurnDamageGroupId = "TestBurn";
+    public const string TestBluntDamageTypeId = "TestBlunt";
+    public const string TestSlashDamageTypeId = "TestSlash";
+    public const string TestPiercingDamageTypeId = "TestPiercing";
+    public const string TestHeatDamageTypeId = "TestHeat";
+    public const string TestShockDamageTypeId = "TestShock";
+    public const string TestColdDamageTypeId = "TestCold";
+
+    [TestPrototypes]
+    public const string DamagePrototypes = $@"
 - type: damageType
   id: {TestBluntDamageTypeId}
   name: damage-type-blunt
@@ -180,5 +180,4 @@ namespace Content.IntegrationTests.Tests.Destructible
         - !type:DamageGroupTrigger
           damageGroup: {TestBurnDamageGroupId}
           damage: 10";
-    }
 }

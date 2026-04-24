@@ -13,6 +13,7 @@ using Content.Shared.CCVar;
 using Robust.Server.Player;
 using Robust.Shared.Configuration;
 using Robust.Shared.Network;
+
 namespace Content.IntegrationTests.Tests.Lobby;
 
 public sealed class ServerReloginTest
@@ -23,7 +24,7 @@ public sealed class ServerReloginTest
         await using var pair = await PoolManager.GetServerClient(new PoolSettings
         {
             Connected = true,
-            DummyTicker = false
+            DummyTicker = false,
         });
         var server = pair.Server;
         var client = pair.Client;
@@ -65,7 +66,6 @@ public sealed class ServerReloginTest
 
         await server.WaitAssertion(() =>
         {
-
             // Check that we were able to reconnect
             Assert.That(serverPlayerMgr.PlayerCount, Is.EqualTo(1));
 

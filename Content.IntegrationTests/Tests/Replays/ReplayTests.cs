@@ -23,7 +23,7 @@ public sealed class ReplayTests
         var settings = new PoolSettings
         {
             DummyTicker = false,
-            Dirty = true
+            Dirty = true,
         };
         await using var pair = await PoolManager.GetServerClient(settings);
         var server = pair.Server;

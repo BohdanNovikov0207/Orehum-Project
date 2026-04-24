@@ -50,7 +50,7 @@ public sealed partial class SerializationTest
         var data = new TestData
         {
             Value = TestEnum.Cc,
-            Sequence = [TestEnum.Dd, TestEnum.Aa]
+            Sequence = [TestEnum.Dd, TestEnum.Aa],
         };
 
         node = seriMan.WriteValue(data, notNullableOverride: true);
@@ -67,7 +67,7 @@ public sealed partial class SerializationTest
 
         // Check that Generic & non-generic serializers are incompativle.
         Enum genericValue = TestEnum.Bb;
-        TestEnum typedValue = TestEnum.Bb;
+        var typedValue = TestEnum.Bb;
 
         var genericNode = seriMan.WriteValue(genericValue, notNullableOverride: true);
         var typedNode = seriMan.WriteValue(typedValue);
@@ -85,7 +85,7 @@ public sealed partial class SerializationTest
     [DataDefinition]
     private sealed partial class TestData
     {
-        [DataField] public Enum Value = default!;
         [DataField] public List<Enum> Sequence = default!;
+        [DataField] public Enum Value = default!;
     }
 }

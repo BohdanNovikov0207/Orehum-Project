@@ -14,7 +14,7 @@ using Robust.Shared.Prototypes;
 
 namespace Content.IntegrationTests.Tests._Goobstation.Heretic;
 
-[TestFixture, TestOf(typeof(RitualKnowledgeBehavior))]
+[TestFixture] [TestOf(typeof(RitualKnowledgeBehavior))]
 public sealed class RitualKnowledgeTests
 {
     private static readonly ProtoId<DatasetPrototype> KnowledgeDataset = "EligibleTags";
@@ -42,7 +42,9 @@ public sealed class RitualKnowledgeTests
             {
                 foreach (var tagId in dataset.Values)
                 {
-                    Assert.That(protoMan.TryIndex<TagPrototype>(tagId, out var tagProto), Is.True, $"\"{tagId}\" is not a valid tag prototype ID");
+                    Assert.That(protoMan.TryIndex<TagPrototype>(tagId, out var tagProto),
+                        Is.True,
+                        $"\"{tagId}\" is not a valid tag prototype ID");
                 }
             });
         });
@@ -75,13 +77,13 @@ public sealed class RitualKnowledgeTests
                     continue;
 
                 if (entProto.TryGetComponent<TagComponent>(out var tags, compFactory))
-                {
                     usedTags.UnionWith(tags.Tags.Select(t => t.Id));
-                }
             }
 
             var unusedTags = dataset.Except(usedTags).ToHashSet();
-            Assert.That(unusedTags, Is.Empty, $"The following ritual item tags are not used by any obtainable entity prototypes: {string.Join(", ", unusedTags)}");
+            Assert.That(unusedTags,
+                Is.Empty,
+                $"The following ritual item tags are not used by any obtainable entity prototypes: {string.Join(", ", unusedTags)}");
         });
 
         await pair.CleanReturnAsync();

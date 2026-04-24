@@ -176,7 +176,9 @@ public sealed class XenoArtifactTest
 
             // Remove the node and make sure it's no longer in the artifact.
             Assert.That(artifactSystem.RemoveNode(artifactEnt, node3!.Value, false));
-            Assert.That(artifactSystem.TryGetIndex(artifactEnt, node3!.Value, out _), Is.False, "Node 3 still present in artifact.");
+            Assert.That(artifactSystem.TryGetIndex(artifactEnt, node3!.Value, out _),
+                Is.False,
+                "Node 3 still present in artifact.");
 
             // Check to make sure that we got rid of all the connections.
             Assert.That(artifactSystem.GetSuccessorNodes(artifactEnt, node2!.Value), Is.Empty);
@@ -251,7 +253,8 @@ public sealed class XenoArtifactTest
     }
 
     /// <summary>
-    /// Checks if removing a node and adding a new node into its place in the adjacency matrix doesn't accidentally retain extra data.
+    /// Checks if removing a node and adding a new node into its place in the adjacency matrix doesn't accidentally retain
+    /// extra data.
     /// </summary>
     [Test]
     public async Task XenoArtifactReplaceTest()
@@ -302,7 +305,6 @@ public sealed class XenoArtifactTest
             Assert.That(artifactSystem.GetPredecessorNodes(artifactEnt, node3.Value), Is.Empty);
             Assert.That(artifactSystem.GetSuccessorNodes(artifactEnt, node4!.Value), Is.Empty);
             Assert.That(artifactSystem.GetPredecessorNodes(artifactEnt, node4!.Value), Is.Empty);
-
         });
         await server.WaitRunTicks(1);
 
@@ -324,7 +326,8 @@ public sealed class XenoArtifactTest
         await server.WaitPost(() =>
         {
             var artifactUid = entManager.Spawn("TestArtifact");
-            Entity<XenoArtifactComponent> artifactEnt = (artifactUid, entManager.GetComponent<XenoArtifactComponent>(artifactUid));
+            Entity<XenoArtifactComponent> artifactEnt = (artifactUid,
+                entManager.GetComponent<XenoArtifactComponent>(artifactUid));
 
             Assert.That(artifactSystem.AddNode(artifactEnt, "TestArtifactNode", out var node1, false));
             Assert.That(artifactSystem.AddNode(artifactEnt, "TestArtifactNode", out var node2, false));
@@ -361,11 +364,10 @@ public sealed class XenoArtifactTest
             NetEntity[] expectedActiveNodes =
             [
                 entManager.GetNetEntity(node3!.Value.Owner),
-                entManager.GetNetEntity(node5!.Value.Owner)
+                entManager.GetNetEntity(node5!.Value.Owner),
             ];
             Assert.That(artifactEnt.Comp.CachedActiveNodes, Is.SupersetOf(expectedActiveNodes));
             Assert.That(artifactEnt.Comp.CachedActiveNodes, Has.Count.EqualTo(expectedActiveNodes.Length));
-
         });
         await server.WaitRunTicks(1);
 
@@ -384,7 +386,8 @@ public sealed class XenoArtifactTest
         await server.WaitPost(() =>
         {
             var artifact1Uid = entManager.Spawn("TestGenArtifactFlat");
-            Entity<XenoArtifactComponent> artifact1Ent = (artifact1Uid, entManager.GetComponent<XenoArtifactComponent>(artifact1Uid));
+            Entity<XenoArtifactComponent> artifact1Ent = (artifact1Uid,
+                entManager.GetComponent<XenoArtifactComponent>(artifact1Uid));
 
             var segments1 = artifactSystem.GetSegments(artifact1Ent);
             Assert.That(segments1.Count, Is.EqualTo(2));
@@ -392,14 +395,16 @@ public sealed class XenoArtifactTest
             Assert.That(segments1[1].Count, Is.EqualTo(1));
 
             var artifact2Uid = entManager.Spawn("TestGenArtifactTall");
-            Entity<XenoArtifactComponent> artifact2Ent = (artifact2Uid, entManager.GetComponent<XenoArtifactComponent>(artifact2Uid));
+            Entity<XenoArtifactComponent> artifact2Ent = (artifact2Uid,
+                entManager.GetComponent<XenoArtifactComponent>(artifact2Uid));
 
             var segments2 = artifactSystem.GetSegments(artifact2Ent);
             Assert.That(segments2.Count, Is.EqualTo(1));
             Assert.That(segments2[0].Count, Is.EqualTo(2));
 
             var artifact3Uid = entManager.Spawn("TestGenArtifactFull");
-            Entity<XenoArtifactComponent> artifact3Ent = (artifact3Uid, entManager.GetComponent<XenoArtifactComponent>(artifact3Uid));
+            Entity<XenoArtifactComponent> artifact3Ent = (artifact3Uid,
+                entManager.GetComponent<XenoArtifactComponent>(artifact3Uid));
 
             var segments3 = artifactSystem.GetSegments(artifact3Ent);
             Assert.That(segments3.Count, Is.EqualTo(1));
@@ -408,9 +413,11 @@ public sealed class XenoArtifactTest
             Assert.That(nodesDepths.Distinct().Count(), Is.EqualTo(3));
             var grouped = nodesDepths.ToLookup(x => x);
             Assert.That(grouped[0].Count(), Is.EqualTo(2));
-            Assert.That(grouped[1].Count(), Is.GreaterThanOrEqualTo(2)); // tree is attempting sometimes to get wider (so it will look like a tree)
-            Assert.That(grouped[2].Count(), Is.LessThanOrEqualTo(2)); // maintain same width or, if we used 3 nodes on previous layer - we only have 1 left!
-
+            Assert.That(grouped[1].Count(),
+                Is.GreaterThanOrEqualTo(2)); // tree is attempting sometimes to get wider (so it will look like a tree)
+            Assert.That(grouped[2].Count(),
+                Is.LessThanOrEqualTo(
+                    2)); // maintain same width or, if we used 3 nodes on previous layer - we only have 1 left!
         });
         await server.WaitRunTicks(1);
 

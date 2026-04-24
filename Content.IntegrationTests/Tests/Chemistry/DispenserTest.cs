@@ -20,7 +20,7 @@ namespace Content.IntegrationTests.Tests.Chemistry;
 public sealed class DispenserTest : InteractionTest
 {
     /// <summary>
-    ///     Basic test that checks that a beaker can be inserted and ejected from a dispenser.
+    /// Basic test that checks that a beaker can be inserted and ejected from a dispenser.
     /// </summary>
     [Test]
     public async Task InsertEjectBuiTest()

@@ -43,12 +43,13 @@ public sealed partial class TestPair
         TestMap = mapData;
         await Server.WaitPost(() =>
         {
-            mapData.MapUid = Server.System<SharedMapSystem>().CreateMap(out mapData.MapId, runMapInit: initialized);
+            mapData.MapUid = Server.System<SharedMapSystem>().CreateMap(out mapData.MapId, initialized);
             mapData.Grid = Server.MapMan.CreateGridEntity(mapData.MapId);
             mapData.GridCoords = new EntityCoordinates(mapData.Grid, 0, 0);
             var plating = tileDefinitionManager[tile];
             var platingTile = new Tile(plating.TileId);
-            Server.System<SharedMapSystem>().SetTile(mapData.Grid.Owner, mapData.Grid.Comp, mapData.GridCoords, platingTile);
+            Server.System<SharedMapSystem>()
+                .SetTile(mapData.Grid.Owner, mapData.Grid.Comp, mapData.GridCoords, platingTile);
             mapData.MapCoords = new MapCoordinates(0, 0, mapData.MapId);
             mapData.Tile = Server.System<SharedMapSystem>().GetAllTiles(mapData.Grid.Owner, mapData.Grid.Comp).First();
         });
@@ -92,7 +93,8 @@ public sealed partial class TestPair
 
         if (!destination.EntMan.TryGetEntity(meta.NetEntity, out var otherUid))
         {
-            Assert.Fail($"Failed to resolve net ID while converting the EntityUid entity {source.EntMan.ToPrettyString(uid)}");
+            Assert.Fail(
+                $"Failed to resolve net ID while converting the EntityUid entity {source.EntMan.ToPrettyString(uid)}");
             return EntityUid.Invalid;
         }
 
@@ -130,7 +132,7 @@ public sealed partial class TestPair
             && !Client.ResolveDependency<IComponentFactory>().TryGetRegistration<T>(out reg))
         {
             Assert.Fail($"Unknown component: {typeof(T).Name}");
-            return new();
+            return new List<(EntityPrototype, T)>();
         }
 
         var id = reg.Name;
@@ -147,7 +149,7 @@ public sealed partial class TestPair
                 continue;
 
             if (proto.Components.TryGetComponent(id, out var cmp))
-                list.Add((proto, (T)cmp));
+                list.Add((proto, (T) cmp));
         }
 
         return list;
@@ -175,7 +177,7 @@ public sealed partial class TestPair
                 continue;
 
             if (proto.Components.ContainsKey(id))
-                list.Add((proto));
+                list.Add(proto);
         }
 
         return list;
@@ -187,7 +189,7 @@ public sealed partial class TestPair
     public async Task SetAntagPreference(ProtoId<AntagPrototype> id, bool value, NetUserId? user = null)
     {
         user ??= Client.User!.Value;
-        if (user is not {} userId)
+        if (user is not { } userId)
             return;
 
         var prefMan = Server.ResolveDependency<IServerPreferencesManager>();
@@ -212,11 +214,11 @@ public sealed partial class TestPair
             await SetJobPriorities(userId, (id, value));
     }
 
-    /// <inheritdoc cref="SetJobPriority"/>
+    /// <inheritdoc cref="SetJobPriority" />
     public async Task SetJobPriorities(params (ProtoId<JobPrototype>, JobPriority)[] priorities)
         => await SetJobPriorities(Client.User!.Value, priorities);
 
-    /// <inheritdoc cref="SetJobPriority"/>
+    /// <inheritdoc cref="SetJobPriority" />
     public async Task SetJobPriorities(NetUserId user, params (ProtoId<JobPrototype>, JobPriority)[] priorities)
     {
         var highCount = priorities.Count(x => x.Item2 == JobPriority.High);

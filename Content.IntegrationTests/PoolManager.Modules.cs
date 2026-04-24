@@ -36,30 +36,27 @@ public static partial class PoolManager
         new ModuleMap(typeof(GameShared), Shared),
     };
 
-    private static readonly Lazy<bool> Discovered = new Lazy<bool>(() =>
-    {
-        LoadCore();
-        LoadExtras();
-
-        foreach (var assembly in AppDomain.CurrentDomain.GetAssemblies())
+    private static readonly Lazy<bool> Discovered = new(() =>
         {
-            if (!string.IsNullOrEmpty(assembly.Location))
+            LoadCore();
+            LoadExtras();
+
+            foreach (var assembly in AppDomain.CurrentDomain.GetAssemblies())
             {
-                if (!assembly.FullName!.StartsWith(ContentPrefix))
-                    continue;
+                if (!string.IsNullOrEmpty(assembly.Location))
+                {
+                    if (!assembly.FullName!.StartsWith(ContentPrefix))
+                        continue;
 
-                AssignModule(assembly);
+                    AssignModule(assembly);
+                }
             }
-        }
 
-        return true;
-    },
-    LazyThreadSafetyMode.ExecutionAndPublication);
+            return true;
+        },
+        LazyThreadSafetyMode.ExecutionAndPublication);
 
-    private static void DiscoverModules()
-    {
-        _ = Discovered.Value;
-    }
+    private static void DiscoverModules() => _ = Discovered.Value;
 
     /// <summary>
     /// This is required for programs that don't explicitly load core modules by themselves.
@@ -71,8 +68,7 @@ public static partial class PoolManager
         LoadAssemblies(fileName => coreModules.Contains(fileName));
     }
 
-    private static void LoadExtras()
-    {
+    private static void LoadExtras() =>
         LoadAssemblies(fileName =>
         {
             if (!fileName.StartsWith(ContentPrefix))
@@ -86,7 +82,6 @@ public static partial class PoolManager
             var middlePartLength = fileName.Length - ContentPrefix.Length - matchingSuffix.Length;
             return middlePartLength > 0;
         });
-    }
 
     private static void LoadAssemblies(Func<string, bool> fileFilter)
     {
@@ -101,9 +96,7 @@ public static partial class PoolManager
         foreach (var dll in matchingDlls)
         {
             if (!AlreadyLoaded(dll))
-            {
                 Assembly.LoadFrom(dll);
-            }
         }
     }
 
@@ -137,9 +130,7 @@ public static partial class PoolManager
 
         // Add pool assembly if needed
         if (includePoolAssembly)
-        {
             assemblies.Add(CurrentAssembly);
-        }
 
         return assemblies.ToArray();
     }

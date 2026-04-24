@@ -13,12 +13,12 @@ namespace Content.IntegrationTests;
 // Partial class for handling the discovering and storing test prototypes.
 public static partial class PoolManager
 {
-    private static List<string> _testPrototypes = new();
-
     private const BindingFlags Flags = BindingFlags.Static
                                        | BindingFlags.NonPublic
                                        | BindingFlags.Public
                                        | BindingFlags.DeclaredOnly;
+
+    private static readonly List<string> _testPrototypes = new();
 
     private static void DiscoverTestPrototypes(Assembly assembly)
     {
@@ -31,7 +31,7 @@ public static partial class PoolManager
 
                 var val = field.GetValue(null);
                 if (val is not string str)
-                    throw new Exception($"TestPrototypeAttribute is only valid on non-null string fields");
+                    throw new Exception("TestPrototypeAttribute is only valid on non-null string fields");
 
                 _testPrototypes.Add(str);
             }

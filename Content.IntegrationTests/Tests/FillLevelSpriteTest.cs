@@ -38,7 +38,8 @@ public sealed class FillLevelSpriteTest
 
             foreach (var proto in protos)
             {
-                Assert.That(proto.TryGetComponent<SolutionContainerVisualsComponent>(out var visuals, componentFactory));
+                Assert.That(
+                    proto.TryGetComponent<SolutionContainerVisualsComponent>(out var visuals, componentFactory));
                 Assert.That(proto.TryGetComponent<SpriteComponent>(out var sprite, componentFactory));
 
                 var rsi = sprite.BaseRSI;
@@ -49,7 +50,8 @@ public sealed class FillLevelSpriteTest
                     for (var i = 1; i <= visuals.MaxFillLevels; i++)
                     {
                         var state = $"{visuals.FillBaseName}{i}";
-                        Assert.That(rsi.TryGetState(state, out _), @$"{proto.ID} has SolutionContainerVisualsComponent with
+                        Assert.That(rsi.TryGetState(state, out _),
+                            @$"{proto.ID} has SolutionContainerVisualsComponent with
                             MaxFillLevels = {visuals.MaxFillLevels}, but {rsi.Path} doesn't have state {state}!");
                     }
                 }
@@ -62,10 +64,10 @@ public sealed class FillLevelSpriteTest
                         foreach (var handname in HandStateNames)
                         {
                             var state = $"inhand-{handname}{visuals.InHandsFillBaseName}{i}";
-                            Assert.That(rsi.TryGetState(state, out _), @$"{proto.ID} has SolutionContainerVisualsComponent with
+                            Assert.That(rsi.TryGetState(state, out _),
+                                @$"{proto.ID} has SolutionContainerVisualsComponent with
                                 InHandsMaxFillLevels = {visuals.InHandsMaxFillLevels}, but {rsi.Path} doesn't have state {state}!");
                         }
-
                     }
                 }
             }

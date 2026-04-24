@@ -8,12 +8,12 @@
 //
 // SPDX-License-Identifier: AGPL-3.0-or-later
 
+using System.Linq;
 using Content.Client.Guidebook;
 using Content.Client.Guidebook.Richtext;
+using Content.Shared.Guidebook;
 using Robust.Shared.ContentPack;
 using Robust.Shared.Prototypes;
-using System.Linq;
-using Content.Shared.Guidebook;
 
 namespace Content.IntegrationTests.Tests.Guidebook;
 

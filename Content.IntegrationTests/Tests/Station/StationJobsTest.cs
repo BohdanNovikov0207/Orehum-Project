@@ -117,7 +117,9 @@ public sealed class StationJobsTest
         {
             for (var i = 0; i < StationCount; i++)
             {
-                stations.Add(stationSystem.InitializeNewStation(fooStationProto.Stations["Station"], null, $"Foo {StationCount}"));
+                stations.Add(stationSystem.InitializeNewStation(fooStationProto.Stations["Station"],
+                    null,
+                    $"Foo {StationCount}"));
             }
         });
 
@@ -129,7 +131,7 @@ public sealed class StationJobsTest
                 .AddPreference("TMime", JobPriority.High)
                 .WithPlayers(
                     new Dictionary<NetUserId, HumanoidCharacterProfile>()
-                    .AddJob("TCaptain", JobPriority.High, CaptainCount)
+                        .AddJob("TCaptain", JobPriority.High, CaptainCount)
                 );
             Assert.That(fakePlayers, Is.Not.Empty);
 
@@ -151,7 +153,9 @@ public sealed class StationJobsTest
                     // Each station should have SOME players.
                     Assert.That(assignedHere, Is.Not.Empty);
                     // And it should have at least the minimum players to be considered a "fair" share, as they're all the same.
-                    Assert.That(assignedHere, Has.Count.GreaterThanOrEqualTo(TotalPlayers / stations.Count), "Station has too few players.");
+                    Assert.That(assignedHere,
+                        Has.Count.GreaterThanOrEqualTo(TotalPlayers / stations.Count),
+                        "Station has too few players.");
                     // And it shouldn't have ALL the players, either.
                     Assert.That(assignedHere, Has.Count.LessThan(TotalPlayers), "Station has too many players.");
                     // And there should be *A* captain, as there's one player with captain enabled per station.
@@ -188,7 +192,7 @@ public sealed class StationJobsTest
         var station = EntityUid.Invalid;
         await server.WaitPost(() =>
         {
-            station = stationSystem.InitializeNewStation(fooStationProto.Stations["Station"], null, $"Foo Station");
+            station = stationSystem.InitializeNewStation(fooStationProto.Stations["Station"], null, "Foo Station");
         });
 
         await server.WaitRunTicks(1);
@@ -198,24 +202,32 @@ public sealed class StationJobsTest
             // Verify jobs are/are not unlimited.
             Assert.Multiple(() =>
             {
-                Assert.That(stationJobs.IsJobUnlimited(station, "TAssistant"), "TAssistant is expected to be unlimited.");
+                Assert.That(stationJobs.IsJobUnlimited(station, "TAssistant"),
+                    "TAssistant is expected to be unlimited.");
                 Assert.That(stationJobs.IsJobUnlimited(station, "TMime"), "TMime is expected to be unlimited.");
-                Assert.That(!stationJobs.IsJobUnlimited(station, "TCaptain"), "TCaptain is expected to not be unlimited.");
+                Assert.That(!stationJobs.IsJobUnlimited(station, "TCaptain"),
+                    "TCaptain is expected to not be unlimited.");
                 Assert.That(!stationJobs.IsJobUnlimited(station, "TClown"), "TClown is expected to not be unlimited.");
             });
             Assert.Multiple(() =>
             {
-                Assert.That(stationJobs.TrySetJobSlot(station, "TClown", 0), "Could not set TClown to have zero slots.");
-                Assert.That(stationJobs.TryGetJobSlot(station, "TClown", out var clownSlots), "Could not get the number of TClown slots.");
+                Assert.That(stationJobs.TrySetJobSlot(station, "TClown", 0),
+                    "Could not set TClown to have zero slots.");
+                Assert.That(stationJobs.TryGetJobSlot(station, "TClown", out var clownSlots),
+                    "Could not get the number of TClown slots.");
                 Assert.That(clownSlots, Is.EqualTo(0));
-                Assert.That(!stationJobs.TryAdjustJobSlot(station, "TCaptain", -9999), "Was able to adjust TCaptain by -9999 without clamping.");
-                Assert.That(stationJobs.TryAdjustJobSlot(station, "TCaptain", -9999, false, true), "Could not adjust TCaptain by -9999.");
-                Assert.That(stationJobs.TryGetJobSlot(station, "TCaptain", out var captainSlots), "Could not get the number of TCaptain slots.");
+                Assert.That(!stationJobs.TryAdjustJobSlot(station, "TCaptain", -9999),
+                    "Was able to adjust TCaptain by -9999 without clamping.");
+                Assert.That(stationJobs.TryAdjustJobSlot(station, "TCaptain", -9999, false, true),
+                    "Could not adjust TCaptain by -9999.");
+                Assert.That(stationJobs.TryGetJobSlot(station, "TCaptain", out var captainSlots),
+                    "Could not get the number of TCaptain slots.");
                 Assert.That(captainSlots, Is.EqualTo(0));
             });
             Assert.Multiple(() =>
             {
-                Assert.That(stationJobs.TrySetJobSlot(station, "TChaplain", 10, true), "Could not create 10 TChaplain slots.");
+                Assert.That(stationJobs.TrySetJobSlot(station, "TChaplain", 10, true),
+                    "Could not create 10 TChaplain slots.");
                 stationJobs.MakeJobUnlimited(station, "TChaplain");
                 Assert.That(stationJobs.IsJobUnlimited(station, "TChaplain"), "Could not make TChaplain unlimited.");
             });
@@ -258,7 +270,9 @@ public sealed class StationJobsTest
                             Assert.That(array.Length, Is.EqualTo(2));
                             Assert.That(array[0] is -1 or >= 0);
                             Assert.That(array[1] is -1 or >= 0);
-                            Assert.That(invalidJobs, Does.Not.Contain(job), $"Station {stationId} contains job prototype {job} which cannot be present roundstart.");
+                            Assert.That(invalidJobs,
+                                Does.Not.Contain(job),
+                                $"Station {stationId} contains job prototype {job} which cannot be present roundstart.");
                         }
                     }
                 }
@@ -271,7 +285,9 @@ public sealed class StationJobsTest
 internal static class JobExtensions
 {
     public static Dictionary<NetUserId, HumanoidCharacterProfile> AddJob(
-        this Dictionary<NetUserId, HumanoidCharacterProfile> inp, string jobId, JobPriority prio = JobPriority.Medium,
+        this Dictionary<NetUserId, HumanoidCharacterProfile> inp,
+        string jobId,
+        JobPriority prio = JobPriority.Medium,
         int amount = 1)
     {
         for (var i = 0; i < amount; i++)
@@ -283,15 +299,13 @@ internal static class JobExtensions
     }
 
     public static Dictionary<NetUserId, HumanoidCharacterProfile> AddPreference(
-        this Dictionary<NetUserId, HumanoidCharacterProfile> inp, string jobId, JobPriority prio = JobPriority.Medium)
-    {
-        return inp.ToDictionary(x => x.Key, x => x.Value.WithJobPriority(jobId, prio));
-    }
+        this Dictionary<NetUserId, HumanoidCharacterProfile> inp,
+        string jobId,
+        JobPriority prio = JobPriority.Medium) =>
+        inp.ToDictionary(x => x.Key, x => x.Value.WithJobPriority(jobId, prio));
 
     public static Dictionary<NetUserId, HumanoidCharacterProfile> WithPlayers(
         this Dictionary<NetUserId, HumanoidCharacterProfile> inp,
-        Dictionary<NetUserId, HumanoidCharacterProfile> second)
-    {
-        return new[] { inp, second }.SelectMany(x => x).ToDictionary(x => x.Key, x => x.Value);
-    }
+        Dictionary<NetUserId, HumanoidCharacterProfile> second) =>
+        new[] { inp, second }.SelectMany(x => x).ToDictionary(x => x.Key, x => x.Value);
 }

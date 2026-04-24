@@ -18,8 +18,12 @@ public sealed class ExplosionPrototypeTest
         {
             foreach (var proto in protos)
             {
-                Assert.That(proto._tileBreakChance, Is.Not.Empty, $"Empty tile break chance definitions for explosion prototype: {proto.ID}");
-                Assert.That(proto._tileBreakChance, Has.Length.EqualTo(proto._tileBreakIntensity.Length), $"Malformed tile break chance definitions for explosion prototype: {proto.ID}");
+                Assert.That(proto._tileBreakChance,
+                    Is.Not.Empty,
+                    $"Empty tile break chance definitions for explosion prototype: {proto.ID}");
+                Assert.That(proto._tileBreakChance,
+                    Has.Length.EqualTo(proto._tileBreakIntensity.Length),
+                    $"Malformed tile break chance definitions for explosion prototype: {proto.ID}");
             }
         });
 

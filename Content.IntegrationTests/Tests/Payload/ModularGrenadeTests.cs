@@ -40,7 +40,7 @@ public sealed class ModularGrenadeTests : InteractionTest
         AssertComp<TimerTriggerComponent>(false);
         await InteractUsing(Trigger);
         AssertComp<TimerTriggerComponent>();
-        await FindEntity(Trigger, LookupFlags.Uncontained, shouldSucceed: false);
+        await FindEntity(Trigger, LookupFlags.Uncontained, false);
         await InteractUsing(Pry);
         AssertComp<TimerTriggerComponent>(false);
 
@@ -53,7 +53,7 @@ public sealed class ModularGrenadeTests : InteractionTest
 
         // Insert & remove payload.
         await InteractUsing(Payload);
-        await FindEntity(Payload, LookupFlags.Uncontained, shouldSucceed: false);
+        await FindEntity(Payload, LookupFlags.Uncontained, false);
         await InteractUsing(Pry);
         var ent = await FindEntity(Payload, LookupFlags.Uncontained);
         await Delete(ent);
@@ -68,7 +68,7 @@ public sealed class ModularGrenadeTests : InteractionTest
         await Pickup();
         AssertComp<ActiveTimerTriggerComponent>(false);
         await UseInHand();
-        AssertComp<ActiveTimerTriggerComponent>(true);
+        AssertComp<ActiveTimerTriggerComponent>();
 
         // So uhhh grenades in hands don't destroy themselves when exploding. Maybe that will be fixed eventually.
         await Drop();
@@ -77,7 +77,8 @@ public sealed class ModularGrenadeTests : InteractionTest
         var triggerSys = SEntMan.System<TriggerSystem>();
         Target = SEntMan.GetNetEntity(await FindEntity(Payload)); // Goobstation - shrapnel payload start
         var modgrenadeEnt = await FindEntity("ModularGrenade");
-        while (Target != null && triggerSys.GetRemainingTime(modgrenadeEnt)?.TotalSeconds >= 0.0) // Goobstation - shrapnel payload end
+        while (Target != null &&
+               triggerSys.GetRemainingTime(modgrenadeEnt)?.TotalSeconds >= 0.0) // Goobstation - shrapnel payload end
         {
             await RunTicks(10);
         }

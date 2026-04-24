@@ -45,7 +45,8 @@ public sealed class DungeonTests
                     for (var j = 0; j < rooms.Count; j++)
                     {
                         var existing = rooms[j];
-                        Assert.That(!existing.Intersects(bounds), $"Found overlapping rooms {i} and {j} in DungeonRoomPack {pack.ID}");
+                        Assert.That(!existing.Intersects(bounds),
+                            $"Found overlapping rooms {i} and {j} in DungeonRoomPack {pack.ID}");
                     }
 
                     rooms.Add(bounds);
@@ -54,12 +55,14 @@ public sealed class DungeonTests
                     Assert.That(room.Left >= 0 &&
                                 room.Bottom >= 0 &&
                                 room.Right <= pack.Size.X &&
-                                room.Top <= pack.Size.Y, $"Found invalid room {room} on DungeonRoomPack {pack.ID}");
+                                room.Top <= pack.Size.Y,
+                        $"Found invalid room {room} on DungeonRoomPack {pack.ID}");
 
                     // Assert that anything exists at this size
                     var rotated = new Vector2i(room.Size.Y, room.Size.X);
 
-                    Assert.That(sizes.Contains(room.Size) || sizes.Contains(rotated), $"Didn't find any dungeon room prototypes for {room.Size} on {pack.ID} index {i}");
+                    Assert.That(sizes.Contains(room.Size) || sizes.Contains(rotated),
+                        $"Didn't find any dungeon room prototypes for {room.Size} on {pack.ID} index {i}");
                 }
             }
         });
@@ -94,8 +97,11 @@ public sealed class DungeonTests
 
                     Assert.Multiple(() =>
                     {
-                        Assert.That(sizes.Contains(pack.Size) || sizes.Contains(rotated), $"Didn't find any dungeon room prototypes for {pack.Size} for {preset.ID} index {i}");
-                        Assert.That(pack.Bottom, Is.GreaterThanOrEqualTo(0), "All dungeon room packs need their y-axis to be above 0!");
+                        Assert.That(sizes.Contains(pack.Size) || sizes.Contains(rotated),
+                            $"Didn't find any dungeon room prototypes for {pack.Size} for {preset.ID} index {i}");
+                        Assert.That(pack.Bottom,
+                            Is.GreaterThanOrEqualTo(0),
+                            "All dungeon room packs need their y-axis to be above 0!");
                     });
                 }
             }

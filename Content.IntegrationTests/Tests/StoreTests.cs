@@ -8,19 +8,7 @@
 //
 // SPDX-License-Identifier: AGPL-3.0-or-later
 
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading;
-using Content.Server.Store.Systems;
-using Content.Server.Traitor.Uplink;
-using Content.Goobstation.Maths.FixedPoint;
-using Content.Shared.Inventory;
-using Content.Shared.Store;
-using Content.Shared.Store.Components;
 //using Content.Shared.StoreDiscount.Components;
-using Robust.Shared.GameObjects;
-using Robust.Shared.Prototypes;
-using Robust.Shared.Random;
 
 namespace Content.IntegrationTests.Tests;
 
@@ -30,7 +18,6 @@ namespace Content.IntegrationTests.Tests;
 [TestFixture]
 public sealed class StoreTests
 {
-
     [TestPrototypes]
     private const string Prototypes = @"
 - type: entity

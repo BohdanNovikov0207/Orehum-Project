@@ -28,7 +28,7 @@ public sealed class JobTest
     private static readonly ProtoId<JobPrototype> Engineer = "StationEngineer";
     private static readonly ProtoId<JobPrototype> Captain = "Captain";
 
-    private static string _map = "JobTestMap";
+    private static readonly string _map = "JobTestMap";
 
     [TestPrototypes]
     private static readonly string JobTestMap = @$"
@@ -81,7 +81,7 @@ public sealed class JobTest
         {
             DummyTicker = false,
             Connected = true,
-            InLobby = true
+            InLobby = true,
         });
 
         pair.Server.CfgMan.SetCVar(CCVars.GameMap, _map);
@@ -114,7 +114,7 @@ public sealed class JobTest
         {
             DummyTicker = false,
             Connected = true,
-            InLobby = true
+            InLobby = true,
         });
 
         pair.Server.CfgMan.SetCVar(CCVars.GameMap, _map);
@@ -153,7 +153,7 @@ public sealed class JobTest
         {
             DummyTicker = false,
             Connected = true,
-            InLobby = true
+            InLobby = true,
         });
 
         pair.Server.CfgMan.SetCVar(CCVars.GameMap, _map);
@@ -167,7 +167,9 @@ public sealed class JobTest
         Assert.That(captain.Weight, Is.GreaterThan(engineer.Weight));
         Assert.That(engineer.Weight, Is.EqualTo(passenger.Weight));
 
-        await pair.SetJobPriorities((Passenger, JobPriority.Medium), (Engineer, JobPriority.High), (Captain, JobPriority.Low));
+        await pair.SetJobPriorities((Passenger, JobPriority.Medium),
+            (Engineer, JobPriority.High),
+            (Captain, JobPriority.Low));
         ticker.ToggleReadyAll(true);
         await pair.Server.WaitPost(() => ticker.StartRound());
         await pair.RunTicksSync(10);
@@ -188,7 +190,7 @@ public sealed class JobTest
         {
             DummyTicker = false,
             Connected = true,
-            InLobby = true
+            InLobby = true,
         });
 
         pair.Server.CfgMan.SetCVar(CCVars.GameMap, _map);

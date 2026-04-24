@@ -34,8 +34,8 @@ public sealed class GibTest
         Assert.That(client.EntMan.EntityExists(nuid1));
         Assert.That(client.EntMan.EntityExists(nuid2));
 
-        await server.WaitAssertion(() => server.System<BodySystem>().GibBody(target1, gibOrgans: false));
-        await server.WaitAssertion(() => server.System<BodySystem>().GibBody(target2, gibOrgans: true));
+        await server.WaitAssertion(() => server.System<BodySystem>().GibBody(target1, false));
+        await server.WaitAssertion(() => server.System<BodySystem>().GibBody(target2, true));
 
         await pair.RunTicksSync(5);
         await pair.WaitCommand("dirty");

@@ -15,7 +15,6 @@ public sealed class ChameleonJobLoadoutTest : InteractionTest
 {
     private static readonly List<ProtoId<JobPrototype>> JobBlacklist =
     [
-
     ];
 
     [Test]
@@ -49,7 +48,8 @@ public sealed class ChameleonJobLoadoutTest : InteractionTest
         {
             foreach (var job in validJobs)
             {
-                Assert.That(job.Value, Is.Not.Zero,
+                Assert.That(job.Value,
+                    Is.Not.Zero,
                     $"{job.Key} has no chameleonOutfit prototype.");
             }
         });
@@ -60,9 +60,7 @@ public sealed class ChameleonJobLoadoutTest : InteractionTest
     /// <summary>
     /// Best guess at what a "round start" job is.
     /// </summary>
-    private bool IsProbablyRoundStartJob(JobPrototype job)
-    {
-        return job.StartingGear != null && ProtoMan.HasIndex<RoleLoadoutPrototype>(LoadoutSystem.GetJobPrototype(job.ID));
-    }
-
+    private bool IsProbablyRoundStartJob(JobPrototype job) => job.StartingGear != null &&
+                                                              ProtoMan.HasIndex<RoleLoadoutPrototype>(
+                                                                  LoadoutSystem.GetJobPrototype(job.ID));
 }

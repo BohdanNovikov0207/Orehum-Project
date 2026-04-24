@@ -38,7 +38,8 @@ public sealed class ContrabandTest
                     if (!severity.ShowDepartmentsAndJobs)
                         continue;
 
-                    Assert.That(contraband.AllowedDepartments.Count + contraband.AllowedJobs.Count, Is.Not.EqualTo(0),
+                    Assert.That(contraband.AllowedDepartments.Count + contraband.AllowedJobs.Count,
+                        Is.Not.EqualTo(0),
                         @$"{proto.ID} has a ContrabandComponent with ShowDepartmentsAndJobs but no allowed departments or jobs.");
                 }
             });

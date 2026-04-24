@@ -46,7 +46,9 @@ public sealed class SalvageTest
                 }
                 catch (Exception ex)
                 {
-                    throw new Exception($"Failed to load salvage map {salvage.ID}, was it saved as a map instead of a grid?", ex);
+                    throw new Exception(
+                        $"Failed to load salvage map {salvage.ID}, was it saved as a map instead of a grid?",
+                        ex);
                 }
 
                 try

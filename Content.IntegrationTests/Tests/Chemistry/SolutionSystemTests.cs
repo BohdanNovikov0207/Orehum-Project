@@ -13,14 +13,13 @@
 //
 // SPDX-License-Identifier: AGPL-3.0-or-later
 
+using Content.Goobstation.Maths.FixedPoint;
 using Content.Shared.Chemistry.Components;
 using Content.Shared.Chemistry.EntitySystems;
-using Content.Goobstation.Maths.FixedPoint;
 using Robust.Shared.GameObjects;
 using Robust.Shared.Prototypes;
 
 namespace Content.IntegrationTests.Tests.Chemistry;
-
 
 // We are adding two non-reactive solutions in these tests
 // To ensure volume(A) + volume(B) = volume(A+B)
@@ -58,6 +57,7 @@ public sealed class SolutionSystemTests
   desc: reagent-desc-nothing
   physicalDesc: reagent-physical-desc-nothing
 ";
+
     [Test]
     public async Task TryAddTwoNonReactiveReagent()
     {
@@ -131,7 +131,8 @@ public sealed class SolutionSystemTests
 
             solution.AddSolution(originalWater, protoMan);
             Assert.That(containerSystem
-                .TryAddSolution(solutionEnt.Value, oilAdded), Is.False);
+                    .TryAddSolution(solutionEnt.Value, oilAdded),
+                Is.False);
 
             var water = solution.GetTotalPrototypeQuantity("Water");
             var oil = solution.GetTotalPrototypeQuantity("Oil");
@@ -231,7 +232,7 @@ public sealed class SolutionSystemTests
 
             solution.AddSolution(originalWater, protoMan);
             Assert.That(containerSystem
-                .TryMixAndOverflow(solutionEnt.Value, oilAdded, threshold, out _),
+                    .TryMixAndOverflow(solutionEnt.Value, oilAdded, threshold, out _),
                 Is.False);
         });
 
@@ -249,14 +250,15 @@ public sealed class SolutionSystemTests
         // Adding reagent with adjusts temperature
         await server.WaitAssertion(() =>
         {
-
             var solution = new Solution("TestReagentA", FixedPoint2.New(100)) { Temperature = temp };
             Assert.That(solution.Temperature, Is.EqualTo(temp * 1));
 
-            solution.AddSolution(new Solution("TestReagentA", FixedPoint2.New(100)) { Temperature = temp * 3 }, protoMan);
+            solution.AddSolution(new Solution("TestReagentA", FixedPoint2.New(100)) { Temperature = temp * 3 },
+                protoMan);
             Assert.That(solution.Temperature, Is.EqualTo(temp * 2));
 
-            solution.AddSolution(new Solution("TestReagentB", FixedPoint2.New(100)) { Temperature = temp * 5 }, protoMan);
+            solution.AddSolution(new Solution("TestReagentB", FixedPoint2.New(100)) { Temperature = temp * 5 },
+                protoMan);
             Assert.That(solution.Temperature, Is.EqualTo(temp * 3));
         });
 
@@ -271,7 +273,8 @@ public sealed class SolutionSystemTests
             var thermalEnergyOne = solutionOne.GetHeatCapacity(protoMan) * solutionOne.Temperature;
             var thermalEnergyTwo = solutionTwo.GetHeatCapacity(protoMan) * solutionTwo.Temperature;
             solutionOne.AddSolution(solutionTwo, protoMan);
-            Assert.That(solutionOne.GetHeatCapacity(protoMan) * solutionOne.Temperature, Is.EqualTo(thermalEnergyOne + thermalEnergyTwo));
+            Assert.That(solutionOne.GetHeatCapacity(protoMan) * solutionOne.Temperature,
+                Is.EqualTo(thermalEnergyOne + thermalEnergyTwo));
         });
 
         await pair.CleanReturnAsync();

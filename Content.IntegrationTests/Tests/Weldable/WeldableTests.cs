@@ -11,7 +11,7 @@ using Content.Shared.Tools.Components;
 namespace Content.IntegrationTests.Tests.Weldable;
 
 /// <summary>
-///  Simple test to check that using a welder on a locker will weld it shut.
+/// Simple test to check that using a welder on a locker will weld it shut.
 /// </summary>
 public sealed class WeldableTests : InteractionTest
 {

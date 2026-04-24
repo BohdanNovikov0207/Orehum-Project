@@ -19,58 +19,53 @@
 using Content.Server.GameTicking;
 using Content.Shared.GameTicking;
 using Robust.Shared.GameObjects;
-using Robust.Shared.Reflection;
 
-namespace Content.IntegrationTests.Tests
+namespace Content.IntegrationTests.Tests;
+
+[TestFixture]
+[TestOf(typeof(RoundRestartCleanupEvent))]
+public sealed class ResettingEntitySystemTests
 {
-    [TestFixture]
-    [TestOf(typeof(RoundRestartCleanupEvent))]
-    public sealed class ResettingEntitySystemTests
+    public sealed class TestRoundRestartCleanupEvent : EntitySystem
     {
-        public sealed class TestRoundRestartCleanupEvent : EntitySystem
+        public bool HasBeenReset { get; set; }
+
+        public override void Initialize()
         {
-            public bool HasBeenReset { get; set; }
+            base.Initialize();
 
-            public override void Initialize()
-            {
-                base.Initialize();
-
-                SubscribeLocalEvent<RoundRestartCleanupEvent>(Reset);
-            }
-
-            public void Reset(RoundRestartCleanupEvent ev)
-            {
-                HasBeenReset = true;
-            }
+            SubscribeLocalEvent<RoundRestartCleanupEvent>(Reset);
         }
 
-        [Test]
-        public async Task ResettingEntitySystemResetTest()
+        public void Reset(RoundRestartCleanupEvent ev) => HasBeenReset = true;
+    }
+
+    [Test]
+    public async Task ResettingEntitySystemResetTest()
+    {
+        await using var pair = await PoolManager.GetServerClient(new PoolSettings
         {
-            await using var pair = await PoolManager.GetServerClient(new PoolSettings
-            {
-                DummyTicker = false,
-                Connected = true,
-                Dirty = true
-            });
-            var server = pair.Server;
+            DummyTicker = false,
+            Connected = true,
+            Dirty = true,
+        });
+        var server = pair.Server;
 
-            var entitySystemManager = server.ResolveDependency<IEntitySystemManager>();
-            var gameTicker = entitySystemManager.GetEntitySystem<GameTicker>();
+        var entitySystemManager = server.ResolveDependency<IEntitySystemManager>();
+        var gameTicker = entitySystemManager.GetEntitySystem<GameTicker>();
 
-            await server.WaitAssertion(() =>
-            {
-                Assert.That(gameTicker.RunLevel, Is.EqualTo(GameRunLevel.InRound));
+        await server.WaitAssertion(() =>
+        {
+            Assert.That(gameTicker.RunLevel, Is.EqualTo(GameRunLevel.InRound));
 
-                var system = entitySystemManager.GetEntitySystem<TestRoundRestartCleanupEvent>();
+            var system = entitySystemManager.GetEntitySystem<TestRoundRestartCleanupEvent>();
 
-                system.HasBeenReset = false;
+            system.HasBeenReset = false;
 
-                gameTicker.RestartRound();
+            gameTicker.RestartRound();
 
-                Assert.That(system.HasBeenReset);
-            });
-            await pair.CleanReturnAsync();
-        }
+            Assert.That(system.HasBeenReset);
+        });
+        await pair.CleanReturnAsync();
     }
 }

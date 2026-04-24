@@ -97,7 +97,7 @@ public sealed class PoolSettings
     public bool Fresh { get; init; }
 
     /// <summary>
-    /// Set to true if the given server should be using a dummy ticker. Ignored if <see cref="InLobby"/> is true.
+    /// Set to true if the given server should be using a dummy ticker. Ignored if <see cref="InLobby" /> is true.
     /// </summary>
     public bool DummyTicker { get; init; } = true;
 
@@ -109,7 +109,7 @@ public sealed class PoolSettings
     /// <summary>
     /// Set to true if the given server/client pair should be connected from each other.
     /// Defaults to disconnected as it makes dirty recycling slightly faster.
-    /// If <see cref="InLobby"/> is true, this option is ignored.
+    /// If <see cref="InLobby" /> is true, this option is ignored.
     /// </summary>
     public bool Connected { get; init; }
 
@@ -118,7 +118,7 @@ public sealed class PoolSettings
     /// If the pair is not in the lobby at the end of the test, this test must be marked as dirty.
     /// </summary>
     /// <remarks>
-    /// If this is enabled, the value of <see cref="DummyTicker"/> is ignored.
+    /// If this is enabled, the value of <see cref="DummyTicker" /> is ignored.
     /// </remarks>
     public bool InLobby { get; init; }
 
@@ -131,7 +131,8 @@ public sealed class PoolSettings
     /// <summary>
     /// This will return a server-client pair that has not loaded test prototypes.
     /// Try avoiding this whenever possible, as this will always  create & destroy a new pair.
-    /// Use <see cref="Pair.TestPair.IsTestPrototype(Robust.Shared.Prototypes.EntityPrototype)"/> if you need to exclude test prototypees.
+    /// Use <see cref="Pair.TestPair.IsTestPrototype(Robust.Shared.Prototypes.EntityPrototype)" /> if you need to exclude test
+    /// prototypees.
     /// </summary>
     public bool NoLoadTestPrototypes { get; init; }
 
@@ -156,32 +157,14 @@ public sealed class PoolSettings
     public string? TestName { get; set; }
 
     /// <summary>
-    /// If set, this will be used to call <see cref="IRobustRandom.SetSeed"/>
+    /// If set, this will be used to call <see cref="IRobustRandom.SetSeed" />
     /// </summary>
     public int? ServerSeed { get; set; }
 
     /// <summary>
-    /// If set, this will be used to call <see cref="IRobustRandom.SetSeed"/>
+    /// If set, this will be used to call <see cref="IRobustRandom.SetSeed" />
     /// </summary>
     public int? ClientSeed { get; set; }
-
-    #region Inferred Properties
-
-    /// <summary>
-    /// If the returned pair must not be reused
-    /// </summary>
-    public bool MustNotBeReused => Destructive || NoLoadContent || NoLoadTestPrototypes;
-
-    /// <summary>
-    /// If the given pair must be brand new
-    /// </summary>
-    public bool MustBeNew => Fresh || NoLoadContent || NoLoadTestPrototypes;
-
-    public bool UseDummyTicker => !InLobby && DummyTicker;
-
-    public bool ShouldBeConnected => InLobby || Connected;
-
-    #endregion
 
     /// <summary>
     /// Tries to guess if we can skip recycling the server/client pair.
@@ -205,4 +188,22 @@ public sealed class PoolSettings
                && Map == nextSettings.Map
                && InLobby == nextSettings.InLobby;
     }
+
+    #region Inferred Properties
+
+    /// <summary>
+    /// If the returned pair must not be reused
+    /// </summary>
+    public bool MustNotBeReused => Destructive || NoLoadContent || NoLoadTestPrototypes;
+
+    /// <summary>
+    /// If the given pair must be brand new
+    /// </summary>
+    public bool MustBeNew => Fresh || NoLoadContent || NoLoadTestPrototypes;
+
+    public bool UseDummyTicker => !InLobby && DummyTicker;
+
+    public bool ShouldBeConnected => InLobby || Connected;
+
+    #endregion
 }

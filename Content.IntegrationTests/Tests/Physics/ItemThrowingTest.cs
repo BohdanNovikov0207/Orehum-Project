@@ -36,14 +36,14 @@ public sealed class ItemThrowingTest : InteractionTest
         AssertExists(egg);
 
         // Currently not a "thrown" item.
-        AssertComp<ThrownItemComponent>(hasComp: false, egg);
+        AssertComp<ThrownItemComponent>(false, egg);
         Assert.That(Comp<PhysicsComponent>(egg).BodyStatus, Is.Not.EqualTo(BodyStatus.InAir));
 
         // Throw it.
         await ThrowItem();
         await RunTicks(1);
         AssertExists(egg);
-        AssertComp<ThrownItemComponent>(hasComp: true, egg);
+        AssertComp<ThrownItemComponent>(true, egg);
         Assert.That(Comp<PhysicsComponent>(egg).BodyStatus, Is.EqualTo(BodyStatus.InAir));
 
         // Splat
@@ -65,14 +65,14 @@ public sealed class ItemThrowingTest : InteractionTest
         AssertExists(egg);
 
         // Currently not a "thrown" item.
-        AssertComp<ThrownItemComponent>(hasComp: false, egg);
+        AssertComp<ThrownItemComponent>(false, egg);
         Assert.That(Comp<PhysicsComponent>(egg).BodyStatus, Is.Not.EqualTo(BodyStatus.InAir));
 
         // Throw it
         await ThrowItem();
         await RunTicks(5);
         AssertExists(egg);
-        AssertComp<ThrownItemComponent>(hasComp: true, egg);
+        AssertComp<ThrownItemComponent>(true, egg);
         Assert.That(Comp<PhysicsComponent>(egg).BodyStatus, Is.EqualTo(BodyStatus.InAir));
 
         // Wait a while
@@ -81,7 +81,7 @@ public sealed class ItemThrowingTest : InteractionTest
         // Egg is egg
         AssertExists(egg);
         AssertPrototype("FoodEgg", egg);
-        AssertComp<ThrownItemComponent>(hasComp: false, egg);
+        AssertComp<ThrownItemComponent>(false, egg);
         Assert.That(Comp<PhysicsComponent>(egg).BodyStatus, Is.Not.EqualTo(BodyStatus.InAir));
     }
 
@@ -101,14 +101,14 @@ public sealed class ItemThrowingTest : InteractionTest
         AssertExists(pen);
 
         // Currently not a "thrown" item.
-        AssertComp<ThrownItemComponent>(hasComp: false, pen);
+        AssertComp<ThrownItemComponent>(false, pen);
         Assert.That(physics.BodyStatus, Is.Not.EqualTo(BodyStatus.InAir));
 
         // Throw it
         await ThrowItem();
         await RunTicks(5);
         AssertExists(pen);
-        AssertComp<ThrownItemComponent>(hasComp: true, pen);
+        AssertComp<ThrownItemComponent>(true, pen);
         Assert.That(physics.BodyStatus, Is.EqualTo(BodyStatus.InAir));
         Assert.That(physics.CanCollide);
 

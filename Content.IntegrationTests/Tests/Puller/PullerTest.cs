@@ -42,7 +42,8 @@ public sealed class PullerTest
                     if (!puller.NeedsHands)
                         continue;
 
-                    Assert.That(proto.HasComponent<HandsComponent>(compFactory), $"Found puller {proto} with NeedsHand pulling but has no hands?");
+                    Assert.That(proto.HasComponent<HandsComponent>(compFactory),
+                        $"Found puller {proto} with NeedsHand pulling but has no hands?");
                 }
             });
         });

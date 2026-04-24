@@ -64,7 +64,7 @@ public sealed class FailAndStartPresetTest
 ";
 
     /// <summary>
-    ///     Test that a nuke ops gamemode can start after failing to start once.
+    /// Test that a nuke ops gamemode can start after failing to start once.
     /// </summary>
     [Test]
     public async Task FailAndStartTest()
@@ -74,7 +74,7 @@ public sealed class FailAndStartPresetTest
             Dirty = true,
             DummyTicker = false,
             Connected = true,
-            InLobby = true
+            InLobby = true,
         });
 
         var server = pair.Server;
@@ -134,10 +134,7 @@ public sealed class TestRuleSystem : EntitySystem
 {
     public bool Run;
 
-    public override void Initialize()
-    {
-        SubscribeLocalEvent<RoundStartAttemptEvent>(OnRoundStartAttempt);
-    }
+    public override void Initialize() => SubscribeLocalEvent<RoundStartAttemptEvent>(OnRoundStartAttempt);
 
     private void OnRoundStartAttempt(RoundStartAttemptEvent args)
     {

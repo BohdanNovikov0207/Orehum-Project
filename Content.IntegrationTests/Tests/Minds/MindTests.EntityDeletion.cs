@@ -87,7 +87,7 @@ public sealed partial class MindTests
     [Test]
     public async Task TestGhostOnDeleteMap()
     {
-        await using var pair = await SetupPair(dirty: true);
+        await using var pair = await SetupPair(true);
         var server = pair.Server;
         var testMap = await pair.CreateTestMap();
         var testMap2 = await pair.CreateTestMap();
@@ -142,7 +142,7 @@ public sealed partial class MindTests
     public async Task TestGhostOnDelete()
     {
         // Client is needed to spawn session
-        await using var pair = await SetupPair(dirty: true);
+        await using var pair = await SetupPair(true);
         var server = pair.Server;
 
         var entMan = server.ResolveDependency<IServerEntityManager>();
@@ -243,7 +243,8 @@ public sealed partial class MindTests
         var ghost = await BecomeGhost(pair);
 
         // Player is a normal ghost (not admin ghost).
-        Assert.That(entMan.GetComponent<MetaDataComponent>(player.AttachedEntity!.Value).EntityPrototype?.ID, Is.Not.EqualTo(GameTicker.AdminObserverPrototypeName));
+        Assert.That(entMan.GetComponent<MetaDataComponent>(player.AttachedEntity!.Value).EntityPrototype?.ID,
+            Is.Not.EqualTo(GameTicker.AdminObserverPrototypeName));
 
         // Try to become an admin ghost
         await server.WaitAssertion(() => serverConsole.ExecuteCommand(player, "aghost"));
@@ -253,8 +254,10 @@ public sealed partial class MindTests
         Assert.Multiple(() =>
         {
             Assert.That(player.AttachedEntity, Is.Not.EqualTo(ghost), "Player is still attached to the old ghost");
-            Assert.That(entMan.HasComponent<GhostComponent>(player.AttachedEntity), "Player did not become a new ghost");
-            Assert.That(entMan.GetComponent<MetaDataComponent>(player.AttachedEntity!.Value).EntityPrototype?.ID, Is.EqualTo(GameTicker.AdminObserverPrototypeName));
+            Assert.That(entMan.HasComponent<GhostComponent>(player.AttachedEntity),
+                "Player did not become a new ghost");
+            Assert.That(entMan.GetComponent<MetaDataComponent>(player.AttachedEntity!.Value).EntityPrototype?.ID,
+                Is.EqualTo(GameTicker.AdminObserverPrototypeName));
         });
 
         var mindId = player.ContentData()?.Mind;

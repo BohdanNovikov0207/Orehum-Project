@@ -17,9 +17,9 @@ namespace Content.IntegrationTests.Pair;
 /// </summary>
 public sealed class TestMapData
 {
-    public EntityUid MapUid { get; set; }
     public Entity<MapGridComponent> Grid;
     public MapId MapId;
+    public EntityUid MapUid { get; set; }
     public EntityCoordinates GridCoords { get; set; }
     public MapCoordinates MapCoords { get; set; }
     public TileRef Tile { get; set; }

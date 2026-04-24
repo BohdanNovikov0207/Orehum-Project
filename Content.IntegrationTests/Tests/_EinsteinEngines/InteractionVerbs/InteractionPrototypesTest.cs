@@ -4,11 +4,7 @@
 //
 // SPDX-License-Identifier: AGPL-3.0-or-later
 
-using System.Linq;
-using Content.Client.Guidebook;
-using Content.Server.Verbs;
 using Content.Shared.InteractionVerbs;
-using Content.Shared.Verbs;
 using Robust.Shared.GameObjects;
 using Robust.Shared.Prototypes;
 
@@ -34,7 +30,8 @@ public sealed class InteractionPrototypesTest
         // TODO probably should test if an entity receives an abstract verb, but Iunno how
         foreach (var proto in protoMan.EnumeratePrototypes<InteractionVerbPrototype>())
         {
-            Assert.That(proto.Abstract || proto.Action is not null, $"Non-abstract prototype {proto.ID} lacks an action!");
+            Assert.That(proto.Abstract || proto.Action is not null,
+                $"Non-abstract prototype {proto.ID} lacks an action!");
         }
 
 

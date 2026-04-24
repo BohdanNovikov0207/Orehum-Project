@@ -19,11 +19,6 @@ namespace Content.IntegrationTests.Tests.Goobstation;
 [FixtureLifeCycle(LifeCycle.InstancePerTestCase)]
 public sealed class UplinkPreferenceTests
 {
-    private TestPair _pair = default!;
-    private EntityUid _player;
-
-    private static readonly ProtoId<UplinkPreferencePrototype> PenPreference = "UplinkPen";
-
     [SetUp]
     public async Task Setup()
     {
@@ -49,10 +44,12 @@ public sealed class UplinkPreferenceTests
     }
 
     [TearDown]
-    public async Task TearDown()
-    {
-        await _pair.CleanReturnAsync();
-    }
+    public async Task TearDown() => await _pair.CleanReturnAsync();
+
+    private TestPair _pair = default!;
+    private EntityUid _player;
+
+    private static readonly ProtoId<UplinkPreferencePrototype> PenPreference = "UplinkPen";
 
     private async Task<EntityUid> SpawnPenInHand()
     {
@@ -173,11 +170,17 @@ public sealed class UplinkPreferenceTests
                 {
                     Assert.That(uplinkTarget, Is.Not.Null, $"Should find uplink target for {pref.ID}");
                     Assert.That(setupEvent, Is.Not.Null, $"SetupUplinkEvent should be raised for {pref.ID}");
-                    Assert.That(setupEvent!.Value.Handled, Is.True, $"SetupUplinkEvent should be handled for {pref.ID}");
+                    Assert.That(setupEvent!.Value.Handled,
+                        Is.True,
+                        $"SetupUplinkEvent should be handled for {pref.ID}");
 
                     var store = entMan.GetComponent<StoreComponent>(uplinkTarget!.Value);
-                    Assert.That(store.Balance.ContainsKey("Telecrystal"), Is.True, $"Store should have TC for {pref.ID}");
-                    Assert.That((int) store.Balance["Telecrystal"], Is.EqualTo(20), $"Store should have 20 TC for {pref.ID}");
+                    Assert.That(store.Balance.ContainsKey("Telecrystal"),
+                        Is.True,
+                        $"Store should have TC for {pref.ID}");
+                    Assert.That((int) store.Balance["Telecrystal"],
+                        Is.EqualTo(20),
+                        $"Store should have 20 TC for {pref.ID}");
                 }
                 else // Fallback
                 {
@@ -201,11 +204,13 @@ public sealed class UplinkPreferenceTests
 
         await server.WaitAssertion(() =>
         {
-            var success = uplinkSys.TryAddUplink(_player, startingBalance, implantPreference, out var uplinkTarget, out _);
+            var success =
+                uplinkSys.TryAddUplink(_player, startingBalance, implantPreference, out var uplinkTarget, out _);
             Assert.That(success, Is.True, "Implant uplink should succeed");
             Assert.That(uplinkTarget, Is.Null, "Implant preference should not return an uplink target entity");
 
-            Assert.That(entMan.TryGetComponent<ImplantedComponent>(_player, out var implanted), Is.True,
+            Assert.That(entMan.TryGetComponent<ImplantedComponent>(_player, out var implanted),
+                Is.True,
                 "Player should have ImplantedComponent after implant uplink");
 
             EntityUid? implantStore = null;
@@ -226,7 +231,8 @@ public sealed class UplinkPreferenceTests
             var catalog = protoMan.Index<ListingPrototype>("UplinkUplinkImplanter");
             var implantCost = (int) catalog.Cost["Telecrystal"];
             var expectedBalance = startingBalance - implantCost;
-            Assert.That((int) store.Balance["Telecrystal"], Is.EqualTo(expectedBalance),
+            Assert.That((int) store.Balance["Telecrystal"],
+                Is.EqualTo(expectedBalance),
                 $"Implant store should have {expectedBalance} TC (starting {startingBalance} minus {implantCost} implant cost)");
         });
     }

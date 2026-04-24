@@ -94,10 +94,8 @@ using System.Threading;
 using Content.Client.IoC;
 using Content.Client.Parallax.Managers;
 using Content.IntegrationTests.Pair;
-using Content.IntegrationTests.Tests;
 using Content.IntegrationTests.Tests.Destructible;
 using Content.IntegrationTests.Tests.DeviceNetwork;
-using Content.IntegrationTests.Tests.Interaction.Click;
 using Robust.Client;
 using Robust.Server;
 using Robust.Shared.Configuration;
@@ -105,7 +103,6 @@ using Robust.Shared.ContentPack;
 using Robust.Shared.GameObjects;
 using Robust.Shared.IoC;
 using Robust.Shared.Log;
-using Robust.Shared.Prototypes;
 using Robust.Shared.Timing;
 using Robust.UnitTesting;
 
@@ -135,12 +132,12 @@ public static partial class PoolManager
         var options = new RobustIntegrationTest.ServerIntegrationOptions
         {
             ContentStart = true,
-            Options = new ServerOptions()
+            Options = new ServerOptions
             {
                 LoadConfigAndUserData = false,
                 LoadContentResources = !poolSettings.NoLoadContent,
             },
-            ContentAssemblies = _contentAssemblies.ToArray()
+            ContentAssemblies = _contentAssemblies.ToArray(),
         };
 
         var logHandler = new PoolTestLogHandler("SERVER");
@@ -217,15 +214,13 @@ public static partial class PoolManager
         {
             FailureLogLevel = LogLevel.Warning,
             ContentStart = true,
-            ContentAssemblies = GetAssemblies(client: true)
+            ContentAssemblies = GetAssemblies(true),
         };
 
         if (poolSettings.NoLoadContent)
-        {
             Assert.Warn("NoLoadContent does not work on the client, ignoring");
-        }
 
-        options.Options = new GameControllerOptions()
+        options.Options = new GameControllerOptions
         {
             LoadConfigAndUserData = false,
             // LoadContentResources = !poolSettings.NoLoadContent
@@ -237,18 +232,19 @@ public static partial class PoolManager
 
         options.BeforeStart += () =>
         {
-            IoCManager.Resolve<IModLoader>().SetModuleBaseCallbacks(new ClientModuleTestingCallbacks
-            {
-                ClientBeforeIoC = () =>
+            IoCManager.Resolve<IModLoader>()
+                .SetModuleBaseCallbacks(new ClientModuleTestingCallbacks
                 {
-                    // do not register extra systems or components here -- they will get cleared when the client is
-                    // disconnected. just use reflection.
-                    IoCManager.Register<IParallaxManager, DummyParallaxManager>(true);
-                    IoCManager.Resolve<ILogManager>().GetSawmill("loc").Level = LogLevel.Error;
-                    IoCManager.Resolve<IConfigurationManager>()
-                        .OnValueChanged(RTCVars.FailureLogLevel, value => logHandler.FailureLevel = value, true);
-                }
-            });
+                    ClientBeforeIoC = () =>
+                    {
+                        // do not register extra systems or components here -- they will get cleared when the client is
+                        // disconnected. just use reflection.
+                        IoCManager.Register<IParallaxManager, DummyParallaxManager>(true);
+                        IoCManager.Resolve<ILogManager>().GetSawmill("loc").Level = LogLevel.Error;
+                        IoCManager.Resolve<IConfigurationManager>()
+                            .OnValueChanged(RTCVars.FailureLogLevel, value => logHandler.FailureLevel = value, true);
+                    },
+                });
         };
 
         SetDefaultCVars(options);
@@ -259,30 +255,27 @@ public static partial class PoolManager
     }
 
     /// <summary>
-    /// Gets a <see cref="Pair.TestPair"/>, which can be used to get access to a server, and client <see cref="Pair.TestPair"/>
+    /// Gets a <see cref="Pair.TestPair" />, which can be used to get access to a server, and client
+    /// <see cref="Pair.TestPair" />
     /// </summary>
-    /// <param name="poolSettings">See <see cref="PoolSettings"/></param>
+    /// <param name="poolSettings">See <see cref="PoolSettings" /></param>
     /// <returns></returns>
     public static async Task<TestPair> GetServerClient(
         PoolSettings? poolSettings = null,
-        ITestContextLike? testContext = null)
-    {
-        return await GetServerClientPair(
+        ITestContextLike? testContext = null) =>
+        await GetServerClientPair(
             poolSettings ?? new PoolSettings(),
             testContext ?? new NUnitTestContextWrap(TestContext.CurrentContext, TestContext.Out));
-    }
 
-    private static string GetDefaultTestName(ITestContextLike testContext)
-    {
-        return testContext.FullName.Replace("Content.IntegrationTests.Tests.", "");
-    }
+    private static string GetDefaultTestName(ITestContextLike testContext) =>
+        testContext.FullName.Replace("Content.IntegrationTests.Tests.", "");
 
     private static async Task<TestPair> GetServerClientPair(
         PoolSettings poolSettings,
         ITestContextLike testContext)
     {
         if (!_initialized)
-            throw new InvalidOperationException($"Pool manager has not been initialized");
+            throw new InvalidOperationException("Pool manager has not been initialized");
 
         // Trust issues with the AsyncLocal that backs this.
         var testOut = testContext.Out;
@@ -313,7 +306,8 @@ public static partial class PoolManager
 
                     if (canSkip)
                     {
-                        await testOut.WriteLineAsync($"{nameof(GetServerClientPair)}: Cleanup not needed, Skipping cleanup of pair");
+                        await testOut.WriteLineAsync(
+                            $"{nameof(GetServerClientPair)}: Cleanup not needed, Skipping cleanup of pair");
                         await SetupCVars(pair.Client, poolSettings);
                         await SetupCVars(pair.Server, poolSettings);
                         await pair.RunTicksSync(1);
@@ -325,11 +319,12 @@ public static partial class PoolManager
                     }
 
                     await pair.RunTicksSync(5);
-                    await pair.SyncTicks(targetDelta: 1);
+                    await pair.SyncTicks(1);
                 }
                 else
                 {
-                    await testOut.WriteLineAsync($"{nameof(GetServerClientPair)}: Creating a new pair, no suitable pair found in pool");
+                    await testOut.WriteLineAsync(
+                        $"{nameof(GetServerClientPair)}: Creating a new pair, no suitable pair found in pool");
                     pair = await CreateServerClientPair(poolSettings, testOut);
                 }
             }
@@ -343,6 +338,7 @@ public static partial class PoolManager
                 {
                     await testOut.WriteLineAsync($"- Pair {pair.Id} Test #{i}: {pair.TestHistory[i]}");
                 }
+
                 await testOut.WriteLineAsync($"{nameof(GetServerClientPair)}: Pair {pair.Id} Test History End");
             }
         }
@@ -407,7 +403,8 @@ public static partial class PoolManager
             else if (pair.State == TestPair.PairState.Ready)
                 Pairs[pair] = false;
             else
-                throw new InvalidOperationException($"Attempted to return a pair in an invalid state. Pair: {pair.Id}. State: {pair.State}.");
+                throw new InvalidOperationException(
+                    $"Attempted to return a pair in an invalid state. Pair: {pair.Id}. State: {pair.State}.");
         }
     }
 
@@ -440,7 +437,7 @@ we are just going to end this here to save a lot of time. This is the exception 
             await pair.Initialize(poolSettings, testOut, _testPrototypes);
             pair.Use();
             await pair.RunTicksSync(5);
-            await pair.SyncTicks(targetDelta: 1);
+            await pair.SyncTicks(1);
             return pair;
         }
         catch (Exception ex)
@@ -457,12 +454,11 @@ we are just going to end this here to save a lot of time. This is the exception 
     /// <param name="func">The condition to check</param>
     /// <param name="maxTicks">How many ticks to try before giving up</param>
     /// <param name="tickStep">How many ticks to wait between checks</param>
-    public static async Task WaitUntil(RobustIntegrationTest.IntegrationInstance instance, Func<bool> func,
+    public static async Task WaitUntil(RobustIntegrationTest.IntegrationInstance instance,
+        Func<bool> func,
         int maxTicks = 600,
-        int tickStep = 1)
-    {
+        int tickStep = 1) =>
         await WaitUntil(instance, async () => await Task.FromResult(func()), maxTicks, tickStep);
-    }
 
     /// <summary>
     /// Runs a server, or a client until a condition is true
@@ -471,7 +467,8 @@ we are just going to end this here to save a lot of time. This is the exception 
     /// <param name="func">The async condition to check</param>
     /// <param name="maxTicks">How many ticks to try before giving up</param>
     /// <param name="tickStep">How many ticks to wait between checks</param>
-    public static async Task WaitUntil(RobustIntegrationTest.IntegrationInstance instance, Func<Task<bool>> func,
+    public static async Task WaitUntil(RobustIntegrationTest.IntegrationInstance instance,
+        Func<Task<bool>> func,
         int maxTicks = 600,
         int tickStep = 1)
     {
@@ -485,9 +482,7 @@ we are just going to end this here to save a lot of time. This is the exception 
             var ticksToRun = tickStep;
 
             if (ticksAwaited + tickStep > maxTicks)
-            {
                 ticksToRun = maxTicks - ticksAwaited;
-            }
 
             await instance.WaitRunTicks(ticksToRun);
 
@@ -516,7 +511,7 @@ we are just going to end this here to save a lot of time. This is the exception 
         DiscoverModules();
 
         _initialized = true;
-        _contentAssemblies = GetAssemblies(client: false).ToHashSet();
+        _contentAssemblies = GetAssemblies(false).ToHashSet();
         _contentAssemblies.UnionWith(extraAssemblies);
 
         _testPrototypes.Clear();

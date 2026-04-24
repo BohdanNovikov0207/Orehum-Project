@@ -21,15 +21,15 @@ namespace Content.IntegrationTests;
 /// Log handler intended for pooled integration tests.
 /// </summary>
 /// <remarks>
-/// <para>
-/// This class logs to two places: an NUnit <see cref="TestContext"/>
-/// (so it nicely gets attributed to a test in your IDE),
-/// and an in-memory ring buffer for diagnostic purposes.
-/// If test pooling breaks, the ring buffer can be used to see what the broken instance has gone through.
-/// </para>
-/// <para>
-/// The active test context can be swapped out so pooled instances can correctly have their logs attributed.
-/// </para>
+///     <para>
+///     This class logs to two places: an NUnit <see cref="TestContext" />
+///     (so it nicely gets attributed to a test in your IDE),
+///     and an in-memory ring buffer for diagnostic purposes.
+///     If test pooling breaks, the ring buffer can be used to see what the broken instance has gone through.
+///     </para>
+///     <para>
+///     The active test context can be swapped out so pooled instances can correctly have their logs attributed.
+///     </para>
 /// </remarks>
 public sealed class PoolTestLogHandler : ILogHandler
 {
@@ -37,24 +37,24 @@ public sealed class PoolTestLogHandler : ILogHandler
 
     private RStopwatch _stopwatch;
 
-    public TextWriter? ActiveContext { get; private set; }
-
-    public LogLevel? FailureLevel { get; set; }
-
-    /// <summary>
-    /// Sawmills whose messages should never cause test failure, even if they meet the <see cref="FailureLevel"/>.
-    /// </summary>
-    public HashSet<string> IgnoredSawmills { get; } = new()
-    {
-        "cfg",
-    };
+    public bool ShuttingDown;
 
     public PoolTestLogHandler(string? prefix)
     {
         _prefix = prefix != null ? $"{prefix}: " : "";
     }
 
-    public bool ShuttingDown;
+    public TextWriter? ActiveContext { get; private set; }
+
+    public LogLevel? FailureLevel { get; set; }
+
+    /// <summary>
+    /// Sawmills whose messages should never cause test failure, even if they meet the <see cref="FailureLevel" />.
+    /// </summary>
+    public HashSet<string> IgnoredSawmills { get; } = new()
+    {
+        "cfg",
+    };
 
     public void Log(string sawmillName, LogEvent message)
     {
@@ -87,10 +87,7 @@ public sealed class PoolTestLogHandler : ILogHandler
         Assert.Fail($"{line} Exception: {message.Exception}");
     }
 
-    public void ClearContext()
-    {
-        ActiveContext = null;
-    }
+    public void ClearContext() => ActiveContext = null;
 
     public void ActivateContext(TextWriter context)
     {

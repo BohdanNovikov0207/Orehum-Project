@@ -20,7 +20,7 @@ namespace Content.IntegrationTests.Tests.GameRules;
 public sealed class SecretStartsTest
 {
     /// <summary>
-    ///     Tests that when secret is started, all of the game rules it successfully adds are also started.
+    /// Tests that when secret is started, all of the game rules it successfully adds are also started.
     /// </summary>
     [Test]
     public async Task TestSecretStarts()
@@ -45,7 +45,9 @@ public sealed class SecretStartsTest
 
         await server.WaitAssertion(() =>
         {
-            Assert.That(gameTicker.GetAddedGameRules().Count(), Is.GreaterThan(1), $"No additional rules started by secret rule.");
+            Assert.That(gameTicker.GetAddedGameRules().Count(),
+                Is.GreaterThan(1),
+                $"No additional rules started by secret rule.");
 
             // End all rules
             gameTicker.ClearGameRules();

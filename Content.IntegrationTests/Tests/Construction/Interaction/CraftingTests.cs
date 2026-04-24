@@ -35,7 +35,6 @@
 
 using System.Linq;
 using Content.IntegrationTests.Tests.Interaction;
-using Content.Shared.DoAfter;
 using Content.Shared.Stacks;
 using Robust.Shared.Containers;
 
@@ -79,7 +78,7 @@ public sealed class CraftingTests : InteractionTest
         await SpawnEntity((Cable, 10), SEntMan.GetCoordinates(PlayerCoords));
 
         // Attempt (and fail) to craft without glass.
-        await CraftItem(Spear, shouldSucceed: false);
+        await CraftItem(Spear, false);
         await FindEntity(Spear, shouldSucceed: false);
 
         // Spawn three shards of glass and finish crafting (only one is needed).

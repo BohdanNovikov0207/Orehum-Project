@@ -41,68 +41,79 @@ using Content.Shared.Disposal.Unit;
 using Robust.Shared.GameObjects;
 using Robust.Shared.Reflection;
 
-namespace Content.IntegrationTests.Tests.Disposal
-{
-    [TestFixture]
-    [TestOf(typeof(DisposalHolderComponent))]
-    [TestOf(typeof(DisposalEntryComponent))]
-    [TestOf(typeof(DisposalUnitComponent))]
-    public sealed class DisposalUnitTest
-    {
-        [Reflect(false)]
-        private sealed class DisposalUnitTestSystem : EntitySystem
-        {
-            public override void Initialize()
-            {
-                base.Initialize();
+namespace Content.IntegrationTests.Tests.Disposal;
 
-                SubscribeLocalEvent<DoInsertDisposalUnitEvent>(ev =>
+[TestFixture]
+[TestOf(typeof(DisposalHolderComponent))]
+[TestOf(typeof(DisposalEntryComponent))]
+[TestOf(typeof(DisposalUnitComponent))]
+public sealed class DisposalUnitTest
+{
+    [Reflect(false)]
+    private sealed class DisposalUnitTestSystem : EntitySystem
+    {
+        public override void Initialize()
+        {
+            base.Initialize();
+
+            SubscribeLocalEvent<DoInsertDisposalUnitEvent>(ev =>
                 {
                     var (_, toInsert, unit) = ev;
                     var insertTransform = Comp<TransformComponent>(toInsert);
                     // Not in a tube yet
                     Assert.That(insertTransform.ParentUid, Is.EqualTo(unit));
-                }, after: new[] { typeof(SharedDisposalUnitSystem) });
-            }
+                },
+                after: new[] { typeof(SharedDisposalUnitSystem) });
         }
+    }
 
-        private static void UnitInsert(EntityUid uid, DisposalUnitComponent unit, bool result, DisposalUnitSystem disposalSystem, params EntityUid[] entities)
+    private static void UnitInsert(EntityUid uid,
+        DisposalUnitComponent unit,
+        bool result,
+        DisposalUnitSystem disposalSystem,
+        params EntityUid[] entities)
+    {
+        foreach (var entity in entities)
         {
-            foreach (var entity in entities)
-            {
-                Assert.That(disposalSystem.CanInsert(uid, unit, entity), Is.EqualTo(result));
-                disposalSystem.TryInsert(uid, entity, null);
-            }
+            Assert.That(disposalSystem.CanInsert(uid, unit, entity), Is.EqualTo(result));
+            disposalSystem.TryInsert(uid, entity, null);
         }
+    }
 
-        private static void UnitContains(DisposalUnitComponent unit, bool result, params EntityUid[] entities)
+    private static void UnitContains(DisposalUnitComponent unit, bool result, params EntityUid[] entities)
+    {
+        foreach (var entity in entities)
         {
-            foreach (var entity in entities)
-            {
-                Assert.That(unit.Container.ContainedEntities.Contains(entity), Is.EqualTo(result));
-            }
+            Assert.That(unit.Container.ContainedEntities.Contains(entity), Is.EqualTo(result));
         }
+    }
 
-        private static void UnitInsertContains(EntityUid uid, DisposalUnitComponent unit, bool result, DisposalUnitSystem disposalSystem, params EntityUid[] entities)
+    private static void UnitInsertContains(EntityUid uid,
+        DisposalUnitComponent unit,
+        bool result,
+        DisposalUnitSystem disposalSystem,
+        params EntityUid[] entities)
+    {
+        UnitInsert(uid, unit, result, disposalSystem, entities);
+        UnitContains(unit, result, entities);
+    }
+
+    private static void Flush(EntityUid unitEntity,
+        DisposalUnitComponent unit,
+        bool result,
+        DisposalUnitSystem disposalSystem,
+        params EntityUid[] entities) =>
+        Assert.Multiple(() =>
         {
-            UnitInsert(uid, unit, result, disposalSystem, entities);
-            UnitContains(unit, result, entities);
-        }
+            Assert.That(unit.Container.ContainedEntities, Is.SupersetOf(entities));
+            Assert.That(entities, Has.Length.EqualTo(unit.Container.ContainedEntities.Count));
 
-        private static void Flush(EntityUid unitEntity, DisposalUnitComponent unit, bool result, DisposalUnitSystem disposalSystem, params EntityUid[] entities)
-        {
-            Assert.Multiple(() =>
-            {
-                Assert.That(unit.Container.ContainedEntities, Is.SupersetOf(entities));
-                Assert.That(entities, Has.Length.EqualTo(unit.Container.ContainedEntities.Count));
+            Assert.That(result, Is.EqualTo(disposalSystem.TryFlush(unitEntity, unit)));
+            Assert.That(result || entities.Length == 0, Is.EqualTo(unit.Container.ContainedEntities.Count == 0));
+        });
 
-                Assert.That(result, Is.EqualTo(disposalSystem.TryFlush(unitEntity, unit)));
-                Assert.That(result || entities.Length == 0, Is.EqualTo(unit.Container.ContainedEntities.Count == 0));
-            });
-        }
-
-        [TestPrototypes]
-        private const string Prototypes = @"
+    [TestPrototypes]
+    private const string Prototypes = @"
 - type: entity
   name: HumanDisposalDummy
   id: HumanDisposalDummy
@@ -173,106 +184,112 @@ namespace Content.IntegrationTests.Tests.Disposal
     anchored: true
 ";
 
-        [Test]
-        public async Task Test()
+    [Test]
+    public async Task Test()
+    {
+        await using var pair = await PoolManager.GetServerClient();
+        var server = pair.Server;
+
+        var testMap = await pair.CreateTestMap();
+
+        EntityUid human = default!;
+        EntityUid wrench = default!;
+        EntityUid disposalUnit = default!;
+        EntityUid disposalTrunk = default!;
+
+        EntityUid unitUid = default;
+        DisposalUnitComponent unitComponent = default!;
+
+        var entityManager = server.ResolveDependency<IEntityManager>();
+        var xformSystem = entityManager.System<SharedTransformSystem>();
+        var disposalSystem = entityManager.System<DisposalUnitSystem>();
+        var power = entityManager.System<PowerReceiverSystem>();
+
+        await server.WaitAssertion(() =>
         {
-            await using var pair = await PoolManager.GetServerClient();
-            var server = pair.Server;
+            // Spawn the entities
+            var coordinates = testMap.GridCoords;
+            human = entityManager.SpawnEntity("HumanDisposalDummy", coordinates);
+            wrench = entityManager.SpawnEntity("WrenchDummy", coordinates);
+            disposalUnit = entityManager.SpawnEntity("DisposalUnitDummy", coordinates);
+            disposalTrunk = entityManager.SpawnEntity("DisposalTrunkDummy", coordinates);
 
-            var testMap = await pair.CreateTestMap();
-
-            EntityUid human = default!;
-            EntityUid wrench = default!;
-            EntityUid disposalUnit = default!;
-            EntityUid disposalTrunk = default!;
-
-            EntityUid unitUid = default;
-            DisposalUnitComponent unitComponent = default!;
-
-            var entityManager = server.ResolveDependency<IEntityManager>();
-            var xformSystem = entityManager.System<SharedTransformSystem>();
-            var disposalSystem = entityManager.System<DisposalUnitSystem>();
-            var power = entityManager.System<PowerReceiverSystem>();
-
-            await server.WaitAssertion(() =>
+            // Test for components existing
+            unitUid = disposalUnit;
+            Assert.Multiple(() =>
             {
-                // Spawn the entities
-                var coordinates = testMap.GridCoords;
-                human = entityManager.SpawnEntity("HumanDisposalDummy", coordinates);
-                wrench = entityManager.SpawnEntity("WrenchDummy", coordinates);
-                disposalUnit = entityManager.SpawnEntity("DisposalUnitDummy", coordinates);
-                disposalTrunk = entityManager.SpawnEntity("DisposalTrunkDummy", coordinates);
-
-                // Test for components existing
-                unitUid = disposalUnit;
-                Assert.Multiple(() =>
-                {
-                    Assert.That(entityManager.TryGetComponent(disposalUnit, out unitComponent));
-                    Assert.That(entityManager.HasComponent<DisposalEntryComponent>(disposalTrunk));
-                });
-
-                // Can't insert, unanchored and unpowered
-                xformSystem.Unanchor(unitUid, entityManager.GetComponent<TransformComponent>(unitUid));
-                UnitInsertContains(disposalUnit, unitComponent, false, disposalSystem, human, wrench, disposalUnit, disposalTrunk);
+                Assert.That(entityManager.TryGetComponent(disposalUnit, out unitComponent));
+                Assert.That(entityManager.HasComponent<DisposalEntryComponent>(disposalTrunk));
             });
 
-            await server.WaitAssertion(() =>
-            {
-                // Anchor the disposal unit
-                xformSystem.AnchorEntity(unitUid, entityManager.GetComponent<TransformComponent>(unitUid));
+            // Can't insert, unanchored and unpowered
+            xformSystem.Unanchor(unitUid, entityManager.GetComponent<TransformComponent>(unitUid));
+            UnitInsertContains(disposalUnit,
+                unitComponent,
+                false,
+                disposalSystem,
+                human,
+                wrench,
+                disposalUnit,
+                disposalTrunk);
+        });
 
-                // No power
-                Assert.That(power.IsPowered(unitUid), Is.False);
+        await server.WaitAssertion(() =>
+        {
+            // Anchor the disposal unit
+            xformSystem.AnchorEntity(unitUid, entityManager.GetComponent<TransformComponent>(unitUid));
 
-                // Can't insert the trunk or the unit into itself
-                UnitInsertContains(unitUid, unitComponent, false, disposalSystem, disposalUnit, disposalTrunk);
+            // No power
+            Assert.That(power.IsPowered(unitUid), Is.False);
 
-                // Can insert mobs and items
-                UnitInsertContains(unitUid, unitComponent, true, disposalSystem, human, wrench);
-            });
+            // Can't insert the trunk or the unit into itself
+            UnitInsertContains(unitUid, unitComponent, false, disposalSystem, disposalUnit, disposalTrunk);
 
-            await server.WaitAssertion(() =>
-            {
-                var worldPos = xformSystem.GetWorldPosition(disposalTrunk);
+            // Can insert mobs and items
+            UnitInsertContains(unitUid, unitComponent, true, disposalSystem, human, wrench);
+        });
 
-                // Move the disposal trunk away
-                xformSystem.SetWorldPosition(disposalTrunk, worldPos + new Vector2(1, 0));
+        await server.WaitAssertion(() =>
+        {
+            var worldPos = xformSystem.GetWorldPosition(disposalTrunk);
 
-                // Fail to flush with a mob and an item
-                Flush(disposalUnit, unitComponent, false, disposalSystem, human, wrench);
-            });
+            // Move the disposal trunk away
+            xformSystem.SetWorldPosition(disposalTrunk, worldPos + new Vector2(1, 0));
 
-            await server.WaitAssertion(() =>
-            {
-                var xform = entityManager.GetComponent<TransformComponent>(disposalTrunk);
-                var worldPos = xformSystem.GetWorldPosition(disposalUnit);
+            // Fail to flush with a mob and an item
+            Flush(disposalUnit, unitComponent, false, disposalSystem, human, wrench);
+        });
 
-                // Move the disposal trunk back
-                xformSystem.SetWorldPosition(disposalTrunk, worldPos);
-                xformSystem.AnchorEntity((disposalTrunk, xform));
+        await server.WaitAssertion(() =>
+        {
+            var xform = entityManager.GetComponent<TransformComponent>(disposalTrunk);
+            var worldPos = xformSystem.GetWorldPosition(disposalUnit);
 
-                // Fail to flush with a mob and an item, no power
-                Flush(disposalUnit, unitComponent, false, disposalSystem, human, wrench);
-            });
+            // Move the disposal trunk back
+            xformSystem.SetWorldPosition(disposalTrunk, worldPos);
+            xformSystem.AnchorEntity((disposalTrunk, xform));
 
-            await server.WaitAssertion(() =>
-            {
-                // Remove power need
-                Assert.That(entityManager.TryGetComponent(disposalUnit, out ApcPowerReceiverComponent powerComp));
-                power.SetNeedsPower(disposalUnit, false);
-                powerComp.Powered = true;
+            // Fail to flush with a mob and an item, no power
+            Flush(disposalUnit, unitComponent, false, disposalSystem, human, wrench);
+        });
 
-                // Flush with a mob and an item
-                Flush(disposalUnit, unitComponent, true, disposalSystem, human, wrench);
-            });
+        await server.WaitAssertion(() =>
+        {
+            // Remove power need
+            Assert.That(entityManager.TryGetComponent(disposalUnit, out ApcPowerReceiverComponent powerComp));
+            power.SetNeedsPower(disposalUnit, false);
+            powerComp.Powered = true;
 
-            await server.WaitAssertion(() =>
-            {
-                // Re-pressurizing
-                Flush(disposalUnit, unitComponent, false, disposalSystem);
-            });
+            // Flush with a mob and an item
+            Flush(disposalUnit, unitComponent, true, disposalSystem, human, wrench);
+        });
 
-            await pair.CleanReturnAsync();
-        }
+        await server.WaitAssertion(() =>
+        {
+            // Re-pressurizing
+            Flush(disposalUnit, unitComponent, false, disposalSystem);
+        });
+
+        await pair.CleanReturnAsync();
     }
 }

@@ -125,7 +125,8 @@ public sealed class TemporaryMindTests
 
         await pair.Server.WaitAssertion(() =>
         {
-            Assert.That(ctx.TempMindSys.TryRestoreToOriginalBody(ctx.NewBody), Is.False,
+            Assert.That(ctx.TempMindSys.TryRestoreToOriginalBody(ctx.NewBody),
+                Is.False,
                 "TryRestoreToOriginalBody should fail when original body is deleted");
         });
 
@@ -212,10 +213,10 @@ public sealed class TemporaryMindTests
     {
         public IEntityManager EntMan = default!;
         public SharedMindSystem MindSys = default!;
-        public TemporaryMindSystem TempMindSys = default!;
-        public ICommonSession Player = default!;
-        public EntityUid OriginalBody;
         public EntityUid NewBody;
+        public EntityUid OriginalBody;
         public EntityUid OrigMindId;
+        public ICommonSession Player = default!;
+        public TemporaryMindSystem TempMindSys = default!;
     }
 }

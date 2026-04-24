@@ -57,59 +57,58 @@ public sealed class FilterTests
             sAdminLogSystem.Add(LogType.Unknown, $"{entity:Entity} test log: {commonGuid} {secondGuid}");
         });
 
-        await PoolManager.WaitUntil(server, async () =>
-        {
-            var commonGuidStr = commonGuid.ToString();
-
-            string firstGuidStr;
-            string secondGuidStr;
-
-            switch (order)
+        await PoolManager.WaitUntil(server,
+            async () =>
             {
-                case DateOrder.Ascending:
-                    // Oldest first
-                    firstGuidStr = firstGuid.ToString();
-                    secondGuidStr = secondGuid.ToString();
-                    break;
-                case DateOrder.Descending:
-                    // Newest first
-                    firstGuidStr = secondGuid.ToString();
-                    secondGuidStr = firstGuid.ToString();
-                    break;
-                default:
-                    throw new ArgumentOutOfRangeException(nameof(order), order, null);
-            }
+                var commonGuidStr = commonGuid.ToString();
 
-            var firstFound = false;
-            var secondFound = false;
+                string firstGuidStr;
+                string secondGuidStr;
 
-            var both = await sAdminLogSystem.CurrentRoundLogs(new LogFilter
-            {
-                Search = commonGuidStr,
-                DateOrder = order
+                switch (order)
+                {
+                    case DateOrder.Ascending:
+                        // Oldest first
+                        firstGuidStr = firstGuid.ToString();
+                        secondGuidStr = secondGuid.ToString();
+                        break;
+                    case DateOrder.Descending:
+                        // Newest first
+                        firstGuidStr = secondGuid.ToString();
+                        secondGuidStr = firstGuid.ToString();
+                        break;
+                    default:
+                        throw new ArgumentOutOfRangeException(nameof(order), order, null);
+                }
+
+                var firstFound = false;
+                var secondFound = false;
+
+                var both = await sAdminLogSystem.CurrentRoundLogs(new LogFilter
+                {
+                    Search = commonGuidStr,
+                    DateOrder = order,
+                });
+
+                foreach (var log in both)
+                {
+                    if (!log.Message.Contains(commonGuidStr))
+                        continue;
+
+                    if (!firstFound)
+                    {
+                        Assert.That(log.Message, Does.Contain(firstGuidStr));
+                        firstFound = true;
+                        continue;
+                    }
+
+                    Assert.That(log.Message, Does.Contain(secondGuidStr));
+                    secondFound = true;
+                    break;
+                }
+
+                return firstFound && secondFound;
             });
-
-            foreach (var log in both)
-            {
-                if (!log.Message.Contains(commonGuidStr))
-                {
-                    continue;
-                }
-
-                if (!firstFound)
-                {
-                    Assert.That(log.Message, Does.Contain(firstGuidStr));
-                    firstFound = true;
-                    continue;
-                }
-
-                Assert.That(log.Message, Does.Contain(secondGuidStr));
-                secondFound = true;
-                break;
-            }
-
-            return firstFound && secondFound;
-        });
         await pair.CleanReturnAsync();
     }
 }

@@ -46,27 +46,26 @@
 //
 // SPDX-License-Identifier: AGPL-3.0-or-later
 
-using Content.Server.Administration.Commands;
+using Content.Goobstation.Maths.FixedPoint;
 using Content.Server.Administration.Systems;
 using Content.Shared.Damage;
 using Content.Shared.Damage.Prototypes;
-using Content.Goobstation.Maths.FixedPoint;
 using Content.Shared.Mobs.Components;
 using Content.Shared.Mobs.Systems;
 using Robust.Shared.GameObjects;
 using Robust.Shared.Map;
 using Robust.Shared.Prototypes;
 
-namespace Content.IntegrationTests.Tests.Commands
-{
-    [TestFixture]
-    [TestOf(typeof(RejuvenateSystem))]
-    public sealed class RejuvenateTest
-    {
-        private static readonly ProtoId<DamageGroupPrototype> TestDamageGroup = "Toxin";
+namespace Content.IntegrationTests.Tests.Commands;
 
-        [TestPrototypes]
-        private const string Prototypes = @"
+[TestFixture]
+[TestOf(typeof(RejuvenateSystem))]
+public sealed class RejuvenateTest
+{
+    private static readonly ProtoId<DamageGroupPrototype> TestDamageGroup = "Toxin";
+
+    [TestPrototypes]
+    private const string Prototypes = @"
 - type: entity
   name: DamageableDummy
   id: DamageableDummy
@@ -80,66 +79,65 @@ namespace Content.IntegrationTests.Tests.Commands
       200: Dead
 ";
 
-        [Test]
-        public async Task RejuvenateDeadTest()
+    [Test]
+    public async Task RejuvenateDeadTest()
+    {
+        await using var pair = await PoolManager.GetServerClient();
+        var server = pair.Server;
+        var entManager = server.ResolveDependency<IEntityManager>();
+        var prototypeManager = server.ResolveDependency<IPrototypeManager>();
+        var mobStateSystem = entManager.System<MobStateSystem>();
+        var damSystem = entManager.System<DamageableSystem>();
+        var rejuvenateSystem = entManager.System<RejuvenateSystem>();
+
+        await server.WaitAssertion(() =>
         {
-            await using var pair = await PoolManager.GetServerClient();
-            var server = pair.Server;
-            var entManager = server.ResolveDependency<IEntityManager>();
-            var prototypeManager = server.ResolveDependency<IPrototypeManager>();
-            var mobStateSystem = entManager.System<MobStateSystem>();
-            var damSystem = entManager.System<DamageableSystem>();
-            var rejuvenateSystem = entManager.System<RejuvenateSystem>();
+            var human = entManager.SpawnEntity("DamageableDummy", MapCoordinates.Nullspace);
+            DamageableComponent damageable = null;
+            MobStateComponent mobState = null;
 
-            await server.WaitAssertion(() =>
+            // Sanity check
+            Assert.Multiple(() =>
             {
-                var human = entManager.SpawnEntity("DamageableDummy", MapCoordinates.Nullspace);
-                DamageableComponent damageable = null;
-                MobStateComponent mobState = null;
-
-                // Sanity check
-                Assert.Multiple(() =>
-                {
-                    Assert.That(entManager.TryGetComponent(human, out damageable));
-                    Assert.That(entManager.TryGetComponent(human, out mobState));
-                });
-                Assert.Multiple(() =>
-                {
-                    Assert.That(mobStateSystem.IsAlive(human, mobState), Is.True);
-                    Assert.That(mobStateSystem.IsCritical(human, mobState), Is.False);
-                    Assert.That(mobStateSystem.IsDead(human, mobState), Is.False);
-                    Assert.That(mobStateSystem.IsIncapacitated(human, mobState), Is.False);
-                });
-
-                // Kill the entity
-                DamageSpecifier damage = new(prototypeManager.Index(TestDamageGroup), FixedPoint2.New(10000000));
-
-                damSystem.TryChangeDamage(human, damage, true);
-
-                // Check that it is dead
-                Assert.Multiple(() =>
-                {
-                    Assert.That(mobStateSystem.IsAlive(human, mobState), Is.False);
-                    Assert.That(mobStateSystem.IsCritical(human, mobState), Is.False);
-                    Assert.That(mobStateSystem.IsDead(human, mobState), Is.True);
-                    Assert.That(mobStateSystem.IsIncapacitated(human, mobState), Is.True);
-                });
-
-                // Rejuvenate them
-                rejuvenateSystem.PerformRejuvenate(human);
-
-                // Check that it is alive and with no damage
-                Assert.Multiple(() =>
-                {
-                    Assert.That(mobStateSystem.IsAlive(human, mobState), Is.True);
-                    Assert.That(mobStateSystem.IsCritical(human, mobState), Is.False);
-                    Assert.That(mobStateSystem.IsDead(human, mobState), Is.False);
-                    Assert.That(mobStateSystem.IsIncapacitated(human, mobState), Is.False);
-
-                    Assert.That(damageable.TotalDamage, Is.EqualTo(FixedPoint2.Zero));
-                });
+                Assert.That(entManager.TryGetComponent(human, out damageable));
+                Assert.That(entManager.TryGetComponent(human, out mobState));
             });
-            await pair.CleanReturnAsync();
-        }
+            Assert.Multiple(() =>
+            {
+                Assert.That(mobStateSystem.IsAlive(human, mobState), Is.True);
+                Assert.That(mobStateSystem.IsCritical(human, mobState), Is.False);
+                Assert.That(mobStateSystem.IsDead(human, mobState), Is.False);
+                Assert.That(mobStateSystem.IsIncapacitated(human, mobState), Is.False);
+            });
+
+            // Kill the entity
+            DamageSpecifier damage = new(prototypeManager.Index(TestDamageGroup), FixedPoint2.New(10000000));
+
+            damSystem.TryChangeDamage(human, damage, true);
+
+            // Check that it is dead
+            Assert.Multiple(() =>
+            {
+                Assert.That(mobStateSystem.IsAlive(human, mobState), Is.False);
+                Assert.That(mobStateSystem.IsCritical(human, mobState), Is.False);
+                Assert.That(mobStateSystem.IsDead(human, mobState), Is.True);
+                Assert.That(mobStateSystem.IsIncapacitated(human, mobState), Is.True);
+            });
+
+            // Rejuvenate them
+            rejuvenateSystem.PerformRejuvenate(human);
+
+            // Check that it is alive and with no damage
+            Assert.Multiple(() =>
+            {
+                Assert.That(mobStateSystem.IsAlive(human, mobState), Is.True);
+                Assert.That(mobStateSystem.IsCritical(human, mobState), Is.False);
+                Assert.That(mobStateSystem.IsDead(human, mobState), Is.False);
+                Assert.That(mobStateSystem.IsIncapacitated(human, mobState), Is.False);
+
+                Assert.That(damageable.TotalDamage, Is.EqualTo(FixedPoint2.Zero));
+            });
+        });
+        await pair.CleanReturnAsync();
     }
 }

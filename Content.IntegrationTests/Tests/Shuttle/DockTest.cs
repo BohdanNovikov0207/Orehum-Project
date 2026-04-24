@@ -62,11 +62,9 @@
 // SPDX-License-Identifier: AGPL-3.0-or-later
 
 using System.Collections.Generic;
-using System.Linq;
 using System.Numerics;
 using Content.Server.Shuttles.Systems;
 using Content.Tests;
-using Robust.Server.GameObjects;
 using Robust.Shared.EntitySerialization.Systems;
 using Robust.Shared.GameObjects;
 using Robust.Shared.Map;
@@ -87,7 +85,11 @@ public sealed class DockTest : ContentUnitTest
 
     [Test]
     [TestCaseSource(nameof(TestSource))]
-    public async Task TestDockingConfig(Vector2 dock1Pos, Vector2 dock2Pos, Angle dock1Angle, Angle dock2Angle, bool result)
+    public async Task TestDockingConfig(Vector2 dock1Pos,
+        Vector2 dock2Pos,
+        Angle dock1Angle,
+        Angle dock2Angle,
+        bool result)
     {
         await using var pair = await PoolManager.GetServerClient();
         var server = pair.Server;
@@ -116,7 +118,7 @@ public sealed class DockTest : ContentUnitTest
             // Grid1 is a vertical I
             // Grid2 is a T
 
-            var tiles1 = new List<(Vector2i Index, Tile Tile)>()
+            var tiles1 = new List<(Vector2i Index, Tile Tile)>
             {
                 new(new Vector2i(0, 0), new Tile(1)),
                 new(new Vector2i(0, 1), new Tile(1)),
@@ -128,7 +130,7 @@ public sealed class DockTest : ContentUnitTest
             var dock1Xform = entManager.GetComponent<TransformComponent>(dock1);
             dock1Xform.LocalRotation = dock1Angle;
 
-            var tiles2 = new List<(Vector2i Index, Tile Tile)>()
+            var tiles2 = new List<(Vector2i Index, Tile Tile)>
             {
                 new(new Vector2i(0, 0), new Tile(1)),
                 new(new Vector2i(0, 1), new Tile(1)),
@@ -183,7 +185,8 @@ public sealed class DockTest : ContentUnitTest
         await server.WaitAssertion(() =>
         {
             mapSystem.SetTile(map.MapUid, mapGrid, Vector2i.Zero, new Tile(1));
-            var airlockEnt = entManager.SpawnEntity("AirlockShuttle", new EntityCoordinates(map.MapUid, Vector2.One / 2f));
+            var airlockEnt =
+                entManager.SpawnEntity("AirlockShuttle", new EntityCoordinates(map.MapUid, Vector2.One / 2f));
             Assert.That(entManager.GetComponent<TransformComponent>(airlockEnt).Anchored);
 
             var dockingConfig = dockingSystem.GetDockingConfig(shuttle, map.MapUid);

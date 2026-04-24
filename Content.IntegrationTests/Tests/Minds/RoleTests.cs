@@ -16,7 +16,7 @@ namespace Content.IntegrationTests.Tests.Minds;
 public sealed class RoleTests
 {
     /// <summary>
-    /// Check that any prototype with a <see cref="MindRoleComponent"/> is properly configured
+    /// Check that any prototype with a <see cref="MindRoleComponent" /> is properly configured
     /// </summary>
     [Test]
     public async Task ValidateRolePrototypes()
@@ -29,16 +29,21 @@ public sealed class RoleTests
         {
             foreach (var (proto, comp) in pair.GetPrototypesWithComponent<MindRoleComponent>())
             {
-                Assert.That(comp.AntagPrototype == null || comp.JobPrototype == null, $"Role {proto.ID} has both a job and antag prototype.");
-                Assert.That(!comp.ExclusiveAntag || comp.Antag, $"Role {proto.ID} is marked as an exclusive antag, despite not being an antag.");
-                Assert.That(comp.Antag || comp.AntagPrototype == null, $"Role {proto.ID} has an antag prototype, despite not being an antag.");
+                Assert.That(comp.AntagPrototype == null || comp.JobPrototype == null,
+                    $"Role {proto.ID} has both a job and antag prototype.");
+                Assert.That(!comp.ExclusiveAntag || comp.Antag,
+                    $"Role {proto.ID} is marked as an exclusive antag, despite not being an antag.");
+                Assert.That(comp.Antag || comp.AntagPrototype == null,
+                    $"Role {proto.ID} has an antag prototype, despite not being an antag.");
 
                 if (comp.JobPrototype != null)
-                    Assert.That(proto.Components.ContainsKey(jobComp), $"Role {proto.ID} is a job, despite not having a job prototype.");
+                    Assert.That(proto.Components.ContainsKey(jobComp),
+                        $"Role {proto.ID} is a job, despite not having a job prototype.");
 
                 // It is possible that this is meant to be supported? Though I would assume that it would be for
                 // admin / prototype uploads, and that pre-defined roles should still check this.
-                Assert.That(!comp.Antag || comp.AntagPrototype != null , $"Role {proto.ID} is an antag, despite not having a antag prototype.");
+                Assert.That(!comp.Antag || comp.AntagPrototype != null,
+                    $"Role {proto.ID} is an antag, despite not having a antag prototype.");
             }
         });
 
@@ -46,8 +51,8 @@ public sealed class RoleTests
     }
 
     /// <summary>
-    /// Check that any prototype with a <see cref="JobRoleComponent"/> also has a properly configured
-    /// <see cref="MindRoleComponent"/>
+    /// Check that any prototype with a <see cref="JobRoleComponent" /> also has a properly configured
+    /// <see cref="MindRoleComponent" />
     /// </summary>
     [Test]
     public async Task ValidateJobPrototypes()
@@ -61,7 +66,7 @@ public sealed class RoleTests
             foreach (var (proto, comp) in pair.GetPrototypesWithComponent<JobRoleComponent>())
             {
                 if (proto.Components.TryGetComponent(mindCompId, out var mindComp))
-                    Assert.That(((MindRoleComponent)mindComp).JobPrototype, Is.Not.Null);
+                    Assert.That(((MindRoleComponent) mindComp).JobPrototype, Is.Not.Null);
             }
         });
 
@@ -69,8 +74,8 @@ public sealed class RoleTests
     }
 
     /// <summary>
-    /// Check that any prototype with a component that inherits from <see cref="BaseMindRoleComponent"/> also has a
-    /// <see cref="MindRoleComponent"/>
+    /// Check that any prototype with a component that inherits from <see cref="BaseMindRoleComponent" /> also has a
+    /// <see cref="MindRoleComponent" />
     /// </summary>
     [Test]
     public async Task ValidateRolesHaveMindRoleComp()
@@ -90,7 +95,8 @@ public sealed class RoleTests
             {
                 foreach (var proto in pair.GetPrototypesWithComponent(comp))
                 {
-                    Assert.That(proto.Components.ContainsKey(mindCompId), $"Role {proto.ID} does not have a {nameof(MindRoleComponent)} despite having a {comp.Name}");
+                    Assert.That(proto.Components.ContainsKey(mindCompId),
+                        $"Role {proto.ID} does not have a {nameof(MindRoleComponent)} despite having a {comp.Name}");
                 }
             }
         });

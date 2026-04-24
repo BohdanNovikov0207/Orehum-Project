@@ -86,7 +86,7 @@ public sealed class CargoTest
     private static readonly HashSet<ProtoId<CargoProductPrototype>> Ignored =
     [
         // This is ignored because it is explicitly intended to be able to sell for more than it costs.
-        new("FunCrateGambling")
+        new("FunCrateGambling"),
     ];
 
     [Test]
@@ -113,7 +113,9 @@ public sealed class CargoTest
                     var ent = entManager.SpawnEntity(proto.Product, testMap.MapCoords);
                     var price = pricing.GetPrice(ent);
 
-                    Assert.That(price, Is.AtMost(proto.Cost), $"Found arbitrage on {proto.ID} cargo product! Cost is {proto.Cost} but sell is {price}!");
+                    Assert.That(price,
+                        Is.AtMost(proto.Cost),
+                        $"Found arbitrage on {proto.ID} cargo product! Cost is {proto.Cost} but sell is {price}!");
                     entManager.DeleteEntity(ent);
                 }
             });
@@ -121,6 +123,7 @@ public sealed class CargoTest
 
         await pair.CleanReturnAsync();
     }
+
     [Test]
     public async Task NoCargoBountyArbitrageTest()
     {
@@ -149,7 +152,9 @@ public sealed class CargoTest
                     foreach (var bounty in bounties)
                     {
                         if (cargo.IsBountyComplete(ent, bounty))
-                            Assert.That(proto.Cost, Is.GreaterThanOrEqualTo(bounty.Reward), $"Found arbitrage on {bounty.ID} cargo bounty! Product {proto.ID} costs {proto.Cost} but fulfills bounty {bounty.ID} with reward {bounty.Reward}!");
+                            Assert.That(proto.Cost,
+                                Is.GreaterThanOrEqualTo(bounty.Reward),
+                                $"Found arbitrage on {bounty.ID} cargo bounty! Product {proto.ID} costs {proto.Cost} but fulfills bounty {bounty.ID} with reward {bounty.Reward}!");
                     }
 
                     entManager.DeleteEntity(ent);
@@ -184,15 +189,18 @@ public sealed class CargoTest
                 // Sanity check
                 Assert.That(proto.TryGetComponent<StaticPriceComponent>(out var staticPriceComp, compFact), Is.True);
 
-                if (proto.TryGetComponent<StackPriceComponent>(out var stackPriceComp, compFact) && stackPriceComp.Price > 0)
+                if (proto.TryGetComponent<StackPriceComponent>(out var stackPriceComp, compFact) &&
+                    stackPriceComp.Price > 0)
                 {
-                    Assert.That(staticPriceComp.Price, Is.EqualTo(0),
+                    Assert.That(staticPriceComp.Price,
+                        Is.EqualTo(0),
                         $"The prototype {proto} has a StackPriceComponent and StaticPriceComponent whose values are not compatible with each other.");
                 }
 
                 if (proto.HasComponent<StackComponent>(compFact))
                 {
-                    Assert.That(staticPriceComp.Price, Is.EqualTo(0),
+                    Assert.That(staticPriceComp.Price,
+                        Is.EqualTo(0),
                         $"The prototype {proto} has a StackComponent and StaticPriceComponent whose values are not compatible with each other.");
                 }
             }
@@ -265,12 +273,15 @@ public sealed class CargoTest
                         entManager.DeleteEntity(slice);
 
                         // If for some reason it can only make one slice, that's okay, I guess
-                        Assert.That(sliceable.TotalCount, Is.EqualTo(1), $"{proto} counts as part of cargo bounty {bounty.ID} and slices into {sliceable.TotalCount} slices which count for the same bounty!");
+                        Assert.That(sliceable.TotalCount,
+                            Is.EqualTo(1),
+                            $"{proto} counts as part of cargo bounty {bounty.ID} and slices into {sliceable.TotalCount} slices which count for the same bounty!");
                     }
                 }
 
                 entManager.DeleteEntity(ent);
             }
+
             mapSystem.DeleteMap(mapId);
         });
 

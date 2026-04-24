@@ -12,22 +12,24 @@
 //
 // SPDX-License-Identifier: AGPL-3.0-or-later
 
+using System.Collections.Generic;
 using System.Linq;
 using Content.Shared.Containers.ItemSlots;
+using Content.Shared.Tag;
 using Content.Shared.Whitelist;
-using Robust.Shared.GameObjects;
+using Robust.Shared.Prototypes;
 
-namespace Content.IntegrationTests.Tests.Utility
+namespace Content.IntegrationTests.Tests.Utility;
+
+[TestFixture]
+[TestOf(typeof(EntityWhitelist))]
+public sealed class EntityWhitelistTest
 {
-    [TestFixture]
-    [TestOf(typeof(EntityWhitelist))]
-    public sealed class EntityWhitelistTest
-    {
-        private const string InvalidComponent = "Sprite";
-        private const string ValidComponent = "Physics";
+    private const string InvalidComponent = "Sprite";
+    private const string ValidComponent = "Physics";
 
-        [TestPrototypes]
-        private const string Prototypes = $@"
+    [TestPrototypes]
+    private const string Prototypes = $@"
 - type: Tag
   id: WhitelistTestValidTag
 - type: Tag
@@ -69,63 +71,62 @@ namespace Content.IntegrationTests.Tests.Utility
     tags:
     - WhitelistTestValidTag";
 
-        [Test]
-        public async Task Test()
+    [Test]
+    public async Task Test()
+    {
+        await using var pair = await PoolManager.GetServerClient();
+        var server = pair.Server;
+
+        var testMap = await pair.CreateTestMap();
+        var mapCoordinates = testMap.MapCoords;
+
+        var sEntities = server.EntMan;
+        var sys = server.System<EntityWhitelistSystem>();
+
+        await server.WaitAssertion(() =>
         {
-            await using var pair = await PoolManager.GetServerClient();
-            var server = pair.Server;
+            var validComponent = sEntities.SpawnEntity("ValidComponentDummy", mapCoordinates);
+            var WhitelistTestValidTag = sEntities.SpawnEntity("WhitelistTestValidTagDummy", mapCoordinates);
 
-            var testMap = await pair.CreateTestMap();
-            var mapCoordinates = testMap.MapCoords;
+            var invalidComponent = sEntities.SpawnEntity("InvalidComponentDummy", mapCoordinates);
+            var WhitelistTestInvalidTag = sEntities.SpawnEntity("WhitelistTestInvalidTagDummy", mapCoordinates);
 
-            var sEntities = server.EntMan;
-            var sys = server.System<EntityWhitelistSystem>();
-
-            await server.WaitAssertion(() =>
+            // Test instantiated on its own
+            var whitelistInst = new EntityWhitelist
             {
-                var validComponent = sEntities.SpawnEntity("ValidComponentDummy", mapCoordinates);
-                var WhitelistTestValidTag = sEntities.SpawnEntity("WhitelistTestValidTagDummy", mapCoordinates);
+                Components = new[] { $"{ValidComponent}" },
+                Tags = new List<ProtoId<TagPrototype>> { "WhitelistTestValidTag" },
+            };
 
-                var invalidComponent = sEntities.SpawnEntity("InvalidComponentDummy", mapCoordinates);
-                var WhitelistTestInvalidTag = sEntities.SpawnEntity("WhitelistTestInvalidTagDummy", mapCoordinates);
+            Assert.Multiple(() =>
+            {
+                Assert.That(sys.IsValid(whitelistInst, validComponent), Is.True);
+                Assert.That(sys.IsValid(whitelistInst, WhitelistTestValidTag), Is.True);
 
-                // Test instantiated on its own
-                var whitelistInst = new EntityWhitelist
-                {
-                    Components = new[] { $"{ValidComponent}" },
-                    Tags = new() { "WhitelistTestValidTag" }
-                };
-
-                Assert.Multiple(() =>
-                {
-                    Assert.That(sys.IsValid(whitelistInst, validComponent), Is.True);
-                    Assert.That(sys.IsValid(whitelistInst, WhitelistTestValidTag), Is.True);
-
-                    Assert.That(sys.IsValid(whitelistInst, invalidComponent), Is.False);
-                    Assert.That(sys.IsValid(whitelistInst, WhitelistTestInvalidTag), Is.False);
-                });
-
-                // Test from serialized
-                var dummy = sEntities.SpawnEntity("WhitelistDummy", mapCoordinates);
-                var whitelistSer = sEntities.GetComponent<ItemSlotsComponent>(dummy).Slots.Values.First().Whitelist;
-                Assert.That(whitelistSer, Is.Not.Null);
-
-                Assert.Multiple(() =>
-                {
-                    Assert.That(whitelistSer.Components, Is.Not.Null);
-                    Assert.That(whitelistSer.Tags, Is.Not.Null);
-                });
-
-                Assert.Multiple(() =>
-                {
-                    Assert.That(sys.IsValid(whitelistSer, validComponent), Is.True);
-                    Assert.That(sys.IsValid(whitelistSer, WhitelistTestValidTag), Is.True);
-
-                    Assert.That(sys.IsValid(whitelistSer, invalidComponent), Is.False);
-                    Assert.That(sys.IsValid(whitelistSer, WhitelistTestInvalidTag), Is.False);
-                });
+                Assert.That(sys.IsValid(whitelistInst, invalidComponent), Is.False);
+                Assert.That(sys.IsValid(whitelistInst, WhitelistTestInvalidTag), Is.False);
             });
-            await pair.CleanReturnAsync();
-        }
+
+            // Test from serialized
+            var dummy = sEntities.SpawnEntity("WhitelistDummy", mapCoordinates);
+            var whitelistSer = sEntities.GetComponent<ItemSlotsComponent>(dummy).Slots.Values.First().Whitelist;
+            Assert.That(whitelistSer, Is.Not.Null);
+
+            Assert.Multiple(() =>
+            {
+                Assert.That(whitelistSer.Components, Is.Not.Null);
+                Assert.That(whitelistSer.Tags, Is.Not.Null);
+            });
+
+            Assert.Multiple(() =>
+            {
+                Assert.That(sys.IsValid(whitelistSer, validComponent), Is.True);
+                Assert.That(sys.IsValid(whitelistSer, WhitelistTestValidTag), Is.True);
+
+                Assert.That(sys.IsValid(whitelistSer, invalidComponent), Is.False);
+                Assert.That(sys.IsValid(whitelistSer, WhitelistTestInvalidTag), Is.False);
+            });
+        });
+        await pair.CleanReturnAsync();
     }
 }

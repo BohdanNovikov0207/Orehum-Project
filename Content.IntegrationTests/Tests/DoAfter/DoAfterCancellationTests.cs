@@ -57,12 +57,12 @@ public sealed class DoAfterCancellationTests : InteractionTest
     public async Task CancelWallConstruct()
     {
         await StartConstruction(WallConstruction.Wall);
-        await InteractUsing(Steel, 5, awaitDoAfters: false);
+        await InteractUsing(Steel, 5, false);
         await CancelDoAfters();
 
         await InteractUsing(Steel, 5);
         ClientAssertPrototype(WallConstruction.Girder, Target);
-        await InteractUsing(Steel, 5, awaitDoAfters: false);
+        await InteractUsing(Steel, 5, false);
         await CancelDoAfters();
         AssertPrototype(WallConstruction.Girder);
 
@@ -97,7 +97,9 @@ public sealed class DoAfterCancellationTests : InteractionTest
         // Goob edit end
 
         // Second DoAfter cancels the first.
-        await Server.WaitPost(() => InteractSys.UserInteraction(SEntMan.GetEntity(Player), SEntMan.GetCoordinates(TargetCoords), SEntMan.GetEntity(Target)));
+        await Server.WaitPost(() => InteractSys.UserInteraction(SEntMan.GetEntity(Player),
+            SEntMan.GetCoordinates(TargetCoords),
+            SEntMan.GetEntity(Target)));
         Assert.That(ActiveDoAfters.Count(), Is.EqualTo(0));
         await AssertTile(Floor);
 
@@ -125,7 +127,9 @@ public sealed class DoAfterCancellationTests : InteractionTest
 
         // Second DoAfter cancels the first.
         // Not using helper, because it runs too many ticks & causes the do-after to finish.
-        await Server.WaitPost(() => InteractSys.UserInteraction(SEntMan.GetEntity(Player), SEntMan.GetCoordinates(TargetCoords), SEntMan.GetEntity(Target)));
+        await Server.WaitPost(() => InteractSys.UserInteraction(SEntMan.GetEntity(Player),
+            SEntMan.GetCoordinates(TargetCoords),
+            SEntMan.GetEntity(Target)));
         Assert.Multiple(() =>
         {
             Assert.That(ActiveDoAfters.Count(), Is.EqualTo(0));
@@ -148,7 +152,9 @@ public sealed class DoAfterCancellationTests : InteractionTest
             Assert.That(ActiveDoAfters.Count(), Is.EqualTo(1));
             Assert.That(comp.IsWelded, Is.True);
         });
-        await Server.WaitPost(() => InteractSys.UserInteraction(SEntMan.GetEntity(Player), SEntMan.GetCoordinates(TargetCoords), SEntMan.GetEntity(Target)));
+        await Server.WaitPost(() => InteractSys.UserInteraction(SEntMan.GetEntity(Player),
+            SEntMan.GetCoordinates(TargetCoords),
+            SEntMan.GetEntity(Target)));
         Assert.Multiple(() =>
         {
             Assert.That(ActiveDoAfters.Count(), Is.EqualTo(0));

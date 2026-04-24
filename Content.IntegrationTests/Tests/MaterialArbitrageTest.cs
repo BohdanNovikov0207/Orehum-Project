@@ -60,6 +60,7 @@
 
 #nullable enable
 using System.Collections.Generic;
+using Content.Goobstation.Maths.FixedPoint;
 using Content.Server.Cargo.Systems;
 using Content.Server.Construction.Completions;
 using Content.Server.Construction.Components;
@@ -70,11 +71,9 @@ using Content.Server.Stack;
 using Content.Shared.Chemistry.Reagent;
 using Content.Shared.Construction.Prototypes;
 using Content.Shared.Construction.Steps;
-using Content.Goobstation.Maths.FixedPoint;
 using Content.Shared.Lathe;
 using Content.Shared.Materials;
 using Content.Shared.Research.Prototypes;
-using Content.Shared.Stacks;
 using Content.Shared.Tools.Components;
 using Robust.Shared.GameObjects;
 using Robust.Shared.Prototypes;
@@ -186,7 +185,7 @@ public sealed class MaterialArbitrageTest
                     if (step is not MaterialConstructionGraphStep materialStep)
                         continue;
 
-                    var stackProto = protoManager.Index<StackPrototype>(materialStep.MaterialPrototypeId);
+                    var stackProto = protoManager.Index(materialStep.MaterialPrototypeId);
                     var spawnProto = protoManager.Index(stackProto.Spawn);
 
                     if (!spawnProto.Components.ContainsKey(materialName) ||
@@ -200,6 +199,7 @@ public sealed class MaterialArbitrageTest
                     }
                 }
             }
+
             constructionMaterials.Add(id, materials);
         }
 
@@ -217,22 +217,21 @@ public sealed class MaterialArbitrageTest
             if (proto.Components.ContainsKey(materialName)
                 && proto.Components.TryGetValue(compositionName, out var compositionReg))
             {
-                var compositionComp = (PhysicalCompositionComponent)compositionReg.Component;
+                var compositionComp = (PhysicalCompositionComponent) compositionReg.Component;
                 baseComposition = compositionComp.MaterialComposition;
-
             }
 
             if (!proto.Components.TryGetValue(refinableName, out var refinableReg))
             {
                 if (baseComposition != null)
-                    compositions[proto.ID] = new(baseComposition);
+                    compositions[proto.ID] = new Dictionary<string, int>(baseComposition);
                 continue;
             }
 
             var composition = new Dictionary<string, int>();
             compositions.Add(proto.ID, composition);
 
-            var refinable = (ToolRefinableComponent)refinableReg.Component;
+            var refinable = (ToolRefinableComponent) refinableReg.Component;
             foreach (var refineResult in refinable.RefineResult)
             {
                 if (refineResult.PrototypeId == null)
@@ -245,7 +244,7 @@ public sealed class MaterialArbitrageTest
                 if (!refineProto.Components.TryGetValue(compositionName, out var refinedCompositionReg))
                     continue;
 
-                var refinedCompositionComp = (PhysicalCompositionComponent)refinedCompositionReg.Component;
+                var refinedCompositionComp = (PhysicalCompositionComponent) refinedCompositionReg.Component;
 
                 // This assumes refine results do not have complex spawn behaviours like exclusive groups.
                 var quantity = refineResult.MaxAmount;
@@ -324,7 +323,9 @@ public sealed class MaterialArbitrageTest
                 var spawnedPrice = await GetSpawnedPrice(spawnedEnts);
                 var price = await GetPrice(id);
                 if (spawnedPrice > 0 && price > 0)
-                    Assert.That(spawnedPrice, Is.LessThanOrEqualTo(price), $"{id} increases in price after being destroyed\nEntities spawned on destruction: {string.Join(',', spawnedEnts)}");
+                    Assert.That(spawnedPrice,
+                        Is.LessThanOrEqualTo(price),
+                        $"{id} increases in price after being destroyed\nEntities spawned on destruction: {string.Join(',', spawnedEnts)}");
 
                 // Check lathe production
                 if (latheRecipes.TryGetValue(id, out var recipes))
@@ -336,11 +337,15 @@ public sealed class MaterialArbitrageTest
                             server.Log.Info($"Unused lathe recipe? {recipe.ID}?");
                             continue;
                         }
+
                         foreach (var (matId, amount) in recipe.Materials)
                         {
-                            var actualAmount = SharedLatheSystem.AdjustMaterial(amount, recipe.ApplyMaterialDiscount, multiplier);
+                            var actualAmount =
+                                SharedLatheSystem.AdjustMaterial(amount, recipe.ApplyMaterialDiscount, multiplier);
                             if (spawnedMats.TryGetValue(matId, out var numSpawned))
-                                Assert.That(numSpawned, Is.LessThanOrEqualTo(actualAmount), $"destroying a {id} spawns more {matId} than required to produce via an (upgraded) lathe.");
+                                Assert.That(numSpawned,
+                                    Is.LessThanOrEqualTo(actualAmount),
+                                    $"destroying a {id} spawns more {matId} than required to produce via an (upgraded) lathe.");
                         }
                     }
                 }
@@ -351,7 +356,9 @@ public sealed class MaterialArbitrageTest
                     foreach (var (matId, amount) in constructionMats)
                     {
                         if (spawnedMats.TryGetValue(matId, out var numSpawned))
-                            Assert.That(numSpawned, Is.LessThanOrEqualTo(amount), $"destroying a {id} spawns more {matId} than required to construct it.");
+                            Assert.That(numSpawned,
+                                Is.LessThanOrEqualTo(amount),
+                                $"destroying a {id} spawns more {matId} than required to construct it.");
                     }
                 }
             }
@@ -398,6 +405,7 @@ public sealed class MaterialArbitrageTest
                     }
                 }
             }
+
             deconstructionMaterials.Add(id, materials);
         }
 
@@ -412,7 +420,9 @@ public sealed class MaterialArbitrageTest
                 var deconstructedPrice = await GetDeconstructedPrice(deconstructedMats);
                 var price = await GetPrice(id);
                 if (deconstructedPrice > 0 && price > 0)
-                    Assert.That(deconstructedPrice, Is.LessThanOrEqualTo(price), $"{id} increases in price after being deconstructed");
+                    Assert.That(deconstructedPrice,
+                        Is.LessThanOrEqualTo(price),
+                        $"{id} increases in price after being deconstructed");
 
                 // Check lathe production
                 if (latheRecipes.TryGetValue(id, out var recipes))
@@ -424,11 +434,15 @@ public sealed class MaterialArbitrageTest
                             server.Log.Info($"Unused lathe recipe? {recipe.ID}?");
                             continue;
                         }
+
                         foreach (var (matId, amount) in recipe.Materials)
                         {
-                            var actualAmount = SharedLatheSystem.AdjustMaterial(amount, recipe.ApplyMaterialDiscount, multiplier);
+                            var actualAmount =
+                                SharedLatheSystem.AdjustMaterial(amount, recipe.ApplyMaterialDiscount, multiplier);
                             if (deconstructedMats.TryGetValue(matId, out var numSpawned))
-                                Assert.That(numSpawned, Is.LessThanOrEqualTo(actualAmount), $"deconstructing {id} spawns more {matId} than required to produce via an (upgraded) lathe.");
+                                Assert.That(numSpawned,
+                                    Is.LessThanOrEqualTo(actualAmount),
+                                    $"deconstructing {id} spawns more {matId} than required to produce via an (upgraded) lathe.");
                         }
                     }
                 }
@@ -439,7 +453,9 @@ public sealed class MaterialArbitrageTest
                     foreach (var (matId, amount) in constructionMats)
                     {
                         if (deconstructedMats.TryGetValue(matId, out var numSpawned))
-                            Assert.That(numSpawned, Is.LessThanOrEqualTo(amount), $"deconstructing a {id} spawns more {matId} than required to construct it.");
+                            Assert.That(numSpawned,
+                                Is.LessThanOrEqualTo(amount),
+                                $"deconstructing a {id} spawns more {matId} than required to construct it.");
                     }
                 }
             }
@@ -475,7 +491,9 @@ public sealed class MaterialArbitrageTest
                 var sumPrice = materialPrice + chemicalPrice;
                 var price = await GetPrice(id);
                 if (sumPrice > 0 && price > 0)
-                    Assert.That(sumPrice, Is.LessThanOrEqualTo(price), $"{id} increases in price after decomposed into raw materials");
+                    Assert.That(sumPrice,
+                        Is.LessThanOrEqualTo(price),
+                        $"{id} increases in price after decomposed into raw materials");
 
                 // Check lathe production
                 if (latheRecipes.TryGetValue(id, out var recipes))
@@ -487,11 +505,15 @@ public sealed class MaterialArbitrageTest
                             server.Log.Info($"Unused lathe recipe? {recipe.ID}?");
                             continue;
                         }
+
                         foreach (var (matId, amount) in recipe.Materials)
                         {
-                            var actualAmount = SharedLatheSystem.AdjustMaterial(amount, recipe.ApplyMaterialDiscount, multiplier);
+                            var actualAmount =
+                                SharedLatheSystem.AdjustMaterial(amount, recipe.ApplyMaterialDiscount, multiplier);
                             if (compositionComponent.MaterialComposition.TryGetValue(matId, out var numSpawned))
-                                Assert.That(numSpawned, Is.LessThanOrEqualTo(actualAmount), $"The physical composition of {id} has more {matId} than required to produce via an (upgraded) lathe.");
+                                Assert.That(numSpawned,
+                                    Is.LessThanOrEqualTo(actualAmount),
+                                    $"The physical composition of {id} has more {matId} than required to produce via an (upgraded) lathe.");
                         }
                     }
                 }
@@ -502,7 +524,9 @@ public sealed class MaterialArbitrageTest
                     foreach (var (matId, amount) in constructionMats)
                     {
                         if (compositionComponent.MaterialComposition.TryGetValue(matId, out var numSpawned))
-                            Assert.That(numSpawned, Is.LessThanOrEqualTo(amount), $"The physical composition of {id} has more {matId} than required to construct it.");
+                            Assert.That(numSpawned,
+                                Is.LessThanOrEqualTo(amount),
+                                $"The physical composition of {id} has more {matId} than required to construct it.");
                     }
                 }
             }
@@ -534,6 +558,7 @@ public sealed class MaterialArbitrageTest
                     entManager.DeleteEntity(ent);
                 });
             }
+
             return price;
         }
 
@@ -546,6 +571,7 @@ public sealed class MaterialArbitrageTest
                 var matProto = protoManager.Index<MaterialPrototype>(id);
                 price += num * matProto.Price;
             }
+
             return price;
         }
 #pragma warning restore CS1998
@@ -559,6 +585,7 @@ public sealed class MaterialArbitrageTest
                 var reagentProto = protoManager.Index<ReagentPrototype>(id);
                 price += num.Double() * reagentProto.PricePerUnit;
             }
+
             return price;
         }
 #pragma warning restore CS1998

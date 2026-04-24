@@ -39,21 +39,22 @@ public sealed class SandboxTest
             ContentStart = true,
             OverrideLogHandler = () => logHandler,
             ContentAssemblies = asm,
-            Options = new GameControllerOptions { LoadConfigAndUserData = false }
+            Options = new GameControllerOptions { LoadConfigAndUserData = false },
         };
 
         options.BeforeStart += () =>
         {
-            IoCManager.Resolve<IModLoader>().SetModuleBaseCallbacks(new ClientModuleTestingCallbacks
-            {
-                ClientBeforeIoC = () =>
+            IoCManager.Resolve<IModLoader>()
+                .SetModuleBaseCallbacks(new ClientModuleTestingCallbacks
                 {
-                    IoCManager.Register<IParallaxManager, DummyParallaxManager>(true);
-                    IoCManager.Resolve<ILogManager>().GetSawmill("loc").Level = LogLevel.Error;
-                    IoCManager.Resolve<IConfigurationManager>()
-                        .OnValueChanged(RTCVars.FailureLogLevel, value => logHandler.FailureLevel = value, true);
-                }
-            });
+                    ClientBeforeIoC = () =>
+                    {
+                        IoCManager.Register<IParallaxManager, DummyParallaxManager>(true);
+                        IoCManager.Resolve<ILogManager>().GetSawmill("loc").Level = LogLevel.Error;
+                        IoCManager.Resolve<IConfigurationManager>()
+                            .OnValueChanged(RTCVars.FailureLogLevel, value => logHandler.FailureLevel = value, true);
+                    },
+                });
         };
 
         using var client = new RobustIntegrationTest.ClientIntegrationInstance(options);

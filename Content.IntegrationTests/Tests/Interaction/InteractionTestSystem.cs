@@ -12,14 +12,14 @@ using Robust.Shared.GameObjects;
 namespace Content.IntegrationTests.Tests.Interaction;
 
 /// <summary>
-///     System for listening to events that get raised when construction entities change.
-///     In particular, when construction ghosts become real entities, and when existing entities get replaced with
-///     new ones.
+/// System for listening to events that get raised when construction entities change.
+/// In particular, when construction ghosts become real entities, and when existing entities get replaced with
+/// new ones.
 /// </summary>
 public sealed class InteractionTestSystem : EntitySystem
 {
-    public Dictionary<int, NetEntity> Ghosts = new();
     public Dictionary<NetEntity, NetEntity> EntChanges = new();
+    public Dictionary<int, NetEntity> Ghosts = new();
 
     public override void Initialize()
     {

@@ -31,7 +31,7 @@ namespace Content.IntegrationTests.Tests.Sprite;
 /// - Shouldn't have an item component
 /// - Is missing the required sprite information.
 /// If none of the abveo are true, it might need to be added to the list of ignored components, see
-/// <see cref="Ignored"/>
+/// <see cref="Ignored" />
 /// </remarks>
 [TestFixture]
 public sealed class PrototypeSaveTest
@@ -41,13 +41,13 @@ public sealed class PrototypeSaveTest
         // The only prototypes that should get ignored are those that REQUIRE setup to get a sprite. At that point it is
         // the responsibility of the spawner to ensure that a valid sprite is set.
         "VirtualItem",
-        "HandPlaceholder" // Frontier
+        "HandPlaceholder", // Frontier
     };
 
     [Test]
     public async Task AllItemsHaveSpritesTest()
     {
-        var settings = new PoolSettings() { Connected = true }; // client needs to be in-game
+        var settings = new PoolSettings { Connected = true }; // client needs to be in-game
         await using var pair = await PoolManager.GetServerClient(settings);
         List<EntityPrototype> badPrototypes = [];
 
@@ -68,7 +68,8 @@ public sealed class PrototypeSaveTest
         {
             foreach (var proto in badPrototypes)
             {
-                Assert.Fail($"Item prototype has no sprite: {proto.ID}. It should probably either be marked as abstract, not be an item, or have a valid sprite");
+                Assert.Fail(
+                    $"Item prototype has no sprite: {proto.ID}. It should probably either be marked as abstract, not be an item, or have a valid sprite");
             }
         });
 

@@ -25,7 +25,7 @@ public sealed partial class MindTests
         {
             Dirty = true,
             DummyTicker = false,
-            Connected = true
+            Connected = true,
         };
         await using var pair = await PoolManager.GetServerClient(settings);
 

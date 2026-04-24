@@ -36,7 +36,7 @@ public sealed class TraitorRuleTest
     [Test]
     public async Task TestTraitorObjectives()
     {
-        await using var pair = await PoolManager.GetServerClient(new PoolSettings()
+        await using var pair = await PoolManager.GetServerClient(new PoolSettings
         {
             Dirty = true,
             DummyTicker = false,
@@ -60,13 +60,13 @@ public sealed class TraitorRuleTest
         await server.WaitAssertion(() =>
         {
             Assert.That(protoMan.TryIndex<EntityPrototype>(TraitorGameRuleProtoId, out var gameRuleEnt),
-            $"Failed to lookup traitor game rule entity prototype with ID \"{TraitorGameRuleProtoId}\"!");
+                $"Failed to lookup traitor game rule entity prototype with ID \"{TraitorGameRuleProtoId}\"!");
 
             Assert.That(gameRuleEnt.TryGetComponent<GameRuleComponent>(out var gameRule, compFact),
-            $"Game rule entity {TraitorGameRuleProtoId} does not have a GameRuleComponent!");
+                $"Game rule entity {TraitorGameRuleProtoId} does not have a GameRuleComponent!");
 
             Assert.That(gameRuleEnt.TryGetComponent<AntagRandomObjectivesComponent>(out var randomObjectives, compFact),
-            $"Game rule entity {TraitorGameRuleProtoId} does not have an AntagRandomObjectivesComponent!");
+                $"Game rule entity {TraitorGameRuleProtoId} does not have an AntagRandomObjectivesComponent!");
 
             minPlayers = gameRule.MinPlayers;
             maxDifficulty = randomObjectives.MaxDifficulty;
@@ -93,7 +93,7 @@ public sealed class TraitorRuleTest
         await server.WaitPost(() =>
         {
             var gameRuleEnt = ticker.AddGameRule(TraitorGameRuleProtoId);
-            Assert.That(entMan.TryGetComponent<TraitorRuleComponent>(gameRuleEnt, out traitorRule));
+            Assert.That(entMan.TryGetComponent(gameRuleEnt, out traitorRule));
 
             // Ready up
             ticker.ToggleReadyAll(true);
@@ -128,9 +128,11 @@ public sealed class TraitorRuleTest
         // Check total objective difficulty
         Assert.That(entMan.TryGetComponent<MindComponent>(mind, out var mindComp));
         var totalDifficulty = mindComp.Objectives.Sum(o => entMan.GetComponent<ObjectiveComponent>(o).Difficulty);
-        Assert.That(totalDifficulty, Is.AtMost(maxDifficulty),
+        Assert.That(totalDifficulty,
+            Is.AtMost(maxDifficulty),
             $"MaxDifficulty exceeded! Objectives: {string.Join(", ", mindComp.Objectives.Select(o => FormatObjective(o, entMan)))}");
-        Assert.That(mindComp.Objectives, Is.Not.Empty,
+        Assert.That(mindComp.Objectives,
+            Is.Not.Empty,
             $"No objectives assigned!");
 
 

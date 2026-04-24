@@ -1,8 +1,5 @@
-using System.Collections.Generic;
-using System.Linq;
 using Content.Server.DeviceLinking.Systems;
 using Content.Shared.DeviceLinking;
-using Content.Shared.Prototypes;
 using Robust.Shared.GameObjects;
 using Robust.Shared.Map;
 using Robust.Shared.Maths;
@@ -25,7 +22,7 @@ public sealed class DeviceLinkingTest
 ";
 
     /// <summary>
-    /// Spawns every entity that has a <see cref="DeviceLinkSinkComponent"/>
+    /// Spawns every entity that has a <see cref="DeviceLinkSinkComponent" />
     /// and sends a signal to every port to make sure nothing causes an error.
     /// </summary>
     [Test]
@@ -68,7 +65,8 @@ public sealed class DeviceLinkingTest
 
                         // Spawn the tester
                         var sourceEnt = server.EntMan.SpawnEntity(PortTesterProtoId, coord);
-                        Assert.That(server.EntMan.TryGetComponent<DeviceLinkSourceComponent>(sourceEnt, out var sourceComp),
+                        Assert.That(
+                            server.EntMan.TryGetComponent<DeviceLinkSourceComponent>(sourceEnt, out var sourceComp),
                             $"Tester prototype does not have a DeviceLinkSourceComponent!");
 
                         // Create a link from the tester's output to the target port on the sink

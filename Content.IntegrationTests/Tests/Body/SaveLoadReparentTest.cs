@@ -75,13 +75,9 @@ public sealed class SaveLoadReparentTest
                     var parent = bodySystem.GetParentPartOrNull(id);
                     Assert.That(parent, Is.Not.EqualTo(default(EntityUid)));
                     if (!bodySystem.IsPartRoot(component.Body.Value, id, null, component))
-                    {
                         Assert.That(parent, Is.Not.Null);
-                    }
                     else
-                    {
                         Assert.That(parent, Is.Null);
-                    }
                 });
 
                 foreach (var (slotId, slot) in component.Children)
@@ -109,19 +105,23 @@ public sealed class SaveLoadReparentTest
             }
 
             // Converts an entity query enumerator to an enumerable.
-            static IEnumerable<(EntityUid Uid, TComp Comp)> EnumerateQueryEnumerator<TComp>(EntityQueryEnumerator<TComp> query)
+            static IEnumerable<(EntityUid Uid, TComp Comp)> EnumerateQueryEnumerator<TComp>(
+                EntityQueryEnumerator<TComp> query)
                 where TComp : Component
             {
                 while (query.MoveNext(out var uid, out var comp))
+                {
                     yield return (uid, comp);
+                }
             }
 
             Assert.That(
                 EnumerateQueryEnumerator(
-                    entities.EntityQueryEnumerator<BodyComponent>()
-                ).Where((e) =>
-                    entities.GetComponent<MetaDataComponent>(e.Uid).EntityPrototype!.Name == "HumanBodyDummy"
-                ),
+                        entities.EntityQueryEnumerator<BodyComponent>()
+                    )
+                    .Where(e =>
+                        entities.GetComponent<MetaDataComponent>(e.Uid).EntityPrototype!.Name == "HumanBodyDummy"
+                    ),
                 Is.Not.Empty
             );
 
@@ -134,9 +134,11 @@ public sealed class SaveLoadReparentTest
 
             var query = EnumerateQueryEnumerator(
                     entities.EntityQueryEnumerator<BodyComponent>()
-                ).Where((e) =>
+                )
+                .Where(e =>
                     entities.GetComponent<MetaDataComponent>(e.Uid).EntityPrototype!.Name == "HumanBodyDummy"
-                ).ToArray();
+                )
+                .ToArray();
 
             Assert.That(query, Is.Not.Empty);
             foreach (var (uid, body) in query)
