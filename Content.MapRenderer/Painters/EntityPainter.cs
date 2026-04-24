@@ -18,7 +18,6 @@ using System.Collections.Generic;
 using System.Numerics;
 using Robust.Client.GameObjects;
 using Robust.Client.Graphics;
-using Robust.Client.ResourceManagement;
 using Robust.Shared.ContentPack;
 using Robust.Shared.GameObjects;
 using Robust.Shared.Timing;
@@ -31,10 +30,10 @@ namespace Content.MapRenderer.Painters;
 
 public sealed class EntityPainter
 {
-    private readonly IResourceManager _resManager;
+    private readonly Image _errorImage;
 
     private readonly Dictionary<(string path, string state), Image> _images;
-    private readonly Image _errorImage;
+    private readonly IResourceManager _resManager;
 
     private readonly IEntityManager _sEntityManager;
     private readonly SpriteSystem _sprite;
@@ -64,36 +63,29 @@ public sealed class EntityPainter
             Run(canvas, entity, xformSystem, customOffset);
         }
 
-        Console.WriteLine($"{nameof(EntityPainter)} painted {entities.Count} entities in {(int)stopwatch.Elapsed.TotalMilliseconds} ms");
+        Console.WriteLine(
+            $"{nameof(EntityPainter)} painted {entities.Count} entities in {(int) stopwatch.Elapsed.TotalMilliseconds} ms");
     }
 
     public void Run(Image canvas, EntityData entity, SharedTransformSystem xformSystem, Vector2 customOffset = default)
     {
         if (!entity.Sprite.Visible || entity.Sprite.ContainerOccluded)
-        {
             return;
-        }
 
         var worldRotation = xformSystem.GetWorldRotation(entity.Owner);
         foreach (var layer in entity.Sprite.AllLayers)
         {
             if (!layer.Visible)
-            {
                 continue;
-            }
 
             if (!layer.RsiState.IsValid)
-            {
                 continue;
-            }
 
             var rsi = layer.ActualRsi;
             Image image;
 
             if (rsi == null || !rsi.TryGetState(layer.RsiState, out var state))
-            {
                 image = _errorImage;
-            }
             else
             {
                 var key = (rsi.Path!.ToString(), state.StateId.Name!);
@@ -109,7 +101,11 @@ public sealed class EntityPainter
 
             image = image.CloneAs<Rgba32>();
 
-            (int, int, int, int) GetRsiFrame(RSI? rsi, Image image, EntityData entity, ISpriteLayer layer, int direction)
+            (int, int, int, int) GetRsiFrame(RSI? rsi,
+                Image image,
+                EntityData entity,
+                ISpriteLayer layer,
+                int direction)
             {
                 if (rsi is null)
                     return (0, 0, EyeManager.PixelsPerMeter, EyeManager.PixelsPerMeter);
@@ -117,17 +113,17 @@ public sealed class EntityPainter
                 var statesX = image.Width / rsi.Size.X;
                 var statesY = image.Height / rsi.Size.Y;
                 var stateCount = statesX * statesY;
-                var frames = stateCount / _sprite.LayerGetDirectionCount((SpriteComponent.Layer)layer);
+                var frames = stateCount / _sprite.LayerGetDirectionCount((SpriteComponent.Layer) layer);
                 var target = direction * frames;
                 var targetY = target / statesX;
                 var targetX = target % statesX;
                 return (targetX * rsi.Size.X, targetY * rsi.Size.Y, rsi.Size.X, rsi.Size.Y);
             }
 
-            var dir = _sprite.LayerGetDirectionCount((SpriteComponent.Layer)layer) switch
+            var dir = _sprite.LayerGetDirectionCount((SpriteComponent.Layer) layer) switch
             {
                 0 => 0,
-                _ => (int)layer.EffectiveDirection(worldRotation)
+                _ => (int) layer.EffectiveDirection(worldRotation),
             };
 
             var (x, y, width, height) = GetRsiFrame(rsi, image, entity, layer, dir);
@@ -135,17 +131,17 @@ public sealed class EntityPainter
             var rect = new Rectangle(x, y, width, height);
             if (!new Rectangle(Point.Empty, image.Size).Contains(rect))
             {
-                Console.WriteLine($"Invalid layer {rsi!.Path}/{layer.RsiState.Name}.png for entity {_sEntityManager.ToPrettyString(entity.Owner)} at ({entity.X}, {entity.Y})");
+                Console.WriteLine(
+                    $"Invalid layer {rsi!.Path}/{layer.RsiState.Name}.png for entity {_sEntityManager.ToPrettyString(entity.Owner)} at ({entity.X}, {entity.Y})");
                 return;
             }
 
             image.Mutate(o => o.Crop(rect));
 
             var spriteRotation = 0f;
-            if (!entity.Sprite.NoRotation && !entity.Sprite.SnapCardinals && _sprite.LayerGetDirectionCount((SpriteComponent.Layer)layer) == 1)
-            {
-                spriteRotation = (float)worldRotation.Degrees;
-            }
+            if (!entity.Sprite.NoRotation && !entity.Sprite.SnapCardinals &&
+                _sprite.LayerGetDirectionCount((SpriteComponent.Layer) layer) == 1)
+                spriteRotation = (float) worldRotation.Degrees;
 
             var colorMix = entity.Sprite.Color * layer.Color;
             var imageColor = Color.FromRgba(colorMix.RByte, colorMix.GByte, colorMix.BByte, colorMix.AByte);
@@ -153,16 +149,16 @@ public sealed class EntityPainter
             coloredImage.Mutate(o => o.BackgroundColor(imageColor));
 
             var (imgX, imgY) = rsi?.Size ?? (EyeManager.PixelsPerMeter, EyeManager.PixelsPerMeter);
-            var offsetX = (int)(entity.Sprite.Offset.X + customOffset.X) * EyeManager.PixelsPerMeter;
-            var offsetY = (int)(entity.Sprite.Offset.Y + customOffset.X) * EyeManager.PixelsPerMeter;
+            var offsetX = (int) (entity.Sprite.Offset.X + customOffset.X) * EyeManager.PixelsPerMeter;
+            var offsetY = (int) (entity.Sprite.Offset.Y + customOffset.X) * EyeManager.PixelsPerMeter;
             image.Mutate(o => o
                 .DrawImage(coloredImage, PixelColorBlendingMode.Multiply, PixelAlphaCompositionMode.SrcAtop, 1)
                 .Resize(imgX, imgY)
                 .Flip(FlipMode.Vertical)
                 .Rotate(spriteRotation));
 
-            var pointX = (int)entity.X + offsetX - imgX / 2;
-            var pointY = (int)entity.Y + offsetY - imgY / 2;
+            var pointX = (int) entity.X + offsetX - imgX / 2;
+            var pointY = (int) entity.Y + offsetY - imgY / 2;
             canvas.Mutate(o => o.DrawImage(image, new Point(pointX, pointY), 1));
         }
     }

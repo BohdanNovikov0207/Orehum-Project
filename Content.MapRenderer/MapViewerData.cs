@@ -25,12 +25,6 @@ public sealed class MapViewerData
 
 public sealed class GridLayer
 {
-    public string GridId { get; set; } = string.Empty;
-    public Position Offset { get; set; }
-    public bool Tiled { get; set; } = false;
-    public string Url { get; set; }
-    public Extent Extent { get; set; }
-
     public GridLayer(RenderedGridImage<Rgba32> gridImage, string url)
     {
         //Get the internal _uid as string
@@ -41,6 +35,12 @@ public sealed class GridLayer
         Extent = new Extent(gridImage.Image.Width, gridImage.Image.Height);
         Url = url;
     }
+
+    public string GridId { get; set; } = string.Empty;
+    public Position Offset { get; set; }
+    public bool Tiled { get; set; } = false;
+    public string Url { get; set; }
+    public Extent Extent { get; set; }
 }
 
 public sealed class LayerGroup
@@ -52,9 +52,8 @@ public sealed class LayerGroup
     public GroupSource Source { get; set; } = new();
     public List<Layer> Layers { get; set; } = new();
 
-    public static LayerGroup DefaultParallax(IResourceManager resourceManager, ParallaxOutput output)
-    {
-        return new LayerGroup
+    public static LayerGroup DefaultParallax(IResourceManager resourceManager, ParallaxOutput output) =>
+        new()
         {
             Scale = new Position(0.1f, 0.1f),
             Source = new GroupSource
@@ -72,17 +71,16 @@ public sealed class LayerGroup
                 {
                     Url = output.ReferenceResourceFile(resourceManager, new ResPath("/Textures/Parallaxes/layer2.png")),
                     Composition = "lighter",
-                    ParallaxScale = new Position(0.2f, 0.2f)
+                    ParallaxScale = new Position(0.2f, 0.2f),
                 },
                 new()
                 {
                     Url = output.ReferenceResourceFile(resourceManager, new ResPath("/Textures/Parallaxes/layer3.png")),
                     Composition = "lighter",
-                    ParallaxScale = new Position(0.3f, 0.3f)
-                }
-            }
+                    ParallaxScale = new Position(0.3f, 0.3f),
+                },
+            },
         };
-    }
 }
 
 public sealed class GroupSource
@@ -102,10 +100,13 @@ public readonly struct Extent
 {
     [JsonInclude]
     public readonly float X1;
+
     [JsonInclude]
     public readonly float Y1;
+
     [JsonInclude]
     public readonly float X2;
+
     [JsonInclude]
     public readonly float Y2;
 
@@ -138,6 +139,7 @@ public readonly struct Position
 {
     [JsonInclude]
     public readonly float X;
+
     [JsonInclude]
     public readonly float Y;
 
@@ -153,13 +155,7 @@ public readonly struct Position
         Y = vector2.Y;
     }
 
-    public static Position Zero()
-    {
-        return new Position(0, 0);
-    }
+    public static Position Zero() => new(0, 0);
 
-    public static Position One()
-    {
-        return new Position(0, 0);
-    }
+    public static Position One() => new(0, 0);
 }

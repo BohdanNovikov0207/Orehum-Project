@@ -57,11 +57,11 @@ var hasHeaderRecord = false;
 var mode = CsvMode.RFC4180;
 var escape = '\'';
 Console.WriteLine($"""
-Delimiter: {delimiter}
-HasHeaderRecord: {hasHeaderRecord}
-Mode: {mode}
-Escape Character: {escape}
-""");
+    Delimiter: {delimiter}
+    HasHeaderRecord: {hasHeaderRecord}
+    Mode: {mode}
+    Escape Character: {escape}
+    """);
 
 Console.WriteLine("Enter the full path to the .csv file containing the Patreon webhook data:");
 var filePath = Console.ReadLine();
@@ -87,7 +87,7 @@ var patrons = new Dictionary<Guid, Patron>();
 var jsonOptions = new JsonSerializerOptions
 {
     IncludeFields = true,
-    NumberHandling = JsonNumberHandling.AllowReadingFromString
+    NumberHandling = JsonNumberHandling.AllowReadingFromString,
 };
 
 // This assumes that the rows are already sorted by id
@@ -104,7 +104,7 @@ foreach (var record in reader.GetRecords<Row>())
     var tiers = content.Data.Relationships.CurrentlyEntitledTiers.Data;
     if (tiers.Count == 0)
         continue;
-    else if (tiers.Count > 1)
+    if (tiers.Count > 1)
         throw new ArgumentException("Found more than one tier");
 
     var tier = tiers[0];
@@ -146,9 +146,9 @@ foreach (var record in reader.GetRecords<Row>())
 var patronList = patrons.Values.ToList();
 patronList.Sort((a, b) => a.Start.CompareTo(b.Start));
 var yaml = patronList.Select(p => $"""
-- Name: "{p.FullName.Replace("\"", "\\\"")}"
-  Tier: {p.TierName}
-""");
+    - Name: "{p.FullName.Replace("\"", "\\\"")}"
+      Tier: {p.TierName}
+    """);
 var output = string.Join(NewLine, yaml) + NewLine;
 File.WriteAllText(patronsPath, output);
 Console.WriteLine($"Updated {patronsPath} with {patronList.Count} patrons.");

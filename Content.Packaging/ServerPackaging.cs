@@ -105,15 +105,6 @@ public static class ServerPackaging
         new PlatformReg("freebsd-x64", "FreeBSD", false),
     };
 
-    private static List<string> PlatformRids => Platforms
-        .Select(o => o.Rid)
-        .ToList();
-
-    private static List<string> PlatformRidsDefault => Platforms
-        .Where(o => o.BuildByDefault)
-        .Select(o => o.Rid)
-        .ToList();
-
     private static readonly List<string> CoreServerContentAssemblies = new()
     {
         "Content.Server.Database",
@@ -151,15 +142,26 @@ public static class ServerPackaging
         "ru",
         "tr",
         "zh-Hans",
-        "zh-Hant"
+        "zh-Hant",
     };
 
-    public static async Task PackageServer(bool skipBuild, bool hybridAcz, IPackageLogger logger, string configuration, List<string>? platforms = null)
+    private static List<string> PlatformRids => Platforms
+        .Select(o => o.Rid)
+        .ToList();
+
+    private static List<string> PlatformRidsDefault => Platforms
+        .Where(o => o.BuildByDefault)
+        .Select(o => o.Rid)
+        .ToList();
+
+    public static async Task PackageServer(bool skipBuild,
+        bool hybridAcz,
+        IPackageLogger logger,
+        string configuration,
+        List<string>? platforms = null)
     {
         if (platforms == null)
-        {
             platforms ??= PlatformRidsDefault;
-        }
 
         if (hybridAcz)
         {
@@ -180,7 +182,11 @@ public static class ServerPackaging
         }
     }
 
-    private static async Task BuildPlatform(PlatformReg platform, bool skipBuild, bool hybridAcz, string configuration, IPackageLogger logger)
+    private static async Task BuildPlatform(PlatformReg platform,
+        bool skipBuild,
+        bool hybridAcz,
+        string configuration,
+        IPackageLogger logger)
     {
         logger.Info($"Building project for {platform.TargetOs}...");
 
@@ -203,8 +209,8 @@ public static class ServerPackaging
                         $"/p:TargetOs={platform.TargetOs}",
                         "/t:Rebuild",
                         "/p:FullRelease=true",
-                        "/m"
-                    }
+                        "/m",
+                    },
                 });
             }
 
@@ -216,7 +222,9 @@ public static class ServerPackaging
         var sw = RStopwatch.StartNew();
         {
             await using var zipFile =
-                File.Open(Path.Combine("release", $"SS14.Server_{platform.Rid}.zip"), FileMode.Create, FileAccess.ReadWrite);
+                File.Open(Path.Combine("release", $"SS14.Server_{platform.Rid}.zip"),
+                    FileMode.Create,
+                    FileAccess.ReadWrite);
             using var zip = new ZipArchive(zipFile, ZipArchiveMode.Update);
             var writer = new AssetPassZipWriter(zip);
 
@@ -241,9 +249,7 @@ public static class ServerPackaging
             {
                 var projectPath = Path.Combine(dir, $"{dirName}.csproj");
                 if (File.Exists(projectPath))
-                {
                     serverModules.Add(dirName);
-                }
             }
         }
 
@@ -265,7 +271,7 @@ public static class ServerPackaging
             var dirName = Path.GetFileName(dir);
 
             // Throw out anything that does not end with ".Server" or ".Shared"
-            if ((!dirName.EndsWith(".Server") && !dirName.EndsWith(".Shared")) || modules.Contains(dirName))
+            if (!dirName.EndsWith(".Server") && !dirName.EndsWith(".Shared") || modules.Contains(dirName))
                 continue;
             var projectPath = Path.Combine(dir, $"{dirName}.csproj");
             if (File.Exists(projectPath))
@@ -275,8 +281,7 @@ public static class ServerPackaging
         return modules;
     }
 
-    private static async Task PublishClientServer(string runtime, string targetOs, string configuration)
-    {
+    private static async Task PublishClientServer(string runtime, string targetOs, string configuration) =>
         await ProcessHelpers.RunCheck(new ProcessStartInfo
         {
             FileName = "dotnet",
@@ -289,10 +294,9 @@ public static class ServerPackaging
                 $"/p:TargetOs={targetOs}",
                 "/p:FullRelease=True",
                 "/m",
-                "RobustToolbox/Robust.Server/Robust.Server.csproj"
-            }
+                "RobustToolbox/Robust.Server/Robust.Server.csproj",
+            },
         });
-    }
 
     private static async Task WriteServerResources(
         PlatformReg platform,
@@ -325,16 +329,17 @@ public static class ServerPackaging
         {
             var fileName = Path.GetFileNameWithoutExtension(fullPath);
 
-            if (!ServerNotExtraAssemblies.Any(o => fileName.StartsWith(o)) && ServerExtraAssemblies.Any(o => fileName.StartsWith(o)))
-            {
+            if (!ServerNotExtraAssemblies.Any(o => fileName.StartsWith(o)) &&
+                ServerExtraAssemblies.Any(o => fileName.StartsWith(o)))
                 contentAssemblies.Add(fileName);
-            }
         }
 
         await RobustSharedPackaging.DoResourceCopy(
-            Path.Combine("RobustToolbox", "bin", "Server",
-            platform.Rid,
-            "publish"),
+            Path.Combine("RobustToolbox",
+                "bin",
+                "Server",
+                platform.Rid,
+                "publish"),
             inputPassCore,
             BinSkipFolders,
             cancel: cancel);
@@ -349,9 +354,7 @@ public static class ServerPackaging
         await RobustServerPackaging.WriteServerResources(contentDir, inputPassResources, cancel);
 
         if (hybridAcz)
-        {
             inputPassCore.InjectFileFromDisk("Content.Client.zip", Path.Combine("release", "SS14.Client.zip"));
-        }
 
         inputPassCore.InjectFinished();
         inputPassResources.InjectFinished();

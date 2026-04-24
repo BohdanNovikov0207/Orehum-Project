@@ -9,12 +9,12 @@ namespace Content.PatreonParser;
 
 public sealed class Included
 {
+    [JsonPropertyName("attributes")]
+    public Attributes Attributes = default!;
+
     [JsonPropertyName("id")]
     public int Id;
 
     [JsonPropertyName("type")]
     public string Type = default!;
-
-    [JsonPropertyName("attributes")]
-    public Attributes Attributes = default!;
 }

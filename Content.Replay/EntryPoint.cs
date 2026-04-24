@@ -17,9 +17,9 @@ namespace Content.Replay;
 public sealed class EntryPoint : GameClient
 {
     [Dependency] private readonly IBaseClient _client = default!;
-    [Dependency] private readonly IStateManager _stateMan = default!;
-    [Dependency] private readonly ContentReplayPlaybackManager _contentReplayPlaybackMan = default!;
     [Dependency] private readonly IClientConGroupController _conGrp = default!;
+    [Dependency] private readonly ContentReplayPlaybackManager _contentReplayPlaybackMan = default!;
+    [Dependency] private readonly IStateManager _stateMan = default!;
 
     public override void Init()
     {

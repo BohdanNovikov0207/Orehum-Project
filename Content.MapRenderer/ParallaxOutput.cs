@@ -12,9 +12,9 @@ public sealed class ParallaxOutput
 {
     public const string OutputDirectory = "_parallax";
 
-    public readonly HashSet<ResPath> FilesToCopy = [];
-
     private readonly string _outputPath;
+
+    public readonly HashSet<ResPath> FilesToCopy = [];
 
     /// <summary>
     /// Helper class for collecting the files used for parallax output

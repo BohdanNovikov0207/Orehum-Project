@@ -24,7 +24,10 @@ public static class ClientPackaging
     /// Be advised this can be called from server packaging during a HybridACZ build.
     /// Be also advised this goes against god and nature
     /// </summary>
-    public static async Task PackageClient(bool skipBuild, string configuration, IPackageLogger logger, string path = ".")
+    public static async Task PackageClient(bool skipBuild,
+        string configuration,
+        IPackageLogger logger,
+        string path = ".")
     {
         logger.Info("Building client...");
 
@@ -46,8 +49,8 @@ public static class ClientPackaging
                         "/v:m",
                         "/t:Rebuild",
                         "/p:FullRelease=true",
-                        "/m"
-                    }
+                        "/m",
+                    },
                 });
             }
         }
@@ -82,9 +85,7 @@ public static class ClientPackaging
             {
                 var projectPath = Path.Combine(dir, $"{dirName}.csproj");
                 if (File.Exists(projectPath))
-                {
                     clientProjects.Add(projectPath);
-                }
             }
         }
 
@@ -97,7 +98,8 @@ public static class ClientPackaging
         if (string.IsNullOrEmpty(path))
             path = ".";
 
-        var modules = new List<string> { "Content.Client", "Content.Shared", "Content.Shared.Database", "Content.ModuleManager" };
+        var modules = new List<string>
+            { "Content.Client", "Content.Shared", "Content.Shared.Database", "Content.ModuleManager" };
         // Goobstation - Modular Packaging
         modules.AddRange(ModuleDiscovery.DiscoverModules(path)
             .Where(m => m.Type is not ModuleType.Server)

@@ -10,6 +10,21 @@ namespace Content.Packaging;
 
 public sealed class CommandLineArgs
 {
+    private CommandLineArgs(
+        bool client,
+        bool skipBuild,
+        bool wipeRelease,
+        bool hybridAcz,
+        List<string>? platforms,
+        string configuration)
+    {
+        Client = client;
+        SkipBuild = skipBuild;
+        WipeRelease = wipeRelease;
+        HybridAcz = hybridAcz;
+        Platforms = platforms;
+        Configuration = configuration;
+    }
     // PJB forgib me
 
     /// <summary>
@@ -63,33 +78,21 @@ public sealed class CommandLineArgs
             if (i == 0)
             {
                 if (arg == "client")
-                {
                     client = true;
-                }
                 else if (arg == "server")
-                {
                     client = false;
-                }
                 else
-                {
                     return false;
-                }
 
                 continue;
             }
 
             if (arg == "--skip-build")
-            {
                 skipBuild = true;
-            }
             else if (arg == "--no-wipe-release")
-            {
                 wipeRelease = false;
-            }
             else if (arg == "--hybrid-acz")
-            {
                 hybridAcz = true;
-            }
             else if (arg == "--platform")
             {
                 if (!enumerator.MoveNext())
@@ -117,9 +120,7 @@ public sealed class CommandLineArgs
                 return false;
             }
             else
-            {
                 Console.WriteLine("Unknown argument: {0}", arg);
-            }
         }
 
         if (client == null)
@@ -132,8 +133,7 @@ public sealed class CommandLineArgs
         return true;
     }
 
-    private static void PrintHelp()
-    {
+    private static void PrintHelp() =>
         Console.WriteLine(@"
 Usage: Content.Packaging [client/server] [options]
 
@@ -144,21 +144,4 @@ Options:
   --platform            Platform for server builds. Default will output several x64 targets.
   --configuration       Configuration to use for building the server (Release, Debug, Tools). Default is Release.
 ");
-    }
-
-    private CommandLineArgs(
-        bool client,
-        bool skipBuild,
-        bool wipeRelease,
-        bool hybridAcz,
-        List<string>? platforms,
-        string configuration)
-    {
-        Client = client;
-        SkipBuild = skipBuild;
-        WipeRelease = wipeRelease;
-        HybridAcz = hybridAcz;
-        Platforms = platforms;
-        Configuration = configuration;
-    }
 }

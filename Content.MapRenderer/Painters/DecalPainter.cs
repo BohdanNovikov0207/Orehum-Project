@@ -14,7 +14,6 @@ using System.IO;
 using System.Numerics;
 using Content.Shared.Decals;
 using Robust.Client.Graphics;
-using Robust.Client.ResourceManagement;
 using Robust.Client.Utility;
 using Robust.Shared.ContentPack;
 using Robust.Shared.Prototypes;
@@ -29,11 +28,10 @@ namespace Content.MapRenderer.Painters;
 
 public sealed class DecalPainter
 {
+    private readonly Dictionary<string, SpriteSpecifier> _decalTextures = new();
     private readonly IResourceManager _resManager;
 
     private readonly IPrototypeManager _sPrototypeManager;
-
-    private readonly Dictionary<string, SpriteSpecifier> _decalTextures = new();
 
     public DecalPainter(ClientIntegrationInstance client, ServerIntegrationInstance server)
     {
@@ -61,7 +59,8 @@ public sealed class DecalPainter
             Run(canvas, decal, customOffset);
         }
 
-        Console.WriteLine($"{nameof(DecalPainter)} painted {decals.Length} decals in {(int) stopwatch.Elapsed.TotalMilliseconds} ms");
+        Console.WriteLine(
+            $"{nameof(DecalPainter)} painted {decals.Length} decals in {(int) stopwatch.Elapsed.TotalMilliseconds} ms");
     }
 
     private void Run(Image canvas, DecalData data, Vector2 customOffset = default)
@@ -75,16 +74,12 @@ public sealed class DecalPainter
 
         Stream stream;
         if (sprite is SpriteSpecifier.Texture texture)
-        {
             stream = _resManager.ContentFileRead(texture.TexturePath);
-        }
         else if (sprite is SpriteSpecifier.Rsi rsi)
         {
             var path = $"{rsi.RsiPath}/{rsi.RsiState}.png";
             if (!path.StartsWith("/Textures"))
-            {
                 path = $"/Textures/{path}";
-            }
 
             stream = _resManager.ContentFileRead(path);
         }
@@ -98,7 +93,8 @@ public sealed class DecalPainter
 
         image.Mutate(o => o.Rotate((float) -decal.Angle.Degrees));
         var coloredImage = new Image<Rgba32>(image.Width, image.Height);
-        Color color = decal.Color?.WithAlpha(byte.MaxValue).ConvertImgSharp() ?? Color.White; // remove the encoded color alpha here
+        Color color = decal.Color?.WithAlpha(byte.MaxValue).ConvertImgSharp() ??
+                      Color.White; // remove the encoded color alpha here
         var alpha = decal.Color?.A ?? 1; // get the alpha separately so we can use it in DrawImage
         coloredImage.Mutate(o => o.BackgroundColor(color));
 

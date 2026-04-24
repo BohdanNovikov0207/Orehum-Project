@@ -31,25 +31,25 @@ namespace Content.Replay.Menu;
 /// </summary>
 public sealed class ReplayMainScreen : State
 {
-    [Dependency] private readonly IResourceManager _resMan = default!;
-    [Dependency] private readonly IComponentFactory _factory = default!;
     [Dependency] private readonly IConfigurationManager _cfg = default!;
-    [Dependency] private readonly IReplayLoadManager _loadMan = default!;
-    [Dependency] private readonly IResourceCache _resourceCache = default!;
     [Dependency] private readonly IGameController _controllerProxy = default!;
+    [Dependency] private readonly IComponentFactory _factory = default!;
+    [Dependency] private readonly IReplayLoadManager _loadMan = default!;
+    [Dependency] private readonly ContentReplayPlaybackManager _replayMan = default!;
+    [Dependency] private readonly IResourceManager _resMan = default!;
+    [Dependency] private readonly IResourceCache _resourceCache = default!;
     [Dependency] private readonly IClientRobustSerializer _serializer = default!;
     [Dependency] private readonly IUserInterfaceManager _userInterfaceManager = default!;
-    [Dependency] private readonly ContentReplayPlaybackManager _replayMan = default!;
+    private ResPath _directory;
 
     private ReplayMainMenuControl _mainMenuControl = default!;
-    private SelectReplayWindow? _selectWindow;
-    private ResPath _directory;
-    private List<(string Name, ResPath Path)> _replays = new();
+    private readonly List<(string Name, ResPath Path)> _replays = new();
     private ResPath? _selected;
+    private SelectReplayWindow? _selectWindow;
 
     protected override void Startup()
     {
-        _mainMenuControl = new(_resourceCache);
+        _mainMenuControl = new ReplayMainMenuControl(_resourceCache);
         _userInterfaceManager.StateRoot.AddChild(_mainMenuControl);
 
         _mainMenuControl.SelectButton.OnPressed += OnSelectPressed;
@@ -82,7 +82,8 @@ public sealed class ReplayMainScreen : State
         }
 
         using var fileReader = new ReplayFileReaderZip(
-            new ZipArchive(_resMan.UserData.OpenRead(replay)), ReplayZipFolder);
+            new ZipArchive(_resMan.UserData.OpenRead(replay)),
+            ReplayZipFolder);
         if (!_resMan.UserData.Exists(replay)
             || _loadMan.LoadYamlMetadata(fileReader) is not { } data)
         {
@@ -149,9 +150,7 @@ public sealed class ReplayMainScreen : State
         var typeHash = hashNode.Value;
         _mainMenuControl.LoadButton.Disabled = false;
         if (Convert.FromHexString(typeHash).SequenceEqual(_serializer.GetSerializableTypesHash()))
-        {
             typeHash = $"[color=green]{typeHash[..16]}[/color]";
-        }
         else
         {
             typeHash = $"[color=red]{typeHash[..16]}[/color]";
@@ -186,7 +185,10 @@ public sealed class ReplayMainScreen : State
         }
 
         // Strip milliseconds. Apparently there is no general format string that suppresses milliseconds.
-        duration = new((int)Math.Floor(duration.TotalDays), duration.Hours, duration.Minutes, duration.Seconds);
+        duration = new TimeSpan((int) Math.Floor(duration.TotalDays),
+            duration.Hours,
+            duration.Minutes,
+            duration.Seconds);
 
         data.TryGet<ValueDataNode>(MetaKeyName, out var nameNode);
         var name = nameNode?.Value ?? string.Empty;
@@ -221,7 +223,8 @@ public sealed class ReplayMainScreen : State
 
         _replayMan.LastLoad = (_selected.Value, ReplayZipFolder);
         var fileReader = new ReplayFileReaderZip(
-            new ZipArchive(_resMan.UserData.OpenRead(_selected.Value)), ReplayZipFolder);
+            new ZipArchive(_resMan.UserData.OpenRead(_selected.Value)),
+            ReplayZipFolder);
         _loadMan.LoadAndStartReplay(fileReader);
     }
 
@@ -235,7 +238,8 @@ public sealed class ReplayMainScreen : State
             try
             {
                 using var fileReader = new ReplayFileReaderZip(
-                    new ZipArchive(_resMan.UserData.OpenRead(file)), ReplayZipFolder);
+                    new ZipArchive(_resMan.UserData.OpenRead(file)),
+                    ReplayZipFolder);
 
                 var data = _loadMan.LoadYamlMetadata(fileReader);
                 if (data == null)
@@ -243,7 +247,6 @@ public sealed class ReplayMainScreen : State
 
                 var name = data.Get<ValueDataNode>(MetaKeyName).Value;
                 _replays.Add((name, file));
-
             }
             catch
             {
@@ -274,6 +277,7 @@ public sealed class ReplayMainScreen : State
             SelectReplay(null);
             return;
         }
+
         _selectWindow?.UpdateSelected(replay);
     }
 
@@ -283,20 +287,15 @@ public sealed class ReplayMainScreen : State
         _selectWindow?.Dispose();
     }
 
-    private void OptionsButtonPressed(BaseButton.ButtonEventArgs args)
-    {
+    private void OptionsButtonPressed(BaseButton.ButtonEventArgs args) =>
         _userInterfaceManager.GetUIController<OptionsUIController>().ToggleWindow();
-    }
 
-    private void QuitButtonPressed(BaseButton.ButtonEventArgs args)
-    {
-        _controllerProxy.Shutdown();
-    }
+    private void QuitButtonPressed(BaseButton.ButtonEventArgs args) => _controllerProxy.Shutdown();
 
     private void OnSelectPressed(BaseButton.ButtonEventArgs args)
     {
         RefreshReplays();
-        _selectWindow ??= new(this);
+        _selectWindow ??= new SelectReplayWindow(this);
         _selectWindow.Repopulate(_replays);
         _selectWindow.UpdateSelected(_selected);
         _selectWindow.OpenCentered();

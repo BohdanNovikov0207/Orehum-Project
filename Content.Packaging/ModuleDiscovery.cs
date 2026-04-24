@@ -5,8 +5,6 @@ namespace Content.Packaging;
 
 public static class ModuleDiscovery
 {
-    public record ModuleInfo(string Name, string ProjectPath, ModuleType Type);
-
     public static IEnumerable<ModuleInfo> DiscoverModules(string path = ".")
     {
         var discoveredAssemblies = new HashSet<string>();
@@ -33,7 +31,7 @@ public static class ModuleDiscovery
 
             // Safely get module type with fallback
             var moduleType = attr.Signature.FixedArguments.Count > 0
-                ? (ModuleType)(attr.Signature.FixedArguments[0].Element ?? 0)
+                ? (ModuleType) (attr.Signature.FixedArguments[0].Element ?? 0)
                 : ModuleType.Shared; // Default fallback
 
             if (dirName != null)
@@ -46,4 +44,6 @@ public static class ModuleDiscovery
             }
         }
     }
+
+    public record ModuleInfo(string Name, string ProjectPath, ModuleType Type);
 }

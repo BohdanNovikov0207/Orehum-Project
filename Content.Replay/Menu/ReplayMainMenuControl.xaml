@@ -10,22 +10,22 @@ SPDX-License-Identifier: MIT
          xmlns:controls="clr-namespace:Content.Client.UserInterface.Controls;assembly=Content.Client"
          xmlns:style="clr-namespace:Content.Client.Stylesheets;assembly=Content.Client"
          xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml">
-    <pllax:ParallaxControl SpeedX="20"/>
+    <pllax:ParallaxControl SpeedX="20" />
     <LayoutContainer>
         <BoxContainer Name="VBox" Orientation="Vertical" StyleIdentifier="mainMenuVBox">
             <TextureRect Name="Logo" Stretch="KeepCentered" />
-            <Label Name="Subtext" Access="Public" Text="{Loc 'replay-menu-subtext'}"/>
+            <Label Name="Subtext" Access="Public" Text="{Loc 'replay-menu-subtext'}" />
             <Button Name="LoadButton"
                     Access="Public"
                     Text="{Loc 'replay-menu-load'}"
                     TextAlign="Center"
                     StyleIdentifier="mainMenu"
-                    Disabled="True"/>
+                    Disabled="True" />
             <Button Name="SelectButton"
                     Access="Public"
                     Text="{Loc 'replay-menu-select'}"
                     TextAlign="Center"
-                    StyleIdentifier="mainMenu"/>
+                    StyleIdentifier="mainMenu" />
             <Button Name="FolderButton"
                     Access="Public"
                     Text="{Loc 'replay-menu-open'}"
@@ -50,9 +50,9 @@ SPDX-License-Identifier: MIT
                         Margin="16"
                         MinSize="300 150">
             <BoxContainer Orientation="Vertical" Align="Begin" Margin="8">
-                <Label Text="{Loc 'replay-info-title'}" Margin="4" HorizontalAlignment="Center"/>
-                <controls:HLine Color="{x:Static style:StyleNano.NanoGold}" Thickness="4"/>
-                <RichTextLabel Access="Public" Name="Info"/>
+                <Label Text="{Loc 'replay-info-title'}" Margin="4" HorizontalAlignment="Center" />
+                <controls:HLine Color="{x:Static style:StyleNano.NanoGold}" Thickness="4" />
+                <RichTextLabel Access="Public" Name="Info" />
             </BoxContainer>
         </PanelContainer>
     </LayoutContainer>

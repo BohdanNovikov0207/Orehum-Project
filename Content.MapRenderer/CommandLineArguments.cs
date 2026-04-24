@@ -15,11 +15,11 @@ public sealed class CommandLineArguments
 {
     public List<string> Maps { get; set; } = new();
     public OutputFormat Format { get; set; } = OutputFormat.png;
-    public bool ExportViewerJson { get; set; } = false;
+    public bool ExportViewerJson { get; set; }
     public string OutputPath { get; set; } = DirectoryExtensions.MapImages().FullName;
-    public bool ArgumentsAreFileNames { get; set; } = false;
-    public bool ShowMarkers { get; set; } = false;
-    public bool OutputParallax { get; set; } = false;
+    public bool ArgumentsAreFileNames { get; set; }
+    public bool ShowMarkers { get; set; }
+    public bool OutputParallax { get; set; }
 
     public static bool TryParse(IReadOnlyList<string> args, [NotNullWhen(true)] out CommandLineArguments? parsed)
     {
@@ -103,8 +103,7 @@ public sealed class CommandLineArguments
         return true;
     }
 
-    public static void PrintHelp()
-    {
+    public static void PrintHelp() =>
         Console.WriteLine(@"Content.MapRenderer <options> [map names]
 Options:
     --format <png|webp>
@@ -124,7 +123,6 @@ Options:
         Output images and data used for map viewer parallax.
     -h / --help
         Displays this help text");
-    }
 }
 
 public sealed class CommandLineArgumentException : Exception
@@ -138,5 +136,5 @@ public sealed class CommandLineArgumentException : Exception
 public enum OutputFormat
 {
     png,
-    webp
+    webp,
 }

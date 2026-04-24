@@ -9,16 +9,16 @@ SPDX-License-Identifier: AGPL-3.0-or-later
 
 <Project Sdk="Microsoft.NET.Sdk">
 
-    <PropertyGroup>
-        <OutputType>Exe</OutputType>
-        <TargetFramework>net9.0</TargetFramework>
-        <ImplicitUsings>enable</ImplicitUsings>
-        <Nullable>enable</Nullable>
-      <ManagePackageVersionsCentrally>true</ManagePackageVersionsCentrally>
-    </PropertyGroup>
+  <PropertyGroup>
+    <OutputType>Exe</OutputType>
+    <TargetFramework>net9.0</TargetFramework>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <Nullable>enable</Nullable>
+    <ManagePackageVersionsCentrally>true</ManagePackageVersionsCentrally>
+  </PropertyGroup>
 
-    <ItemGroup>
-      <PackageReference Include="CsvHelper" />
-    </ItemGroup>
+  <ItemGroup>
+    <PackageReference Include="CsvHelper"/>
+  </ItemGroup>
 
 </Project>
