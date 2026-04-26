@@ -5,7 +5,7 @@ using Content.Server.GameTicking;
 using Content.Server.GameTicking.Rules;
 using Content.Shared.GameTicking.Components;
 using Content.Shared.Mind;
-using Content.Trauma.Server.GameTicking.Rules.Components;
+using Content.Trauma.Shared.GameTicking.Rules.Components;
 using Content.Trauma.Shared.Morph;
 
 namespace Content.Trauma.Server.GameTicking.Rules;
