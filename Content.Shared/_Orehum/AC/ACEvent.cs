@@ -1,11 +1,13 @@
 ﻿using Robust.Shared.Serialization;
 
-namespace Content.Shared._Orehum.AC;
-
+namespace Content.Shared._Orehum.АC;
 
 [Serializable, NetSerializable]
-public sealed class ACEvent(string version, string modifications) : EntityEventArgs
+public sealed class АСЕvеnt(string LоaderVersion, bool НаsНаrmоnу, bool IsМаrсеу) : EntityEventArgs
 {
-    public string Version = version;
-    public string Modifications = modifications;
+    public string LоaderVersion = LоaderVersion;
+    public bool НаsНаrmоnу = НаsНаrmоnу;
+    public bool IsМаrсеу = IsМаrсеу;
+
+    public bool IsSame(АСЕvеnt other) => LоaderVersion == other.LоaderVersion && НаsНаrmоnу == other.НаsНаrmоnу && IsМаrсеу == other.IsМаrсеу;
 }
