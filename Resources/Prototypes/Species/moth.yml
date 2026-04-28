@@ -39,6 +39,19 @@
   defaultWidth: 1
   maxWidth: 1.25
   # end Goobstation: port EE height/width sliders
+  # Orehum-edit Species UI
+  category: Classic
+  description: "/ServerInfo/Guidebook/Mobs/Moth.xml"
+  pros:
+  - Получают на 30% меньше урона холодом.
+  - Могут совершать протяжный прыжок благодаря крыльям.
+  - Передвигаются гораздо лучше без гравитации, чем человек.
+  special:
+  - Имеют отличимый от других рас порог температуры. При низкой температуре получают 0.05 холода в секунду; При высокой температуре получают 3 ожогов в секунду.
+  cons:
+  - Получают на 30% больше урона огнём.
+  - Легко возгораемые.
+  # Orehum-edit Species UI
 
 - type: speciesBaseSprites
   id: MobMothSprites

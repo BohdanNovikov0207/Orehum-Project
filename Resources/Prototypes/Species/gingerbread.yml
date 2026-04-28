@@ -16,6 +16,10 @@
   dollPrototype: MobGingerbreadDummy
   skinColoration: HumanToned
   defaultSkinTone: "#9a7c5a"
+  # Orehum-edit Species UI
+  category: Special
+  description: "/ServerInfo/Guidebook/Mobs/Gingerbread.xml"
+  # Orehum-edit Species UI
 
 - type: speciesBaseSprites
   id: MobGingerbreadSprites

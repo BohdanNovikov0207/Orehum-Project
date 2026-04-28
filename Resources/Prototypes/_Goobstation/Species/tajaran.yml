@@ -30,6 +30,20 @@
   defaultWidth: 0.90
   maxWidth: 1.10
   # end Goobstation: port EE height/width sliders
+  # Orehum-edit Species UI
+  category: Classic
+  description: "/ServerInfo/Guidebook/Mobs/Tajaran.xml"
+  pros:
+  - Получают на 20% меньше холодного урона.
+  - Нейтрализуют 99% урона от падения, или удара об что-то.
+  special:
+  - Не издают звуков ходьбы, если не носят обуви.
+  - Могут поместится в вещмешок.
+  cons:
+  - Получают на 15% больше дробящего урона.
+  - Получают на 20% больше огненного урона.
+  - Стамина меньше на 25%, чем у человека.
+  # Orehum-edit Species UI
 
 - type: markingPoints
   id: MobTajaranMarkingLimits

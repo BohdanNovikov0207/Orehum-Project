@@ -36,6 +36,20 @@
   defaultWidth: 0.80
   maxWidth: 1.10
   # end Goobstation: port EE height/width sliders
+  # Orehum-edit Species UI
+  category: Unusual
+  description: "/ServerInfo/Guidebook/Mobs/_DV/Rodentia.xml"
+  pros:
+  - Могут прятать мелкие предметы за щеками. Наличие предметов во рту делает их речь неразборчивой, и они роняют все предметы, которые были у них во рту, если на них нападают, оглушают или толкают.
+  - Может прятаться под столами.
+  special:
+  - Помещаются в вещмешки.
+  - Может рыться в мусоропроводах, из которых иногда можно выкопать еду.
+  cons:
+  - Получает на 15% больше дробящего урона, и на 15% больше режущего и колющего урона.
+  - Мышеловки всегда срабатывают.
+  - Голодают на 33% быстрее.
+  # Orehum-edit Species UI
 
 - type: speciesBaseSprites
   id: MobRodentiaSprites
