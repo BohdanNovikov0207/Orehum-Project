@@ -1,0 +1,26 @@
+- type: vessel
+  id: PTS
+  name: Частный транспортный трансфер
+  description: Частное транспортное судно вместимостью до 6 пассажиров.
+  price: 26700
+  category: Small
+  group: Civilian
+  shuttlePath: /Maps/_Starlight/Shuttles/pts.yml
+
+- type: vessel
+  id: Barge
+  name: Баржа
+  description: Крупное судно, переоборудованное в бар, построенный из металлолома.
+  price: 78500
+  category: Medium
+  group: Civilian
+  shuttlePath: /Maps/_Starlight/Shuttles/barge.yml
+
+- type: vessel
+  id: Prospector
+  name: NT-7 Проспектор
+  description: Небольшое горнодобывающее судно, предназначенное для оказания помощи в спасательных операциях.
+  price: 31350
+  category: Small
+  group: Civilian
+  shuttlePath: /Maps/_Starlight/Shuttles/prospector.yml
