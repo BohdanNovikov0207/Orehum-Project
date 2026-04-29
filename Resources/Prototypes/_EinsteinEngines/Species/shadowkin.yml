@@ -32,6 +32,17 @@
   defaultWidth: 0.85
   maxWidth: 1.15
   # end Goobstation: port EE height/width sliders
+  # Orehum-edit Species UI
+  category: Unusual
+  description: "/ServerInfo/Guidebook/Mobs/Shadowkin.xml"
+  pros:
+  - Обладают ночным зрением.
+  cons:
+  - Получают на 50% больше огненного урона.
+  - Кровь на 75% хуже восстанавливается.
+  - Не могут защититься от оглушения светошумовыми приспособлениями.
+  # Orehum-edit Species UI
+
 
 - type: speciesBaseSprites
   id: MobShadowkinSprites

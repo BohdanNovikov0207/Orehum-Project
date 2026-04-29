@@ -19,6 +19,9 @@
   femaleFirstNames: NamesSkeletonFirst
   dollPrototype: MobSkeletonPersonDummy
   skinColoration: TintedHues
+  # Orehum-edit Species UI
+  category: Special
+  # Orehum-edit Species UI
 
 - type: speciesBaseSprites
   id: MobSkeletonSprites
