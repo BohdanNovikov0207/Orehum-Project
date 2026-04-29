@@ -24,9 +24,6 @@ namespace Content.Client._Orehum.Lobby.UI;
 [GenerateTypedNameReferences]
 public sealed partial class SpeciesWindow : FancyWindow
 {
-    [Dependency] private readonly DocumentParsingManager _parsingMan = default!;
-    [Dependency] private readonly IEntityManager _ent = default!;
-
     public event Action<ProtoId<SpeciesPrototype>>? ChooseAction;
     public ProtoId<SpeciesPrototype> CurrentSpecies;
 
@@ -35,6 +32,7 @@ public sealed partial class SpeciesWindow : FancyWindow
     private readonly IPrototypeManager _proto;
     private readonly LobbyUIController _uIController;
     private readonly IResourceManager _resMan;
+    private readonly DocumentParsingManager _parsingMan;
 
     public SpeciesWindow(HumanoidCharacterProfile profile,
                         IPrototypeManager proto,
@@ -44,7 +42,7 @@ public sealed partial class SpeciesWindow : FancyWindow
                         DocumentParsingManager parsing)
     {
         RobustXamlLoader.Load(this);
-        IoCManager.InjectDependencies(this);
+        _parsingMan = parsing;
 
         Select.OnPressed += _ => ChooseAction?.Invoke(CurrentSpecies);
 
@@ -57,7 +55,7 @@ public sealed partial class SpeciesWindow : FancyWindow
         _resMan = resManager;
 
         var protoList = _proto.EnumeratePrototypes<SpeciesPrototype>().Where(x => x.RoundStart).ToList();
-        protoList.Sort((x, y) => Loc.GetString(x.Name)[0].CompareTo(Loc.GetString(y.Name)[0]));
+        protoList.Sort((x, y) => string.Compare(Loc.GetString(x.Name), Loc.GetString(y.Name), StringComparison.CurrentCulture));
 
         AddLabel(Loc.GetString("species-category-label-classic"));
         foreach (var item in protoList.Where(x => x.Category == SpeciesCategory.Classic))

@@ -1,6 +1,8 @@
 <controls:FancyWindow xmlns="https://spacestation14.io"
+         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
          xmlns:controls="clr-namespace:Content.Client.UserInterface.Controls"
          xmlns:graphics="clr-namespace:Robust.Client.Graphics;assembly=Robust.Client"
+         x:Class="Content.Client._Orehum.Lobby.UI.SpeciesWindow"
          SetSize="800 800"
          MinSize="800 128"
          Resizable="False">

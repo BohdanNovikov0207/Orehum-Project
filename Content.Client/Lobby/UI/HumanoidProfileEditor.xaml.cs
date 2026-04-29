@@ -289,6 +289,7 @@ namespace Content.Client.Lobby.UI
             ISharedSponsorsManager clientSponsorsManager)
         {
             RobustXamlLoader.Load(this);
+            IoCManager.InjectDependencies(this);
             _sawmill = logManager.GetSawmill("profile.editor");
             _cfgManager = configurationManager;
             _entManager = entManager;

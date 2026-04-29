@@ -34,7 +34,7 @@
   # end Goobstation: port EE height/width sliders
   # Orehum-edit Species UI
   category: Unusual
-  description: "/ServerInfo/_Europa/SpeciesDescriptions/Shadekin.xml"
+  description: "/ServerInfo/Guidebook/Mobs/Shadowkin.xml"
   pros:
   - Обладают ночным зрением.
   cons:

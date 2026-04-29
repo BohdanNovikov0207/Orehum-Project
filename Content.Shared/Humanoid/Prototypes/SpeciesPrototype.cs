@@ -224,19 +224,15 @@ public sealed partial class SpeciesPrototype : IPrototype
     // Corvax-Sponsors-End
 
     [DataField]
-    public SpeciesCategory Category = SpeciesCategory.Classic;
-
+    public SpeciesCategory Category { get; private set; } = SpeciesCategory.Classic;
     [DataField]
-    public ResPath? Description;
-
+    public ResPath? Description { get; private set; }
     [DataField]
-    public List<string> Pros = new();
-
+    public List<string> Pros { get; private set; } = new();
     [DataField]
-    public List<string> Cons = new();
-
+    public List<string> Cons { get; private set; } = new();
     [DataField]
-    public List<string> Special = new();
+    public List<string> Special { get; private set; } = new();
 
 }
 
