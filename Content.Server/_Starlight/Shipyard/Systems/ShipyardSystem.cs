@@ -11,7 +11,7 @@ using Content.Shared.Station.Components;
 using Content.Server.Shuttles.Components;
 using Robust.Server.GameObjects;
 using Robust.Shared.Utility;
-using Content.Shared.Starlight.CCVar;
+using Content.Shared.CCVar;
 using Robust.Shared.Configuration;
 using Robust.Shared.Timing;
 using System.Numerics;
@@ -39,8 +39,8 @@ public sealed class ShipyardSystem : SharedShipyardSystem
     {
         base.Initialize();
 
-        _enabled = _configManager.GetCVar(StarlightCCVars.Shipyard);
-        _configManager.OnValueChanged(StarlightCCVars.Shipyard, SetShipyardEnabled);
+        _enabled = _configManager.GetCVar(CCVars.Shipyard);
+        _configManager.OnValueChanged(CCVars.Shipyard, SetShipyardEnabled);
         SubscribeLocalEvent<ShipyardConsoleComponent, ComponentInit>(OnShipyardStartup);
         SubscribeLocalEvent<ShipyardConsoleComponent, ComponentShutdown>(OnShipyardShutdown);
         SubscribeLocalEvent<RoundRestartCleanupEvent>(OnRoundRestart);
