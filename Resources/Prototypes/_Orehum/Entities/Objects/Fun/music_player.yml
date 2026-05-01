@@ -10,9 +10,6 @@
   - type: Item
     size: Small
   - type: Jukebox
-    onState: on
-    offState: off
-    selectState: select
   - type: ActivatableUI
     key: enum.JukeboxUiKey.Key
   - type: UserInterface
