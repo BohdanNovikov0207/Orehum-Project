@@ -17,6 +17,12 @@
   - !type:PlayerGUIDLoadoutEffect
     guid: 51dc2208-850d-40c3-8cde-0eb556847db1
 
+- type: loadoutEffectGroup
+  id: unenduring
+  effects:
+  - !type:PlayerGUIDLoadoutEffect
+    guid: b62055d5-1ad1-4dda-90da-dbd652ef4ea6
+
 #Items
 - type: loadout
   id: RubberPig
@@ -44,3 +50,12 @@
   storage:
     back:
     - Mor5hey97Beer
+
+- type: loadout
+  id: MusicPlayer
+  effects:
+  - !type:GroupLoadoutEffect
+    proto: unenduring
+  storage:
+    back:
+    - MusicPlayer

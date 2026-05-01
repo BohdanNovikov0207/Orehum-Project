@@ -369,3 +369,27 @@
   name: SKWLKR - Мёртвые души
   path:
     path: /Audio/_Orehum/Jukebox/Dead-souls.ogg
+
+- type: jukebox
+  id: bubblepopelectric
+  name: Gwen Stefani - Bubble Pop Electric
+  path:
+    path: /Audio/_Orehum/Jukebox/bubble_pop_electric.ogg
+
+- type: jukebox
+  id: jane
+  name: The Long Faces - Jane!
+  path:
+    path: /Audio/_Orehum/Jukebox/jane.ogg
+
+- type: jukebox
+  id: byebyethere
+  name: Mr.Sauceman - Bye Bye There!
+  path:
+    path: /Audio/_Orehum/Jukebox/bye-bye-there.ogg
+
+- type: jukebox
+  id: tomtom
+  name: Holy F - "Tom Tom"
+  path:
+    path: /Audio/_Orehum/Jukebox/tomtom.ogg
