@@ -317,3 +317,23 @@
   license: "CC-BY-SA-3.0"
   copyright: "SKWLKR - Dead souls"
   source: "https://youtu.be/B2Ybud5qQ98?si=YQ0nDgLcrxlncYBJ"
+
+- files: [bubble_pop_electric.ogg]
+  license: "CC-BY-SA-3.0"
+  copyright: "Gwen Stefani - Bubble Pop Electric"
+  source: "https://www.youtube.com/watch?v=xIF0Me8j0dg"
+
+- files: [jane.ogg]
+  license: "CC-BY-SA-3.0"
+  copyright: "The Long Faces - Jane!"
+  source: "https://www.youtube.com/watch?v=HydkjjDNTmY"
+
+- files: [bye-bye-there.ogg]
+  license: "CC-BY-SA-3.0"
+  copyright: "Mr.Sauceman - Bye Bye There!"
+  source: "https://www.youtube.com/watch?v=R1s5C4qclPg"
+
+- files: [tomtom.ogg]
+  license: "CC-BY-SA-3.0"
+  copyright: "Holy F - Tom Tom"
+  source: "https://www.youtube.com/watch?v=-8MbcIvCAec"

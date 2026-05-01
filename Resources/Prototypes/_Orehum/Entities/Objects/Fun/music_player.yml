@@ -1,0 +1,21 @@
+- type: entity
+  parent: BaseItem
+  id: MusicPlayer
+  name: музыкальный проигрыватель
+  description: Компактный и простой в использовании проигрыватель, способный воспроизводить уже установленную в него музыку.
+  components:
+  - type: Sprite
+    sprite: _Orehum/Objects/Fun/music_player.rsi
+    state: icon
+  - type: Item
+    size: Small
+  - type: Jukebox
+    onState: on
+    offState: off
+    selectState: select
+  - type: ActivatableUI
+    key: enum.JukeboxUiKey.Key
+  - type: UserInterface
+    interfaces:
+        enum.JukeboxUiKey.Key:
+          type: JukeboxBoundUserInterface
