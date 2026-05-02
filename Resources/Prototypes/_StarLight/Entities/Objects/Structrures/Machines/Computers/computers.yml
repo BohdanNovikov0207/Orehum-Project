@@ -19,8 +19,7 @@
         state: generic_panel_open
   - type: ShipyardConsole
   - type: AccessReader
-    access:
-    - [ Captain ]
+    access: [[ "Command" ]]
   - type: ActivatableUI
     key: enum.ShipyardConsoleUiKey.Shipyard
   - type: UserInterface

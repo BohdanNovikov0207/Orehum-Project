@@ -301,6 +301,7 @@
     - id: CommandMegaphone # goob - loudspeakers
     - id: ReinforcementCallerHoP # Trauma
     - id: ServiceComputerCommsFlatpack
+    - id: ShipyardComputerCircuitboard
 
 - type: entity
   id: LockerHeadOfPersonnelFilled

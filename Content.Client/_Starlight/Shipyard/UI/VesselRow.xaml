@@ -6,7 +6,7 @@
         <Button Name="Purchase"
             Access="Public"
             ToolTip=""
-            Text="{Loc 'purchase'}"
+            Text="{Loc 'shipyard-purchase'}"
             StyleClasses="LabelSubText" />
         <Label Name="VesselName"
             Access="Public"
