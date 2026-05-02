@@ -17665,3 +17665,27 @@ Entries:
         Bye-bye there, Tom Tom
   id: 7362
   time: '2026-05-01T11:26:57.0000000+00:00'
+- author: IsNotAcceptable
+  changes:
+    - type: Add
+      message: Консоль Верфи
+    - type: Add
+      message: 3 Покупаемые шаттла
+    - type: Tweak
+      message: Текущий шаттл карго взят из Б\У рынка
+    - type: Add
+      message: Настройка максимальной нагрузки для энергосистемы.
+    - type: Add
+      message: >-
+        Оператор радарного кольца - следит, чтобы персонал далеко не отдалился
+        от станции
+    - type: Remove
+      message: Цель на постройку обычного шаттла
+    - type: Add
+      message: Цель на очистку сектора от космического мусора
+    - type: Add
+      message: Плата верфи лежит в шкафу ГП
+    - type: Add
+      message: Руководство по шаттлам
+  id: 7363
+  time: '2026-05-02T13:01:03.0000000+00:00'
