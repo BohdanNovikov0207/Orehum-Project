@@ -541,11 +541,17 @@ public sealed partial class DevilContractSystem : EntitySystem
             return false;
 
         foreach (var clauseProto in clauses)
-            if (clauseProto.Value.Name is not null && clauseProto.Value.Name.Trim().ToLowerInvariant().Replace(" ", "") == clauseKey)
+        {
+            if (clauseProto.Value.Name is null)
+                continue;
+
+            var normalizedName = clauseProto.Value.Name.Trim().ToLowerInvariant().Replace(" ", "");
+            if (normalizedName == clauseKey)
             {
                 prototype = clauseProto.Value;
                 return true;
             }
+        }
 
         return false;
     }
