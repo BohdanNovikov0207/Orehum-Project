@@ -31,7 +31,7 @@
   categories: [ HideSpawnMenu ]
   components:
   - type: Sprite
-    sprite: _NF/Guidebook/shuttle_maps/128x96.rsi
+    sprite: _Orehum/Guidebook/shuttle_maps/128x96.rsi
     state: barge
 
 - type: entity
