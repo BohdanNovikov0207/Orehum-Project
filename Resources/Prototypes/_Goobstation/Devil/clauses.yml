@@ -65,7 +65,7 @@
   addedComponents:
   - type: BreathingImmunity
   - type: PressureImmunity
-#  - type: SpecialLowTempImmunity
+  - type: SpecialLowTempImmunity
 
 - type: clause
   id: fearofdeath
