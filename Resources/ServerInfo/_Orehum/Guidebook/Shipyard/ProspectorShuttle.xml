@@ -1,0 +1,20 @@
+<Document>
+  # УТИЛИЗАЦИОНЫЙ ШАТТЛ КЛАСА «ПРОСПЕКТОР»
+  <Box>
+    <GuideEntityEmbed Entity="Pickaxe"/>
+    <GuideEntityEmbed Entity="OreBag"/>
+  </Box>
+  <Box>
+    <GuideEntityEmbed Entity="ShuttleMapProspector" Caption=""/>
+  </Box>
+  [color=#a4885c]Размер шаттла:[/color] Малый
+
+  [color=#a4885c]Рекомендуемый кол-во экипажа:[/color] 1-2
+
+  [color=#a4885c]Тип электропитания:[/color] Плазма
+
+  # Описание шаттла
+
+  "Небольшое горнодобывающее судно, предназначенное для оказания помощи в спасательных операциях."
+
+</Document>
