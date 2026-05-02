@@ -1,0 +1,12 @@
+- type: entity
+  parent: BaseComputerCircuitboard
+  id: ShipyardComputerCircuitboard
+  name: компьютерная плата верфя
+  description: Печатная плата компьютера для бортового компьютера на верфи.
+  components:
+    - type: Sprite
+      state: cpu_supply
+    - type: ComputerBoard
+      prototype: ComputerShipyard
+    - type: StaticPrice
+      price: 750

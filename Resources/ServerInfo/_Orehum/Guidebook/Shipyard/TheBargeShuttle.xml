@@ -1,0 +1,29 @@
+<Document>
+  # ГРУЗОВОЙ ШАТТЛ КЛАССА «БАРЖА»
+  <Box>
+    <GuideEntityEmbed Entity="OreProcessor"/>
+    <GuideEntityEmbed Entity="VendingMachineSalvage"/>
+    <GuideEntityEmbed Entity="VendingMachineBooze"/>
+  </Box>
+  <Box>
+    <GuideEntityEmbed Entity="ShuttleMapBarge" Caption=""/>
+  </Box>
+  [color=#a4885c]Размер шаттла:[/color] Средний
+
+  [color=#a4885c]Рекомендуемое кол-во экипажа:[/color] 2-4
+
+  [color=#a4885c]Тип электропитания:[/color] Солнечная/Плазма
+
+  # Описание шаттла
+
+  "Крейсер дальнего плавания, предназначенный для длительных спасательных и грузовых работ в открытом космосе."
+
+  # Функционал
+
+  <Box>
+    <GuideEntityEmbed Entity="ButtonFrameCautionSecurity" Caption="Внешние воздушные шлюзы с болтовым креплением"/>
+    <GuideEntityEmbed Entity="ButtonFrameCaution" Caption="Двигатели пониженной мощности"/>
+    <GuideEntityEmbed Entity="ButtonFrameJanitor" Caption="Переключаемый тип питания"/>
+  </Box>
+
+</Document>

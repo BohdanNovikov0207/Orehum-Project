@@ -290,5 +290,12 @@ public sealed partial class CCVars
     public static readonly CVarDef<float> ImpactInertiaScaling =
         CVarDef.Create("shuttle.impact.inertia_scaling", 0.5f, CVar.SERVERONLY);
 
+    /// <summary>
+    /// Whether the Shipyard is enabled.
+    /// </summary>
+    public static readonly CVarDef<bool> Shipyard =
+        CVarDef.Create("shuttle.shipyard", true, CVar.SERVERONLY);
+
+
     #endregion
 }

@@ -1,0 +1,90 @@
+- type: job
+  id: OrehumFrontierGuard
+  name: "Оператор Радарного Кольца"
+  description: "Поддерживайте стабильность внешнего оборонного периметра, отслеживая сигналы радарного кольца и не допуская выхода персонала в мертвую зону, кишащую пустотными левиафанами."
+  playTimeTracker: JobFrontierGuard
+  setPreference: false
+  startingGear: FrontierGear
+  icon: "JobIconNanotrasen"
+  supervisors: job-supervisors-centcom
+  canBeAntag: false
+  requirements:
+  - !type:AgeRequirement
+    requiredAge: 26
+  - !type:SpeciesRequirement
+    inverted: true
+    species:
+    - Felinid
+    - Resomi
+    - Plasmaman
+    - SlimePerson
+    - IPC
+    - Shadowkin
+    - Oni
+    - Vox
+  accessGroups:
+  - AllAccess
+  access:
+  - CentralCommand
+  special:
+  - !type:AddImplantSpecial
+    implants: [ MindShieldImplant, FreedomImplant, BluespaceLifelineImplant, RadioImplantCentcomm, NutrimentPumpImplant, StypticStimulatorImplant, DeathRattleImplantCentcomm ]
+
+- type: startingGear
+  id: FrontierGear
+  equipment:
+    jumpsuit: ClothingUniformJumpsuitMilitaryTurtleneckRev
+    shoes: ClothingShoesSwat
+    outerClothing: ClothingOuterArmorHelldiver
+    suitstorage: WeaponShotgunAntelope
+    head: ClothingHeadHelmetHelldiver
+    mask: ClothingMaskGasERT
+    eyes: ClothingEyesGlassesSecurityAdvanced
+    gloves: ClothingHandsGlovesCombat
+    back: ClothingBackpackMerc
+    neck: ClothingNeckCloakHelldiver
+    id: NavyOfficerPDA
+    ears: ClothingHeadsetAltCentCom
+    belt: ClothingBeltMercWebbing
+    pocket1: DoubleEmergencyOxygenTankFilled
+    pocket2: WeaponPistolEchis
+  storage:
+    back:
+    - CombatMedipen
+    - CombatMedipen
+    - SurvivalMedipen
+    - SurvivalMedipen
+    - ToolDebug
+    - DeterrentCaseFilled
+    - Megaphone
+    belt:
+    - MedkitCombatFilled
+    - MagazineShotgunIncendiary
+    - MagazineShotgunSlug
+    - BoxLethalshot
+    - ExGrenade
+    - ExGrenade
+
+- type: entity
+  id: RandomHumanoidSpawnerFrontierGuard
+  name: Оператор Радарного Кольца
+  components:
+  - type: Sprite
+    sprite: Mobs/Species/Human/parts.rsi
+    state: full
+  - type: RandomMetadata
+    nameSegments: [ NamesBorer ]
+  - type: RandomHumanoidSpawner
+    settings: FrontierGuard
+
+- type: randomHumanoidSettings
+  parent: EventHumanoidMindShielded
+  id: FrontierGuard
+  components:
+  - type: Loadout
+    prototypes: [ FrontierGear ]
+  - type: RandomMetadata
+    nameSegments:
+    - NamesMilitaryFirstLeader
+    - NamesMilitaryLast
+    nameFormat: name-format-standard

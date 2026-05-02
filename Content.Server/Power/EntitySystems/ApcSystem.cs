@@ -199,7 +199,8 @@ public sealed class ApcSystem : EntitySystem
 
         var state = new ApcBoundInterfaceState(apc.MainBreakerEnabled,
             (int) MathF.Ceiling(battery.CurrentSupply), apc.LastExternalState,
-            charge);
+            charge,
+            apc.MaxLoad);
 
         _ui.SetUiState((uid, ui), ApcUiKey.Key, state);
     }
