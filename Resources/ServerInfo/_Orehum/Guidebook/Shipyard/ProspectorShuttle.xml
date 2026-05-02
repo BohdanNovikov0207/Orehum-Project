@@ -1,5 +1,5 @@
 <Document>
-  # УТИЛИЗАЦИОНЫЙ ШАТТЛ КЛАСА «ПРОСПЕКТОР»
+  # УТИЛИЗАЦИОННЫЙ ШАТТЛ КЛАСCА «ПРОСПЕКТОР»
   <Box>
     <GuideEntityEmbed Entity="Pickaxe"/>
     <GuideEntityEmbed Entity="OreBag"/>
@@ -9,7 +9,7 @@
   </Box>
   [color=#a4885c]Размер шаттла:[/color] Малый
 
-  [color=#a4885c]Рекомендуемый кол-во экипажа:[/color] 1-2
+  [color=#a4885c]Рекомендуемое кол-во экипажа:[/color] 1-2
 
   [color=#a4885c]Тип электропитания:[/color] Плазма
 
