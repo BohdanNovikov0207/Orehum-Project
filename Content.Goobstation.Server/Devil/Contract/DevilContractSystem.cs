@@ -59,14 +59,11 @@ public sealed partial class DevilContractSystem : EntitySystem
 
     private ISawmill _sawmill = null!;
 
-    private Dictionary<string, DevilClausePrototype> _clausesByNormalizedName = new(); // Orehum edit
-
     public override void Initialize()
     {
         base.Initialize();
         InitializeRegex();
         InitializeSpecialActions();
-        InitializeClauseCache(); // Orehum edit
 
         SubscribeLocalEvent<DevilContractComponent, BeingSignedAttemptEvent>(OnContractSignAttempt);
         SubscribeLocalEvent<DevilContractComponent, ExaminedEvent>(OnExamined);
@@ -95,21 +92,6 @@ public sealed partial class DevilContractSystem : EntitySystem
         _clauseRegex = new Regex($@"^\s*(?<target>{targetPattern})\s*:\s*(?<clause>.+?)\s*$",
             RegexOptions.IgnoreCase | RegexOptions.Compiled | RegexOptions.Multiline);
     }
-
-    // Orehum start
-    private void InitializeClauseCache()
-    {
-        _clausesByNormalizedName.Clear();
-        foreach (var clause in _prototypeManager.EnumeratePrototypes<DevilClausePrototype>())
-        {
-            if (clause.Name is not null)
-            {
-                var key = clause.Name.Trim().ToLowerInvariant().Replace(" ", "");
-                _clausesByNormalizedName.TryAdd(key, clause);
-            }
-        }
-    }
-    // Orehum end
 
     private void OnGetVerbs(Entity<DevilContractComponent> contract, ref GetVerbsEvent<AlternativeVerb> args)
     {
@@ -551,10 +533,22 @@ public sealed partial class DevilContractSystem : EntitySystem
 
     #endregion
 
-    // Orehum start
+    // CorvaxGoob-TTS-Start
     private bool TryGetClauseByKey(string clauseKey, [NotNullWhen(true)] out DevilClausePrototype? prototype)
     {
-        return _clausesByNormalizedName.TryGetValue(clauseKey, out prototype);
+        prototype = null;
+
+        if (!_prototypeManager.TryGetInstances<DevilClausePrototype>(out var clauses))
+            return false;
+
+        foreach (var clauseProto in clauses)
+            if (clauseProto.Value.Name is not null && clauseProto.Value.Name.Trim().ToLowerInvariant().Replace(" ", "") == clauseKey)
+            {
+                prototype = clauseProto.Value;
+                return true;
+            }
+
+        return false;
     }
-    // Orehum end
+    // CorvaxGoob-TTS-En
 }
