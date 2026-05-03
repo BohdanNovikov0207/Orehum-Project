@@ -1,13 +1,20 @@
 ---
 name: ss14-documentation-writing
-description: A practical documentation standard in Space Station 14 for C#, SWSL, YAML and FTL: how to write `<summary>`, when to add explanatory comments, how to document partial systems, and how to avoid noisy documentation. Use it when writing, refactoring and reviewing documentation in code, prototypes and localization.
-metadata:
-  source_skill: "../../../.agent/skills/ss14-documentation-writing/SKILL.md"
+description: Write reviewable implementation notes for larger SS14 changes. Use when a gameplay change is large, when you need PR-ready technical notes, when a multi-file feature needs a brief internal write-up, or when a complex change should leave behind clear guidance for future edits.
 ---
 
-# Codex Bridge
+# SS14 Documentation Writing
 
-Canonical skill file:
-../../../.agent/skills/ss14-documentation-writing/SKILL.md.
+Use this skill when a change is large enough that future reviewers or contributors will benefit from a short technical explanation.
 
-Load references/scripts/assets from the same source skill directory.
+## Workflow
+
+1. Open `references/code-change-docs.md`.
+2. Summarize the problem, the system boundaries, and the verification.
+3. Keep notes short and technical.
+4. Prefer updating existing docs or PR notes over creating random new markdown files.
+
+## Reference Map
+
+- `references/code-change-docs.md`
+- `../ss14-docs-mdbook/references/reference-page-template.md`
