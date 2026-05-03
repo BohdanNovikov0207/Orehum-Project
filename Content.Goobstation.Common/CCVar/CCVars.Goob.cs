@@ -678,6 +678,8 @@ public sealed partial class GoobCVars
     public static readonly CVarDef<bool> SprintEnabled =
         CVarDef.Create("trauma.sprint_enabled", false, CVar.SERVER | CVar.REPLICATED);
 
+    #endregion
+
     #region Particles
 
     /// <summary>
