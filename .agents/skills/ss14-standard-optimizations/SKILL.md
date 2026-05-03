@@ -1,13 +1,23 @@
 ---
 name: ss14-standard-optimizations
-description: Practical skill in standard optimizations of Space Station 14: caching, reduction of allocations, abandonment of LINQ in hot-path, ActiveComponent approach, EntityQuery, order of components in EntityQueryEnumerator, ByRef events, DirtyField, early exits and cleaning of unnecessary components. Use it when designing, reviewing and optimizing ECS ​​code in server/shared/client.
-metadata:
-  source_skill: "../../../.agent/skills/ss14-standard-optimizations/SKILL.md"
+description: Optimize SS14 gameplay code in common hot paths. Use when working on Update loops, frequently raised events, high-volume entity iteration, prediction-heavy client code, or other gameplay code where standard SS14 performance patterns matter.
 ---
 
-# Codex Bridge
+# SS14 Standard Optimizations
 
-Canonical skill file:
-../../../.agent/skills/ss14-standard-optimizations/SKILL.md.
+Use this skill when performance matters, especially in frequent event handlers or update paths.
 
-Load references/scripts/assets from the same source skill directory.
+## Workflow
+
+1. Open `references/optimization-checklist.md`.
+2. Open `references/event-hotpath-patterns.md` for frequent handlers.
+3. Open `references/entity-query-patterns.md` for high-volume iteration.
+2. Keep the optimization local to the actual hot path.
+3. Do not trade away correctness or prediction safety for micro-optimizations without evidence.
+
+## Reference Map
+
+- `references/optimization-checklist.md`
+- `references/event-hotpath-patterns.md`
+- `references/entity-query-patterns.md`
+- `../ss14-debugging-workflow/references/debugging-mindset.md`
