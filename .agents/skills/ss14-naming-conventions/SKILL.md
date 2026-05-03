@@ -1,13 +1,19 @@
 ---
 name: ss14-naming-conventions
-description: Strict naming standards in Space Station 14 for C#, YAML prototypes and FTL: names of components/systems/dependencies, prototype IDs, localization keys, variables and files. Use it when creating or reviewing new code, prototypes and localization, when you need to check compliance with the naming standard.
-metadata:
-  source_skill: "../../../.agent/skills/ss14-naming-conventions/SKILL.md"
+description: Apply SS14 naming conventions for C#, prototypes, events, dependencies, and localization. Use when naming handlers, methods, components, events, prototype IDs, localization IDs, or serialized fields in this repo.
 ---
 
-# Codex Bridge
+# SS14 Naming Conventions
 
-Canonical skill file:
-../../../.agent/skills/ss14-naming-conventions/SKILL.md.
+Use this skill whenever you need to choose a new name.
 
-Load references/scripts/assets from the same source skill directory.
+## Workflow
+
+1. Open `references/csharp-and-ftl-naming.md`.
+2. Match the nearest existing feature style before inventing a new pattern.
+3. Keep method, event, prototype, and FTL names explicit and feature-scoped.
+
+## Reference Map
+
+- `references/csharp-and-ftl-naming.md`
+- `../ss14-ecs-basics/references/ecs-primer.md`

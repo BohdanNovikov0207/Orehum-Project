@@ -177,12 +177,6 @@
   artist: Diebeck
 
 - type: lobbyBackground
-  id: GoobNukie
-  background: /Textures/LobbyScreens/GoobNukie.webp
-  name: Goob Nukie
-  artist: Cheeki
-
-- type: lobbyBackground
   id: grandtheftgoob
   background: /Textures/LobbyScreens/grandtheftgoob.webp
   name: Grand Theft Goob
@@ -235,12 +229,6 @@
   background: /Textures/LobbyScreens/lostpai.webp
   name: Lost pAI
   artist: Cattom
-
-- type: lobbyBackground
-  id: stargoob
-  background: /Textures/LobbyScreens/StarGoob.webp
-  name: GoobWars
-  artist: Jvne
 
 - type: lobbyBackground
   id: enlist-lavaland

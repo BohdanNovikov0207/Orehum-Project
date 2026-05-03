@@ -1,0 +1,34 @@
+- type: entity
+  id: ComputerShipyard
+  parent: BaseComputer
+  name: консоль верфи
+  description: Использовался для покупки шаттлов.
+  components:
+  - type: Sprite
+    layers:
+      - map: ["computerLayerBody"]
+        state: computer
+      - map: ["computerLayerKeyboard"]
+        state: generic_keyboard
+      - map: ["computerLayerScreen"]
+        state: shipyard
+        sprite: _Starlight/Structures/Machines/computers.rsi
+      - map: ["computerLayerKeys"]
+        state: generic_keys
+      - map: [ "enum.WiresVisualLayers.MaintenancePanel" ]
+        state: generic_panel_open
+  - type: ShipyardConsole
+  - type: AccessReader
+    access: [[ "Command" ]]
+  - type: ActivatableUI
+    key: enum.ShipyardConsoleUiKey.Shipyard
+  - type: UserInterface
+    interfaces:
+      enum.ShipyardConsoleUiKey.Shipyard:
+        type: ShipyardConsoleBoundUserInterface
+  - type: Computer
+    board: ShipyardComputerCircuitboard
+  - type: PointLight
+    radius: 1.5
+    energy: 1.6
+    color: "#b89f25"

@@ -205,13 +205,15 @@ namespace Content.Shared.APC
         public readonly int Power;
         public readonly ApcExternalPowerState ApcExternalPower;
         public readonly float Charge;
+        public readonly float MaxLoad;
 
-        public ApcBoundInterfaceState(bool mainBreaker, int power, ApcExternalPowerState apcExternalPower, float charge)
+        public ApcBoundInterfaceState(bool mainBreaker, int power, ApcExternalPowerState apcExternalPower, float charge, float maxLoad)
         {
             MainBreaker = mainBreaker;
             Power = power;
             ApcExternalPower = apcExternalPower;
             Charge = charge;
+            MaxLoad = maxLoad;
         }
 
         public bool Equals(ApcBoundInterfaceState? other)
@@ -221,7 +223,8 @@ namespace Content.Shared.APC
             return MainBreaker == other.MainBreaker &&
                    Power == other.Power &&
                    ApcExternalPower == other.ApcExternalPower &&
-                   MathHelper.CloseTo(Charge, other.Charge);
+                   MathHelper.CloseTo(Charge, other.Charge) &&
+                   MathHelper.CloseTo(MaxLoad, other.MaxLoad);
         }
 
         public override bool Equals(object? obj)
@@ -231,7 +234,7 @@ namespace Content.Shared.APC
 
         public override int GetHashCode()
         {
-            return HashCode.Combine(MainBreaker, Power, (int) ApcExternalPower, Charge);
+            return HashCode.Combine(MainBreaker, Power, (int) ApcExternalPower, Charge, MaxLoad);
         }
     }
 
