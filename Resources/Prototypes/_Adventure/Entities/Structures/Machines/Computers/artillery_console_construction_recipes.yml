@@ -7,12 +7,6 @@
   canRotate: false
   category: construction-category-structures
   description: construction-recipe-bluespace-artillery-console-desc
-  icon:
-    sprite: _Adventure/Structures/Machines/BSA.rsi
-    state: base
-  layers:
-  - sprite: _Adventure/Structures/Machines/BSA.rsi
-    state: base
   objectType: Structure
   placementMode: SnapgridCenter
   canBuildInImpassable: false

@@ -8,12 +8,6 @@
   canRotate: false
   category: construction-category-structures
   description: construction-recipe-bluespace-artillery-desc
-  icon:
-    sprite: _Adventure/Structures/BSA.rsi
-    state: cannon_east
-  layers:
-  - sprite: _Adventure/Structures/BSA.rsi
-    state: cannon_east
   objectType: Structure
   placementMode: SnapgridCenter
   canBuildInImpassable: false
