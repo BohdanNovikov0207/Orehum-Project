@@ -1,6 +1,6 @@
 - type: technology
   id: BluespaceArtillery
-  name: Блюспейс артиллерия (необходимо разрешение ЦК)
+  name: research-technology-bluespace-artillery
   icon:
     sprite: _Adventure/Structures/BSA.rsi
     state: cannon_east
