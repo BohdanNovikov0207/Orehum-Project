@@ -76,19 +76,14 @@
       steps:
       - tag: LightBulb
         name: construction-graph-tag-light-bulb
-        amount: 1
       - tag: LightBulb
         name: construction-graph-tag-second-light-bulb
-        amount: 1
       - tag: LightBulb
         name: construction-graph-tag-third-light-bulb
-        amount: 1
       - tag: LightBulb
         name: construction-graph-tag-fourth-light-bulb
-        amount: 1
       - tag: LightBulb
         name: construction-graph-tag-fifth-light-bulb
-        amount: 1
       - material: Cable
         amount: 10
       - material: CableMV
@@ -643,7 +638,6 @@
         doAfter: 5
       - tag: BlueprintBSA
         name: construction-graph-tag-blueprint-bsa
-        amount: 1
 
   - node: frame1
     entity: BluespaceArtilleryFrameFlipped
@@ -707,19 +701,14 @@
       steps:
       - tag: LightBulb
         name: construction-graph-tag-light-bulb
-        amount: 1
       - tag: LightBulb
         name: construction-graph-tag-second-light-bulb
-        amount: 1
       - tag: LightBulb
         name: construction-graph-tag-third-light-bulb
-        amount: 1
       - tag: LightBulb
         name: construction-graph-tag-fourth-light-bulb
-        amount: 1
       - tag: LightBulb
         name: construction-graph-tag-fifth-light-bulb
-        amount: 1
       - material: Cable
         amount: 10
       - material: CableMV
