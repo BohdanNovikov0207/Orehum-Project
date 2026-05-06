@@ -106,3 +106,7 @@
 - type: stationGoal
   id: CleaningSpace
   text: station-goal-cleaning-space
+
+- type: stationGoal
+  id: BluespaceArtillery
+  text: station-goal-bluespace-artillery

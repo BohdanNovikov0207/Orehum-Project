@@ -59,3 +59,16 @@
     Steel: 100
     Glass: 500
     Bananium: 100
+
+# Orehum circuitboard
+- type: latheRecipe
+  parent: BaseCircuitboardRecipe
+  abstract: true
+  id: BasePlSiGoCircuitboardRecipe
+  materials:
+    Steel: 100
+    Plastic: 150
+    Glass: 150
+    Plasma: 100
+    Silver: 150
+    Gold: 100

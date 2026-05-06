@@ -604,6 +604,7 @@
     # Goobstation Packs
     - SharedBoards
     - ShuttleBoardsGoob
+    - BluespaceArtilleryBoards # Orehum craft Artillery
   - type: MaterialStorage
     whitelist:
       tags:
