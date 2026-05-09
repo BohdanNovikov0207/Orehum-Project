@@ -64,4 +64,4 @@ trait-condition-borg-not = Вы не должны быть [color=yellow]бор�
 # Antag conditions
 trait-condition-antag-is = Должен иметь возможность стать антагонистом: [color=red]{$antag}[/color].
 trait-condition-antag-not = Не должен быть антагонистом: [color=red]{$antag}[/color].
-trait-editor-show-unavailable = Показать недоступны
+trait-editor-show-unavailable = Показать недоступные
