@@ -1,4 +1,4 @@
-﻿using System.Diagnostics.CodeAnalysis;
+using System.Diagnostics.CodeAnalysis;
 using Robust.Shared.Network;
 
 namespace Content.Corvax.Interfaces.Shared;
@@ -58,6 +58,11 @@ public interface ISharedSponsorsManager
     }
 
     public bool IsServerAllRoles(NetUserId userId)
+    {
+        throw new NotImplementedException();
+    }
+
+    public bool TryGetTier(NetUserId userId, out int tier)
     {
         throw new NotImplementedException();
     }

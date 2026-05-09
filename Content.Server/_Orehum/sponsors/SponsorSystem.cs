@@ -23,7 +23,10 @@ public sealed class SponsorSystem : EntitySystem
         if (HasComp<GhostComponent>(uid))
             return;
 
-        if (!_sponsorsMgr.TryGetServerPrototypes(args.Player.UserId, out var items) || items.Count == 0)
+        if (!_sponsorsMgr.TryGetTier(args.Player.UserId, out var tier))
+            return;
+
+        if (tier <= 3)
             return;
 
         EnsureComp<SponsorComponent>(uid);
