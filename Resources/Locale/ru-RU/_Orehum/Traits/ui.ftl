@@ -13,8 +13,8 @@ trait-editor-footer-hint = Наведите курсор для деталей
 trait-editor-footer-info = Негативная стоимость дает бонусные очки
 
 ## Disabled Traits Popup
-disabled-traits-popup-title = Черты Выключено
-disabled-traits-popup-label = Черты Выключено
+disabled-traits-popup-title = Черты выключены
+disabled-traits-popup-label = Черты выключены
 disabled-traits-popup-message = Некоторые из ваших черт не применимы, поскольку они не отвечают требованиям состояния.
 disabled-traits-popup-list-header = Следующие черты отключены:
 disabled-traits-popup-reason = • {$reason}
