@@ -61,6 +61,7 @@ using Content.Shared.Random.Helpers;
 using Content.Shared.Roles;
 using Content.Goobstation.Common.Barks; // Goob Station - Barks
 using Content.Shared.Traits;
+using Content.Shared._Orehum.CCVars;
 using Robust.Shared.Collections;
 using Robust.Shared.Configuration;
 using Robust.Shared.Enums;
@@ -381,6 +382,24 @@ namespace Content.Shared.Preferences
         {
             return new(this) { Species = species };
         }
+
+        // Orehum - TRAITS
+        public HumanoidCharacterProfile WithoutAllTraitPreferences()
+        {
+            return new(this)
+            {
+                _traitPreferences = new HashSet<ProtoId<TraitPrototype>>(),
+            };
+        }
+
+        public HumanoidCharacterProfile WithTraitPreferences(IEnumerable<ProtoId<TraitPrototype>> traitPreferences)
+        {
+            return new(this)
+            {
+                _traitPreferences = new(traitPreferences),
+            };
+        }
+        // Orehum - TRAITS
 
         // begin Goobstation: port EE height/width sliders
         public HumanoidCharacterProfile WithHeight(float height)
@@ -749,7 +768,11 @@ namespace Content.Shared.Preferences
             _antagPreferences.UnionWith(antags);
 
             _traitPreferences.Clear();
-            _traitPreferences.UnionWith(GetValidTraits(traits, prototypeManager));
+            // Orehum - TRAITS
+            var maxPoints = configManager.GetCVar(TraitsCCVars.MaxTraitPoints);
+            var maxCount = configManager.GetCVar(TraitsCCVars.MaxTraitCount);
+            _traitPreferences.UnionWith(GetValidTraits(traits, prototypeManager, maxPoints, maxCount));
+            // Orehum - TRAITS
 
             // Checks prototypes exist for all loadouts and dump / set to default if not.
             var toRemove = new ValueList<string>();
@@ -775,21 +798,35 @@ namespace Content.Shared.Preferences
         /// <summary>
         /// Takes in an IEnumerable of traits and returns a List of the valid traits.
         /// </summary>
-        public List<ProtoId<TraitPrototype>> GetValidTraits(IEnumerable<ProtoId<TraitPrototype>> traits, IPrototypeManager protoManager)
+        public List<ProtoId<TraitPrototype>> GetValidTraits(IEnumerable<ProtoId<TraitPrototype>> traits, IPrototypeManager protoManager,
+            int maxGlobalPoints, int maxGlobalCount)
         {
             // Track points count for each group.
             var groups = new Dictionary<string, int>();
+            var counts = new Dictionary<string, int>();
             var result = new List<ProtoId<TraitPrototype>>();
+            var totalPoints = 0;
+            var totalCount = 0;
+            var sortedTraits = traits
+                .Where(protoManager.HasIndex)
+                .OrderBy(id => protoManager.Index(id).Cost);
 
-            foreach (var trait in traits)
+            foreach (var traitId in sortedTraits)
             {
-                if (!protoManager.TryIndex(trait, out var traitProto))
+                if (!protoManager.TryIndex(traitId, out var traitProto))
                     continue;
 
-                // Always valid.
+                if (totalCount + 1 > maxGlobalCount)
+                    continue;
+
+                if (totalPoints + traitProto.Cost > maxGlobalPoints)
+                    continue;
+
                 if (traitProto.Category == null)
                 {
-                    result.Add(trait);
+                    result.Add(traitId);
+                    totalPoints += traitProto.Cost;
+                    totalCount++;
                     continue;
                 }
 
@@ -797,15 +834,21 @@ namespace Content.Shared.Preferences
                 if (!protoManager.TryIndex(traitProto.Category, out var category))
                     continue;
 
-                var existing = groups.GetOrNew(category.ID);
-                existing += traitProto.Cost;
-
-                // Too expensive.
-                if (existing > category.MaxTraitPoints)
+                var existingPoints = groups.GetValueOrDefault(category.ID, 0);
+                var existingCount = counts.GetValueOrDefault(category.ID, 0);
+                var maxCatPoints = category.MaxPoints ?? category.MaxTraitPoints;
+                if (maxCatPoints.HasValue && existingPoints + traitProto.Cost > maxCatPoints.Value)
                     continue;
 
-                groups[category.ID] = existing;
-                result.Add(trait);
+                // Too expensive.
+                if (category.MaxTraits.HasValue && existingCount + 1 > category.MaxTraits.Value)
+                    continue;
+
+                groups[category.ID] = existingPoints + traitProto.Cost;
+                counts[category.ID] = existingCount + 1;
+                result.Add(traitId);
+                totalPoints += traitProto.Cost;
+                totalCount++;
             }
 
             return result;

@@ -76,6 +76,11 @@
   - LanguageKnowledge
   - ForeignerTrait
   # Einstein Engines - Language end
+  # Orehum
+  - Lightweight
+  - LightStep
+  - BloodDeficiency
+  # Orehum
   blacklist:
     components:
     - AttachedClothing # helmets, which are part of the suit

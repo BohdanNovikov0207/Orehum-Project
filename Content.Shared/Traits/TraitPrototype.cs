@@ -17,6 +17,10 @@ using Content.Shared.Whitelist;
 using Robust.Shared.Prototypes;
 using Content.Shared.Humanoid.Prototypes; // Goob: Ported from DeltaV - Species specific trait support.
 
+using Content.Shared._Orehum.Traits.Conditions;
+using Content.Shared._Orehum.Traits.Effects;
+using Robust.Shared.Serialization.TypeSerializers.Implementations.Custom.Prototype;
+
 namespace Content.Shared.Traits;
 
 /// <summary>
@@ -54,10 +58,28 @@ public sealed partial class TraitPrototype : IPrototype
     public List<string> Blacklist { get; private set; } = new();
 
     /// <summary>
+    /// List of conditions to meet for availability.
+    /// </summary>
+    [DataField("conditions")]
+    public List<BaseTraitCondition> Conditions { get; set; } = new();
+
+    /// <summary>
+    /// Effects applied when the trait is granted.
+    /// </summary>
+    [DataField("effects")]
+    public List<BaseTraitEffect> Effects { get; set; } = new();
+
+    /// <summary>
+    /// Other traits that are mutually exclusive with this one.
+    /// </summary>
+    [DataField("conflicts")]
+    public List<ProtoId<TraitPrototype>> Conflicts { get; set; } = new();
+
+    /// <summary>
     /// The components that get added to the player, when they pick this trait.
     /// </summary>
-    [DataField]
-    public ComponentRegistry Components { get; private set; } = new();
+    [DataField("components")]
+    public ComponentRegistry Components { get; set; } = new();
 
     /// <summary>
     /// Gear that is given to the player, when they pick this trait.
