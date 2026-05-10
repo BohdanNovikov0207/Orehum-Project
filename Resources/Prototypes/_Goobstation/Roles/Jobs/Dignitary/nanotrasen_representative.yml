@@ -101,7 +101,7 @@
   requirements:
     - !type:DepartmentTimeRequirement
       department: Command
-      time: 9999999999 #muhehehe
+      time: 180000
     - !type:AgeRequirement
       requiredAge: 21
     - !type:SpeciesRequirement # Goob - None Felinid
