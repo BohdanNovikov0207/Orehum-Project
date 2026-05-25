@@ -2,7 +2,7 @@
   parent: [BaseItem, BaseStash, ClothingMaskBase]
   id: TennisBall
   name: теннисный мячик
-  description: Создано для того, чтобы испытывать терпение сотрудников службы безопасности.
+  description: Создан для того, чтобы испытывать терпение сотрудников службы безопасности.
   components:
   - type: Sprite
     sprite: _Goobstation/Objects/Fun/tennis.rsi
@@ -96,7 +96,7 @@
   name: теннисная ракетка синдиката
   parent: BaseTennisRacket
   id: SyndicateTennisRacket
-  description: Надежная теннисная ракетка синдиката
+  description: Надежная теннисная ракетка Синдиката
   components:
   - type: Sprite
     sprite: _Goobstation/Objects/Fun/syndicate_tennis_racket.rsi
