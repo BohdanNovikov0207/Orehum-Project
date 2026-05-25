@@ -101,6 +101,10 @@
   setPreference: true
   objective: roles-antag-syndicate-agent-objective
   guides: [ Traitors ]
+  requirements:
+  - !type:OverallPlaytimeRequirement
+    time: 1h
+  creditImage: /Textures/_Trauma/EndCredits/Antags/traitor.png # Trauma
 
 - type: antag
   id: TraitorSleeper

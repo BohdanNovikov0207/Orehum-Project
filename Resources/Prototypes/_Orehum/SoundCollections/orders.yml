@@ -1,0 +1,19 @@
+- type: soundCollection
+  id: OrderFocus
+  files:
+    - /Audio/_Orehum/Orders/focus/backtohell.ogg
+    - /Audio/_Orehum/Orders/focus/fire.ogg
+    - /Audio/_Orehum/Orders/focus/takedown.ogg
+
+- type: soundCollection
+  id: OrderHold
+  files:
+    - /Audio/_Orehum/Orders/hold/holdsteady.ogg
+    - /Audio/_Orehum/Orders/hold/onme.ogg
+
+- type: soundCollection
+  id: OrderMove
+  files:
+    - /Audio/_Orehum/Orders/move/forward.ogg
+    - /Audio/_Orehum/Orders/move/gogo.ogg
+    - /Audio/_Orehum/Orders/move/moveout.ogg

@@ -73,6 +73,13 @@ public sealed partial class ApcComponent : BaseApcNetComponent
     public const float HighPowerThreshold = 0.9f;
     public static TimeSpan VisualsChangeDelay = TimeSpan.FromSeconds(1);
 
+    /// <summary>
+    /// Maximum continuous load in Watts that this APC can supply to loads. Exceeding this starts a
+    /// timer, which after enough overloading causes the APC to "trip" off.
+    /// </summary>
+    [DataField]
+    public float MaxLoad = 20e3f;
+
     // TODO ECS power a little better!
     // End the suffering
     protected override void AddSelfToNet(IApcNet apcNet)

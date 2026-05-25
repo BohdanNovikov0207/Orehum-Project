@@ -27,6 +27,16 @@
   maleFirstNames: NamesVulpakinMale
   femaleFirstNames: NamesVulpakinFemale
   lastNames: NamesVulpakinLast
+  # Orehum-edit Species UI
+  category: Classic
+  description: "/ServerInfo/Guidebook/Mobs/Vulpkanin.xml"
+  pros:
+  - Наносят урон тупым и режущим уроном.
+  special:
+  - Видят мир в красных и зеленых цветах.
+  cons:
+  - Получают на 15% больше теплового урона.
+  # Orehum-edit Species UI
 
 - type: speciesBaseSprites
   id: MobVulpkaninSprites

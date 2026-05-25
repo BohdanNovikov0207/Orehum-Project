@@ -23,7 +23,6 @@
 - type: contrabandSeverity
   id: Restricted
   examineText: contraband-examine-text-Restricted
-  showDepartmentsAndJobs: true
 
 # Having this as a regular crew member is considered grand theft. (nuke disk, captain's gear, objective items, etc)
 - type: contrabandSeverity
@@ -42,6 +41,5 @@
 
 # These toys belong to the clown, give them back or get honked
 - type: contrabandSeverity
-  id: Honkraband 
+  id: Honkraband
   examineText: contraband-examine-text-Clown
-  

@@ -20,7 +20,7 @@ public sealed partial class MindcontrolledComponent : Component
     [DataField]
     public EntityUid? Master = null;
     [DataField]
-    public SoundSpecifier MindcontrolStartSound = new SoundPathSpecifier("/Audio/_Goobstation/Ambience/Antag/mindcontrol_start.ogg");
+    public SoundSpecifier MindcontrolStartSound = new SoundPathSpecifier("/Audio/_Goobstation/Ambience/Antag/bloodcult_gain.ogg");
     [DataField]
     public bool BriefingSent = false;
 

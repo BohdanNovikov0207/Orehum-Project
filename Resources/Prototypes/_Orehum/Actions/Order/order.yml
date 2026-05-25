@@ -1,0 +1,38 @@
+- type: entity
+  id: ActionOrderFocus
+  parent: ActionOrderBase
+  name: Целься!
+  components:
+  - type: Action
+    itemIconStyle: NoItem
+    icon:
+      sprite: _Orehum/Actions/marine_actions.rsi
+      state: focus
+  - type: InstantAction
+    event: !type:FocusActionEvent
+
+- type: entity
+  id: ActionOrderHold
+  parent: ActionOrderBase
+  name: Удерживать!
+  components:
+  - type: Action
+    itemIconStyle: NoItem
+    icon:
+      sprite: _Orehum/Actions/marine_actions.rsi
+      state: hold
+  - type: InstantAction
+    event: !type:HoldActionEvent
+
+- type: entity
+  id: ActionOrderMove
+  parent: ActionOrderBase
+  name: Вперед!
+  components:
+  - type: Action
+    itemIconStyle: NoItem
+    icon:
+      sprite: _Orehum/Actions/marine_actions.rsi
+      state: move
+  - type: InstantAction
+    event: !type:MoveActionEvent

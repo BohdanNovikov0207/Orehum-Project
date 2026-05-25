@@ -43,5 +43,5 @@
       - ShowAntagIcons
       - Mindcontrolled
   icon:
-    sprite: /Textures/_Goobstation/Interface/Misc/job_icons.rsi
-    state: Mindcontrolled
+    sprite: /Textures/_Orehum/Interface/Misc/geass.rsi
+    state: geass

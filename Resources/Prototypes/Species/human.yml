@@ -41,6 +41,10 @@
   defaultWidth: 1
   maxWidth: 1.10
   # end Goobstation: port EE height/width sliders
+  # Orehum-edit Species UI
+  category: Classic
+  description: "/ServerInfo/Guidebook/Mobs/Human.xml"
+  # Orehum-edit Species UI
 
 # The lack of a layer means that
 # this person cannot have round-start anything

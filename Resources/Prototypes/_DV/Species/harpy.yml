@@ -34,6 +34,21 @@
   defaultWidth: 0.80
   maxWidth: 1.2
   # end Goobstation: port EE height/width sliders
+  # Orehum-edit Species UI
+  category: Unusual
+  description: "/ServerInfo/Guidebook/Mobs/Harpy.xml"
+  pros:
+  - Могут летать на своих крыльях.
+  - Бегают на 10% быстрее, чем человек.
+  - Умеют петь, без инструментов.
+  - Умеют имитировать чужие голоса.
+  - Не могут порезаться об стекло и активировать мины с мышеловками своими ногами.
+  special:
+  - Дышат в 3 раза чаще, чем человек.
+  cons:
+  - Получают на 15% больше тупого урона.
+  - Не могут с лёгкостью тянуть другие расы и предметы, по сравнению с человеком.
+  # Orehum-edit Species UI
 
 - type: speciesBaseSprites
   id: MobHarpySprites

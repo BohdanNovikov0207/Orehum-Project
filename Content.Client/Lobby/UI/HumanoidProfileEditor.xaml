@@ -24,6 +24,7 @@ SPDX-License-Identifier: AGPL-3.0-or-later
          xmlns:humanoid="clr-namespace:Content.Client.Humanoid"
          xmlns:cc="clr-namespace:Content.Client.Administration.UI.CustomControls"
          xmlns:ui="clr-namespace:Content.Client.Lobby.UI"
+         xmlns:orehum="clr-namespace:Content.Client._Orehum.Traits.UI"
          HorizontalExpand="True">
         <!-- Left side -->
         <BoxContainer Orientation="Vertical" Margin="10 10 10 10" HorizontalExpand="True">
@@ -73,14 +74,16 @@ SPDX-License-Identifier: AGPL-3.0-or-later
                         <!-- appearanceList -->
                         <BoxContainer Orientation="Vertical">
                             <BoxContainer Margin="10" Orientation="Vertical" HorizontalExpand="True">
-                                <!-- Species -->
+                                <!-- Orehum edit - Species -->
                                 <BoxContainer HorizontalExpand="True">
                                     <Label Text="{Loc 'humanoid-profile-editor-species-label'}" />
                                     <Control HorizontalExpand="True"/>
                                     <TextureButton Name="SpeciesInfoButton" Scale="0.3 0.3"
                                                    VerticalAlignment="Center"
-                                                   ToolTip="{Loc 'humanoid-profile-editor-guidebook-button-tooltip'}"/>
-                                    <OptionButton Name="SpeciesButton" HorizontalAlignment="Right" />
+                                                   ToolTip="{Loc 'humanoid-profile-editor-guidebook-button-tooltip'}"
+                                                   Visible="False"/>
+                                    <OptionButton Name="SpeciesButton" HorizontalAlignment="Right" Visible="False"/>
+                                    <Button Name="NewSpeciesButton" HorizontalAlignment="Right" ToggleMode="True" />
                                 </BoxContainer>
                                 <!-- Age -->
                                 <BoxContainer HorizontalExpand="True">
@@ -170,14 +173,8 @@ SPDX-License-Identifier: AGPL-3.0-or-later
                         <BoxContainer Name="AntagList" Orientation="Vertical" />
                     </ScrollContainer>
                 </BoxContainer>
-                <BoxContainer Name="TraitsTab" Orientation="Vertical" Margin="10">
                     <!-- Traits -->
-                    <BoxContainer Orientation="Horizontal" HorizontalAlignment="Center" Margin="0 0 0 10">
-                        <Label Text="Доступные очки: " />
-                        <Label Name="TotalTraitPointsLabel" Text="0" FontColorOverride="Cyan" />
-                    </BoxContainer>
-                    <TabContainer Name="TraitsTabContainer" VerticalExpand="True" />
-                </BoxContainer>
+                    <orehum:TraitsTab Name="TraitsTab" />
                 <BoxContainer Name="MarkingsTab" Orientation="Vertical" Margin="10">
                     <!-- Markings -->
                     <ScrollContainer VerticalExpand="True">

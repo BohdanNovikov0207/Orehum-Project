@@ -1,0 +1,45 @@
+- type: guideEntry
+  id: ShuttlesGuide
+  name: guide-entry-shuttles
+  text: "/ServerInfo/_Orehum/Guidebook/Shipyard/Shuttles.xml"
+  children:
+  - TheBargeShuttle
+  - ProspectorShuttle
+  - PTShuttle
+
+- type: guideEntry
+  id: TheBargeShuttle
+  name: guide-entry-shuttles-barge
+  text: "/ServerInfo/_Orehum/Guidebook/Shipyard/TheBargeShuttle.xml"
+
+- type: guideEntry
+  id: ProspectorShuttle
+  name: guide-entry-shuttles-prospector
+  text: "/ServerInfo/_Orehum/Guidebook/Shipyard/ProspectorShuttle.xml"
+
+- type: guideEntry
+  id: PTShuttle
+  name: guide-entry-shuttles-pts
+  text: "/ServerInfo/_Orehum/Guidebook/Shipyard/PTShuttle.xml"
+
+
+# Texture
+- type: entity
+  parent: PosterBase
+  id: ShuttleMapBarge
+  name: "NC Barge"
+  categories: [ HideSpawnMenu ]
+  components:
+  - type: Sprite
+    sprite: _Orehum/Guidebook/shuttle_maps/128x96.rsi
+    state: barge
+
+- type: entity
+  parent: PosterBase
+  id: ShuttleMapProspector
+  name: "NC Prospector"
+  categories: [ HideSpawnMenu ]
+  components:
+  - type: Sprite
+    sprite: _Orehum/Guidebook/shuttle_maps/128x96.rsi
+    state: prospector

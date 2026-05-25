@@ -35,6 +35,7 @@
 using Content.Shared.Dataset;
 using Content.Shared.Humanoid.Markings;
 using Robust.Shared.Prototypes;
+using Robust.Shared.Utility;
 
 namespace Content.Shared.Humanoid.Prototypes;
 
@@ -222,6 +223,17 @@ public sealed partial class SpeciesPrototype : IPrototype
     public bool SponsorOnly { get; private set; } = false;
     // Corvax-Sponsors-End
 
+    [DataField]
+    public SpeciesCategory Category { get; private set; } = SpeciesCategory.Classic;
+    [DataField]
+    public ResPath? Description { get; private set; }
+    [DataField]
+    public List<string> Pros { get; private set; } = new();
+    [DataField]
+    public List<string> Cons { get; private set; } = new();
+    [DataField]
+    public List<string> Special { get; private set; } = new();
+
 }
 
 public enum SpeciesNaming : byte
@@ -234,4 +246,12 @@ public enum SpeciesNaming : byte
     LastNoFirst, // DeltaV
     FirstDashLast, // Goobstation
     FirstRoman // EE Plasmeme Change
+}
+
+public enum SpeciesCategory : byte
+{
+    Classic,
+    Unusual,
+    Special,
+    Sponsor
 }

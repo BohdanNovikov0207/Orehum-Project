@@ -5,6 +5,24 @@
   - !type:PlayerGUIDLoadoutEffect
     guid: e0544f2e-3c2a-456b-affd-1a622f367e78
 
+- type: loadoutEffectGroup
+  id: Strawberry
+  effects:
+  - !type:PlayerGUIDLoadoutEffect
+    guid: 7a24ff74-3479-43c7-b824-2746bad29bd4
+
+- type: loadoutEffectGroup
+  id: mor5hey97
+  effects:
+  - !type:PlayerGUIDLoadoutEffect
+    guid: 51dc2208-850d-40c3-8cde-0eb556847db1
+
+- type: loadoutEffectGroup
+  id: unenduring
+  effects:
+  - !type:PlayerGUIDLoadoutEffect
+    guid: b62055d5-1ad1-4dda-90da-dbd652ef4ea6
+
 #Items
 - type: loadout
   id: RubberPig
@@ -14,3 +32,30 @@
   storage:
     back:
     - RubberPig
+
+- type: loadout
+  id: StrawberryBeer
+  effects:
+  - !type:GroupLoadoutEffect
+    proto: Strawberry
+  storage:
+    back:
+    - StrawberryBeer
+
+- type: loadout
+  id: Mor5hey97Beer
+  effects:
+  - !type:GroupLoadoutEffect
+    proto: mor5hey97
+  storage:
+    back:
+    - Mor5hey97Beer
+
+- type: loadout
+  id: MusicPlayer
+  effects:
+  - !type:GroupLoadoutEffect
+    proto: unenduring
+  storage:
+    back:
+    - MusicPlayer

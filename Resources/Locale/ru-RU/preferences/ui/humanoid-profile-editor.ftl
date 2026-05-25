@@ -62,5 +62,3 @@ trait-category-quirks = Причуды
 trait-category-visual = Зрительные
 trait-category-auditory = Слуховые
 trait-category-speach = Речевые
-trait-category-physical = Физические
-trait-category-mental = Психические

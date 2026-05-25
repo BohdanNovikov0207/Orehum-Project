@@ -212,6 +212,7 @@
       conditions:
       - !type:PlayerCountCondition
         max: 15
+    - id: SecApartmentTablet # Corvax-SecApartment
 
 # No laser table + Laser table
 - type: entityTable
@@ -300,6 +301,7 @@
     - id: CommandMegaphone # goob - loudspeakers
     - id: ReinforcementCallerHoP # Trauma
     - id: ServiceComputerCommsFlatpack
+    - id: ShipyardComputerCircuitboard
 
 - type: entity
   id: LockerHeadOfPersonnelFilled

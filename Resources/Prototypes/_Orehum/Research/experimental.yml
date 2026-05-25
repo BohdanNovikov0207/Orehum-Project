@@ -1,0 +1,14 @@
+- type: technology
+  id: BluespaceArtillery
+  name: research-technology-bluespace-artillery
+  icon:
+    sprite: _Adventure/Structures/BSA.rsi
+    state: cannon_east
+  discipline: Experimental
+  tier: 3
+  cost: 15100
+  recipeUnlocks:
+  - ArtilleryComputerCircuitboard
+  position: -4,-3
+  technologyPrerequisites:
+  - BluespaceTheory

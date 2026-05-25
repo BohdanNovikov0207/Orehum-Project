@@ -185,3 +185,7 @@
 
 - type: playTimeTracker
   id: JobZookeeper
+
+# Orehum
+- type: playTimeTracker
+  id: JobFrontierGuard

@@ -33,6 +33,18 @@
   defaultWidth: 1
   maxWidth: 1
   # end Goobstation: port EE height/width sliders
+  # Orehum-edit Species UI
+  category: Classic
+  description: "/ServerInfo/Guidebook/Mobs/Resomi.xml"
+  pros:
+  - Невосприимчивы к урону от холода и другим воздействиям.
+  special:
+  - Могут поместится в вещмешок.
+  cons:
+  - Получают на 30% больше тупого и теплового урона.
+  - Температура, которую большинство других видов считают комфортной, для них невыносимо высокая, и они начинают страдать начиная всего с 30°C.
+  - Не могут с лёгкостью тянуть другие расы и предметы, по сравнению с человеком.
+  # Orehum-edit Species UI
 
 - type: speciesBaseSprites
   id: MobResomiSprites

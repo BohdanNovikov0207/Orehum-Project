@@ -1,0 +1,41 @@
+﻿- type: traitCategory
+  id: Physical
+  name: trait-category-physical
+  priority: 0
+  accentColor: "#f97316"
+
+- type: traitCategory
+  id: Medical
+  name: trait-category-medical
+  priority: 10
+  accentColor: "#ef4444"
+
+- type: traitCategory
+  id: Mental
+  name: trait-category-mental
+  priority: 20
+  accentColor: "#a855f7"
+
+- type: traitCategory
+  id: Meta
+  name: trait-category-meta
+  priority: 30
+  accentColor: "#eab308"
+
+- type: traitCategory
+  id: Disabilities
+  name: trait-category-disabilities
+  priority: 100
+
+- type: traitCategory
+  id: SpeechTraits
+  name: trait-category-speech
+  #maxTraitPoints: 2
+  maxTraits: 2
+  priority: 50
+
+- type: traitCategory
+  id: Quirks
+  name: trait-category-quirks
+  #maxTraitPoints: 0
+  priority: 100

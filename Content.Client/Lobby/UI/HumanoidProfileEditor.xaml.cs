@@ -156,9 +156,12 @@
 using System.IO;
 using System.Linq;
 using System.Numerics;
+using Content.Client._Orehum.Lobby.UI;
+using Content.Client.Guidebook;
 using Content.Client.Humanoid;
 using Content.Client.Lobby.UI.Loadouts;
 using Content.Client.Lobby.UI.Roles;
+using Content.Client._Orehum.Traits.UI;
 using Content.Client.Message;
 using Content.Client.Players.PlayTimeTracking;
 using Content.Client.Sprite;
@@ -199,6 +202,7 @@ namespace Content.Client.Lobby.UI
     [GenerateTypedNameReferences]
     public sealed partial class HumanoidProfileEditor : BoxContainer
     {
+        [Dependency] private readonly DocumentParsingManager _parsingMan = default!;
         private readonly IClientPreferencesManager _preferencesManager;
         private readonly IConfigurationManager _cfgManager;
         private readonly IEntityManager _entManager;
@@ -270,6 +274,8 @@ namespace Content.Client.Lobby.UI
 
         private ISawmill _sawmill;
 
+        private SpeciesWindow? _speciesWindow; // Orehum edit
+
         public HumanoidProfileEditor(
             IClientPreferencesManager preferencesManager,
             IConfigurationManager configurationManager,
@@ -284,6 +290,7 @@ namespace Content.Client.Lobby.UI
             ISharedSponsorsManager clientSponsorsManager)
         {
             RobustXamlLoader.Load(this);
+            IoCManager.InjectDependencies(this);
             _sawmill = logManager.GetSawmill("profile.editor");
             _cfgManager = configurationManager;
             _entManager = entManager;
@@ -406,6 +413,50 @@ namespace Content.Client.Lobby.UI
                 UpdateHeightWidthSliders(); // Goobstation: port EE height/width sliders
                 RefreshTraits();
             };
+
+            // Orehum-edit start
+            NewSpeciesButton.OnToggled += args =>
+            {
+                if (Profile == null)
+                    return;
+
+                _speciesWindow?.Dispose();
+
+                if (!args.Pressed)
+                {
+                    _speciesWindow = null;
+                }
+                else
+                {
+                    _speciesWindow = new(
+                        Profile,
+                        prototypeManager,
+                        entManager,
+                        _controller,
+                        _resManager,
+                        _parsingMan);
+
+                    _speciesWindow.OpenCenteredLeft();
+                    var oldProfile = Profile.Clone();
+                    _speciesWindow.ChooseAction += args =>
+                    {
+                        SetSpecies(args);
+                        OnSkinColorOnValueChangedKeepColor(oldProfile);
+                        UpdateHairPickers();
+                        _speciesWindow?.Dispose();
+                        _speciesWindow = null;
+                        var name1 = _prototypeManager.Index(Profile?.Species ?? "Human").Name;
+                        NewSpeciesButton.Text = Loc.GetString(name1);
+                        NewSpeciesButton.Pressed = false;
+                    };
+                    _speciesWindow.OnClose += () =>
+                    {
+                        NewSpeciesButton.Pressed = false;
+                        _speciesWindow = null;
+                    };
+                }
+            };
+            // Orehum-edit end
 
             // begin Goobstation: port EE height/width sliders
             #region Height and Width
@@ -613,6 +664,7 @@ namespace Content.Client.Lobby.UI
             #endregion Jobs
 
             TabContainer.SetTabTitle(2, Loc.GetString("humanoid-profile-editor-antags-tab"));
+            TabContainer.SetTabTitle(3, Loc.GetString("trait-editor-title"));
 
             RefreshTraits();
 
@@ -653,6 +705,16 @@ namespace Content.Client.Lobby.UI
 
             SpeciesInfoButton.OnPressed += OnSpeciesInfoButtonPressed;
 
+            // Orehum - TRAITS
+            TraitsTab.OnTraitsChanged += traits =>
+            {
+                if (Profile == null)
+                    return;
+                Profile = Profile.WithTraitPreferences(traits);
+                SetDirty();
+            };
+            // Orehum - TRAITS
+
             UpdateSpeciesGuidebookIcon();
             IsDirty = false;
         }
@@ -688,112 +750,19 @@ namespace Content.Client.Lobby.UI
             }
         }
 
+        // Orehum - TRAITS
         /// <summary>
         /// Refreshes traits selector
         /// </summary>
         public void RefreshTraits()
         {
-            foreach (var child in TraitsTabContainer.Children.ToList())
-            {
-                child.Orphan();
-                child.Dispose();
-            }
-            TraitsTabContainer.RemoveAllChildren();
+            if (Profile == null)
+                return;
 
-            if (Profile == null) return;
-
-            int totalPointsBalance = 7;
-            foreach (var traitId in Profile.TraitPreferences)
-            {
-                if (_prototypeManager.TryIndex<TraitPrototype>(traitId, out var trait))
-                {
-                    totalPointsBalance -= trait.Cost;
-                }
-            }
-
-            TotalTraitPointsLabel.Text = Loc.GetString("humanoid-profile-editor-traits-header", ("points", totalPointsBalance));
-            TotalTraitPointsLabel.FontColorOverride = totalPointsBalance < 0 ? Color.Red : Color.Cyan;
-
-            var traitGroups = new Dictionary<string, List<TraitPrototype>>();
-            var allTraits = _prototypeManager.EnumeratePrototypes<TraitPrototype>().OrderBy(t => Loc.GetString(t.Name));
-
-            foreach (var trait in allTraits)
-            {
-                if (Profile.Species is { } selectedSpecies &&
-                   (trait.ExcludedSpecies.Contains(selectedSpecies) ||
-                    trait.IncludedSpecies.Count > 0 && !trait.IncludedSpecies.Contains(selectedSpecies)))
-                    continue;
-
-                var catId = trait.Category?.ToString() ?? "Default";
-                if (!traitGroups.ContainsKey(catId)) traitGroups[catId] = new List<TraitPrototype>();
-                traitGroups[catId].Add(trait);
-            }
-
-            foreach (var (categoryId, traits) in traitGroups)
-            {
-                _prototypeManager.TryIndex<TraitCategoryPrototype>(categoryId, out var categoryProto);
-                var categoryName = categoryProto != null ? Loc.GetString(categoryProto.Name) : Loc.GetString("traits-category-default");
-
-                var listContainer = new BoxContainer { Orientation = LayoutOrientation.Vertical, Margin = new Thickness(5) };
-                var scroll = new ScrollContainer { VerticalExpand = true };
-                scroll.AddChild(listContainer);
-
-                var tabPage = new BoxContainer { Orientation = LayoutOrientation.Vertical, Visible = true };
-                tabPage.AddChild(scroll);
-
-                TraitsTabContainer.AddChild(tabPage);
-                var tabIndex = TraitsTabContainer.ChildCount - 1;
-                TraitsTabContainer.SetTabTitle(tabIndex, categoryName);
-
-                foreach (var trait in traits)
-                {
-                    if (!Profile.TraitPreferences.Contains(trait.ID) && !IsTraitCompatible(trait))
-                    {
-                        continue;
-                    }
-
-                    var selector = new TraitPreferenceSelector(trait);
-                    selector.Preference = Profile.TraitPreferences.Contains(trait.ID);
-
-                    selector.PreferenceChanged += preference =>
-                    {
-                        if (preference)
-                            Profile = Profile.WithTraitPreference(trait.ID, _prototypeManager);
-                        else
-                            Profile = Profile.WithoutTraitPreference(trait.ID, _prototypeManager);
-
-                        SetDirty();
-                        RefreshTraits();
-                    };
-                    listContainer.AddChild(selector);
-                }
-            }
-
-            if (TraitsTabContainer.Parent?.Parent is TabContainer mainTabs)
-            {
-                for (var i = 0; i < mainTabs.ChildCount; i++)
-                {
-                    if (mainTabs.GetChild(i) == TraitsTabContainer.Parent)
-                    {
-                        mainTabs.SetTabTitle(i, Loc.GetString("humanoid-profile-editor-traits-tab"));
-                        break;
-                    }
-                }
-            }
-            UpdateSaveButton();
+            TraitsTab.SetSelectedTraits(Profile.TraitPreferences);
+            TraitsTab.UpdateConditions(Profile);
         }
-
-        public bool IsTraitsBalanceValid()
-        {
-            if (Profile == null) return true;
-            int points = 0;
-            foreach (var traitId in Profile.TraitPreferences)
-            {
-                if (_prototypeManager.TryIndex<TraitPrototype>(traitId, out var trait))
-                    points -= trait.Cost;
-            }
-            return points >= 0;
-        }
+        //Orehum - TRAITS
 
         /// <summary>
         /// Refreshes the species selector.
@@ -819,6 +788,12 @@ namespace Content.Client.Lobby.UI
                 if (Profile?.Species.Equals(_species[i].ID) == true)
                 {
                     SpeciesButton.SelectId(i);
+
+                    // Orehum-edit start
+                    NewSpeciesButton.Text = name;
+                    NewSpeciesButton.Pressed = false;
+                    _speciesWindow?.Dispose();
+                    // Orehum-edit end
                 }
             }
 
@@ -879,6 +854,7 @@ namespace Content.Client.Lobby.UI
                 selector.OnSelected += preference =>
                 {
                     Profile = Profile?.WithAntagPreference(antag.ID, preference == 0);
+                    RefreshTraits(); // Orehum - TRAITS
                     SetDirty();
                 };
 
@@ -1189,6 +1165,7 @@ namespace Content.Client.Lobby.UI
                         ReloadPreview();
 
                         UpdateJobPriorities();
+                        RefreshTraits(); // Orehum - TRAITS
                         SetDirty();
                     };
 
@@ -2104,6 +2081,51 @@ namespace Content.Client.Lobby.UI
             }
 
             return true;
+        }
+
+        private void OnSkinColorOnValueChangedKeepColor(HumanoidCharacterProfile previous)
+        {
+            if (Profile is null) return;
+
+            var skin = _prototypeManager.Index<SpeciesPrototype>(Profile.Species).SkinColoration;
+            var color = previous.Appearance.SkinColor;
+
+            switch (skin)
+            {
+                case HumanoidSkinColor.HumanToned:
+                    var tone = SkinColor.HumanSkinToneFromColor(previous.Appearance.SkinColor);
+                    color = SkinColor.HumanSkinTone((int)tone);
+                    Skin.Value = tone;
+
+                    Profile = Profile.WithCharacterAppearance(Profile.Appearance.WithSkinColor(color));//
+                    break;
+                case HumanoidSkinColor.Hues:
+                    break;
+                case HumanoidSkinColor.TintedHues:
+                    color = SkinColor.TintedHues(previous.Appearance.SkinColor);
+
+                    Profile = Profile.WithCharacterAppearance(Profile.Appearance.WithSkinColor(color));
+                    break;
+                case HumanoidSkinColor.VoxFeathers:
+                    color = SkinColor.ClosestVoxColor(previous.Appearance.SkinColor);
+
+                    Profile = Profile.WithCharacterAppearance(Profile.Appearance.WithSkinColor(color));
+                    break;
+                case HumanoidSkinColor.NoColor:
+                    color = Color.White;
+
+                    Profile = Profile.WithCharacterAppearance(Profile.Appearance.WithSkinColor(color));
+                    break;
+                case HumanoidSkinColor.AnimalFur:
+                    color = SkinColor.ClosestAnimalFurColor(previous.Appearance.SkinColor);
+
+                    Profile = Profile.WithCharacterAppearance(Profile.Appearance.WithSkinColor(color));
+                    break;
+            }
+
+            _rgbSkinColorSelector.Color = color;
+
+            ReloadProfilePreview();
         }
     }
 }

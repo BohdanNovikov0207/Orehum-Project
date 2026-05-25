@@ -128,6 +128,7 @@
   - !type:AddComponentSpecial # goobstation
     components:
       - type: SecurityStaff
+      - type: OrderListen
 
 - type: startingGear
   id: SecurityCadetGear

@@ -1,0 +1,36 @@
+// SPDX-FileCopyrightText: 2026 Space Station 14 Contributors
+//
+// SPDX-License-Identifier: AGPL-3.0-or-later
+
+using System.Numerics;
+using Robust.Shared.GameStates;
+
+namespace Content.Shared._Orion.Posing;
+
+[RegisterComponent, NetworkedComponent, AutoGenerateComponentState(true)]
+public sealed partial class PosingComponent : Component
+{
+    [ViewVariables(VVAccess.ReadWrite), AutoNetworkedField]
+    public Vector2 CurrentOffset = Vector2.Zero;
+
+    [ViewVariables(VVAccess.ReadWrite), AutoNetworkedField]
+    public Angle CurrentAngle = Angle.Zero;
+
+    [DataField, AutoNetworkedField]
+    public Vector2 OffsetLimits = new(0.3f, 0.3f);
+
+    [DataField, AutoNetworkedField]
+    public float AngleLimits = 180f;
+
+    [ViewVariables(VVAccess.ReadWrite), AutoNetworkedField]
+    public bool Posing = false;
+
+    [DataField]
+    public string DefaultInputContext = "human";
+
+    [DataField]
+    public Vector2 DefaultOffset = Vector2.Zero;
+
+    [DataField]
+    public float DefaultAngle;
+}

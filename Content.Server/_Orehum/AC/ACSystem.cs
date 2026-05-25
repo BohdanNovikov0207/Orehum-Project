@@ -1,23 +1,45 @@
 ﻿using Content.Server.Chat.Managers;
-using Content.Shared._Orehum.AC;
+using Content.Server.GameTicking;
+using Content.Shared._Orehum.АC;
+using Robust.Server.Player;
+using Robust.Shared.Player;
 
-namespace Content.Server._Orehum.AC;
+// ReSharper disable once CheckNamespace
+namespace Content.Server._Orehum.АC;
 
-public sealed class ACSystem : EntitySystem
+public sealed class АСSуstеm : EntitySystem
 {
     [Dependency] private readonly IChatManager _chatManager = default!;
+    [Dependency] private readonly IPlayerManager _playerManager = default!;
+
+    private readonly Dictionary<string, АСЕvеnt> _cachedEventMessages = new(64);
 
     public override void Initialize()
     {
         base.Initialize();
 
-        SubscribeNetworkEvent<ACEvent>(OnACEvent);
+        _playerManager.PlayerStatusChanged += OnPlayerStatusChanged;
+        SubscribeNetworkEvent<АСЕvеnt>(OnACEvent);
     }
 
-    private void OnACEvent(ACEvent even, EntitySessionEventArgs args)
+    private void OnPlayerStatusChanged(object? sender, SessionStatusEventArgs e)
     {
-        var version = even.Version != "unknown" ? $"v0.{even.Version}.0" : even.Version;
-        var msg = $"Игрок {args.SenderSession.Name} использует лаунчер: {version}.{(string.IsNullOrWhiteSpace(even.Modifications) ? null : $"\nОбнаружены следы: {even.Modifications}")}";
+        if (_cachedEventMessages.ContainsKey(e.Session.Name))
+            _cachedEventMessages.Remove(e.Session.Name);
+    }
+
+    private void OnACEvent(АСЕvеnt even, EntitySessionEventArgs args)
+    {
+        var user = args.SenderSession.Name;
+
+        if (even.LоaderVersion.Length >= 15)
+            even.LоaderVersion = "(тут был спам)";
+
+        if (_cachedEventMessages.TryGetValue(user, out var cached) && cached.IsSame(even))
+            return;
+        _cachedEventMessages[user] = even;
+
+        var msg = $"Игрок {user} использует загрузчик: {even.LоaderVersion}.{(even.НаsНаrmоnу ? $" Имеет Hаrmоny{(even.IsМаrсеу ? " и марси" : null)}" : null)}";
         _chatManager.SendAdminAnnouncement(msg);
         Log.Info(msg);
     }

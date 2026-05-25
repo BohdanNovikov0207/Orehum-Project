@@ -27,6 +27,18 @@
   markingLimits: MobFelinidMarkingLimits
   dollPrototype: MobFelinidDummy
   skinColoration: HumanToned
+  # Orehum-edit Species UI
+  category: Unusual
+  description: "/ServerInfo/Guidebook/Mobs/Felinid.xml"
+  pros:
+  - Нейтрализуют 99% урона от падения, или удара об что-то.
+  special:
+  - Не издают звуков ходьбы, если не носят обуви.
+  - Отхаркивают комок шерсти.
+  - Могут обрыгаться, при удержании.
+  cons:
+  - Стамина меньше на 25%, чем у человека.
+  # Orehum-edit Species UI
 
 - type: markingPoints
   id: MobFelinidMarkingLimits

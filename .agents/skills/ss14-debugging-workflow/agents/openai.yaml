@@ -1,0 +1,4 @@
+interface:
+  display_name: "SS14 Debugging"
+  short_description: "Logs, VV, breakpoints, and runtime debugging workflow"
+  default_prompt: "Use $ss14-debugging-workflow to investigate an SS14 bug."

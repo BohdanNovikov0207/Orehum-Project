@@ -13,6 +13,7 @@
   markingLimits: MobHumanMarkingLimits
   dollPrototype: MobBananaMenDummy
   skinColoration: NoColor
+  category: Special # wtf
 
 - type: speciesBaseSprites
   id: MobBananaMenSprites

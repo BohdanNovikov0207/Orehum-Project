@@ -7,6 +7,7 @@
 //
 // SPDX-License-Identifier: AGPL-3.0-or-later
 
+using System.Diagnostics.CodeAnalysis;
 using System.Linq;
 using System.Text.RegularExpressions;
 using Content.Shared._Shitmed.Medical.Surgery.Wounds.Systems;
@@ -91,6 +92,7 @@ public sealed partial class DevilContractSystem : EntitySystem
         _clauseRegex = new Regex($@"^\s*(?<target>{targetPattern})\s*:\s*(?<clause>.+?)\s*$",
             RegexOptions.IgnoreCase | RegexOptions.Compiled | RegexOptions.Multiline);
     }
+
     private void OnGetVerbs(Entity<DevilContractComponent> contract, ref GetVerbsEvent<AlternativeVerb> args)
     {
         if (!args.CanInteract
@@ -271,6 +273,9 @@ public sealed partial class DevilContractSystem : EntitySystem
     }
     public bool TryTransferSouls(EntityUid devil, EntityUid contractee, int added)
     {
+        if (TerminatingOrDeleted(contractee))
+            return false;
+
         // Can't sell what doesn't exist.
         if (HasComp<CondemnedComponent>(contractee)
             || devil == contractee)
@@ -302,11 +307,11 @@ public sealed partial class DevilContractSystem : EntitySystem
 
             var clauseKey = match.Groups["clause"].Value.Trim().ToLowerInvariant().Replace(" ", "");
 
-            if (!_prototypeManager.TryIndex(clauseKey, out DevilClausePrototype? clauseProto)
-                || !contract.Comp.CurrentClauses.Add(clauseProto))
-                continue;
-
-            newWeight += clauseProto.ClauseWeight;
+            if (TryGetClauseByKey(clauseKey, out var clauseProto)) // CorvaxGoob-TTS
+            {
+                contract.Comp.CurrentClauses.Add(clauseProto);
+                newWeight += clauseProto.ClauseWeight;
+            }
         }
 
         contract.Comp.ContractWeight = newWeight;
@@ -339,7 +344,7 @@ public sealed partial class DevilContractSystem : EntitySystem
                 continue;
             }
 
-            if (!_prototypeManager.TryIndex(clauseKey, out DevilClausePrototype? clause))
+            if (!TryGetClauseByKey(clauseKey, out var clause)) // CorvaxGoob-TTS
             {
                 _sawmill.Warning($"Unknown contract clause: {clauseKey}");
                 continue;
@@ -365,6 +370,9 @@ public sealed partial class DevilContractSystem : EntitySystem
     private void ApplyEffectToTarget(EntityUid target, DevilClausePrototype clause, Entity<DevilContractComponent>? contract)
     {
         //_sawmill.Debug($"Applying {clause.ID} effect to {ToPrettyString(target)}");
+
+        if (TerminatingOrDeleted(target))
+            return;
 
         DoPolymorphs(target, clause);
 
@@ -524,4 +532,23 @@ public sealed partial class DevilContractSystem : EntitySystem
     }
 
     #endregion
+
+    // CorvaxGoob-TTS-Start
+    private bool TryGetClauseByKey(string clauseKey, [NotNullWhen(true)] out DevilClausePrototype? prototype)
+    {
+        prototype = null;
+
+        if (!_prototypeManager.TryGetInstances<DevilClausePrototype>(out var clauses))
+            return false;
+
+        foreach (var clauseProto in clauses)
+            if (clauseProto.Value.Name is not null && clauseProto.Value.Name.Trim().ToLowerInvariant().Replace(" ", "") == clauseKey)
+            {
+                prototype = clauseProto.Value;
+                return true;
+            }
+
+        return false;
+    }
+    // CorvaxGoob-TTS-En
 }

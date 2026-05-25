@@ -240,4 +240,16 @@ public sealed class SponsorsManager : ISharedSponsorsManager
 
         return _cachedSponsors[userId].HavePriorityJoin;
     }
+
+    public bool TryGetTier(NetUserId userId, out int tier)
+    {
+        if (_cachedSponsors.TryGetValue(userId, out var sponsor))
+        {
+            tier = sponsor.Tier ?? 0;
+            return true;
+        }
+
+        tier = 0;
+        return false;
+    }
 }

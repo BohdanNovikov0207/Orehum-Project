@@ -24,6 +24,7 @@
 
 using System.Numerics;
 using Content.Shared.Silicons.StationAi;
+using Content.Shared.Pinpointer;
 using Robust.Client.Graphics;
 using Robust.Client.Player;
 using Robust.Shared.Enums;
@@ -32,6 +33,7 @@ using Robust.Shared.Physics;
 using Robust.Shared.Prototypes;
 using Robust.Shared.Timing;
 using Content.Shared.Movement.Components; // Shitmed - Starlight Abductors Change
+using Content.Client._Orehum.NavMapRender; // Orehum - NavMapRender
 
 namespace Content.Client.Silicons.StationAi;
 
@@ -39,7 +41,7 @@ public sealed class StationAiOverlay : Overlay
 {
     private static readonly ProtoId<ShaderPrototype> CameraStaticShader = "CameraStatic";
     private static readonly ProtoId<ShaderPrototype> StencilMaskShader = "StencilMask";
-    private static readonly ProtoId<ShaderPrototype> StencilDrawShader = "StencilDraw";
+    private static readonly ProtoId<ShaderPrototype> StencilDrawShader = "StencilDrawUnshaded"; //Orehum-edit
 
     [Dependency] private readonly IClyde _clyde = default!;
     [Dependency] private readonly IEntityManager _entManager = default!;
@@ -47,21 +49,29 @@ public sealed class StationAiOverlay : Overlay
     [Dependency] private readonly IPlayerManager _player = default!;
     [Dependency] private readonly IPrototypeManager _proto = default!;
 
-    public override OverlaySpace Space => OverlaySpace.WorldSpace;
+    public override OverlaySpace Space => OverlaySpace.WorldSpaceEntities;
 
     private readonly HashSet<Vector2i> _visibleTiles = new();
+    private readonly Dictionary<Vector2i, HashSet<string>> _visibleTileTags = []; // Orehum
 
     private IRenderTexture? _staticTexture;
     private IRenderTexture? _stencilTexture;
 
-    private float _updateRate = 1f / 30f;
+    private static readonly RenderTargetFormatParameters _renderParams = new(RenderTargetColorFormat.Rgba8Srgb); // Carpmosia
+    private const float UpdateRate = 1f / 30f; // Carpmosia
+
     private float _accumulator;
 
-    private EntityUid _lastGridUid = EntityUid.Invalid; // goobstation - off grid vision fix
+    // Orehum start
+    private readonly CyberspaceNavMapRenderer _cyberspaceRenderer;
+    private EntityUid _lastGridUid = EntityUid.Invalid;
+    // Orehum end
 
     public StationAiOverlay()
     {
         IoCManager.InjectDependencies(this);
+        ZIndex = (int) Content.Shared.DrawDepth.DrawDepth.CyberspaceOverlays; // Orehum: above all normal DrawDepths (max=13), below CyberspaceObjects (100)
+        _cyberspaceRenderer = new CyberspaceNavMapRenderer(_proto); // Orehum
     }
 
     protected override void Draw(in OverlayDrawArgs args)
@@ -74,6 +84,9 @@ public sealed class StationAiOverlay : Overlay
             _staticTexture = _clyde.CreateRenderTarget(args.Viewport.Size,
                 new RenderTargetFormatParameters(RenderTargetColorFormat.Rgba8Srgb),
                 name: "station-ai-static");
+
+            _stencilTexture = _clyde.CreateRenderTarget(args.Viewport.Size, _renderParams, name: "station-ai-stencil");
+            _staticTexture = _clyde.CreateRenderTarget(args.Viewport.Size, _renderParams, name: "station-ai-static");
         }
 
         var worldHandle = args.WorldHandle;
@@ -90,9 +103,17 @@ public sealed class StationAiOverlay : Overlay
         // Shitmed Change End
 
         _entManager.TryGetComponent(playerEnt, out TransformComponent? playerXform);
-        var gridUid = playerXform?.GridUid ?? EntityUid.Invalid;
+
+        // Orehum edit-start
+        var gridUid = playerXform?.GridUid
+            ?? (stationAiOverlay is { AllowCrossGrid: true } ? _lastGridUid : EntityUid.Invalid);
+        if (gridUid != EntityUid.Invalid)
+            _lastGridUid = gridUid;
+        // Orehum edit-end
+
         _entManager.TryGetComponent(gridUid, out MapGridComponent? grid);
         _entManager.TryGetComponent(gridUid, out BroadphaseComponent? broadphase);
+        _entManager.TryGetComponent(gridUid, out NavMapComponent? navMap); // Orehum
 
         // begin goobstation - off grid vision fix
         // If our current entity isn't on a valid grid/broadphase, reuse the last known valid grid so vision doesn't go black.
@@ -118,10 +139,14 @@ public sealed class StationAiOverlay : Overlay
             var lookups = _entManager.System<EntityLookupSystem>();
             var xforms = _entManager.System<SharedTransformSystem>();
 
+            // Orehum: rebuild cached navmap geometry on timer, grid change, or camera move
+            _cyberspaceRenderer.Update((float)_timing.FrameTime.TotalSeconds, gridUid, navMap, grid, xforms, worldBounds);
+
             if (_accumulator <= 0f)
             {
-                _accumulator = MathF.Max(0f, _accumulator + _updateRate);
+                _accumulator = MathF.Max(0f, _accumulator + UpdateRate);
                 _visibleTiles.Clear();
+                _visibleTileTags.Clear();
                 _entManager.System<StationAiVisionSystem>().GetView((gridUid, broadphase, grid), worldBounds, _visibleTiles);
             }
 
@@ -143,13 +168,7 @@ public sealed class StationAiOverlay : Overlay
 
             // Once this is gucci optimise rendering.
             worldHandle.RenderInRenderTarget(_staticTexture!,
-            () =>
-            {
-                worldHandle.SetTransform(invMatrix);
-                var shader = _proto.Index(CameraStaticShader).Instance();
-                worldHandle.UseShader(shader);
-                worldHandle.DrawRect(worldBounds, Color.White);
-            },
+                () => _cyberspaceRenderer.Draw(worldHandle, matty), // Orehum
             Color.Black);
         }
         // Not on a grid
