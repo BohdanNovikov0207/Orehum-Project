@@ -1,4 +1,5 @@
 ﻿- type: entity
+<<<<<<< HEAD
   parent: [BaseItem, BaseStash, ClothingMaskBase]
   id: TennisBall
   name: теннисный мячик
@@ -53,6 +54,9 @@
 
 - type: entity
   name: теннисная ракетка
+=======
+  name: tennis racket
+>>>>>>> 819ff6845d52b21ce5da31a61760b81c6d1aa75f
   parent: BaseItem
   id: BaseTennisRacket
   description: Прочная теннисная ракетка.

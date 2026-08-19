@@ -7,12 +7,12 @@ public sealed partial class GhostThemePrototype : IPrototype
 {
     /// <inheritdoc/>
     [IdDataField]
-    public string ID { get; } = default!;
+    public string ID { get; set; } = default!;
 
     [DataField]
     public LocId Name;
 
     [DataField("components")]
     [AlwaysPushInheritance]
-    public ComponentRegistry Components { get; } = new();
+    public ComponentRegistry Components { get; set; } = new();
 }

@@ -1,8 +1,3 @@
-// SPDX-FileCopyrightText: 2025 August Eymann <august.eymann@gmail.com>
-// SPDX-FileCopyrightText: 2025 GoobBot <uristmchands@proton.me>
-// SPDX-FileCopyrightText: 2025 gluesniffler <159397573+gluesniffler@users.noreply.github.com>
-// SPDX-FileCopyrightText: 2025 gluesniffler <linebarrelerenthusiast@gmail.com>
-//
 // SPDX-License-Identifier: AGPL-3.0-or-later
 
 using Content.Goobstation.Common.Movement;
@@ -102,7 +97,7 @@ public abstract class SharedSprintingSystem : EntitySystem
             return;
 
         // We dont add it to the EQE since the comp might get added as this runs.
-        var query = EntityQueryEnumerator<SprinterComponent, StaminaModifierComponent>();
+        var query = EntityQueryEnumerator<SprinterComponent, StaminaModifierStatusEffectComponent>();
         while (query.MoveNext(out var uid, out var sprinterComp, out var staminaComp))
         {
             if (!sprinterComp.IsSprinting
@@ -209,7 +204,7 @@ public abstract class SharedSprintingSystem : EntitySystem
 
     private void OnStandingStateSprintAttempt(EntityUid uid, StandingStateComponent component, ref SprintAttemptEvent args)
     {
-        if (!_standing.IsDown(uid, component))
+        if (!_standing.IsDown(uid))
             return;
 
         _popupSystem.PopupClient(Loc.GetString("no-sprint-while-lying"), uid, uid, PopupType.Medium);
@@ -305,7 +300,7 @@ public abstract class SharedSprintingSystem : EntitySystem
         if (!sprinter.IsSprinting)
             return;
 
-        _staminaSystem.TakeStaminaDamage(uid, sprinter.StaminaPenaltyOnShove, applyResistances: true, logDamage: false);
+        _staminaSystem.TakeStaminaDamage(uid, sprinter.StaminaPenaltyOnShove, logDamage: false);
         ToggleSprint(uid, sprinter, false, gracefulStop: true);
     }
 

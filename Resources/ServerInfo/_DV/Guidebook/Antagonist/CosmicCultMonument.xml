@@ -27,10 +27,15 @@
 
   Будьте готовы защищать Памятник во время Призыва, так как одно прерванное действие может внезапно и без церемоний остановить ритуал.
 
+<<<<<<< HEAD
   Конвертация дополнительных членов экипажа с помощью [color=#4cabb3]Глифа Истины[/color] во время Призыва ускорит процесс, приблизив культ к полной победе.
 
   ## Глифы
   Глифы можно [color=#4cabb3]написать[/color], взаимодействуя с Памятником. Также можно [color=#4cabb3]стереть[/color] неиспользованный Глиф таким же образом.
+=======
+  ## Glyphs
+  Glyphs may be [color=#4cabb3]Scribed[/color] by interacting with the Monument. You may also [color=#4cabb3]Unscribe[/color] an unused Glyph in a similar manner at The Monument.
+>>>>>>> 819ff6845d52b21ce5da31a61760b81c6d1aa75f
 
   Учтите, что активация Глифа наносит урон всем культистам, участвующим в его активации!
 
@@ -44,10 +49,19 @@
     <GuideEntityEmbed Entity="CosmicGlyphCessation" Caption=""/>
     <GuideEntityEmbed Entity="CosmicGlyphTruth" Caption=""/>
   </Box>
+<<<<<<< HEAD
   - [bold]Глиф Знания[/bold] позволяет конвертировать некультиста, поставленного на него, в космического культиста! Священники и персонажи с ментальным щитом не могут быть конвертированы этим глифом.
   - [bold]Глиф Проекции[/bold] позволяет культисту временно покинуть тело в виде свободно плавающей и невидимой [color=#4cabb3]Астральной Формы[/color], чтобы шпионить за ничего не подозревающими членами экипажа.
   - [bold]Глиф Охраны[/bold] превращает любой скафандр — жёсткий или мягкий — в специальную [color=#4cabb3]Энтропическую Броню[/color] космического культа.
   - [bold]Глиф Клинков[/bold] случайным образом превращает любой острый предмет в одно из [color=#4cabb3]уникальных оружий[/color] космического культа.
   - [bold]Глиф Прекращения[/bold] превращает переносной очиститель атмосферы в неподвижный [color=#4cabb3]Пустотный Шпиль[/color].
   - [bold]Глиф Истины[/bold] позволяет конвертировать любого некультиста, поставленного на него, в космического культиста, даже если это священник или персонаж с ментальным щитом.
+=======
+  - [bold]Glyph of Knowledge[/bold] allows a non-cultist brought upon it to be [color=#4cabb3]converted[/color] into a fellow cosmic cultist! Chaplains and individuals with a mindshield cannot be converted using this glyph.
+  - [bold]Glyph of Projection[/bold] will allow the cultist using it to temporarily escape their body as a free-floating and imperceptible [color=#4cabb3]Astral Form[/color], allowing the cultist to spy on unsuspecting crewmembers.
+  - [bold]Glyph of Warding[/bold] transmutes any spacesuit - hard or soft - into the cosmic cult's special [color=#4cabb3]Entropic Armor[/color].
+  - [bold]Glyph of Blades[/bold] randomly transmutes any sharp object into one of the cosmic cult's [color=#4cabb3]Unique Weapons[/color].
+  - [bold]Glyph of Cessation[/bold] transmutes a portable atmospherics scrubber into an unanchored [color=#4cabb3]Vacuous Spire[/color], or a telecommunication server into a [color=#4cabb3]Multispectral Inhibitor[/color].
+  - [bold]Glyph of Truth[/bold] allows any non-cultist brought upon it to be [color=#4cabb3]converted[/color] into a fellow cosmic cultist, even if they are a chaplain or protected by a mindshield.
+>>>>>>> 819ff6845d52b21ce5da31a61760b81c6d1aa75f
 </Document>

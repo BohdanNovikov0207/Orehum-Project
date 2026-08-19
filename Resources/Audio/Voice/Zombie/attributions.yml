@@ -1,4 +1,10 @@
+<<<<<<< HEAD
 - files: ["zombie-1.ogg", "zombie-2.ogg", "zombie-3.ogg", "zombie-4.ogg"]
+=======
+# SPDX-License-Identifier: MIT
+
+- files: ["zombie-1.ogg"]
+>>>>>>> 819ff6845d52b21ce5da31a61760b81c6d1aa75f
   license: "CC-BY-NC-SA-3.0"
   copyright: "https://github.com/dead-space-server"
   source: "https://github.com/dead-space-server/space-station-14-fobos/tree/2fc59481ef0fffc32dbfe3e4f27129f57319040a/Resources/Audio/_DeadSpace/Necromorfs"

@@ -8,9 +8,11 @@
 		<Nullable>enable</Nullable>
 	</PropertyGroup>
 
+    <Import Project="..\RobustToolbox\Imports\Client.props" />
+    <Import Project="..\RobustToolbox\Imports\Shared.props" />
+
 	<ItemGroup>
 		<ProjectReference Include="../Content.Shared/Content.Shared.csproj" />
-		<ProjectReference Include="../RobustToolbox/Robust.Shared/Robust.Shared.csproj" Private="false" />
 	</ItemGroup>
 
 	<Import Project="../RobustToolbox/MSBuild/Robust.Properties.targets" />

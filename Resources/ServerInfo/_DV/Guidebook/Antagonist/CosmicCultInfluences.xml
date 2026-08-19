@@ -11,6 +11,7 @@
     <GuideEntityEmbed Entity="CosmicEchoVfx" Caption=""/>
   </Box>
 
+<<<<<<< HEAD
   ## Начальные влияния
   - [color=#4cabb3][bold]Поглощение Энтропии:[/bold][/color] Беззвучно поглощает энтропию у цели, нанося при этом небольшой урон.
   - [color=#4cabb3][bold]Взор Пустоты:[/bold][/color] Испускает ужасающий импульс космического света, замедляя и дезориентируя всех поблизости.
@@ -21,6 +22,21 @@
   - [color=#4cabb3][bold]Прорыв Внутрь:[/bold][/color] Сконцентрированный выброс энергии, способный насильно открыть защищённую дверь.
   - [color=#4cabb3][bold]Астральная Нова:[/bold][/color] Выпускает мощный и разрушительный заряд астральной энергии.
   - [color=#4cabb3][bold]Пустотное Воздействие:[/bold][/color] Полностью нейтрализует входящий урон на короткое время.
+=======
+  ## Starting Influences
+  - [color=#4cabb3][bold]Siphon Entropy:[/bold][/color] Silently siphon entropy from your target, dealing some damage in the process.
+  - [color=#4cabb3][bold]Shunt Subjectivity:[/bold][/color] Shunt your target's mind out of their body and unto the cosmic dark, temporarily rendering their body mindless.
+
+  ## Special Influences
+  - [color=#4cabb3][bold]Null Fragmentation:[/bold][/color] Transfer malign empowerment into a digital system, such as an AI Upload Console or Cyborg, corrupting it in the process. Doing so will expend empowerment.
+
+  ## Unlockable Active Influences
+  - [color=#4cabb3][bold]Abberant Lapse:[/bold][/color] Lapse your target's corporeal form, temporarily rendering it immutable, impassible, and frozen in place.
+  - [color=#4cabb3][bold]Null Glare:[/bold][/color] Emit a horrific pulse of cosmic light, slowing and disorienting everyone around you. Its effects are amplified against silicon-based entities.
+  - [color=#4cabb3][bold]Force Ingress:[/bold][/color] Use a concentrated blast of power to force a secure doorway open.
+  - [color=#4cabb3][bold]Astral Nova:[/bold][/color] Hurl a large and disruptive blast of astral energy.
+  - [color=#4cabb3][bold]Vacuous Imposition:[/bold][/color] You negate any incoming damage for a short time.
+>>>>>>> 819ff6845d52b21ce5da31a61760b81c6d1aa75f
 
   ## Разблокируемые пассивные влияния
   - [color=#4cabb3][bold]Отказ от Метаболизма:[/bold][/color] Тебе больше не требуется есть или пить — твои физические потребности разрушены.

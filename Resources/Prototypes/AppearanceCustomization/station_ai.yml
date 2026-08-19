@@ -35,6 +35,9 @@
   - StationAiIconWeird
   - StationAiIconInverted
   # </Trauma>
+  - StationAiIconBingle #Goobstation
+  - StationAiIconBlank #Goobstation
+  - StationAiIconPerformer #Goobstation
 
 - type: stationAiCustomizationGroup
   id: StationAiHolograms
@@ -48,6 +51,7 @@
   - StationAiHologramDog
   - StationAiHologramKobold
   - StationAiHologramMonkey
+<<<<<<< HEAD
   - StationAiHologramHorror
   - StationAiHologramXenomorphQueen
   - StationAiHologramAngel
@@ -67,6 +71,12 @@
 #  - StationAiHologramKobold # Orion-Edit: Already have it
 #  - StationAiHologramMonkey # Orion-Edit: Already have it
   - StationAiHologramScurret # goob
+=======
+  - StationAiHologramScurret #Goobstation
+  - StationAiHologramHorror #Goobstation
+  - StationAiHologramQueen #Goobstation
+  - StationAiHologramPerformer  #Goobstation
+>>>>>>> 819ff6845d52b21ce5da31a61760b81c6d1aa75f
 
 # Iconography
 - type: stationAiCustomization

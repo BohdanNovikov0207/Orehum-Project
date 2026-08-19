@@ -13,12 +13,13 @@
 		<Platforms>AnyCPU</Platforms>
 	</PropertyGroup>
 
+    <Import Project="..\RobustToolbox\Imports\Client.props" />
+    <Import Project="..\RobustToolbox\Imports\Shared.props" />
+
 	<ItemGroup>
     <ProjectReference Include="../Content.Trauma.Common/Content.Trauma.Common.csproj" />
 		<ProjectReference Include="../Content.Goobstation.Client/Content.Goobstation.Client.csproj" />
 		<ProjectReference Include="../Content.Trauma.Shared/Content.Trauma.Shared.csproj" />
-		<ProjectReference Include="../RobustToolbox/Robust.Client/Robust.Client.csproj" />
-		<ProjectReference Include="../RobustToolbox/Robust.Shared/Robust.Shared.csproj" />
 	</ItemGroup>
 
 	<Import Project="../RobustToolbox/MSBuild/Robust.Properties.targets" />

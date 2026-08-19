@@ -1,5 +1,6 @@
 using Content.Shared.Mind;
 using Content.Shared.Roles;
+using Content.Shared.Roles.Components;
 
 
 namespace Content.Shared._White.Roles;

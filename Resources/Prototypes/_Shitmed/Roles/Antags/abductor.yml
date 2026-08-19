@@ -1,11 +1,3 @@
-# SPDX-FileCopyrightText: 2025 Aiden <28298836+Aidenkrz@users.noreply.github.com>
-# SPDX-FileCopyrightText: 2025 CerberusWolfie <wb.johnb.willis@gmail.com>
-# SPDX-FileCopyrightText: 2025 GoobBot <uristmchands@proton.me>
-# SPDX-FileCopyrightText: 2025 Piras314 <p1r4s@proton.me>
-# SPDX-FileCopyrightText: 2025 SX-7 <sn1.test.preria.2002@gmail.com>
-# SPDX-FileCopyrightText: 2025 Theodore Lukin <66275205+pheenty@users.noreply.github.com>
-# SPDX-FileCopyrightText: 2025 gluesniffler <159397573+gluesniffler@users.noreply.github.com>
-#
 # SPDX-License-Identifier: AGPL-3.0-or-later
 
 - type: antag
@@ -13,6 +5,7 @@
   name: abductor-lone-ghost-role-name
   antagonist: true
   objective: roles-antag-abductor-objective
+<<<<<<< HEAD
 
 - type: antag
   id: AbductorAgentAntag
@@ -30,12 +23,41 @@
     time: 10800 #3 hours
   # </Goob>
   creditImage: /Textures/_Trauma/EndCredits/Antags/abductors.png
+=======
+  requirements:
+  - !type:OverallPlaytimeRequirement
+    time: 5h #5 hours
+  - !type:DepartmentTimeRequirement
+    department: Medical
+    time: 2h #2 hours
+  - !type:DepartmentTimeRequirement
+    department: Security
+    time: 2h #2 hours
+>>>>>>> 819ff6845d52b21ce5da31a61760b81c6d1aa75f
 
 - type: antag
   id: AbductorScientistAntag
   name: abductor-scientist-ghost-role-name
   antagonist: true
   objective: roles-antag-abductor-objective
+  requirements:
+  - !type:OverallPlaytimeRequirement
+    time: 5h #5 hours
+  - !type:DepartmentTimeRequirement
+    department: Medical
+    time: 3h #3 hours
+
+- type: antag
+  id: AbductorAgentAntag
+  name: abductor-agent-ghost-role-name
+  antagonist: true
+  objective: roles-antag-abductor-objective
+  requirements:
+  - !type:OverallPlaytimeRequirement
+    time: 5h #5 hours
+  - !type:DepartmentTimeRequirement
+    department: Security
+    time: 3h #3 hours
 
 - type: antag
   id: AbductorVictimAntag

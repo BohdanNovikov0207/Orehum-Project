@@ -1,3 +1,4 @@
+<<<<<<< HEAD:Resources/Locale/ru-RU/_DV/species/species.ftl
 # SPDX-FileCopyrightText: 2024 Aidenkrz <aiden@djkraz.com>
 # SPDX-FileCopyrightText: 2024 Kira Bridgeton <161087999+Verbalase@users.noreply.github.com>
 # SPDX-FileCopyrightText: 2024 Piras314 <p1r4s@proton.me>
@@ -6,6 +7,8 @@
 # SPDX-FileCopyrightText: 2025 deltanedas <39013340+deltanedas@users.noreply.github.com>
 # SPDX-FileCopyrightText: 2025 deltanedas <@deltanedas:kde.org>
 #
+=======
+>>>>>>> 819ff6845d52b21ce5da31a61760b81c6d1aa75f:Resources/Prototypes/_DV/Traits/altvision.yml
 # SPDX-License-Identifier: AGPL-3.0-or-later
 
 
