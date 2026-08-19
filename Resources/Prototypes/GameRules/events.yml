@@ -63,11 +63,8 @@
     # - id: BingleSpawn #Goobstation - Bingle
     - id: SlaughterDemonMidround # Goobstation - Slaughter Demon
     - id: XenomorphsInfestation # WD EDIT
-<<<<<<< HEAD
-=======
     - id: SlasherSpawn # Goobstation - The Slasher
     - id: SpacePirates # Goobstation - you probably can read whom this rule spawns
->>>>>>> 819ff6845d52b21ce5da31a61760b81c6d1aa75f
     - id: SingulothKnightsMidround # Goobstation - New Midrounds
     #- id: DarkLordMidround # Goobstation - New Midrounds
     - id: MimeAssassinMidround # Goobstation - New Midrounds

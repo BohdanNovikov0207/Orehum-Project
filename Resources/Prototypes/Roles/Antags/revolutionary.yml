@@ -7,18 +7,11 @@
   setPreference: true
   objective: roles-antag-rev-head-objective
   requirements:
-<<<<<<< HEAD
   - !type:DepartmentTimeRequirement # Goob - was overall
     department: Command # Goob - was overall
     time: 10h
   guides: [ Revolutionaries ] # Goob
   creditImage: /Textures/_Trauma/EndCredits/Antags/revolution.png # Trauma
-=======
-  - !type:DepartmentTimeRequirement # was  - !type:OverallPlaytimeRequirement, Goob change
-      department: Command
-      time: 10h # Goobstation
-  guides: [ Revolutionaries ]
->>>>>>> 819ff6845d52b21ce5da31a61760b81c6d1aa75f
 
 - type: antag
   id: Rev

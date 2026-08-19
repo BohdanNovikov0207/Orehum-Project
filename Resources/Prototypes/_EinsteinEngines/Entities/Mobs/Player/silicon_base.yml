@@ -245,12 +245,7 @@
     - type: Climbing
     - type: StandingState
     - type: MindContainer
-<<<<<<< HEAD
       showExamineInfo: true
-=======
-    - type: MindExaminable
-    - type: SSDIndicator
->>>>>>> 819ff6845d52b21ce5da31a61760b81c6d1aa75f
     - type: CanEscapeInventory
     - type: HumanoidAppearance
       species: IPC

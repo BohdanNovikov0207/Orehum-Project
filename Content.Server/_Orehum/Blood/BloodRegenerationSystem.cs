@@ -86,9 +86,10 @@ public sealed class BloodRegenerationSystem : EntitySystem
             if (ent.Comp.BloodSolution == null)
                 return false;
 
+            var bloodReagentId = ent.Comp.BloodReferenceSolution.Contents.FirstOrDefault().Reagent.Prototype;
             return _solutions.RemoveReagent(
                        ent.Comp.BloodSolution.Value,
-                       new ReagentId(ent.Comp.BloodReagent, _bloodstream.GetEntityBloodData(ent.Owner)),
+                       bloodReagentId,
                        -amount) > FixedPoint2.Zero;
         }
 

@@ -187,11 +187,8 @@
     - id: WeaponLauncherSingularityBuster
     - id: MachinePowerTransmissionLaserFlatpack
     - id: RCDRechargingCE
-<<<<<<< HEAD
     - id: EngiComputerCommsFlatpack
-=======
     - id: MaterialSiloFlatpack # Goob
->>>>>>> 819ff6845d52b21ce5da31a61760b81c6d1aa75f
 
 # Hardsuit table, used for suit storage as well
 - type: entityTable
@@ -390,12 +387,9 @@
     - id: WantedListCartridge
     - id: DrinkHosFlask
     - id: ClothingBeltSheathHeadOfSecurityFilled # Goobstation - security revamp
-<<<<<<< HEAD
     - id: ReinforcementCallerHos # Trauma
     - id: SecurityComputerCommsFlatpack
-=======
     - id: MaterialSiloFlatpack # Goob
->>>>>>> 819ff6845d52b21ce5da31a61760b81c6d1aa75f
 
 # Hardsuit table, used for suit storage as well
 - type: entityTable

@@ -1,21 +1,6 @@
 # SPDX-License-Identifier: AGPL-3.0-or-later
 
 - type: vendingMachineInventory
-  id: NanoMedInventory
-  startingInventory:
-    HandheldHealthAnalyzer: 1
-    Gauze: 3
-    Brutepack: 3
-    Ointment: 3
-    Bloodpack: 3
-    ChemistryBottleEpinephrine: 3
-    Syringe: 3
-    PillCanisterTricordrazine: 2
-  contrabandInventory:
-    PillCanisterRandom: 1
-    PowerCellSmall: 2
-
-- type: vendingMachineInventory
   id: NanoMedCivilianWallInventory
   startingInventory:
     HandheldHealthAnalyzer: 1
@@ -38,13 +23,8 @@
     Gauze: 5
     Brutepack: 5
     Ointment: 5
-<<<<<<< HEAD
     CMBloodPackFull: 5 #IV!
     IVstandflatpack: 3 #IV!
-=======
-    Bloodpack: 5
-    Tourniquet: 6 # Goobstation
->>>>>>> 819ff6845d52b21ce5da31a61760b81c6d1aa75f
     ChemistryBottleEpinephrine: 3
     ChemistryBottleBicaridine: 1
     Syringe: 5

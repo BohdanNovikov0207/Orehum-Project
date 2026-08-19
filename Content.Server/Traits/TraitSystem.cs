@@ -4,6 +4,7 @@ using Content.Server._EinsteinEngines.Language;
 using Content.Shared.GameTicking;
 using Content.Shared.Hands.Components;
 using Content.Shared.Hands.EntitySystems;
+using Content.Shared.Humanoid.Prototypes;
 using Content.Shared.Roles;
 using Content.Shared.Traits;
 using Content.Shared.Whitelist;
@@ -43,15 +44,28 @@ public sealed class TraitSystem : EntitySystem
                 return;
             }
 
-            if (_whitelistSystem.IsWhitelistFail(traitPrototype.Whitelist, args.Mob) ||
-                _whitelistSystem.IsWhitelistPass(traitPrototype.Blacklist, args.Mob))
+            // Orehum start
+            if (_whitelistSystem.IsWhitelistFail(traitPrototype.Whitelist, args.Mob))
                 continue;
 
+            if (traitPrototype.Blacklist.Count > 0)
+            {
+                var prototype = Prototype(args.Mob)?.ID;
+                if (traitPrototype.Blacklist.Contains(args.Mob.ToString()) ||
+                    (prototype != null && traitPrototype.Blacklist.Contains(prototype)))
+                    continue;
+            }
+
             // Begin Goobstation: Species trait support
-            if (traitPrototype.IncludedSpecies.Count > 0 && !traitPrototype.IncludedSpecies.Contains(args.Profile.Species) ||
-                traitPrototype.ExcludedSpecies.Contains(args.Profile.Species))
+            ProtoId<SpeciesPrototype> playerSpecies = args.Profile.Species;
+
+            if (traitPrototype.IncludedSpecies.Count > 0 && !traitPrototype.IncludedSpecies.Contains(playerSpecies))
+                continue;
+
+            if (traitPrototype.ExcludedSpecies.Contains(playerSpecies))
                 continue;
             // End Goobstation: Species trait support
+            // Orehum end
 
             // Add all components required by the prototype
             if (traitPrototype.Components.Count > 0)

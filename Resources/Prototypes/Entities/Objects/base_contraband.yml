@@ -200,7 +200,6 @@
     allowedJobs: [ Bartender ]
 
 - type: entity
-<<<<<<< HEAD
   id: BaseSecurityBartenderZookeeperContraband
   parent: BaseRestrictedContraband
   abstract: false
@@ -210,8 +209,6 @@
     allowedJobs: [ Bartender, Zookeeper ]
 
 - type: entity
-=======
->>>>>>> 819ff6845d52b21ce5da31a61760b81c6d1aa75f
   id: BaseSecurityLawyerContraband
   parent: BaseRestrictedContraband
   abstract: false

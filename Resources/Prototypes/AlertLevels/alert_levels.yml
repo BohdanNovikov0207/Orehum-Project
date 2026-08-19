@@ -103,7 +103,6 @@
       emergencyLightColor: Magenta
       forceEnableEmergencyLights: true
       shuttleTime: 600
-<<<<<<< HEAD
     enigma:
       announcement: alert-level-enigma-announcement
       selectable: false
@@ -113,12 +112,4 @@
       emergencyLightColor: '#EF7200'
       forceEnableEmergencyLights: true
       shuttleTime: 120
-=======
-    amber:
-      announcement: alert-level-amber-announcement
-      sound: /Audio/_Goobstation/Announcements/amberalarm.ogg
-      color: "#8A3324"
-      emergencyLightColor: "#8A3324"
-      forceEnableEmergencyLights: true
-      shuttleTime: 600
->>>>>>> 819ff6845d52b21ce5da31a61760b81c6d1aa75f
+

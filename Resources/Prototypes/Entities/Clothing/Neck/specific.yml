@@ -18,10 +18,8 @@
     - type: ChameleonClothing
       slot: [NECK]
       default: ClothingNeckScarfStripedRed
-<<<<<<< HEAD
     - type: UserInterface
       interfaces:
         enum.ChameleonUiKey.Key:
           type: ChameleonBoundUserInterface
-=======
->>>>>>> 819ff6845d52b21ce5da31a61760b81c6d1aa75f
+

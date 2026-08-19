@@ -1,4 +1,5 @@
 ﻿using Content.Server.Temperature.Components;
+using Content.Shared.Temperature.Components;
 
 namespace Content.Server._Orehum.Traits.HeatResistant;
 
@@ -13,7 +14,7 @@ public sealed class TempResistantSystem : EntitySystem
 
     private void OnInit(Entity<TempResistantComponent> ent, ref MapInitEvent args)
     {
-        if (!TryComp<TemperatureComponent>(ent.Owner, out var temperature)) return;
+        if (!TryComp<ContainerTemperatureComponent>(ent.Owner, out var temperature)) return;
         temperature.HeatDamageThreshold *= ent.Comp.HeatModifier;
         temperature.ColdDamageThreshold *= ent.Comp.ColdModifier;
     }

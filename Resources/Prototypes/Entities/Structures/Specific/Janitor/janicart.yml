@@ -358,14 +358,10 @@
       interfaces:
         enum.StorageUiKey.Key:
           type: StorageBoundUserInterface
-<<<<<<< HEAD
         enum.ItemSlotsUiKey.Key: # imp
           type: ItemSlotsBoundUserInterface
-    - type: Drink
-=======
     - type: Edible
       edible: Drink
->>>>>>> 819ff6845d52b21ce5da31a61760b81c6d1aa75f
       solution: bucket
       destroyOnEmpty: false
       utensil: Spoon

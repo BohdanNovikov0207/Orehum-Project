@@ -106,7 +106,6 @@
   parent: ClothingBeltMedical
   suffix: Filled
   components:
-<<<<<<< HEAD
   - type: StorageFill
     contents:
       - id: Brutepack
@@ -116,25 +115,12 @@
       - id: CMBloodPackFull #IV!
       - id: Gauze
       - id: EmergencyMedipen #You never know what people are going to latejoin into
-=======
-  - type: EntityTableContainerFill
-    containers:
-      storagebase: !type:AllSelector
-        children:
-        - id: Brutepack
-          amount: 2
-        - id: Ointment
-        - id: Bloodpack
-        - id: Gauze
-        - id: EmergencyMedipen #You never know what people are going to latejoin into
->>>>>>> 819ff6845d52b21ce5da31a61760b81c6d1aa75f
 
 - type: entity
   id: ClothingBeltMedicalEMTFilled
   parent: ClothingBeltMedicalEMT
   suffix: Paramedic, Filled
   components:
-<<<<<<< HEAD
   - type: StorageFill
     contents:
       - id: Brutepack
@@ -149,26 +135,6 @@
       - id: CartridgeBicaridine
       - id: CartridgeDermaline
       - id: CartridgeAtropine # Goobstation - end
-=======
-  - type: EntityTableContainerFill
-    containers:
-      storagebase: !type:AllSelector
-        children:
-        - id: Brutepack
-        - id: Ointment
-        - id: Bloodpack
-        - id: Gauze
-        # Goobstation Start
-        #- id: EmergencyMedipen #You never know what people are going to latejoin into
-        #  amount: 3
-        - id: HandheldCrewMonitor
-        - id: ParamedHypo
-        - id: CartridgeSaline
-        - id: CartridgeBicaridine
-        - id: CartridgeDermaline
-        - id: CartridgeAtropine
-        # Goobstation - end
->>>>>>> 819ff6845d52b21ce5da31a61760b81c6d1aa75f
 
 - type: entity
   id: ClothingBeltPlantFilled

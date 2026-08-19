@@ -282,12 +282,8 @@
   - MimeEnvirohelm
   - MimeEnvirosuit
   - MimeEnvirogloves
-<<<<<<< HEAD
   - MimeGloves
   - ExclusiveItems
-=======
-
->>>>>>> 819ff6845d52b21ce5da31a61760b81c6d1aa75f
 
 - type: roleLoadout
   id: JobMusician
@@ -749,7 +745,6 @@
 
 # Wildcards
 - type: roleLoadout
-<<<<<<< HEAD
   id: JobZookeeper
   groups:
   - ZookeeperHead
@@ -768,8 +763,6 @@
   - ExclusiveItems
 
 - type: roleLoadout
-=======
->>>>>>> 819ff6845d52b21ce5da31a61760b81c6d1aa75f
   id: JobReporter
   groups:
   - GroupTankHarness
@@ -806,7 +799,6 @@
   - PsychologistEnvirogloves
   - ExclusiveItems
 
-<<<<<<< HEAD
 - type: roleLoadout
   id: JobBoxer
   groups:
@@ -824,8 +816,6 @@
   - BoxerEnvirosuit
   - ExclusiveItems
 
-=======
->>>>>>> 819ff6845d52b21ce5da31a61760b81c6d1aa75f
 # These loadouts are used for non-crew spawns, like off-station antags and event mobs
 # They will be used without player configuration, thus they will only ever apply what is forced by MinLimit
 
