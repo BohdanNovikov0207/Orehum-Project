@@ -11,7 +11,7 @@
   - type: InteractionOutline
   - type: Sprite
     snapCardinals: true
-    sprite: Structures/Power/Generation/ame.rsi
+    sprite: _Starlight/Structures/Power/Generation/ame.rsi # Starlight Edit
     state: control
     layers:
     - state: control
@@ -97,7 +97,7 @@
   - type: PowerMonitoringDevice
     group: Generator
     loadNode: input
-    sprite: Structures/Power/Generation/ame.rsi
+    sprite: _Starlight/Structures/Power/Generation/ame.rsi # Starlight Edit
     state: static
   - type: PowerSupplier
     supplyRate: 0
@@ -142,7 +142,7 @@
   - type: InteractionOutline
   - type: Sprite
     drawdepth: Walls
-    sprite: Structures/Power/Generation/ame.rsi
+    sprite: _Starlight/Structures/Power/Generation/ame.rsi # Starlight Edit
     state: shield_0
     layers:
     - state: shield_0
