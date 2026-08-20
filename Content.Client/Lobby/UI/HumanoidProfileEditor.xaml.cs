@@ -603,120 +603,11 @@ namespace Content.Client.Lobby.UI
         /// </summary>
         public void RefreshTraits()
         {
-            TraitsList.RemoveAllChildren();
-
-            var traits = _prototypeManager.EnumeratePrototypes<TraitPrototype>().OrderBy(t => Loc.GetString(t.Name)).ToList();
-            TabContainer.SetTabTitle(3, Loc.GetString("humanoid-profile-editor-traits-tab"));
-
-            if (traits.Count < 1)
-            {
-                TraitsList.AddChild(new Label
-                {
-                    Text = Loc.GetString("humanoid-profile-editor-no-traits"),
-                    FontColorOverride = Color.Gray,
-                });
+            if (Profile == null)
                 return;
-            }
 
-            // Setup model
-            Dictionary<string, List<string>> traitGroups = new();
-            List<string> defaultTraits = new();
-            traitGroups.Add(TraitCategoryPrototype.Default, defaultTraits);
-
-            foreach (var trait in traits)
-            {
-                // Begin Goobstation: ported from DeltaV - Species trait exclusion
-                if (Profile?.Species is { } selectedSpecies && (trait.ExcludedSpecies.Contains(selectedSpecies) ||
-                    trait.IncludedSpecies.Count > 0 && !trait.IncludedSpecies.Contains(selectedSpecies)))
-                {
-                    Profile = Profile?.WithoutTraitPreference(trait.ID, _prototypeManager);
-                    continue;
-                }
-                // End Goobstation: ported from DeltaV - Species trait exclusion
-
-                if (trait.Category == null)
-                {
-                    defaultTraits.Add(trait.ID);
-                    continue;
-                }
-
-                if (!_prototypeManager.HasIndex(trait.Category))
-                    continue;
-
-                var group = traitGroups.GetOrNew(trait.Category);
-                group.Add(trait.ID);
-            }
-
-            // Create UI view from model
-            foreach (var (categoryId, categoryTraits) in traitGroups)
-            {
-                TraitCategoryPrototype? category = null;
-
-                if (categoryId != TraitCategoryPrototype.Default)
-                {
-                    category = _prototypeManager.Index<TraitCategoryPrototype>(categoryId);
-                    // Label
-                    TraitsList.AddChild(new Label
-                    {
-                        Text = Loc.GetString(category.Name),
-                        Margin = new Thickness(0, 10, 0, 0),
-                        StyleClasses = { StyleClass.LabelHeading },
-                    });
-                }
-
-                List<TraitPreferenceSelector?> selectors = new();
-                var selectionCount = 0;
-
-                foreach (var traitProto in categoryTraits)
-                {
-                    var trait = _prototypeManager.Index<TraitPrototype>(traitProto);
-                    var selector = new TraitPreferenceSelector(trait);
-
-                    selector.Preference = Profile?.TraitPreferences.Contains(trait.ID) == true;
-                    if (selector.Preference)
-                        selectionCount += trait.Cost;
-
-                    selector.PreferenceChanged += preference =>
-                    {
-                        if (preference)
-                        {
-                            Profile = Profile?.WithTraitPreference(trait.ID, _prototypeManager);
-                        }
-                        else
-                        {
-                            Profile = Profile?.WithoutTraitPreference(trait.ID, _prototypeManager);
-                        }
-
-                        SetDirty();
-                        RefreshTraits(); // If too many traits are selected, they will be reset to the real value.
-                    };
-                    selectors.Add(selector);
-                }
-
-                // Selection counter
-                if (category is { MaxTraitPoints: >= 0 })
-                {
-                    TraitsList.AddChild(new Label
-                    {
-                        Text = Loc.GetString("humanoid-profile-editor-trait-count-hint", ("current", selectionCount), ("max", category.MaxTraitPoints)),
-                        FontColorOverride = Color.Gray
-                    });
-                }
-
-                foreach (var selector in selectors)
-                {
-                    if (selector == null)
-                        continue;
-
-                    if (category is { MaxTraitPoints: >= 0 } &&
-                        selector.Cost + selectionCount > category.MaxTraitPoints)
-                    {
-                        selector.Checkbox.Label.FontColorOverride = Color.Red;
-                    }
-
-                    TraitsList.AddChild(selector);
-                }
-            }
+            TraitsTab.SetSelectedTraits(Profile.TraitPreferences);
+            TraitsTab.UpdateConditions(Profile);
         }
         //Orehum - TRAITS
 
@@ -1940,49 +1831,61 @@ namespace Content.Client.Lobby.UI
             return true;
         }
 
+        // ADT Species Window start
         private void OnSkinColorOnValueChangedKeepColor(HumanoidCharacterProfile previous)
         {
             if (Profile is null) return;
 
-            var skin = _prototypeManager.Index<SpeciesPrototype>(Profile.Species).SkinColoration;
+            var skinTypeStr = _prototypeManager.Index<SpeciesPrototype>(Profile.Species).SkinColoration;
             var color = previous.Appearance.SkinColor;
 
-            switch (skin)
+            switch (skinTypeStr)
             {
-                case HumanoidSkinColor.HumanToned:
-                    var tone = SkinColor.HumanSkinToneFromColor(previous.Appearance.SkinColor);
-                    color = SkinColor.HumanSkinTone((int)tone);
-                    Skin.Value = tone;
-
-                    Profile = Profile.WithCharacterAppearance(Profile.Appearance.WithSkinColor(color));//
+                case "HumanToned":
                     break;
-                case HumanoidSkinColor.Hues:
-                    break;
-                case HumanoidSkinColor.TintedHues:
-                    color = SkinColor.TintedHues(previous.Appearance.SkinColor);
 
-                    Profile = Profile.WithCharacterAppearance(Profile.Appearance.WithSkinColor(color));
+                case "Hues":
+                    color = AdjustBrightness(color, 0.9f, 1.0f);
                     break;
-                case HumanoidSkinColor.VoxFeathers:
-                    color = SkinColor.ClosestVoxColor(previous.Appearance.SkinColor);
 
-                    Profile = Profile.WithCharacterAppearance(Profile.Appearance.WithSkinColor(color));
+                case "TintedHues":
+                    color = AdjustSaturation(color, 0.1f);
                     break;
-                case HumanoidSkinColor.NoColor:
-                    color = Color.White;
 
-                    Profile = Profile.WithCharacterAppearance(Profile.Appearance.WithSkinColor(color));
+                case "VoxFeathers":
+                    color = ClampColor(color, 29f / 360f, 174f / 360f, 0.2f, 0.88f, 0.36f, 0.55f);
                     break;
-                case HumanoidSkinColor.AnimalFur:
-                    color = SkinColor.ClosestAnimalFurColor(previous.Appearance.SkinColor);
 
-                    Profile = Profile.WithCharacterAppearance(Profile.Appearance.WithSkinColor(color));
+                default:
                     break;
             }
 
             _rgbSkinColorSelector.Color = color;
-
             ReloadProfilePreview();
         }
+
+        private Color AdjustBrightness(Color color, float min, float max)
+        {
+            var hsv = Color.ToHsv(color);
+            hsv.Z = Math.Clamp(hsv.Z, min, max);
+            return Color.FromHsv(hsv);
+        }
+
+        private Color AdjustSaturation(Color color, float maxSaturation)
+        {
+            var hsv = Color.ToHsv(color);
+            hsv.Y = Math.Min(hsv.Y, maxSaturation);
+            return Color.FromHsv(hsv);
+        }
+
+        private Color ClampColor(Color color, float minH, float maxH, float minS, float maxS, float minV, float maxV)
+        {
+            var hsv = Color.ToHsv(color);
+            hsv.X = Math.Clamp(hsv.X, minH, maxH);
+            hsv.Y = Math.Clamp(hsv.Y, minS, maxS);
+            hsv.Z = Math.Clamp(hsv.Z, minV, maxV);
+            return Color.FromHsv(hsv);
+        }
+        // ADT Species Window end
     }
 }

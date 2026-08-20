@@ -199,7 +199,7 @@ namespace Content.Client.Stylesheets
         public const string StyleClassLabelSubText = "LabelSubText";
         public const string StyleClassRedTopButton = "negative";
         public const string ClassHighDivider = "HighDivider";
-        public const string ClassLowDivider = "LowDivider";
+        public const string LowDivider = "LowDivider";
         public const string ClassAngleRect = "AngleRect";
 
         //Delta-V - Manifest pronouns
@@ -1520,7 +1520,7 @@ namespace Content.Client.Stylesheets
                 // ---
 
                 // Dividers
-                Element<PanelContainer>().Class(ClassLowDivider)
+                Element<PanelContainer>().Class(LowDivider)
                     .Prop(PanelContainer.StylePropertyPanel, new StyleBoxFlat
                     {
                         BackgroundColor = Color.FromHex("#444"),
