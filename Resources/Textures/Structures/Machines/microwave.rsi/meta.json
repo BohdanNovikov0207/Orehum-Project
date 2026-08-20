@@ -62,7 +62,6 @@
             ]
         },
         {
-<<<<<<< HEAD
             "name": "mwo",
             "delays": [
                 [
@@ -71,14 +70,6 @@
                 ]
             ]
         },
-       {
-           "name": "mw-o"
-       }
-    ]
-}
-=======
-            "name": "mwo"
-        },
         {
             "name": "inhand-right",
             "directions": 4
@@ -86,7 +77,9 @@
         {
             "name": "inhand-left",
             "directions": 4
-        }
-      ]
-    }
->>>>>>> 819ff6845d52b21ce5da31a61760b81c6d1aa75f
+        },
+       {
+           "name": "mw-o"
+       }
+    ]
+}
