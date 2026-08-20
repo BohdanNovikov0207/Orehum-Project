@@ -33,12 +33,7 @@
       collection: RubberPig
       params:
         variation: 0.125
-  - type: Food
-    requiresSpecialDigestion: true
-    useSound:
-      collection: RubberPig
-      params:
-        variation: 0.125
+  - type: Edible
   - type: MeleeWeapon
     wideAnimationRotation: 110
     soundHit:
@@ -74,10 +69,7 @@
     - type: EmitSoundOnTrigger
       sound:
         path: /Audio/_Orehum/ME4TA/Items/Toys/jeff.ogg
-    - type: Food
-      requiresSpecialDigestion: true
-      useSound:
-        path: /Audio/_Orehum/ME4TA/Items/Toys/jeff.ogg
+    - type: Edible
     - type: MeleeWeapon
       wideAnimationRotation: 110
       soundHit:
@@ -108,10 +100,7 @@
     - type: EmitSoundOnTrigger
       sound:
         path: /Audio/_Orehum/ME4TA/Items/Toys/pAkva.ogg
-    - type: Food
-      requiresSpecialDigestion: true
-      useSound:
-        path: /Audio/_Orehum/ME4TA/Items/Toys/pAkva.ogg
+    - type: Edible
     - type: MeleeWeapon
       wideAnimationRotation: 110
       soundHit:

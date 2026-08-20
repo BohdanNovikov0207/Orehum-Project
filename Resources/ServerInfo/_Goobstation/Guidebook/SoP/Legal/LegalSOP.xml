@@ -1,25 +1,7 @@
-<<<<<<< HEAD
 <Document> # Правовой регламент Это перечень процедур для отдельных действий, связанных с Космическим законом, правовыми мерами и другими прецедентами, которые могут иметь место на этой станции.
 В целом это больше, чем рекомендации: их соблюдение может и будет обеспечиваться Командованием и Службой безопасности.
 
 В этой папке представлены следующие правовые процедуры:
-=======
-<!--
-SPDX-License-Identifier: AGPL-3.0-or-later
--->
-
-<Document>
-# Legal Procedures
-This is the list of procedures for separate actions involving Space Law, Legal Actions, and other precedents that may take place on this station.
-
-These are more than guidelines, generally speaking, and can/will be enforced by Command/Security.
-
-The following Legal procedures have entries in this folder:
-- [textlink="Execution Procedures" link="Execution SOP"]
-- [textlink="Permanent Brigging Procedures" link="PermaBrig SOP"]
-- [textlink="Punishments Procedures" link="Punishments SOP"]
-- [textlink="Searches Procedures" link="Searches SOP"]
->>>>>>> 819ff6845d52b21ce5da31a61760b81c6d1aa75f
 
 [textlink="Процедуры казни" link="Execution SOP"]
 [textlink="Процедуры помещения в пермабриг" link="PermaBrig SOP"]

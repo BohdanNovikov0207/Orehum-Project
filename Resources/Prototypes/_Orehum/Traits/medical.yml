@@ -126,6 +126,6 @@
     - Plasmaman
   components:
   - type: Narcolepsy
-    timeBetweenIncidents: 300, 600
-    durationOfIncident: 10, 30
+    timeBetweenIncidents: 600
+    durationOfIncident: 60
 #endregion
