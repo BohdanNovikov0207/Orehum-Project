@@ -885,25 +885,6 @@
     - state: generic
     - state: icon-treatment
   - type: ItemBorgModule
-<<<<<<< HEAD
-    moduleId: Treatment
-    items:
-    - HandheldHealthAnalyzerUnpowered
-    - Gauze10Lingering
-    - Brutepack10Lingering
-    - Ointment10Lingering
-    - RegenerativeMeshLingering0
-    - MedicatedSutureLingering0
-  # Gabystation Start - #IV!
-  - type: DroppableBorgModule
-    moduleId: Treatment
-    items:
-    - id: CMBloodPackFull
-      whitelist:
-        tags:
-        - Bloodpack
-  # Gabystation End - #IV!
-=======
     hands:
     - item: HandheldHealthAnalyzer
     - item: AdvancedJetInjector
@@ -928,7 +909,6 @@
         whitelist:
           components:
           - Healing
->>>>>>> 819ff6845d52b21ce5da31a61760b81c6d1aa75f
   - type: BorgModuleIcon
     icon: { sprite: Interface/Actions/actions_borg.rsi, state: treatment-module }
 

@@ -3,7 +3,8 @@
 using Content.Shared._Adventure.Bartender.Systems; // Adventure
 using Content.Server.Damage.Components;
 using Content.Shared.Damage;
-using Content.Shared.Nutrition.Components; // Adventure
+using Content.Shared.Nutrition.Components;
+using Content.Shared.Nutrition.EntitySystems; // Adventure
 using Content.Shared.Throwing;
 
 namespace Content.Server.Damage.Systems
@@ -25,7 +26,10 @@ namespace Content.Server.Damage.Systems
         private void DamageOnLand(EntityUid uid, DamageOnLandComponent component, ref LandEvent args)
         {
             // Adventure start
-            if (args.User is { } user && HasComp<DrinkComponent>(uid) && _nonspillthrower.GetSpillProofThrow(user))
+            if (args.User is { } user
+                && TryComp<EdibleComponent>(uid, out var edible)
+                && edible.Edible == IngestionSystem.Drink
+                && _nonspillthrower.GetSpillProofThrow(user))
             {
                 return;
             }

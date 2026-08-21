@@ -67,7 +67,6 @@
   - type: Damageable
     damageContainer: Biological
     damageModifierSet: Slime
-<<<<<<< HEAD
   - type: Geras # ADT-tweak
 #  - type: PassiveDamage # Around 8 damage a minute healed
 #    allowedStates:
@@ -78,17 +77,6 @@
 #        Heat: -0.14
 #      groups:
 #        Brute: -0.14
-=======
-  - type: PassiveDamage # Around 8 damage a minute healed
-    allowedStates:
-    - Alive
-    damageCap: 65
-    damage:
-      types:
-        Heat: -0.14
-      groups:
-        Brute: -0.14
->>>>>>> 819ff6845d52b21ce5da31a61760b81c6d1aa75f
   #  - type: DamageVisuals
   #    damageOverlayGroups:
   #      Brute:

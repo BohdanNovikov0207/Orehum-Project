@@ -205,4 +205,9 @@ namespace Content.Server.GameTicking
         public bool UserHasJoinedGame(NetUserId userId)
             => PlayerGameStatuses.TryGetValue(userId, out var status) && status == PlayerGameStatus.JoinedGame;
     }
+
+    // Harmony start - ready manifest
+    [ByRefEvent]
+    public struct PlayerToggledReadyEvent;
+    // Harmony end - ready manifest
 }

@@ -31,26 +31,16 @@
     #- id: BlobSpawn # Goobstation - removed for low pop too little sec
     - id: LoneAbductorSpawn
     - id: DuoAbductorSpawn
-<<<<<<< HEAD
     #- id: BingleSpawn
-=======
-    - id: BingleSpawn
->>>>>>> 819ff6845d52b21ce5da31a61760b81c6d1aa75f
    #- id: SlaughterDemonMidround
    #- id: XenomorphsInfestation #  removed for low pop too little sec
     - id: SlasherSpawn
     - id: SpacePirates
-<<<<<<< HEAD
     #- id: GreyTideAntagMidround
-=======
->>>>>>> 819ff6845d52b21ce5da31a61760b81c6d1aa75f
     #- id: SingulothKnightsMidround
     #- id: DarkLordMidround
     - id: MimeAssassinMidround
     - id: DarkPriestMidround
     #- id: VoxRaidersMidround
-<<<<<<< HEAD
     #- id: TunnelClownMidround
-=======
-    - id: TunnelClownMidround
->>>>>>> 819ff6845d52b21ce5da31a61760b81c6d1aa75f
+

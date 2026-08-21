@@ -172,7 +172,6 @@
     - MaterialSilo
   - type: MaterialStorage
     ignoreColor: true
-  - type: Silo
 
 - type: entity
   parent: BaseRevIndustry

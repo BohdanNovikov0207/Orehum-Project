@@ -158,14 +158,10 @@
     radius: 2.0
     energy: 7.0
   - type: IgniteOnCollide
-<<<<<<< HEAD
     fireStacks: 0.5
   - type: Tracer # Orehum
     color: "#D1B479FF"
     length: 3
-=======
-    fireStacks: 0.5 # Goob
->>>>>>> 819ff6845d52b21ce5da31a61760b81c6d1aa75f
 
 - type: entity
   id: BaseBulletAP

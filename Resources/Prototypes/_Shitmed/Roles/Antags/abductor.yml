@@ -5,7 +5,6 @@
   name: abductor-lone-ghost-role-name
   antagonist: true
   objective: roles-antag-abductor-objective
-<<<<<<< HEAD
 
 - type: antag
   id: AbductorAgentAntag
@@ -23,17 +22,6 @@
     time: 10800 #3 hours
   # </Goob>
   creditImage: /Textures/_Trauma/EndCredits/Antags/abductors.png
-=======
-  requirements:
-  - !type:OverallPlaytimeRequirement
-    time: 5h #5 hours
-  - !type:DepartmentTimeRequirement
-    department: Medical
-    time: 2h #2 hours
-  - !type:DepartmentTimeRequirement
-    department: Security
-    time: 2h #2 hours
->>>>>>> 819ff6845d52b21ce5da31a61760b81c6d1aa75f
 
 - type: antag
   id: AbductorScientistAntag
@@ -45,18 +33,6 @@
     time: 5h #5 hours
   - !type:DepartmentTimeRequirement
     department: Medical
-    time: 3h #3 hours
-
-- type: antag
-  id: AbductorAgentAntag
-  name: abductor-agent-ghost-role-name
-  antagonist: true
-  objective: roles-antag-abductor-objective
-  requirements:
-  - !type:OverallPlaytimeRequirement
-    time: 5h #5 hours
-  - !type:DepartmentTimeRequirement
-    department: Security
     time: 3h #3 hours
 
 - type: antag

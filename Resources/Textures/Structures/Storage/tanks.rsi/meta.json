@@ -123,16 +123,6 @@
     },
     {
       "name": "generictank-1"
-<<<<<<< HEAD
-    },
-    {
-      "name": "cleanerdispenser"
-    },
-    {
-      "name": "fueldispenser"
-    },
-    {
-      "name": "pepperdispenser"
     },
     {
       "name": "generictank-1-1",
@@ -153,8 +143,6 @@
     {
       "name": "generictank-1-4",
       "directions": 1
-=======
->>>>>>> 819ff6845d52b21ce5da31a61760b81c6d1aa75f
     }
   ]
 }

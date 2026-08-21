@@ -66,15 +66,6 @@
       state: ai_performer_dead
 
 - type: stationAiCustomization
-  id: StationAiHologramHorror
-  name: station-ai-hologram-horror
-  previewKey: Hologram
-  layerData:
-    Hologram:
-      sprite: _Goobstation/Mobs/Silicon/holograms.rsi
-      state: ai_horror
-
-- type: stationAiCustomization
   id: StationAiHologramQueen
   name: station-ai-hologram-queen
   previewKey: Hologram

@@ -1,5 +1,5 @@
 - type: entity
-  parent: [DrinkBottleVisualsAll, DrinkBottleGlassSmallBaseFull]
+  parent: [DrinkVisualsAllFilled, DrinkBottleGlassSmallBaseFull]
   id: StrawberryBeer
   name: бутылка пива
   description: "Обычная бутылка пива. На этикетке аккуратным почерком выведено: «Вручено Strawberry»."
@@ -22,7 +22,7 @@
     - Beer
 
 - type: entity
-  parent: [DrinkBottleVisualsAll, DrinkBottleGlassSmallBaseFull]
+  parent: [DrinkVisualsAllFilled, DrinkBottleGlassSmallBaseFull]
   id: Mor5hey97Beer
   name: бутылка пива
   description: "Обычная бутылка пива. На этикетке аккуратным почерком выведено: «Вручено Mor5hey97»."

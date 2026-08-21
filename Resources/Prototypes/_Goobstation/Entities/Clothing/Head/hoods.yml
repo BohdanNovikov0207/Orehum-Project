@@ -53,7 +53,6 @@
   - type: Clothing
     sprite: _CorvaxGoob/Clothing/Head/HereticHoods/rust_hood.rsi # CorvaxGoob
 
-<<<<<<< HEAD
 - type: entity
   parent: ClothingHeadBase
   id: ClothingHeadHatHoodSchemaMonk
@@ -106,5 +105,3 @@
     state: icon
   - type: Clothing
     sprite: _CorvaxGoob/Clothing/Head/HereticHoods/blade_hood.rsi # CorvaxGoob
-=======
->>>>>>> 819ff6845d52b21ce5da31a61760b81c6d1aa75f

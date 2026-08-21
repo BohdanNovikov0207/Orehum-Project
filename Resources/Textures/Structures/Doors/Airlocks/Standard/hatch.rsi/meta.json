@@ -1,11 +1,7 @@
 {
   "version": 1,
   "license": "CC-BY-SA-3.0",
-<<<<<<< HEAD
   "copyright": "Taken from paradise station at commit https://github.com/ParadiseSS13/Paradise/commit/9312f1fb7dcdf1c195e255a528f31092613fb60d Resprite by KREKS",
-=======
-  "copyright": "Taken from Paradise Station 13 at commit https://github.com/ParadiseSS13/Paradise/commit/9312f1fb7dcdf1c195e255a528f31092613fb60d. assembly, closed, closing, open, opening, panel_open modified by K-Dynamic (github).",
->>>>>>> 819ff6845d52b21ce5da31a61760b81c6d1aa75f
   "size": {
     "x": 32,
     "y": 32
@@ -18,40 +14,27 @@
       "name": "bolted_unlit"
     },
     {
-<<<<<<< HEAD
       "name": "bolted_open_unlit"
     },
     {
-=======
->>>>>>> 819ff6845d52b21ce5da31a61760b81c6d1aa75f
       "name": "closed"
     },
     {
       "name": "closed_unlit"
     },
     {
-<<<<<<< HEAD
       "name": "open_unlit"
     },
     {
-=======
->>>>>>> 819ff6845d52b21ce5da31a61760b81c6d1aa75f
       "name": "closing",
       "delays": [
         [
           0.1,
           0.1,
-<<<<<<< HEAD
           0.07,
           0.07,
           0.07,
           0.2
-=======
-          0.1,
-          0.1,
-          0.1,
-          0.1
->>>>>>> 819ff6845d52b21ce5da31a61760b81c6d1aa75f
         ]
       ]
     },
@@ -61,17 +44,10 @@
         [
           0.1,
           0.1,
-<<<<<<< HEAD
           0.07,
           0.07,
           0.07,
           0.2
-=======
-          0.1,
-          0.1,
-          0.1,
-          0.1
->>>>>>> 819ff6845d52b21ce5da31a61760b81c6d1aa75f
         ]
       ]
     },
@@ -83,25 +59,12 @@
           0.1,
           0.1,
           0.1,
-<<<<<<< HEAD
-=======
-          0.1,
->>>>>>> 819ff6845d52b21ce5da31a61760b81c6d1aa75f
           0.1
         ]
       ]
     },
     {
-<<<<<<< HEAD
       "name": "open"
-=======
-      "name": "open",
-      "delays": [
-        [
-          1
-        ]
-      ]
->>>>>>> 819ff6845d52b21ce5da31a61760b81c6d1aa75f
     },
     {
       "name": "opening",
@@ -109,17 +72,10 @@
         [
           0.1,
           0.1,
-<<<<<<< HEAD
           0.07,
           0.07,
           0.07,
           0.2
-=======
-          0.1,
-          0.1,
-          0.1,
-          0.1
->>>>>>> 819ff6845d52b21ce5da31a61760b81c6d1aa75f
         ]
       ]
     },
@@ -129,17 +85,10 @@
         [
           0.1,
           0.1,
-<<<<<<< HEAD
           0.07,
           0.07,
           0.07,
           0.2
-=======
-          0.1,
-          0.1,
-          0.1,
-          0.1
->>>>>>> 819ff6845d52b21ce5da31a61760b81c6d1aa75f
         ]
       ]
     },
@@ -149,59 +98,30 @@
         [
           0.1,
           0.1,
-<<<<<<< HEAD
           0.07,
           0.07,
           0.07,
           0.2
-=======
-          0.1,
-          0.1,
-          0.1,
-          0.1
->>>>>>> 819ff6845d52b21ce5da31a61760b81c6d1aa75f
         ]
       ]
     },
     {
-<<<<<<< HEAD
       "name": "panel_closed"
-=======
-      "name": "panel_open",
-      "delays": [
-        [
-          1
-        ]
-      ]
->>>>>>> 819ff6845d52b21ce5da31a61760b81c6d1aa75f
     },
     {
       "name": "panel_opening",
       "delays": [
         [
-          0.1,
-          0.1,
-<<<<<<< HEAD
-          0.07,
-          0.07,
-          0.07,
-          0.2
+            0.1,
+            0.1,
+            0.1,
+            0.1
         ]
       ]
     },
-
     {
       "name": "panel_open"
     },
-=======
-          0.1,
-          0.1,
-          0.1,
-          0.1
-        ]
-      ]
-    },
->>>>>>> 819ff6845d52b21ce5da31a61760b81c6d1aa75f
     {
       "name": "sparks",
       "delays": [
@@ -224,14 +144,7 @@
           0.1,
           0.1,
           0.1,
-          0.1,
-<<<<<<< HEAD
-          1.7
-=======
-          0.1,
-          0.1,
           0.1
->>>>>>> 819ff6845d52b21ce5da31a61760b81c6d1aa75f
         ]
       ]
     },
@@ -244,12 +157,7 @@
           0.1,
           0.1,
           0.1,
-<<<<<<< HEAD
-          0.1
-=======
-          0.1,
           1.7
->>>>>>> 819ff6845d52b21ce5da31a61760b81c6d1aa75f
         ]
       ]
     },
@@ -273,20 +181,19 @@
       "name": "emergency_unlit",
       "delays": [
         [
-<<<<<<< HEAD
           1.2,
           1.2
         ]
       ]
     },
     {
-      "name": "emergency_open_unlit"
-=======
+      "name": "emergency_open_unlit",
+      "delays": [
+        [
           0.4,
           0.4
         ]
       ]
->>>>>>> 819ff6845d52b21ce5da31a61760b81c6d1aa75f
     }
   ]
 }

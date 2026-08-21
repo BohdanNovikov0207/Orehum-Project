@@ -67,8 +67,6 @@
   name: astral ascended
   description: Transcendant, ascendant.
   components:
-  - type: Puller
-    needsHands: false
   - type: MovementSpeedModifier
     baseWalkSpeed: 6
     baseSprintSpeed: 6
@@ -121,7 +119,6 @@
        enabled: true
        isLooped: true
        reverseWhenFinished: true
-<<<<<<< HEAD
   - type: StatusEffects # Overwriting status effects
     allowed:
     - SlowedDown
@@ -191,7 +188,6 @@
     - ascended_titles
   - type: WeakToHoly # Goobstation Shitchap
     alwaysTakeHoly: true
-=======
 
 - type: entity
   parent: MobCosmicAstralAscended
@@ -269,4 +265,3 @@
       Dead:
         Base: dead
         BaseUnshaded: dead_unshaded
->>>>>>> 819ff6845d52b21ce5da31a61760b81c6d1aa75f

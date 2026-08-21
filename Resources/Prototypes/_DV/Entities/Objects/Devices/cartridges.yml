@@ -1,29 +1,5 @@
 # SPDX-License-Identifier: AGPL-3.0-or-later
 
-<<<<<<< HEAD
-- type: entity
-  parent: BaseItem
-  id: MailMetricsCartridge
-  name: mail metrics cartridge
-  description: A cartridge that tracks statistics related to mail deliveries.
-  components:
-  - type: Sprite
-    sprite: _DV/Objects/Devices/cartridge.rsi
-    state: cart-mail
-  - type: Icon
-    sprite: _DV/Objects/Devices/cartridge.rsi
-    state: cart-mail
-  - type: UIFragment
-    ui: !type:MailMetricUi
-  - type: MailMetricsCartridge
-  - type: Cartridge
-    programName: mail-metrics-program-name
-    icon:
-      sprite: _CorvaxGoob/Interface/Misc/program_icons.rsi # Corvax-Goob-RespriteProgramsIcons
-      state: mailmetrics
-=======
-# Upstreamrr todo <mailfix>
-
 #- type: entity
 #  parent: BaseItem
 #  id: MailMetricsCartridge
@@ -42,9 +18,8 @@
 #  - type: Cartridge
 #    programName: mail-metrics-program-name
 #    icon:
-#      sprite: Nyanotrasen/Objects/Specific/Mail/mail.rsi
-#      state: icon
->>>>>>> 819ff6845d52b21ce5da31a61760b81c6d1aa75f
+#      sprite: _CorvaxGoob/Interface/Misc/program_icons.rsi # Corvax-Goob-RespriteProgramsIcons
+#      state: mailmetrics
 
 - type: entity
   parent: BaseItem

@@ -5,6 +5,7 @@ using Content.Client.Lobby;
 using Content.Client.Stylesheets;
 using Content.Client.UserInterface.Controls;
 using Content.Shared.Humanoid;
+using Content.Shared.Humanoid.Markings;
 using Content.Shared.Humanoid.Prototypes;
 using Content.Shared.Preferences;
 using Content.Shared.Roles;
@@ -14,6 +15,7 @@ using Robust.Client.UserInterface.Controls;
 using Robust.Client.UserInterface.XAML;
 using Robust.Shared.ContentPack;
 using Robust.Shared.Prototypes;
+using Robust.Shared.Random;
 
 namespace Content.Client._Orehum.Lobby.UI;
 
@@ -32,7 +34,9 @@ public sealed partial class SpeciesWindow : FancyWindow
     private readonly IPrototypeManager _proto;
     private readonly LobbyUIController _uIController;
     private readonly IResourceManager _resMan;
-    private readonly DocumentParsingManager _parsingMan;
+    [Dependency] private readonly DocumentParsingManager _parsingMan = default!;
+    [Dependency] private readonly IRobustRandom _random = default!;
+    [Dependency] private readonly ILocalizationManager _loc = default!;
 
     public SpeciesWindow(HumanoidCharacterProfile profile,
                         IPrototypeManager proto,
@@ -106,6 +110,9 @@ public sealed partial class SpeciesWindow : FancyWindow
         SelectSpecies(Profile.Species);
     }
 
+    private string LocOrLiteral(string id)
+        => _loc.TryGetString(id, out var value) ? value : id;
+
     private void AddLabel(string text)
     {
         var container = new BoxContainer()
@@ -116,7 +123,7 @@ public sealed partial class SpeciesWindow : FancyWindow
         var label = new Label()
         {
             Text = text,
-            StyleClasses = { StyleBase.ClassLowDivider },
+            StyleClasses = { "LowDivider" },
             Margin = new(2f, 2f),
             HorizontalAlignment = HAlignment.Center,
         };
@@ -141,70 +148,35 @@ public sealed partial class SpeciesWindow : FancyWindow
             button.Pressed = protoId == button.Proto;
         }
 
-        var jobEntry = Profile.JobPriorities.FirstOrDefault(x => x.Value == JobPriority.High);
         var proto = _proto.Index(protoId);
+        var job = Profile.JobPriorities.Where(x => x.Value == JobPriority.High).First().Key;
         CurrentSpecies = protoId;
-
-            JobPrototype? jobProto = null;
-        var highJob = Profile.JobPriorities.FirstOrDefault(x => x.Value == JobPriority.High);
-        if (!string.IsNullOrEmpty(highJob.Key) && _proto.TryIndex(highJob.Key, out var job))
-            jobProto = job;
 
         var previewProfile = Profile;
         previewProfile = previewProfile.WithSpecies(protoId);
 
+        previewProfile = previewProfile.WithCharacterAppearance(
+            HumanoidCharacterAppearance.EnsureValid(previewProfile.Appearance, protoId, previewProfile.Sex, []));
+
         var skin = proto.SkinColoration;
-        switch (skin)
+        var skinType = _proto.Index(protoId).SkinColoration;
+        var strategy = _proto.Index(skinType).Strategy;
+
+        var newSkinColor = strategy.InputType switch
         {
-            case HumanoidSkinColor.HumanToned:
-                {
-                    var tone = SkinColor.HumanSkinToneFromColor(Profile.Appearance.SkinColor);
-                    var color = SkinColor.HumanSkinTone((int)tone);
+            SkinColorationStrategyInput.Unary => strategy.FromUnary(_random.NextFloat(0f, 100f)),
+            SkinColorationStrategyInput.Color => strategy.ClosestSkinColor(new Color(_random.NextFloat(1), _random.NextFloat(1), _random.NextFloat(1), 1)),
+            _ => strategy.ClosestSkinColor(new Color(_random.NextFloat(1), _random.NextFloat(1), _random.NextFloat(1), 1)),
+        };
 
-                    previewProfile = previewProfile.WithCharacterAppearance(previewProfile.Appearance.WithSkinColor(color));
-                    break;
-                }
-            case HumanoidSkinColor.Hues:
-                {
-                    break;
-                }
-            case HumanoidSkinColor.TintedHues:
-                {
-                    var color = SkinColor.TintedHues(Profile.Appearance.SkinColor);
-
-                    previewProfile = previewProfile.WithCharacterAppearance(previewProfile.Appearance.WithSkinColor(color));
-                    break;
-                }
-            case HumanoidSkinColor.VoxFeathers:
-                {
-                    var color = SkinColor.ClosestVoxColor(Profile.Appearance.SkinColor);
-
-                    previewProfile = previewProfile.WithCharacterAppearance(previewProfile.Appearance.WithSkinColor(color));
-                    break;
-                }
-            case HumanoidSkinColor.NoColor:
-                {
-                    var color = Color.White;
-
-                    previewProfile = previewProfile.WithCharacterAppearance(previewProfile.Appearance.WithSkinColor(color));
-                    break;
-                }
-            case HumanoidSkinColor.AnimalFur:
-                {
-                    var color = SkinColor.ClosestAnimalFurColor(Profile.Appearance.SkinColor);
-
-                    previewProfile = previewProfile.WithCharacterAppearance(previewProfile.Appearance.WithSkinColor(color));
-                    break;
-                }
-        }
-
-        var mob = _uIController.LoadProfileEntity(previewProfile, jobProto, false);
+        var mob = _uIController.LoadProfileEntity(previewProfile, _proto.Index(job), false);  // Раздетый моб
         Mob.SetEntity(mob);
 
-        var loadoutMob = _uIController.LoadProfileEntity(previewProfile, jobProto, true);
+        var loadoutMob = _uIController.LoadProfileEntity(previewProfile, _proto.Index(job), true);    // Моб в одежде должности
         JobLoadout.SetEntity(loadoutMob);
 
         Select.Disabled = Profile.Species == protoId;
+        Select.OnPressed += args => ChooseAction?.Invoke(protoId);
 
         var prosConsContainer = new BoxContainer()
         {
@@ -215,7 +187,7 @@ public sealed partial class SpeciesWindow : FancyWindow
         var prosConsLabel = new RichTextLabel()
         {
             Text = Loc.GetString("ui-species-pros-cons"),
-            StyleClasses = { StyleBase.ClassLowDivider },
+            StyleClasses = { "LowDivider" },
             Margin = new(2f, 2f),
         };
         var separator = new HSeparator()
@@ -243,8 +215,8 @@ public sealed partial class SpeciesWindow : FancyWindow
                 {
                     var label = new RichTextLabel()
                     {
-                        Text = "[color=#13f244]- " + Loc.GetString(item) + "[/color]",
-                        StyleClasses = { StyleBase.ClassLowDivider },
+                        Text = "[color=#13f244]- " + LocOrLiteral(item) + "[/color]",
+                        StyleClasses = { "LowDivider" },
                         Margin = new(4f, 2f),
                     };
                     prosConsContainer.AddChild(label);
@@ -258,8 +230,8 @@ public sealed partial class SpeciesWindow : FancyWindow
                 {
                     var label = new RichTextLabel()
                     {
-                        Text = "- " + Loc.GetString(item),
-                        StyleClasses = { StyleBase.ClassLowDivider },
+                        Text = "- " + LocOrLiteral(item),
+                        StyleClasses = { "LowDivider" },
                         Margin = new(4f, 2f),
                     };
                     prosConsContainer.AddChild(label);
@@ -273,8 +245,8 @@ public sealed partial class SpeciesWindow : FancyWindow
                 {
                     var label = new RichTextLabel()
                     {
-                        Text = "[color=#d63636]- " + Loc.GetString(item) + "[/color]",
-                        StyleClasses = { StyleBase.ClassLowDivider },
+                        Text = "[color=#d63636]- " + LocOrLiteral(item) + "[/color]",
+                        StyleClasses = { "LowDivider" },
                         Margin = new(4f, 2f),
                     };
                     prosConsContainer.AddChild(label);
@@ -286,8 +258,6 @@ public sealed partial class SpeciesWindow : FancyWindow
         if (!proto.Description.HasValue)
             return;
 
-        // Take race descriptions text from .xml files, so we need to find and use the content from the specified file..
-        // Everything works the same way as in the guidebook (yes, you can insert images here)
         using var file = _resMan.ContentFileReadText(proto.Description.Value);
         _parsingMan.TryAddMarkup(DetailInfoContainer, file.ReadToEnd());
     }

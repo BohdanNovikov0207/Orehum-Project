@@ -479,8 +479,6 @@
     sprite: _Goobstation/Clothing/Uniforms/Jumpsuit/Security/security_black.rsi
   - type: Clothing
     sprite: _Goobstation/Clothing/Uniforms/Jumpsuit/Security/security_black.rsi
-<<<<<<< HEAD
-=======
 
 # Golden liaison jumpsuit
 - type: entity
@@ -505,4 +503,3 @@
     sprite: _ShitChap/Clothing/Uniforms/monk.rsi
   - type: Clothing
     sprite: _ShitChap/Clothing/Uniforms/monk.rsi
->>>>>>> 819ff6845d52b21ce5da31a61760b81c6d1aa75f

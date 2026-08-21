@@ -964,13 +964,11 @@ GhostBarSpawner: null
 # 2026-01-18
 DVSmartFridgeMedical: SmartFridgeMedical
 
-<<<<<<< HEAD
 # 2026-01-10 Goobstation Change Mapped Chem to Energy Chem by default
 ChemDispenser: EnergyChemDispenser
 
 # 2026-03-07 Gabystation Change Mapped Bloodpack to CMBloodPackFull by default
 Bloodpack: CMBloodPackFull
-=======
 ## 2026-01-10 Goobstation Change Mapped Chem to Energy Chem by default
 #ChemDispenser: EnergyChemDispenser
 # Edit: this was un-done at some point. wow.
@@ -1020,4 +1018,3 @@ HandheldHealthAnalyzerEmpty: HandheldHealthAnalyzer
 
 #2026-01-09
 BorgModuleAdvancedChemical: BorgModuleAdvancedTopical
->>>>>>> 819ff6845d52b21ce5da31a61760b81c6d1aa75f

@@ -5,7 +5,7 @@ using Robust.Shared.Prototypes;
 
 namespace Content.Goobstation.Client.GhostCosmetics;
 
-public sealed class GhostCosmeticsSystem : EntitySystem
+public sealed class GhostCosmeticsClientSystem : EntitySystem
 {
     [Dependency] private readonly ParticleSystem _particles = default!;
     [Dependency] private readonly IPrototypeManager _prototypes = default!;

@@ -325,18 +325,6 @@
     - WhitelistChameleon
   - type: HideLayerClothing
     layers: {}
-    
-- type: entity
-  parent: ClothingHeadHatHelmetTemplar
-  id: ClothingHeadHatHoodSchemaMonk
-  categories: [ HideSpawnMenu ]
-  name: hood of a monastic vestments
-  description: Comfortable hood of monastic vestment.
-  components:
-  - type: Sprite
-    sprite: _Goobstation/Clothing/Head/Hoods/schema_monk.rsi
-  - type: Clothing
-    sprite: _Goobstation/Clothing/Head/Hoods/schema_monk.rsi
 
 - type: entity
   parent: ClothingHeadHatHelmetTemplar

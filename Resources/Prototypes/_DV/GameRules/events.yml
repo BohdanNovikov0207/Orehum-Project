@@ -48,10 +48,5 @@
     chaosScore: -50
   - type: RandomMultipleSpawnRule
     prototype: CosmicMalignRift
-<<<<<<< HEAD
     minAmount: 2
     maxAmount: 4
-=======
-    minAmount: 1
-    maxAmount: 3
->>>>>>> 819ff6845d52b21ce5da31a61760b81c6d1aa75f

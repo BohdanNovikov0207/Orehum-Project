@@ -9,7 +9,7 @@ using Robust.Shared.Prototypes;
 
 namespace Content.Goobstation.Server.GhostCosmetics;
 
-public sealed class GhostCosmeticsSystem : EntitySystem
+public sealed class GhostCosmeticsServerSystem : EntitySystem
 {
     [Dependency] private readonly LinkAccountManager _linkAccount = default!;
     [Dependency] private readonly IPlayerManager _player = default!;
@@ -18,7 +18,7 @@ public sealed class GhostCosmeticsSystem : EntitySystem
     public override void Initialize()
     {
         SubscribeNetworkEvent<ChangeGhostCosmeticsEvent>(OnChangeCosmetics);
-        SubscribeLocalEvent<GhostComponent, PlayerAttachedEvent>(OnGhostPlayerAttached);
+        SubscribeLocalEvent<PlayerAttachedEvent>(OnPlayerAttached);
 
         _linkAccount.PatronUpdated += OnPatronUpdated;
     }
@@ -45,9 +45,12 @@ public sealed class GhostCosmeticsSystem : EntitySystem
         _linkAccount.SetGhostCosmetics(session.UserId, particles?.ID, hat?.ID, mask?.ID);
     }
 
-    private void OnGhostPlayerAttached(Entity<GhostComponent> ent, ref PlayerAttachedEvent args)
+    private void OnPlayerAttached(PlayerAttachedEvent args)
     {
-        Apply(ent, _linkAccount.GetPatron(args.Player.UserId));
+        if (TryComp<GhostComponent>(args.Entity, out var ghost))
+        {
+            Apply(args.Entity, _linkAccount.GetPatron(args.Player.UserId));
+        }
     }
 
     private void OnPatronUpdated((NetUserId Id, SharedRMCPatronFull Patron) tuple)

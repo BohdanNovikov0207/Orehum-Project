@@ -12,19 +12,6 @@
   components:
   - type: Sprite
     sprite: Objects/Consumable/Drinks/glass_clear.rsi
-<<<<<<< HEAD:Resources/Prototypes/Entities/Objects/Consumable/Drinks/drinks.yml
-    layers:
-      - state: icon
-        map: [ "enum.SolutionContainerLayers.Base" ]
-      - state: fill1
-        map: [ "enum.SolutionContainerLayers.Fill" ]
-        visible: false
-      - state: icon-front
-        map: [ "enum.SolutionContainerLayers.Overlay" ]
-  - type: Appearance
-  - type: Drink # Adventure
-=======
->>>>>>> 819ff6845d52b21ce5da31a61760b81c6d1aa75f:Resources/Prototypes/Entities/Objects/Consumable/Drinks/drinks_metamorphic.yml
   - type: SolutionContainerManager
     solutions:
       drink:

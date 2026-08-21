@@ -424,12 +424,8 @@
     key: enum.RcdUiKey.Key
   - type: Tag
     tags:
-<<<<<<< HEAD
       - DroneUsable # Goobstation
       - RCD
-=======
-    - DroneUsable # Goobstation
->>>>>>> 819ff6845d52b21ce5da31a61760b81c6d1aa75f
 
 - type: entity
   id: RPD

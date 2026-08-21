@@ -8,12 +8,8 @@
   sprites: MobBananaMenSprites
   markingLimits: MobHumanMarkingLimits
   dollPrototype: MobBananaMenDummy
-<<<<<<< HEAD
   skinColoration: NoColor
   category: Special # wtf
-=======
-  skinColoration: TintedHues
->>>>>>> 819ff6845d52b21ce5da31a61760b81c6d1aa75f
 
 - type: speciesBaseSprites
   id: MobBananaMenSprites

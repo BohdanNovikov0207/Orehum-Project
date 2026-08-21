@@ -154,7 +154,6 @@
       head: ClothingHeadHatHoodHereticCostume
 
 - type: entity
-<<<<<<< HEAD
   parent: ClothingOuterBaseToggleable
   id: ClothingOuterSchemaMonk
   name: monastic vestments
@@ -234,8 +233,6 @@
       NerveDamage: 0.0
 
 - type: entity
-=======
->>>>>>> 819ff6845d52b21ce5da31a61760b81c6d1aa75f
   parent: [ClothingOuterBaseLarge, AllowSuitStorageClothing, BaseMajorContraband]
   id: ClothingOuterBrassArmor
   name: brass armor

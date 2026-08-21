@@ -12,12 +12,7 @@
 
 let
   dependencies = with pkgs; [
-<<<<<<< HEAD
-    dotnetCorePackages.sdk_9_0
-    dotnet-ef
-=======
     dotnet-sdk_10
->>>>>>> 819ff6845d52b21ce5da31a61760b81c6d1aa75f
     icu
     glfw
     libGL
