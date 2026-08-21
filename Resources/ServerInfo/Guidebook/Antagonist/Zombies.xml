@@ -28,29 +28,8 @@ SPDX-License-Identifier: AGPL-3.0-or-later
 
   ## Лечение
 
-<<<<<<< HEAD
   - Если вы уже зомбированы, единственное лекарство - смерть.
   - Если вы еще не зомбированы, использование [color=#a4885c]Амбузола[/color] остановит инфекцию, чтобы не допустить вашей своевременной гибели, но вы всё равно можете заразиться снова, если будете не слишком осторожны. [color=#a4885c]Амбузол Плюс[/color] будет предотвращать заражение постоянно, только пока вы живы.
-=======
-  The undead can also chomp on a crit or dead body to [bold]instantly convert[/bold] it to a zombie.
-
-  ## Zombie Attributes
-  A zombie can be identified by dark green skin, red eyes, slow movement, rotting smell, and lack of motor functions. They'll drop their headset and gloves upon turning, and cuffs don't work against their vicious bite.
-
-  Zombies are known for their [bold]resilience to slashes, bruises, poison and cold.[/bold] They can survive in a vacuum and do not require food, water, air, or sleep. The undead do, however, [italic]take increased burn and shock damage.[/italic]
-
-  ## Survival
-  When the infection sweeps and [color=#cb0000]Security[/color] falls, it's up to the [bold]survivors[/bold] to try and make it to Central Command.
-
-  [bold]Constructing barricades[/bold] around departments or [bold]bolting doors[/bold] can buy enough time to make weapons, save lives or make a plan.
-
-  Remember that when it really hits the fan, [italic]you've gotta do what you gotta do[/italic], as long as it's not at the expense of fellow survivors. Scavenge what you need from those who haven't made it.
-
-  ## Cure
-  [bold][color=red]Slain[/color] zombies can be completely cured using [color=#86caf7]Ambuzol[/color] or [color=#1274b5]Ambuzol Plus[/color].[/bold]
-
-  If someone is infected but has not yet turned into a zombie, [color=#86caf7]Ambuzol[/color] can be used to cure the active infection. [color=#1274b5]Ambuzol Plus[/color] can be used to both cure and completely protect you from re-infection!
->>>>>>> 819ff6845d52b21ce5da31a61760b81c6d1aa75f
 
   <Box>
     <GuideReagentEmbed Reagent="Ambuzol"/>

@@ -117,7 +117,7 @@ public sealed partial class GoobCVars
     public static readonly CVarDef<bool> DisablePathfinding =
         CVarDef.Create("goob.disable_pathfinding", false, CVar.SERVER | CVar.SERVERONLY);
 
-  
+
     #region Player Listener
 
     /// <summary>
@@ -286,7 +286,7 @@ public sealed partial class GoobCVars
     #region Goobcoins
 
     public static readonly CVarDef<int> GoobcoinsPerPlayer =
-        CVarDef.Create("servercurrency.per_player", 10, CVar.SERVERONLY);
+        CVarDef.Create("servercurrency.per_player", 50, CVar.SERVERONLY);
 
     public static readonly CVarDef<int> GoobcoinNonAntagMultiplier =
         CVarDef.Create("servercurrency.non_antag_multiplier", 1, CVar.SERVERONLY);
@@ -295,7 +295,7 @@ public sealed partial class GoobCVars
         CVarDef.Create("servercurrency.server_multiplier", 1, CVar.SERVERONLY);
 
     public static readonly CVarDef<int> GoobcoinMinPlayers =
-        CVarDef.Create("servercurrency.min_players", 5, CVar.SERVERONLY);
+        CVarDef.Create("servercurrency.min_players", 3, CVar.SERVERONLY);
 
     public static readonly CVarDef<bool> GoobcoinUseLowpopMultiplier =
         CVarDef.Create("servercurrency.use_lowpop_multiplier", true, CVar.SERVERONLY);
@@ -608,7 +608,7 @@ public sealed partial class GoobCVars
     /// Whether or not to show detailed examine text.
     /// </summary>
     public static readonly CVarDef<bool> DetailedExamine =
-        CVarDef.Create("misc.detailed_examine", true, CVar.CLIENT | CVar.ARCHIVE | CVar.REPLICATED);
+        CVarDef.Create("misc.detailed_examine", false, CVar.CLIENT | CVar.ARCHIVE | CVar.REPLICATED);
 
     /// <summary>
     /// Fire damage

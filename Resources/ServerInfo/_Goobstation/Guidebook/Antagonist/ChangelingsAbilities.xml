@@ -263,21 +263,7 @@ SPDX-License-Identifier: AGPL-3.0-or-later
   - Можно использовать, будучи связанным.
   - Замедляет регенерацию химикатов на 25%.
 
-<<<<<<< HEAD
   ## Запасы адреналина
-=======
-  ## Darkness Adaption
-  <Box>
-    [color=#999999][italic] 4 Evolution Points / 10 Chems [italic][/color]
-  </Box>
-  - While in the dark, you become very translucent and gain night vision.
-  - The translucency cannot be reduced even while moving, attacking or interacting.
-  - Both the translucency and night vision is lost when not shrouded in darkness, or while on fire.
-  - While active and adjusting to the dark, chem regen rate is decreased by 15%.
-  - Can be used while cuffed.
-
-  ## Adrenaline Reserves
->>>>>>> 819ff6845d52b21ce5da31a61760b81c6d1aa75f
   <Box>
     [color=#999999][italic] 4 очка эволюции / 25 химикатов[italic][/color]
   </Box>

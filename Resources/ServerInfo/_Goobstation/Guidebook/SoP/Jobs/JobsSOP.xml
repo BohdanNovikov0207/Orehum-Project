@@ -1,7 +1,3 @@
-<<<<<<< HEAD
-<Document> # Регламент должностей Ниже представлены несколько категорий стандартных процедур (SOP), специфичных для конкретных должностей. Они призваны помочь прояснить различные задачи вашей должности или отдела.<Box> [bold][color=#f0e4b4]Для ясности:[/color][/bold] это не [italic]чек-лист[/italic] для обязательного выполнения. Ими можно пользоваться и в таком формате, но в первую очередь их следует рассматривать как рекомендации. </Box>
-В этом разделе находятся следующие папки:
-=======
 <!--
 SPDX-License-Identifier: AGPL-3.0-or-later
 -->
@@ -22,7 +18,6 @@ The following folders are listed underneath this folder:
 - [textlink="Science Department" link="ScienceSOP"]
 - [textlink="Security Department" link="SecuritySOP"]
 - [textlink="Service Department" link="ServiceSOP"]
->>>>>>> 819ff6845d52b21ce5da31a61760b81c6d1aa75f
 
 [textlink="Отдел снабжения" link="Cargo SOP"]
 [textlink="Отдел командования" link="Command SOP"]
