@@ -326,18 +326,6 @@
   artist: asardonicsailor
 
 - type: lobbyBackground
-  id: lostpai
-  background: /Textures/LobbyScreens/lostpai.webp
-  name: Lost pAI
-  artist: Cattom
-
-- type: lobbyBackground
-  id: enlist-lavaland
-  background: /Textures/LobbyScreens/enlist.webp
-  name: Nanotrasen wants YOU.
-  artist: thebiggestbruh
-
-- type: lobbyBackground
   id: ling-in-my-vents
   background: /Textures/LobbyScreens/sec_theres_ling_in_my_vents.webp
   name: Sec theres ling in my vents
