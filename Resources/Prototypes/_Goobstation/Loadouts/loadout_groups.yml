@@ -1521,6 +1521,7 @@
   - SecurityMeleeKnife
   - SecurityMeleePolyBaton
   - SecurityMeleeSpear
+  - SecurityMeleeTerminus
 
 - type: loadoutGroup
   id: SecurityGloves
