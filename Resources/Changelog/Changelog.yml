@@ -5306,13 +5306,13 @@ Entries:
   id: 9411
   time: '2026-01-16T00:52:35.0000000+00:00'
   url: https://github.com/space-wizards/space-station-14/pull/42445
-- author: ME4TA
+- author: Greizer
   changes:
     - type: Tweak
       message: Прогрузка чанков теперь работают быстрее
   id: 9412
   time: '2026-08-22T06:53:38.0000000+00:00'
-- author: ME4TA
+- author: Greizer
   changes:
     - type: Tweak
       message: Меню хирургии переделана визуально
