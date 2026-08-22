@@ -799,23 +799,6 @@
   - PsychologistEnvirogloves
   - ExclusiveItems
 
-- type: roleLoadout
-  id: JobBoxer
-  groups:
-  - GroupTankHarness
-  - BoxerJumpsuit
-  - BoxerGloves
-  - CommonBackpack
-  - Glasses
-  - Survival
-  - Trinkets
-  - Animals
-  - GroupSpeciesBreathTool
-  # Goobstation - EE Plasmeme Change.
-  - BoxerEnvirohelm
-  - BoxerEnvirosuit
-  - ExclusiveItems
-
 # These loadouts are used for non-crew spawns, like off-station antags and event mobs
 # They will be used without player configuration, thus they will only ever apply what is forced by MinLimit
 

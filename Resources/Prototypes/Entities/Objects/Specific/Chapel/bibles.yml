@@ -26,6 +26,26 @@
     - VelesBookSet
     maxSelectedSets: 1
 
+- type: entity
+  parent: Bible
+  name: Tanakh
+  description: "Choose life, that you and your offspring may live."
+  id: BibleTanakh
+  components:
+  - type: Sprite
+    sprite: _Goobstation/Wizard/Objects/scroll.rsi
+    layers:
+    - state: scroll2
+  - type: Item
+    sprite: _Goobstation/Wizard/Objects/scroll.rsi
+    size: Small
+  - type: MeleeWeapon
+    soundHit:
+      collection: AlienClaw
+    damage:
+      types:
+        Blunt: 3
+
 - type: selectableSet
   id: DruidSet
   name: друидическая табличка
@@ -242,6 +262,29 @@
     sprite: Objects/Specific/Chapel/necronomicon.rsi
   - type: Item
     sprite: Objects/Specific/Chapel/necronomicon.rsi
+
+- type: entity
+  parent: Bible
+  name: сатанинская библия
+  description: "Что может пойти не так?"
+  id: BibleSatanic
+  components:
+  - type: Sprite
+    sprite: Objects/Specific/Chapel/satanicbible.rsi
+  - type: Item
+    sprite: Objects/Specific/Chapel/satanicbible.rsi
+
+
+- type: entity
+  parent: Bible
+  name: Коран
+  description: "Молитвенный коврик в комплект не входит"
+  id: BibleQuran
+  components:
+  - type: Sprite
+    sprite: Objects/Specific/Chapel/quran.rsi
+  - type: Item
+    sprite: Objects/Specific/Chapel/quran.rsi
 
 - type: entity
   parent: BaseAction

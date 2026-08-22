@@ -13,16 +13,6 @@
 
 #Techni
 - type: loadoutGroup
-  id: CargoTechnicianItem
-  name: loadout-group-cargo-technician-item
-  minLimit: 0
-  maxLimit: 2
-  loadouts:
-  - WeaponMailLake
-  - MailCapsulePrimed
-  - MailMetricsCartridge
-
-- type: loadoutGroup
   id: CargoTechnicianBelt
   name: loadout-group-cargo-technician-belt
   minLimit: 0

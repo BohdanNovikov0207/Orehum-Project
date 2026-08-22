@@ -67,6 +67,8 @@
   name: astral ascended
   description: Transcendant, ascendant.
   components:
+  - type: Puller
+    needsHands: false
   - type: MovementSpeedModifier
     baseWalkSpeed: 6
     baseSprintSpeed: 6
@@ -109,85 +111,16 @@
     castShadows: false
   - type: LightBehaviour
     behaviours:
-     - !type:FadeBehaviour
-       interpolate: Linear
-       minDuration: 5.5
-       maxDuration: 5.5
-       startValue: 0.5
-       endValue: 2
-       property: Energy
-       enabled: true
-       isLooped: true
-       reverseWhenFinished: true
-  - type: StatusEffects # Overwriting status effects
-    allowed:
-    - SlowedDown
-    - RadiationProtection
-    - Adrenaline
-  - type: MeleeWeapon
-    hidden: true
-    angle: 90
-    range: 2
-    animation: WeaponArcCosmic
-    attackRate: 1
-    clickDamageModifier: 1
-    damage:
-      types:
-        Slash: 3
-        Asphyxiation: 3
-        Cold: 3
-        Structural: 20
-    soundHit:
-      path: /Audio/_DV/CosmicCult/cosmicsword_hit.ogg
-      params:
-        variation: 0.2
-        volume: -4
-    soundSwing:
-      path: /Audio/_DV/CosmicCult/cosmicweapon_swing.ogg
-      params:
-        variation: 0.125
-        volume: -4
-    soundNoDamage:
-      path: /Audio/_DV/CosmicCult/cosmicsword_glance.ogg
-      params:
-        variation: 0.2
-        volume: -11
-  - type: StaminaDamageOnHit
-    damage: 32
-  - type: Puller
-    needsHands: false
-  - type: MobState
-  - type: MobStateActions
-    actions:
-      Critical:
-      - ActionCritSuccumb
-      - ActionCritLastWords
-  - type: MobThresholds
-    thresholds:
-      0: Alive
-      375: Critical
-      450: Dead
-  - type: SlowOnDamage
-    speedModifierThresholds:
-      225: 0.7
-      375: 0.5
-  - type: Butcherable
-    spawned:
-    - id: AscendedDendrite
-      amount: 1
-  - type: InteractionPopup
-    successChance: 0.25
-    interactSuccessString: petting-success-rogue-ascended
-    interactFailureString: petting-failure-rogue-ascended
-    interactFailureSound:
-      path: /Audio/_DV/CosmicCult/ascendant_noise.ogg
-    soundPerceivedByOthers: false
-  - type: RandomMetadata
-    nameSegments:
-    - ascended_names
-    - ascended_titles
-  - type: WeakToHoly # Goobstation Shitchap
-    alwaysTakeHoly: true
+    - !type:FadeBehaviour
+      interpolate: Linear
+      minDuration: 5.5
+      maxDuration: 5.5
+      startValue: 0.5
+      endValue: 2
+      property: Energy
+      enabled: true
+      isLooped: true
+      reverseWhenFinished: true
 
 - type: entity
   parent: MobCosmicAstralAscended
