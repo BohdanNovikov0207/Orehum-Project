@@ -65,6 +65,12 @@
     - SpearTelescopic
 
 - type: loadout
+  id: SecurityMeleeTerminus
+  storage:
+    back:
+    - Terminus
+
+- type: loadout
   id: SecurityOfficerEnvirosuit
   equipment:
     jumpsuit: ClothingUniformEnvirosuitSec
