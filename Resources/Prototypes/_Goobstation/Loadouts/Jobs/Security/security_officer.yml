@@ -66,6 +66,10 @@
 
 - type: loadout
   id: SecurityMeleeTerminus
+  effects:
+  - !type:SpeciesLoadoutEffect
+    species:
+    - Oni
   storage:
     back:
     - Terminus
