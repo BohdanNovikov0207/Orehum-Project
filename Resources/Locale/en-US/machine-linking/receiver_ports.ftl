@@ -108,3 +108,8 @@ signal-port-description-logic-enable = Only loads the input signal into the memo
 
 signal-port-name-logic-random-input = Input Signal
 signal-port-description-logic-random-input = Receives any signal to trigger a random output.
+
+signal-port-name-vitals-monitor-receiver-med = Medical Bed
+signal-port-description-vitals-monitor-receiver-med = Sending info about patient condition to a Vital Monitor.
+signal-port-name-vitals-monitor-receiver-stasis = Stasis Bed
+signal-port-description-vitals-monitor-receiver-stasis = Sending info about patient condition to a Vital Monitor.

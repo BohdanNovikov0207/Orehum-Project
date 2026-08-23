@@ -333,6 +333,7 @@
     - SharedBoards
     - ShuttleBoardsGoob
     - BluespaceArtilleryBoards # Orehum craft Artillery
+    - ReactorCircuitboards
   - type: MaterialStorage
     whitelist: *StandardMaterialWhitelist
   - type: OreSiloClient

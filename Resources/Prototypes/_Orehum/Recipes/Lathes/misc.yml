@@ -1,0 +1,9 @@
+- type: latheRecipe
+  parent: BaseToolRecipe
+  id: RadiationBlockingProjector
+  result: RadiationBlockingProjector
+  completetime: 8
+  materials:
+    Steel: 300
+    Glass: 100
+    Plastic: 50

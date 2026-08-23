@@ -57,6 +57,7 @@ admin-smite-ghostkick-name = Кик втихаря
 admin-smite-nyanify-name = НЯфикация
 admin-smite-kill-sign-name = Знак смерти
 admin-smite-omni-accent-name = Омни-акцент
+admin-smite-become-fuelrod-name = Превратить в топливный стержень
 
 ## Smite descriptions
 
@@ -106,6 +107,7 @@ admin-smite-omni-accent-description = Заставляет цель говори
 admin-smite-crawler-description = Заставляет цель упасть и лишает возможности подняться. Для лучшего эффекта также удаляет руки!
 admin-smite-super-bonk-lite-description = Заставляет цель удариться о каждый стол на станции и за её пределами. Прекращает действовать после смерти цели.
 admin-smite-hell-teleport-description = Телепортирует объект в Ад.
+admin-smite-become-fuelrod-description = Превращает цель в топливный стержень для ядерного реактора.
 
 ## Tricks descriptions
 
