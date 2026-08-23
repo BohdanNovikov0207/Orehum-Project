@@ -10,29 +10,8 @@
 # Technician
 
 # Item
-- type: loadout
-  id: WeaponMailLake
-  storage:
-    back:
-    - WeaponMailLake
-
-- type: loadout
-  id: MailCapsulePrimed
-  storage:
-    back:
-    - BoxMailCapsulePrimed
-
-- type: loadout
-  id: MailMetricsCartridge
-  storage:
-    back:
-    - MailMetricsCartridge
 
 # Backpack
-- type: loadout
-  id: CargoTechnicianMessengerMailman
-  equipment:
-    back: ClothingBackpackMessengerMailman
 
 # Belt
 - type: loadout

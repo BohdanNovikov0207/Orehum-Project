@@ -245,7 +245,6 @@
     - type: Climbing
     - type: StandingState
     - type: MindContainer
-      showExamineInfo: true
     - type: CanEscapeInventory
     - type: HumanoidAppearance
       species: IPC
