@@ -166,7 +166,7 @@ public sealed partial class NuclearReactorComponent : Component
     /// Alert level to set after meltdown
     /// </summary>
     [DataField]
-    public string MeltdownAlertLevel = "yellow";
+    public string MeltdownAlertLevel = "enigma";
 
     /// <summary>
     /// The minimum radiation from the melted reactor
