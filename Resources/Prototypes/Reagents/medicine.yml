@@ -1868,6 +1868,9 @@
       - !type:AdjustReagent
         reagent: MindbreakerToxin
         amount: -3.0
+      - !type:AdjustReagent
+        reagent: Phenylpiperidine
+        amount: -3.0
 
 - type: reagent
   id: Warfarin

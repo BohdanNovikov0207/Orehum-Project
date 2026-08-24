@@ -498,6 +498,8 @@
     spawned:
     - id: FoodMeat
       amount: 3
+    - id: PhenylpiperidineSolidified
+      amount: 1
   - type: LanguageKnowledge # Einstein Engines - Language
     speaks:
     - Dog
