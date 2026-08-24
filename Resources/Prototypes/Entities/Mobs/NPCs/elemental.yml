@@ -416,6 +416,7 @@
       - id: ReagentSlimeNorepinephricAcid
       - id: ReagentSlimeEphedrine
       - id: ReagentSlimeRobustHarvest
+      - id: ReagentSlimePhenylpiperidine
 
 - type: entity
   id: ReagentSlimeBeer

@@ -1,0 +1,14 @@
+- type: entity
+  id: ChemistryBottlePhenylpiperidine
+  suffix: phenylpiperidine
+  parent: BaseChemistryBottleFilled
+  components:
+  - type: Label
+    currentLabel: reagent-name-phenylpiperidine
+  - type: SolutionContainerManager
+    solutions:
+      drink:
+        maxVol: 30
+        reagents:
+        - ReagentId: Phenylpiperidine
+          Quantity: 30
