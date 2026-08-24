@@ -36,8 +36,6 @@
         - !type:ReagentCondition
           reagent: Phenylpiperidine
           max: 4.99
-        - !type:MetabolizerTypeCondition
-          type: [ Cyclorite ]
         reagent: Phenylpiperidine
         amount: -0.1
     Narcotic:
@@ -115,7 +113,5 @@
         - !type:ReagentCondition
           reagent: Phenylpiperidine
           min: 5.01
-        - !type:MetabolizerTypeCondition
-          type: [ Cyclorite ]
         reagent: Phenylpiperidine
         amount: 0.1
