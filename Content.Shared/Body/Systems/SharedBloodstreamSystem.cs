@@ -502,23 +502,22 @@ public abstract partial class SharedBloodstreamSystem : EntitySystem
             return false;
 
         referenceFactor = Math.Clamp(referenceFactor, 0f, ent.Comp.MaxVolumeModifier);
-        var ratio = amount / ent.Comp.BloodReferenceSolution.Volume;
 
         foreach (var (referenceReagent, referenceQuantity) in ent.Comp.BloodReferenceSolution)
         {
-            var error = referenceQuantity * referenceFactor - bloodSolution.GetTotalPrototypeQuantity(referenceReagent.Prototype);
-            var adjustedAmount = referenceQuantity * ratio;
+            var targetQuantity = referenceQuantity * referenceFactor;
+            var currentQuantity = bloodSolution.GetTotalPrototypeQuantity(referenceReagent.Prototype);
+            var error = targetQuantity - currentQuantity;
 
             if (error > 0)
             {
-                error = FixedPoint2.Min(error, adjustedAmount);
-                bloodSolution.AddReagent(referenceReagent, error);
+                var toAdd = FixedPoint2.Min(error, amount);
+                bloodSolution.AddReagent(referenceReagent, toAdd);
             }
             else if (error < 0)
             {
-                // invert the error since we're removing reagents...
-                error = FixedPoint2.Min( -error, adjustedAmount);
-                bloodSolution.RemoveReagent(referenceReagent, error);
+                var toRemove = FixedPoint2.Min(-error, amount);
+                bloodSolution.RemoveReagent(referenceReagent, toRemove);
             }
         }
 
